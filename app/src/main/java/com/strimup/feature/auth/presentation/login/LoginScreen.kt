@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,13 +24,12 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.R
+import com.strimup.common.ui.component.CustomTextField
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.home.presentation.component.Social
@@ -100,26 +97,18 @@ fun LoginScreen(
                 },
             )
 
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+            CustomTextField(
                 value = emailValue,
                 onValueChange = onEmailChange,
-                label = { Text("Identifiant") },
-                colors = customTextFieldColors,
-                singleLine = true
+                label = "Email",
+                isPassword = false,
             )
 
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            CustomTextField(
                 value = passwordValue,
                 onValueChange = onPasswordChange,
-                label = { Text("Mot de passe") },
-                colors = customTextFieldColors,
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                label = "Mot de passe",
+                isPassword = true,
             )
 
             TextButton(

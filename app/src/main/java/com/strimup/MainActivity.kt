@@ -25,7 +25,12 @@ class MainActivity : ComponentActivity() {
                         emailValue = "",
                         onEmailChange = {},
                         passwordValue = "",
-                        onPasswordChange = {}
+                        onPasswordChange = {},
+                        onForgetPasswordClick = {},
+                        onLoginClick = {},
+                        onRegisterClick = {},
+
+
                     )
 
             }
