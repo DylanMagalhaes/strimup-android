@@ -23,6 +23,7 @@ fun CustomTextField(
     onValueChange: (String) -> Unit,
     label: String,
     isPassword: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val customTextFieldColors = TextFieldDefaults.colors(
         focusedContainerColor = Color.Transparent,
@@ -41,7 +42,7 @@ fun CustomTextField(
     )
 
     OutlinedTextField(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         value = value,
@@ -67,11 +68,11 @@ fun CustomTextField(
 private fun CustomTextFieldPreview() {
     StrimupTheme {
         CustomTextField(
+            modifier = Modifier,
             value = "",
             onValueChange = {},
             label = "Mot de passe",
             isPassword = true,
-
         )
     }
 }

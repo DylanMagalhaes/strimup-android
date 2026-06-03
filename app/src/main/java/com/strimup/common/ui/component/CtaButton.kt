@@ -14,10 +14,10 @@ import com.strimup.common.ui.theme.StrimupTheme
 @Composable
 fun CtaButton(
     label : String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onButtonClick: () -> Unit,
 
-) {
+    ) {
     Button(
         modifier = modifier
             .fillMaxWidth(),
@@ -38,8 +38,6 @@ private fun CtaButtonPreview() {
         CtaButton(
             onButtonClick = {},
             label = "Entrer",
-            modifier = Modifier
-
         )
     }
 }
