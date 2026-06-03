@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,6 +28,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.R
+import com.strimup.common.ui.component.CtaButton
 import com.strimup.common.ui.component.CustomTextField
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
@@ -122,17 +122,12 @@ fun LoginScreen(
                 )
             }
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                onClick = onLoginClick,
-            ) {
-                Text(
-                    text = "Entrer",
-                    fontFamily = zalandoFontFamily,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+            CtaButton(
+                modifier = Modifier,
+                label = "Entrer",
+                onButtonClick = onLoginClick,
+
+            )
 
             Row(
                 modifier = Modifier
