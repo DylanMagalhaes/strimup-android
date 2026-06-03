@@ -1,0 +1,104 @@
+package com.strimup.feature.home.presentation.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.common.ui.theme.zalandoFontFamily
+
+@Composable
+fun StreamerCard(
+    pseudo: String,
+    socials: List<Social>,
+    saved: Boolean,
+    modifier: Modifier = Modifier,
+    onFavoriteClick: () -> Unit,
+    onSocialClick: (Social) -> Unit
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+                .padding(start = 16.dp, end = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(Color.White)
+                    .size(48.dp)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Text(
+                    text = pseudo,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontFamily = zalandoFontFamily,
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Bold,
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    socials.forEach {
+                        SocialIconButton(
+                            social = it,
+                            onClick = onSocialClick
+                        )
+                    }
+                }
+            }
+
+            FavoriteIconButton(
+                saved = saved,
+                onClick = onFavoriteClick,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun StreamerCardPreview() {
+    StrimupTheme {
+        StreamerCard(
+            modifier = Modifier.fillMaxWidth(),
+            pseudo = "Mello",
+            socials = listOf(Social.Twitch, Social.Instagram, Social.Youtube),
+            saved = false,
+            onSocialClick = {},
+            onFavoriteClick = {},
+        )
+    }
+}
