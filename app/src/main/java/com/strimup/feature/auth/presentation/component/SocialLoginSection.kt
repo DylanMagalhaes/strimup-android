@@ -12,15 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.strimup.common.ui.component.button.Social
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.feature.home.domain.entity.StreamerEntity
 
+/*
 @Composable
 fun SocialLoginSection(
+    socials: List<StreamerEntity.Social>,
     modifier: Modifier = Modifier,
-    onSocialClick: (Social) -> Unit,
+    onSocialClick: (StreamerEntity.Social) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -52,8 +54,8 @@ fun SocialLoginSection(
 
         SocialIconButton(
             modifier = Modifier.size(56.dp),
-            social = Social.Twitch,
-            onClick = onSocialClick
+            iconRes =,
+            onClick = { onSocialClick(TODO()) }
         )
     }
 }
@@ -63,7 +65,7 @@ fun SocialLoginSection(
 private fun SocialLoginSectionPreview() {
     StrimupTheme {
         SocialLoginSection(
-            onSocialClick = {}
         )
     }
 }
+*/

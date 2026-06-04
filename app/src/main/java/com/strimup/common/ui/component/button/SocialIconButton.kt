@@ -1,8 +1,7 @@
 package com.strimup.common.ui.component.button
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -17,54 +16,40 @@ import androidx.compose.ui.unit.dp
 import com.strimup.R
 import com.strimup.common.ui.theme.StrimupTheme
 
-enum class Social(val drawableRes: Int) {
-    Twitch(drawableRes = R.drawable.ic_twitch),
-    Youtube(drawableRes = R.drawable.ic_youtube),
-    Kick(drawableRes = R.drawable.ic_kick),
-    TikTok(drawableRes = R.drawable.ic_tiktok),
-    Instagram(drawableRes = R.drawable.ic_instagram),
-}
-
-@Composable
-fun SocialIconButton(
-    social: Social,
+@Composable fun SocialIconButton(
+    @DrawableRes iconRes: Int,
     modifier: Modifier = Modifier,
-    onClick: (Social) -> Unit,
+    onClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(12.dp)
     IconButton(
         modifier = modifier
-            .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = shape)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = shape
+            )
             .size(36.dp),
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         shape = shape,
-        onClick = { onClick(social) },
+        onClick = onClick,
     ) {
         Icon(
             modifier = Modifier.size(14.dp),
-            painter = painterResource(social.drawableRes),
+            painter = painterResource(iconRes),
             contentDescription = null,
         )
     }
 }
 
-@Preview
-@Composable
-private fun SocialIconButtonPreview() {
+@Preview @Composable private fun SocialIconButtonPreview() {
     StrimupTheme {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Social.entries
-                .forEach { socialIcon ->
-                    SocialIconButton(
-                        social = socialIcon,
-                        onClick = {},
-                    )
-                }
-        }
+        SocialIconButton(
+            iconRes = R.drawable.ic_twitch,
+            onClick = {},
+        )
     }
 }

@@ -27,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.R
 import com.strimup.common.ui.component.button.PrimaryButton
-import com.strimup.common.ui.component.button.Social
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.textfield.StrimupTextField
 import com.strimup.common.ui.theme.StrimupTheme
@@ -135,10 +134,6 @@ fun LoginScreen(
 
             }
 
-            SocialIconButton(
-                modifier = Modifier.size(56.dp),
-                social = Social.Twitch,
-            ) { }
 
 
 

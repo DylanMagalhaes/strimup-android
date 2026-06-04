@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // Hilt
+    implementation(libs.hilt.viewmodel.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 

@@ -35,12 +35,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.common.ui.component.button.PrimaryButton
-import com.strimup.common.ui.component.button.Social
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.component.textfield.StrimupTextField
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.auth.presentation.component.SocialLoginSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +65,6 @@ fun RegisterScreen(
     isConfirmPasswordVisible: Boolean,
     onConfirmPasswordVisibleChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    onSocialClick: (Social) -> Unit,
 ) {
     Surface(
         modifier = modifier,
@@ -204,9 +201,6 @@ fun RegisterScreen(
 
             VerticalSpacer(8.dp)
 
-            SocialLoginSection(
-                onSocialClick = onSocialClick
-            )
         }
     }
 }
@@ -228,7 +222,6 @@ private fun RegisterScreenPreview() {
             onDateDropDownExpendedChange = {},
             isSexDropDownExpended = false,
             onSexDropDownExpendedChange = {},
-            onSocialClick = {},
             sexValue = "Homme",
             onSexValueChange = {},
             onDateTextValueChange = {},

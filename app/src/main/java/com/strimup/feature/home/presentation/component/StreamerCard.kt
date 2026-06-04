@@ -21,19 +21,21 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.strimup.common.ui.component.button.Social
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.feature.home.domain.entity.StreamerEntity.Social
+import com.strimup.feature.home.domain.entity.StreamerEntity.Social.Type
+import com.strimup.feature.home.presentation.mapper.getIconRes
 
 @Composable
 fun StreamerCard(
     pseudo: String,
     socials: List<Social>,
     saved: Boolean,
-    modifier: Modifier = Modifier,
     onFavoriteClick: () -> Unit,
-    onSocialClick: (Social) -> Unit
+    onSocialClick: (Social) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier,
@@ -73,10 +75,10 @@ fun StreamerCard(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    socials.forEach {
+                    socials.forEach { social ->
                         SocialIconButton(
-                            social = it,
-                            onClick = onSocialClick
+                            iconRes = social.getIconRes(),
+                            onClick = { onSocialClick(social) }
                         )
                     }
                 }
@@ -97,7 +99,7 @@ private fun StreamerCardPreview() {
         StreamerCard(
             modifier = Modifier.fillMaxWidth(),
             pseudo = "Mello",
-            socials = listOf(Social.Twitch, Social.Instagram, Social.Youtube),
+            socials = listOf(Social(url = "", type = Type.Instagram)),
             saved = false,
             onSocialClick = {},
             onFavoriteClick = {},

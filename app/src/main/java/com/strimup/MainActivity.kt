@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.home.presentation.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,16 +16,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             StrimupTheme {
-                LoginScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    emailValue = "",
-                    onEmailChange = {},
-                    passwordValue = "",
-                    onPasswordChange = {},
-                    onForgetPasswordClick = {},
-                    onLoginClick = {},
-                    onRegisterClick = {},
-                )
+                HomeScreen(modifier = Modifier.fillMaxSize())
             }
         }
     }
