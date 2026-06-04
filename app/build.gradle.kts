@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -50,10 +53,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.compose.material.icons)
 
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    // Convertisseur Gson ou Serialization (pour transformer le JSON en objets Kotlin)
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    // Retrofit + Kotlin Serialization
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
