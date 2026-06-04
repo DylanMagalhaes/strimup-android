@@ -1,27 +1,23 @@
-package com.strimup.common.ui.component
+package com.strimup.common.ui.component.button
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.ui.text.font.FontWeight
-import com.strimup.common.ui.theme.zalandoFontFamily
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-
 import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.common.ui.theme.zalandoFontFamily
 
 @Composable
-fun CtaButton(
-    label : String,
+fun PrimaryButton(
+    label: String,
     modifier: Modifier = Modifier,
-    onButtonClick: () -> Unit,
-
-    ) {
+    onClick: () -> Unit,
+) {
     Button(
-        modifier = modifier
-            .fillMaxWidth(),
-        onClick = onButtonClick,
+        modifier = modifier,
+        onClick = onClick,
     ) {
         Text(
             text = label,
@@ -33,10 +29,10 @@ fun CtaButton(
 
 @Preview
 @Composable
-private fun CtaButtonPreview() {
+private fun PrimaryButtonPreview() {
     StrimupTheme {
-        CtaButton(
-            onButtonClick = {},
+        PrimaryButton(
+            onClick = {},
             label = "Entrer",
         )
     }

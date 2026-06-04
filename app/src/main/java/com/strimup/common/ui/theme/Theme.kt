@@ -14,7 +14,6 @@ fun StrimupTheme(
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 32.dp) {
         MaterialTheme(
             colorScheme = DarkColorScheme,
-            typography = Typography,
             content = content
         )
     }

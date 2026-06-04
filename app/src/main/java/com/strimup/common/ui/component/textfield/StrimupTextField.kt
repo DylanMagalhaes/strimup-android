@@ -1,4 +1,4 @@
-package com.strimup.common.ui.component
+package com.strimup.common.ui.component.textfield
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,28 +18,30 @@ import androidx.compose.ui.unit.dp
 import com.strimup.common.ui.theme.StrimupTheme
 
 @Composable
-fun CustomTextField(
+fun StrimupTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    isPassword: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isPassword: Boolean = false,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
-    val customTextFieldColors = TextFieldDefaults.colors(
-        focusedContainerColor = Color.Transparent,
-        unfocusedContainerColor = Color.Transparent,
+    val customTextFieldColors =
+        TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
 
-        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-        unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-        errorIndicatorColor = MaterialTheme.colorScheme.error,
+            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+            errorIndicatorColor = MaterialTheme.colorScheme.error,
 
-        focusedLabelColor = MaterialTheme.colorScheme.primary,
-        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-        errorLabelColor = MaterialTheme.colorScheme.error,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+            errorLabelColor = MaterialTheme.colorScheme.error,
 
-        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
-    )
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+        )
 
     OutlinedTextField(
         modifier = modifier
@@ -50,6 +52,7 @@ fun CustomTextField(
         label = { Text(label) },
         colors = customTextFieldColors,
         singleLine = true,
+        trailingIcon = trailingIcon,
         keyboardOptions = if (isPassword) {
             KeyboardOptions(keyboardType = KeyboardType.Password)
         } else {
@@ -65,9 +68,9 @@ fun CustomTextField(
 
 @Preview
 @Composable
-private fun CustomTextFieldPreview() {
+private fun StrimupTextFieldPreview() {
     StrimupTheme {
-        CustomTextField(
+        StrimupTextField(
             modifier = Modifier,
             value = "",
             onValueChange = {},

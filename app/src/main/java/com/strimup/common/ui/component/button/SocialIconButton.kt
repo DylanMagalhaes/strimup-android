@@ -1,4 +1,4 @@
-package com.strimup.feature.home.presentation.component
+package com.strimup.common.ui.component.button
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement

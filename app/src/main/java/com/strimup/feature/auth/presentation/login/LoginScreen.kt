@@ -13,11 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -28,12 +26,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.R
-import com.strimup.common.ui.component.CtaButton
-import com.strimup.common.ui.component.CustomTextField
+import com.strimup.common.ui.component.button.PrimaryButton
+import com.strimup.common.ui.component.button.Social
+import com.strimup.common.ui.component.button.SocialIconButton
+import com.strimup.common.ui.component.textfield.StrimupTextField
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.home.presentation.component.Social
-import com.strimup.feature.home.presentation.component.SocialIconButton
 
 @Composable
 fun LoginScreen(
@@ -47,7 +45,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Column(
@@ -81,14 +79,13 @@ fun LoginScreen(
                 },
             )
 
-            CustomTextField(
+            StrimupTextField(
                 value = emailValue,
                 onValueChange = onEmailChange,
                 label = "Email",
-                isPassword = false,
             )
 
-            CustomTextField(
+            StrimupTextField(
                 value = passwordValue,
                 onValueChange = onPasswordChange,
                 label = "Mot de passe",
@@ -106,11 +103,10 @@ fun LoginScreen(
                 )
             }
 
-            CtaButton(
-                modifier = Modifier,
-                label = "Entrer",
-                onButtonClick = onLoginClick,
-
+            PrimaryButton(
+                modifier = Modifier.fillMaxWidth(),
+                label = "Se connecter",
+                onClick = onLoginClick,
             )
 
             Row(
@@ -144,24 +140,19 @@ fun LoginScreen(
                 social = Social.Twitch,
             ) { }
 
-            Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = "Pas encore de compte ?",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                    )
 
-                    TextButton(
-                        onClick = onRegisterClick,
-                    ) {
-                        Text(text = "S'inscrire maintenant")
-                    }
-                }
+
+            Text(
+                text = "Pas encore de compte ?",
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+            )
+
+            TextButton(
+                onClick = onRegisterClick,
+            ) {
+                Text(text = "S'inscrire maintenant")
             }
+
         }
     }
 }
