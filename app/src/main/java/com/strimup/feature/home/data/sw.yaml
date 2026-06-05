@@ -1,0 +1,1686 @@
+openapi: 3.0.3
+info:
+  title: Strimup API
+  version: 1.0.0
+  description: |
+    API REST du backend Strimup (Express.js / PostgreSQL).
+
+    **Authentification** : deux méthodes acceptées en parallèle :
+    - Cookie HTTP-only `strimup_at` (access token JWT) posé automatiquement par le serveur.
+    - Header `Authorization: Bearer <token>` pour les clients qui ne gèrent pas les cookies.
+
+    **Rate limiting** : 300 req/15 min global sur `/api`. Les routes d'auth ont des limites plus strictes (10-20 req/15 min).
+
+servers:
+  - url: http://localhost:4000/api
+    description: Développement local
+  - url: https://api.strimup.com/api
+    description: Production
+
+tags:
+  - name: Auth
+    description: Authentification, inscription, OAuth Twitch
+  - name: Streamer
+    description: Profils streamers, recherche, matching
+  - name: Tag
+    description: Tags / catégories
+  - name: Favorites
+    description: Favoris de l'utilisateur
+  - name: Filters
+    description: Filtres sauvegardés
+  - name: Notifications
+    description: Notifications utilisateur
+  - name: Admin
+    description: Administration (rôle admin requis)
+  - name: Beta
+    description: Accès bêta / whitelist IP
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: strimup_at
+      description: JWT access token posé automatiquement après login/register.
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Une erreur est survenue"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 42
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        pseudo:
+          type: string
+          example: monStreamer
+        role:
+          type: string
+          enum: [streamer, advertiser, admin]
+          example: streamer
+        birth_date:
+          type: string
+          format: date
+          example: "1998-05-12"
+          nullable: true
+        gender:
+          type: string
+          enum: [male, female, other]
+          nullable: true
+        twitch_id:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    AuthResult:
+      type: object
+      properties:
+        message:
+          type: string
+        token:
+          type: string
+          description: JWT access token (aussi posé en cookie strimup_at)
+        user:
+          $ref: '#/components/schemas/User'
+
+    StreamerProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        pseudo:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        avatar_url:
+          type: string
+          nullable: true
+        twitch_url:
+          type: string
+          nullable: true
+        youtube_url:
+          type: string
+          nullable: true
+        twitter_url:
+          type: string
+          nullable: true
+        instagram_url:
+          type: string
+          nullable: true
+        tiktok_url:
+          type: string
+          nullable: true
+        avg_viewers:
+          type: integer
+          nullable: true
+        languages:
+          type: array
+          items:
+            type: string
+          nullable: true
+        frequency:
+          type: string
+          nullable: true
+        is_live:
+          type: boolean
+        live_title:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        videos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Video'
+
+    StreamerSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        pseudo:
+          type: string
+        avatar_url:
+          type: string
+          nullable: true
+        is_live:
+          type: boolean
+        avg_viewers:
+          type: integer
+          nullable: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 7
+        name:
+          type: string
+          example: "FPS"
+        category:
+          type: string
+          example: "e-sport"
+
+    Video:
+      type: object
+      properties:
+        id:
+          type: integer
+        url:
+          type: string
+        title:
+          type: string
+          nullable: true
+
+    PaginatedStreamers:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StreamerSummary'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        message:
+          type: string
+        data:
+          type: object
+          nullable: true
+        read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    SavedFilter:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        filter:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    Announcement:
+      type: object
+      properties:
+        id:
+          type: integer
+        message:
+          type: string
+        data:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    AdminStats:
+      type: object
+      properties:
+        total_users:
+          type: integer
+        total_streamers:
+          type: integer
+        total_advertisers:
+          type: integer
+        live_now:
+          type: integer
+        total_tags:
+          type: integer
+
+paths:
+
+  # ─────────────────────────────────────────
+  # AUTH
+  # ─────────────────────────────────────────
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Créer un compte
+      description: |
+        Crée un nouvel utilisateur. Un email de bienvenue est envoyé de façon asynchrone.
+        Les cookies `strimup_at` et `strimup_rt` sont posés en HTTP-only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, role, pseudo]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: "MonMotDePasse123"
+                role:
+                  type: string
+                  enum: [streamer, advertiser]
+                  example: streamer
+                pseudo:
+                  type: string
+                  example: monStreamer
+                birth_date:
+                  type: string
+                  format: date
+                  example: "1998-05-12"
+                gender:
+                  type: string
+                  enum: [male, female, other]
+                siret:
+                  type: string
+                  description: Requis si role = advertiser
+                contact_name:
+                  type: string
+                  description: Nom du contact pour les advertisers
+      responses:
+        '201':
+          description: Compte créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '400':
+          description: Données invalides ou email/pseudo déjà pris
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Connexion par email/mot de passe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: "MonMotDePasse123"
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '401':
+          description: Identifiants incorrects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rafraîchir l'access token
+      description: |
+        Utilise le cookie `strimup_rt` (refresh token) pour émettre un nouveau token d'accès.
+        Repose les deux cookies (`strimup_at` et `strimup_rt`).
+      responses:
+        '200':
+          description: Token rafraîchi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Session expirée ou refresh token invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/issue-refresh:
+    post:
+      tags: [Auth]
+      summary: Émettre un refresh token (après OAuth redirect)
+      description: |
+        Utilisé par le frontend via proxy Vercel après un redirect OAuth Twitch.
+        Nécessite un access token valide (cookie ou header Bearer).
+        Pose les cookies `strimup_at` et `strimup_rt` sur le bon domaine.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cookies posés avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Récupérer l'utilisateur connecté
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Données de l'utilisateur connecté
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Déconnexion
+      description: Révoque le refresh token et efface les cookies d'authentification.
+      responses:
+        '200':
+          description: Déconnecté
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Déconnecté"
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Demander un lien de réinitialisation de mot de passe
+      description: |
+        Envoie un email de réinitialisation si l'email existe.
+        La réponse est identique que l'email existe ou non (anti-énumération).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+      responses:
+        '200':
+          description: Email envoyé (ou adresse inexistante, réponse identique)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Si cet email existe, un lien de réinitialisation a été envoyé."
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Réinitialiser le mot de passe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token:
+                  type: string
+                  description: Token reçu par email
+                  example: "abc123resettoken"
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: "NouveauMotDePasse123"
+      responses:
+        '200':
+          description: Mot de passe modifié
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Mot de passe modifié avec succès."
+        '400':
+          description: Token invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/twitch/login:
+    get:
+      tags: [Auth]
+      summary: Connexion / inscription via Twitch (OAuth redirect)
+      description: Redirige vers la page d'autorisation Twitch. Le navigateur est redirigé, ne retourne pas de JSON.
+      responses:
+        '302':
+          description: Redirection vers Twitch OAuth
+
+  /auth/twitch/link:
+    get:
+      tags: [Auth]
+      summary: Lier un compte Twitch à un compte existant (redirect)
+      description: Redirige vers Twitch pour lier le compte Twitch à l'utilisateur connecté.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: next
+          in: query
+          description: Chemin de redirection après liaison
+          schema:
+            type: string
+            example: "/dashboard"
+      responses:
+        '302':
+          description: Redirection vers Twitch OAuth
+        '401':
+          description: Non authentifié
+
+  /auth/twitch/link-url:
+    get:
+      tags: [Auth]
+      summary: Obtenir l'URL de liaison Twitch (JSON)
+      description: |
+        Retourne l'URL d'autorisation Twitch sous forme JSON au lieu d'effectuer un redirect.
+        Utile pour les clients mobiles ou fetch-based qui ne peuvent pas suivre les redirects avec cookies.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: next
+          in: query
+          schema:
+            type: string
+            example: "/dashboard"
+      responses:
+        '200':
+          description: URL de liaison Twitch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: "https://id.twitch.tv/oauth2/authorize?..."
+        '401':
+          description: Non authentifié
+
+  /auth/twitch/callback:
+    get:
+      tags: [Auth]
+      summary: Callback OAuth Twitch
+      description: |
+        Endpoint de retour après l'autorisation Twitch. Géré automatiquement par Twitch, ne pas appeler directement.
+        - Mode **login** : pose les cookies et redirige vers le front.
+        - Mode **onboarding** : pose un cookie temporaire `strimup_oauth_tmp` et redirige vers la page d'onboarding.
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirection vers le frontend
+        '400':
+          description: Erreur OAuth
+
+  /auth/oauth/complete:
+    post:
+      tags: [Auth]
+      summary: Finaliser l'onboarding OAuth Twitch
+      description: |
+        À appeler après le callback Twitch en mode onboarding (nouvel utilisateur).
+        Lit le cookie temporaire `strimup_oauth_tmp` (ou `tmp` dans le body) pour finaliser la création du compte.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [streamer, advertiser]
+                birth_date:
+                  type: string
+                  format: date
+                  example: "1998-05-12"
+                gender:
+                  type: string
+                  enum: [male, female, other]
+                tmp:
+                  type: string
+                  description: Token OAuth temporaire (alternatif au cookie strimup_oauth_tmp)
+      responses:
+        '200':
+          description: Connexion réussie après onboarding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '400':
+          description: Token temporaire invalide ou données manquantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─────────────────────────────────────────
+  # STREAMER
+  # ─────────────────────────────────────────
+
+  /streamer/options:
+    get:
+      tags: [Streamer]
+      summary: Options disponibles pour le formulaire streamer
+      description: Retourne les listes de valeurs possibles (personnalités, fréquences, tranches de viewers, etc.).
+      responses:
+        '200':
+          description: Options disponibles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  personalities:
+                    type: array
+                    items:
+                      type: string
+                  frequencies:
+                    type: array
+                    items:
+                      type: string
+                  viewer_ranges:
+                    type: array
+                    items:
+                      type: string
+                  languages:
+                    type: array
+                    items:
+                      type: string
+
+  /streamer/search:
+    get:
+      tags: [Streamer]
+      summary: Rechercher des streamers par pseudo
+      parameters:
+        - name: q
+          in: query
+          description: Terme de recherche (pseudo)
+          schema:
+            type: string
+            example: "ninja"
+      responses:
+        '200':
+          description: Liste de streamers correspondants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StreamerSummary'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /streamer/random:
+    get:
+      tags: [Streamer]
+      summary: Obtenir des streamers aléatoires
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: Streamers aléatoires paginés
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStreamers'
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /streamer/match:
+    post:
+      tags: [Streamer]
+      summary: Filtrer / matcher des streamers
+      description: Retourne des streamers correspondant aux critères de filtre fournis (paginé).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: integer
+                  minimum: 1
+                  default: 1
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 50
+                  default: 20
+                filter:
+                  type: object
+                  description: Critères de filtrage
+                  properties:
+                    tags:
+                      type: array
+                      items:
+                        type: integer
+                      description: IDs de tags
+                    languages:
+                      type: array
+                      items:
+                        type: string
+                    frequency:
+                      type: string
+                    avg_viewers_min:
+                      type: integer
+                    avg_viewers_max:
+                      type: integer
+                    is_live:
+                      type: boolean
+      responses:
+        '200':
+          description: Streamers correspondant aux filtres
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStreamers'
+        '400':
+          description: Filtre invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /streamer/{pseudo}:
+    get:
+      tags: [Streamer]
+      summary: Profil public d'un streamer
+      parameters:
+        - name: pseudo
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "monStreamer"
+      responses:
+        '200':
+          description: Profil public du streamer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamerProfile'
+        '404':
+          description: Streamer introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /streamer/update:
+    put:
+      tags: [Streamer]
+      summary: Mettre à jour son profil streamer
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bio:
+                  type: string
+                  nullable: true
+                twitch_url:
+                  type: string
+                  nullable: true
+                youtube_url:
+                  type: string
+                  nullable: true
+                twitter_url:
+                  type: string
+                  nullable: true
+                instagram_url:
+                  type: string
+                  nullable: true
+                tiktok_url:
+                  type: string
+                  nullable: true
+                avg_viewers:
+                  type: integer
+                  nullable: true
+                languages:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                frequency:
+                  type: string
+                  nullable: true
+                tags:
+                  type: array
+                  items:
+                    type: integer
+                  description: IDs des tags à associer
+      responses:
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Profil complété avec succès"
+                  streamer:
+                    $ref: '#/components/schemas/StreamerProfile'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Streamer non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /streamer/avatar:
+    put:
+      tags: [Streamer]
+      summary: Uploader un avatar
+      description: |
+        Upload d'une image de profil (PNG, JPG ou WebP, 5 Mo max).
+        L'image est redimensionnée et stockée (S3 ou disque local selon la config).
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [avatar]
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: Fichier image (png/jpg/webp, max 5 Mo)
+      responses:
+        '200':
+          description: Avatar mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Avatar mis à jour"
+                  avatar_url:
+                    type: string
+                    example: "https://cdn.strimup.com/avatars/42.webp"
+        '400':
+          description: Fichier manquant ou format invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Non authentifié
+
+  /streamer/videos:
+    post:
+      tags: [Streamer]
+      summary: Ajouter une vidéo au profil
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url:
+                  type: string
+                  example: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                title:
+                  type: string
+                  nullable: true
+                  example: "Ma meilleure game"
+      responses:
+        '201':
+          description: Vidéo ajoutée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Vidéo ajoutée avec succès"
+                  video:
+                    $ref: '#/components/schemas/Video'
+        '401':
+          description: Non authentifié
+        '500':
+          description: Erreur serveur
+
+  /streamer/videos/{videoId}:
+    delete:
+      tags: [Streamer]
+      summary: Supprimer une vidéo du profil
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: videoId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 15
+      responses:
+        '200':
+          description: Vidéo supprimée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Vidéo supprimée avec succès"
+        '400':
+          description: Vidéo introuvable ou non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Non authentifié
+
+  # ─────────────────────────────────────────
+  # TAG
+  # ─────────────────────────────────────────
+
+  /tag:
+    get:
+      tags: [Tag]
+      summary: Lister tous les tags
+      responses:
+        '200':
+          description: Liste de tous les tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+
+  # ─────────────────────────────────────────
+  # FAVORITES
+  # ─────────────────────────────────────────
+
+  /favorites:
+    get:
+      tags: [Favorites]
+      summary: Lister les favoris de l'utilisateur
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des streamers en favoris
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StreamerSummary'
+        '401':
+          description: Non authentifié
+
+  /favorites/{streamerId}:
+    post:
+      tags: [Favorites]
+      summary: Ajouter un streamer aux favoris
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: streamerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 7
+      responses:
+        '201':
+          description: Ajouté aux favoris
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Ajouté aux favoris"
+        '401':
+          description: Non authentifié
+        '500':
+          description: Erreur serveur
+
+    delete:
+      tags: [Favorites]
+      summary: Retirer un streamer des favoris
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: streamerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 7
+      responses:
+        '200':
+          description: Retiré des favoris
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Retiré des favoris"
+        '401':
+          description: Non authentifié
+
+  # ─────────────────────────────────────────
+  # FILTERS (saved filters)
+  # ─────────────────────────────────────────
+
+  /filters:
+    get:
+      tags: [Filters]
+      summary: Lister les filtres sauvegardés
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des filtres sauvegardés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedFilter'
+        '401':
+          description: Non authentifié
+
+    post:
+      tags: [Filters]
+      summary: Créer un filtre sauvegardé
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, filter]
+              properties:
+                name:
+                  type: string
+                  example: "FPS francophones"
+                filter:
+                  type: object
+                  description: Critères du filtre (même structure que POST /streamer/match filter)
+                  example:
+                    tags: [3, 7]
+                    languages: ["fr"]
+      responses:
+        '201':
+          description: Filtre créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedFilter'
+        '400':
+          description: Données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Non authentifié
+
+  /filters/{id}:
+    delete:
+      tags: [Filters]
+      summary: Supprimer un filtre sauvegardé
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 3
+      responses:
+        '200':
+          description: Filtre supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Filtre supprimé"
+        '400':
+          description: Filtre introuvable ou non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Non authentifié
+
+  # ─────────────────────────────────────────
+  # NOTIFICATIONS
+  # ─────────────────────────────────────────
+
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Lister les notifications (paginées)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Notifications paginées
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  total:
+                    type: integer
+        '401':
+          description: Non authentifié
+
+  /notifications/unread-count:
+    get:
+      tags: [Notifications]
+      summary: Nombre de notifications non lues
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Compteur de notifications non lues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 3
+        '401':
+          description: Non authentifié
+
+  /notifications/read-all:
+    post:
+      tags: [Notifications]
+      summary: Marquer toutes les notifications comme lues
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Toutes les notifications marquées comme lues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ok"
+        '401':
+          description: Non authentifié
+
+  /notifications/{id}/read:
+    post:
+      tags: [Notifications]
+      summary: Marquer une notification comme lue
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 12
+      responses:
+        '200':
+          description: Notification marquée comme lue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ok"
+        '401':
+          description: Non authentifié
+
+  /notifications/{id}:
+    delete:
+      tags: [Notifications]
+      summary: Supprimer une notification
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 12
+      responses:
+        '200':
+          description: Notification supprimée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ok"
+        '401':
+          description: Non authentifié
+
+  # ─────────────────────────────────────────
+  # ADMIN
+  # ─────────────────────────────────────────
+
+  /admin/stats:
+    get:
+      tags: [Admin]
+      summary: Statistiques générales de la plateforme
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Statistiques
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStats'
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé (rôle admin requis)
+
+  /admin/top-streamers:
+    get:
+      tags: [Admin]
+      summary: Top streamers (par nombre de favoris)
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            example: 10
+      responses:
+        '200':
+          description: Top streamers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StreamerSummary'
+        '403':
+          description: Accès refusé
+
+  /admin/top-tags:
+    get:
+      tags: [Admin]
+      summary: Tags les plus utilisés
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Top tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    category:
+                      type: string
+                    count:
+                      type: integer
+        '403':
+          description: Accès refusé
+
+  /admin/tags:
+    get:
+      tags: [Admin]
+      summary: Tags groupés par catégorie
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tags par catégorie
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Tag'
+                example:
+                  "e-sport":
+                    - id: 1
+                      name: "FPS"
+                      category: "e-sport"
+        '403':
+          description: Accès refusé
+
+    post:
+      tags: [Admin]
+      summary: Créer un tag
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, category]
+              properties:
+                name:
+                  type: string
+                  example: "Battle Royale"
+                category:
+                  type: string
+                  example: "e-sport"
+      responses:
+        '201':
+          description: Tag créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '400':
+          description: Tag déjà existant ou données invalides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Accès refusé
+
+  /admin/tags/{id}:
+    delete:
+      tags: [Admin]
+      summary: Supprimer un tag
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 7
+      responses:
+        '200':
+          description: Tag supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Tag supprimé"
+        '400':
+          description: ID invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Tag introuvable
+        '403':
+          description: Accès refusé
+
+  /admin/announcements:
+    get:
+      tags: [Admin]
+      summary: Lister les annonces
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Liste des annonces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Announcement'
+        '403':
+          description: Accès refusé
+
+    post:
+      tags: [Admin]
+      summary: Créer une annonce
+      description: Crée une annonce qui génère automatiquement des notifications pour tous les utilisateurs.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                  example: "Nouvelle fonctionnalité disponible !"
+                data:
+                  type: object
+                  nullable: true
+                  description: Données supplémentaires optionnelles (JSON libre)
+      responses:
+        '201':
+          description: Annonce créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Announcement'
+        '400':
+          description: Message manquant ou trop long
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Accès refusé
+
+  /admin/announcements/{id}:
+    delete:
+      tags: [Admin]
+      summary: Supprimer une annonce
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 5
+      responses:
+        '200':
+          description: Annonce supprimée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Annonce supprimée"
+        '400':
+          description: ID invalide
+        '404':
+          description: Annonce introuvable
+        '403':
+          description: Accès refusé
+
+  # ─────────────────────────────────────────
+  # BETA
+  # ─────────────────────────────────────────
+
+  /beta/status:
+    get:
+      tags: [Beta]
+      summary: Vérifier si l'IP a un accès bêta
+      description: Retourne `true` si l'IP du client est dans la whitelist `BETA_BYPASS_IPS`.
+      responses:
+        '200':
+          description: Statut d'accès bêta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bypassed:
+                    type: boolean
+                    example: false
+
+  /beta/debug:
+    get:
+      tags: [Beta]
+      summary: Debug IP bêta
+      description: Retourne l'IP vue par le serveur et le statut de bypass. À désactiver en production.
+      responses:
+        '200':
+          description: Infos de debug
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientIp:
+                    type: string
+                    example: "81.2.3.4"
+                  xForwardedFor:
+                    type: string
+                    nullable: true
+                    example: "81.2.3.4"
+                  bypassed:
+                    type: boolean
+                    example: true
