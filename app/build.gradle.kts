@@ -52,13 +52,11 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.compose.material.icons)
-
-    // Retrofit + Kotlin Serialization
+    implementation(libs.coil)
+    implementation(libs.coil.network)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
-
-    // Hilt
     implementation(libs.hilt.viewmodel.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

@@ -1,7 +1,11 @@
 package com.strimup.feature.home.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -12,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.theme.StrimupTheme
@@ -43,18 +48,26 @@ private fun HomeScreen(
 ) {
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.background,
+        color = MaterialTheme.colorScheme.surface,
     ) {
         if (state.loading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         } else {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
                 items(items = state.streamers) { streamer ->
                     StreamerCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(112.dp),
                         pseudo = streamer.userName,
                         socials = streamer.socials,
+                        imageUrl = streamer.imageUrl,
                         saved = false,
                         onSocialClick = onStreamerSocialClick,
                         onFavoriteClick = { onStreamerFavoriteClick(streamer) },
