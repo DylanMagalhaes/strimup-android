@@ -6,7 +6,7 @@ data class StreamerEntity(
     val imageUrl: String,
 ) {
     data class Social(
-        val url: String,
+        val url: String?,
         val type: Type,
     ) {
         enum class Type {
