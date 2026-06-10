@@ -10,7 +10,7 @@ val DarkColorScheme = darkColorScheme(
     secondary = BrandNeonGreen,
     onSecondary = Black ,
 
-    tertiary = Pink80,
+    tertiary = RedLive,
 
     surface = Grey1,
     onSurface = White,

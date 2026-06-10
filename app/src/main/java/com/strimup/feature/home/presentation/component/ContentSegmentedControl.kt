@@ -2,6 +2,7 @@ package com.strimup.feature.home.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,7 +25,7 @@ fun ContentSegmentedControl(
     onButtonClick: (HomeTab) -> Unit,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.Center
         ) {
         Button(

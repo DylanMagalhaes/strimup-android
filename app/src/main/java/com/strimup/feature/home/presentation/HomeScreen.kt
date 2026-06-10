@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,7 +39,7 @@ fun HomeScreen(
         state = state,
         onStreamerSocialClick = { TODO() },
         onStreamerFavoriteClick = { TODO() },
-        onSegmentedControlClick = { viewModel.onSegmentedControlClick(it)}
+        onSegmentedControlClick = { viewModel.onSegmentedControlClick(it) }
     )
 }
 
@@ -59,8 +58,6 @@ private fun HomeScreen(
         Column(modifier = Modifier.padding(top = 32.dp)) {
             ContentSegmentedControl(
                 modifier = Modifier.fillMaxWidth(),
-                //onDiscoveryClick = onDiscoveryClick,
-                //onLiveClick = onLiveClick,
                 onButtonClick = onSegmentedControlClick,
                 isInLiveSelected = state.isInLiveSelected,
                 isDiscoverySelected = state.isDiscoverySelected,
@@ -84,6 +81,7 @@ private fun HomeScreen(
                             socials = streamer.socials,
                             imageUrl = streamer.imageUrl,
                             saved = false,
+                            isLive = streamer.isLive,
                             onSocialClick = onStreamerSocialClick,
                             onFavoriteClick = { onStreamerFavoriteClick(streamer) },
                         )

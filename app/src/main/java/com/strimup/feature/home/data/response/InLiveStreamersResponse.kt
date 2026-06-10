@@ -27,6 +27,8 @@ data class InLiveStreamersResponse(
             val avatarUrl: String?,
             @SerialName("is_verified")
             val isVerified: Boolean?,
+            @SerialName("is_live")
+            val isLive: Boolean?,
             @SerialName("live_title")
             val liveTitle: String?,
             @SerialName("twitch_url")

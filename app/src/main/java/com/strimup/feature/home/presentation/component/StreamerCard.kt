@@ -1,14 +1,17 @@
 package com.strimup.feature.home.presentation.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +39,7 @@ fun StreamerCard(
     socials: List<Social>,
     saved: Boolean,
     imageUrl: String,
+    isLive: Boolean,
     onFavoriteClick: () -> Unit,
     onSocialClick: (Social) -> Unit,
     modifier: Modifier = Modifier,
@@ -55,16 +59,45 @@ fun StreamerCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
-                    .clip(shape = RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .4f)),
-                model = imageUrl,
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-            )
+            Box() {
+                AsyncImage(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(shape = RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .4f))
+                        .then(
+                            if (isLive) {
+                                Modifier.border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                            } else {
+                                Modifier
+                            }
+                        ),
+                    model = imageUrl,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                )
+
+                if (isLive) Badge(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .offset(y = 6.dp),
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    content = {
+                        Text(
+                            text = "Live",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontFamily = zalandoFontFamily,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    },
+                )
+
+            }
 
             Column(
                 modifier = Modifier
@@ -110,6 +143,7 @@ private fun StreamerCardPreview() {
             socials = listOf(Social(url = "", type = Type.Instagram)),
             saved = false,
             imageUrl = "",
+            isLive = true,
             onSocialClick = {},
             onFavoriteClick = {},
         )
