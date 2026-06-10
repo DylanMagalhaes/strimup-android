@@ -3,6 +3,7 @@ package com.strimup.feature.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.feature.home.domain.StreamerRepository
+import com.strimup.feature.home.domain.entity.StreamerEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,48 +31,28 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onSegmentedControlClick(buttonName: HomeTab) {
-        when(buttonName) {
-            HomeTab.DISCOVERY -> {
-                if (_state.value.isDiscoverySelected) return
-                _state.update {
-                    it.copy(
-                        loading = true,
-                        isInLiveSelected = false,
-                        isDiscoverySelected = true,
-                    )
-                }
-                viewModelScope.launch {
-                    val streamers = streamerRepository.getRandomStreamers()
-
-                    _state.update {
-                        it.copy(
-                            streamers = streamers,
-                            loading = false,
-                        )
-                    }
-                }
+    fun onSegmentedControlClick(tab: HomeTab) {
+        if (tab == HomeTab.IN_LIVE && state.value.isInLiveSelected || tab == HomeTab.DISCOVERY && _state.value.isDiscoverySelected) return
+        _state.update {
+            it.copy(
+                loading = true,
+                isInLiveSelected = tab == HomeTab.IN_LIVE,
+                isDiscoverySelected = tab == HomeTab.DISCOVERY,
+            )
+        }
+        viewModelScope.launch {
+           val streamers = when (tab) {
+                HomeTab.IN_LIVE -> streamerRepository.getInLiveStreamers()
+                HomeTab.DISCOVERY -> streamerRepository.getRandomStreamers()
             }
-            HomeTab.IN_LIVE -> {
-                if (_state.value.isInLiveSelected) return
-                _state.update {
-                    it.copy(
-                        loading = true,
-                        isInLiveSelected = true,
-                        isDiscoverySelected = false,
-                    )
-                }
-                viewModelScope.launch {
-                    val streamers = streamerRepository.getInLiveStreamers()
 
-                    _state.update {
-                        it.copy(
-                            streamers = streamers,
-                            loading = false,
-                        )
-                    }
-                }
+            _state.update {
+                it.copy(
+                    streamers = streamers,
+                    loading = false,
+                )
             }
         }
     }
+
 }
