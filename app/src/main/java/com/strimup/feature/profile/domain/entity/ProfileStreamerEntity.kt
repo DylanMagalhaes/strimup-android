@@ -1,10 +1,12 @@
-package com.strimup.feature.home.domain.entity
+package com.strimup.feature.profile.domain.entity
 
-data class StreamerEntity(
+data class ProfileStreamerEntity(
     val userName: String,
     val socials: List<Social>,
     val imageUrl: String,
     val isLive: Boolean,
+    val bio: String,
+    val tags: List<Tag>,
 ) {
     data class Social(
         val url: String?,
@@ -18,4 +20,9 @@ data class StreamerEntity(
             Tiktok,
         }
     }
+
+    data class Tag(
+        val name: String,
+        val category: String
+    )
 }
