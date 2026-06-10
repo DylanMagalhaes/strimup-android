@@ -16,4 +16,14 @@ class DefaultStreamerRepository @Inject constructor(
             ?.map { it.toEntity() }
             ?: throw IOException("error fetching random streamers")
     }
+
+    override suspend fun getInLiveStreamers(): List<StreamerEntity> {
+        return service.getInliveStreamers()
+            .items
+            ?.map { it.toEntity() }
+            ?: throw IOException("error fetching random streamers")
+    }
+
+
 }
+

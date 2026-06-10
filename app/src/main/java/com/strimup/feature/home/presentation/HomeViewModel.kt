@@ -29,4 +29,49 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun onSegmentedControlClick(buttonName: HomeTab) {
+        when(buttonName) {
+            HomeTab.DISCOVERY -> {
+                if (_state.value.isDiscoverySelected) return
+                _state.update {
+                    it.copy(
+                        loading = true,
+                        isInLiveSelected = false,
+                        isDiscoverySelected = true,
+                    )
+                }
+                viewModelScope.launch {
+                    val streamers = streamerRepository.getRandomStreamers()
+
+                    _state.update {
+                        it.copy(
+                            streamers = streamers,
+                            loading = false,
+                        )
+                    }
+                }
+            }
+            HomeTab.IN_LIVE -> {
+                if (_state.value.isInLiveSelected) return
+                _state.update {
+                    it.copy(
+                        loading = true,
+                        isInLiveSelected = true,
+                        isDiscoverySelected = false,
+                    )
+                }
+                viewModelScope.launch {
+                    val streamers = streamerRepository.getInLiveStreamers()
+
+                    _state.update {
+                        it.copy(
+                            streamers = streamers,
+                            loading = false,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
