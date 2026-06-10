@@ -10,6 +10,7 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
         return listOf(
             StreamerEntity(
                 isLive = true,
+                liveTitle = "lore ipsum dolores",
                 userName = "Squeezie",
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMW1ej_GeDal7F5wF9obJX-34O1-_9-VqpDk_o_NAnyYVUHFbGH-ayQ25e6j549GpqNTlWLOcOWUtqkExn3pmptkpPdMfZnp0TQ4lLsw&s=10",
                 socials = listOf(
@@ -30,6 +31,7 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
 
             StreamerEntity(
                 isLive = false,
+                liveTitle = null,
                 userName = "Gotaga",
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwZvRGAD3H9tbtJLc5dd-Y4uxt2CbAWxZs60ZrSQWAbg8JrBHecFaiwbr6qJeS6pwpIA-1VIwuZ_4VWdQ_DB3siF4ugHiXf2NriIPeHes&s=10",
                 socials = listOf(
@@ -54,6 +56,7 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
         return listOf(
             StreamerEntity(
                 isLive = true,
+                liveTitle = "lore ipsum dolores",
                 userName = "Squeezie",
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMW1ej_GeDal7F5wF9obJX-34O1-_9-VqpDk_o_NAnyYVUHFbGH-ayQ25e6j549GpqNTlWLOcOWUtqkExn3pmptkpPdMfZnp0TQ4lLsw&s=10",
                 socials = listOf(
@@ -74,6 +77,7 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
 
             StreamerEntity(
                 isLive = true,
+                liveTitle = "lore ipsum dolores",
                 userName = "Gotaga",
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwZvRGAD3H9tbtJLc5dd-Y4uxt2CbAWxZs60ZrSQWAbg8JrBHecFaiwbr6qJeS6pwpIA-1VIwuZ_4VWdQ_DB3siF4ugHiXf2NriIPeHes&s=10",
                 socials = listOf(

@@ -16,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -33,29 +35,29 @@ import com.strimup.feature.home.domain.entity.StreamerEntity.Social
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social.Type
 import com.strimup.feature.home.presentation.mapper.getIconRes
 
-@Composable
-fun StreamerCard(
+@Composable fun StreamerCard(
     pseudo: String,
     socials: List<Social>,
     saved: Boolean,
     imageUrl: String,
     isLive: Boolean,
+    liveTitle: String?,
     onFavoriteClick: () -> Unit,
     onSocialClick: (Social) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
+        modifier = modifier, shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
-                .padding(start = 16.dp, end = 12.dp),
+                .padding(
+                    start = 16.dp, end = 12.dp
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -64,7 +66,9 @@ fun StreamerCard(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(shape = RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .4f))
+                        .background(
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = .4f)
+                        )
                         .then(
                             if (isLive) {
                                 Modifier.border(
@@ -102,7 +106,9 @@ fun StreamerCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+
             ) {
                 Text(
                     text = pseudo,
@@ -112,15 +118,35 @@ fun StreamerCard(
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Bold,
                 )
+                if (liveTitle != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        VerticalDivider(
+                            modifier = Modifier.size(16.dp),
+                            thickness = 2.dp,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+
+
+                        Text(
+                            text = liveTitle,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+
+                            )
+
+                    }
+                }
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     socials.forEach { social ->
                         SocialIconButton(
-                            iconRes = social.getIconRes(),
-                            onClick = { onSocialClick(social) }
-                        )
+                            iconRes = social.getIconRes(), onClick = { onSocialClick(social) })
                     }
                 }
             }
@@ -133,9 +159,7 @@ fun StreamerCard(
     }
 }
 
-@Preview
-@Composable
-private fun StreamerCardPreview() {
+@Preview @Composable private fun StreamerCardPreview() {
     StrimupTheme {
         StreamerCard(
             modifier = Modifier.fillMaxWidth(),
@@ -144,6 +168,7 @@ private fun StreamerCardPreview() {
             saved = false,
             imageUrl = "",
             isLive = true,
+            liveTitle = "lorem ipsum dolores ombrage",
             onSocialClick = {},
             onFavoriteClick = {},
         )

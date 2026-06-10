@@ -25,8 +25,8 @@ fun FavoriteIconButton(
     IconButton(
         modifier = modifier,
         colors = IconButtonDefaults.iconButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),
         shape = RoundedCornerShape(12.dp),
         onClick = onClick,

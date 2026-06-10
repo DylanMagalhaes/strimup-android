@@ -32,6 +32,8 @@ fun RandomStreamersResponse.StreamerData.toEntity(): StreamerEntity {
         socials = socialsList,
         imageUrl = this.streamerProfile?.avatarUrl ?: "",
         isLive = requireNotNull(this.streamerProfile?.isLive),
+        liveTitle = this.streamerProfile?.liveTitle
+
     )
 }
 
@@ -62,6 +64,7 @@ fun InLiveStreamersResponse.StreamerData.toEntity(): StreamerEntity {
         socials = socialsList,
         imageUrl = this.streamerProfile?.avatarUrl ?: "",
         isLive = requireNotNull(this.streamerProfile?.isLive),
+        liveTitle = this.streamerProfile.liveTitle,
 
-    )
+        )
 }

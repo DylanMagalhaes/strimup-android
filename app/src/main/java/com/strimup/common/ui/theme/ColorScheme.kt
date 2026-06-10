@@ -12,10 +12,10 @@ val DarkColorScheme = darkColorScheme(
 
     tertiary = RedLive,
 
-    surface = Grey1,
+    surface = Grey2,
     onSurface = White,
 
-    surfaceVariant = Grey2,
+    surfaceVariant = Grey1,
     onSurfaceVariant = White,
 
     outline = Grey1,

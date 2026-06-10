@@ -53,7 +53,7 @@ private fun HomeScreen(
 ) {
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(top = 32.dp)) {
             ContentSegmentedControl(
@@ -82,6 +82,7 @@ private fun HomeScreen(
                             imageUrl = streamer.imageUrl,
                             saved = false,
                             isLive = streamer.isLive,
+                            liveTitle = streamer.liveTitle,
                             onSocialClick = onStreamerSocialClick,
                             onFavoriteClick = { onStreamerFavoriteClick(streamer) },
                         )
