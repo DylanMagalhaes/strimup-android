@@ -1,9 +1,11 @@
 package com.strimup.feature.home.presentation
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,8 +26,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.StreamerEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social
-import com.strimup.feature.home.presentation.component.ContentSegmentedControl
+import com.strimup.feature.home.presentation.component.HomeTabs
 import com.strimup.feature.home.presentation.component.StreamerCard
+import com.strimup.feature.home.presentation.model.HomeTab
 
 @Composable
 fun HomeScreen(
@@ -39,7 +42,7 @@ fun HomeScreen(
         state = state,
         onStreamerSocialClick = { TODO() },
         onStreamerFavoriteClick = { TODO() },
-        onSegmentedControlClick = { viewModel.onSegmentedControlClick(it) }
+        onTabClick = { viewModel.onTabClick(it) }
     )
 }
 
@@ -48,7 +51,7 @@ private fun HomeScreen(
     state: UiState,
     onStreamerFavoriteClick: (StreamerEntity) -> Unit,
     onStreamerSocialClick: (Social) -> Unit,
-    onSegmentedControlClick: (HomeTab) -> Unit,
+    onTabClick: (HomeTab) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -56,39 +59,42 @@ private fun HomeScreen(
         color = MaterialTheme.colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(top = 32.dp)) {
-            ContentSegmentedControl(
+            HomeTabs(
                 modifier = Modifier.fillMaxWidth(),
-                onButtonClick = onSegmentedControlClick,
-                isInLiveSelected = state.isInLiveSelected,
-                isDiscoverySelected = state.isDiscoverySelected,
+                onButtonClick = onTabClick,
+                currentTab = state.currentTab,
             )
-            if (state.loading) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    items(items = state.streamers) { streamer ->
-                        StreamerCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(112.dp),
-                            pseudo = streamer.userName,
-                            socials = streamer.socials,
-                            imageUrl = streamer.imageUrl,
-                            saved = false,
-                            isLive = streamer.isLive,
-                            liveTitle = streamer.liveTitle,
-                            onSocialClick = onStreamerSocialClick,
-                            onFavoriteClick = { onStreamerFavoriteClick(streamer) },
-                        )
+
+            Crossfade(targetState = state.loading) { loading ->
+                if (loading) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        items(items = state.streamers) { streamer ->
+                            StreamerCard(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .defaultMinSize(minHeight = 112.dp),
+                                pseudo = streamer.userName,
+                                socials = streamer.socials,
+                                imageUrl = streamer.imageUrl,
+                                saved = false, //Todo
+                                isLive = streamer.isLive,
+                                liveTitle = streamer.liveTitle,
+                                onSocialClick = onStreamerSocialClick,
+                                onFavoriteClick = { onStreamerFavoriteClick(streamer) },
+                            )
+                        }
                     }
                 }
             }
+
         }
     }
 }
@@ -102,7 +108,7 @@ private fun HomeScreenPreview() {
             state = UiState(),
             onStreamerFavoriteClick = {},
             onStreamerSocialClick = {},
-            onSegmentedControlClick = {}
+            onTabClick = {}
         )
     }
 }

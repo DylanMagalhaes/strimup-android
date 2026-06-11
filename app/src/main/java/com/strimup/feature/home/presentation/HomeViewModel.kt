@@ -3,9 +3,11 @@ package com.strimup.feature.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.feature.home.domain.StreamerRepository
-import com.strimup.feature.home.domain.entity.StreamerEntity
+import com.strimup.feature.home.presentation.model.HomeTab
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,6 +19,8 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
+
+    private var fetchStreamersJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -31,28 +35,30 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onSegmentedControlClick(tab: HomeTab) {
-        if (tab == HomeTab.IN_LIVE && state.value.isInLiveSelected || tab == HomeTab.DISCOVERY && _state.value.isDiscoverySelected) return
+    fun onTabClick(tab: HomeTab) {
+        fetchStreamersJob?.cancel()
+
         _state.update {
             it.copy(
                 loading = true,
-                isInLiveSelected = tab == HomeTab.IN_LIVE,
-                isDiscoverySelected = tab == HomeTab.DISCOVERY,
+                currentTab = tab,
             )
         }
-        viewModelScope.launch {
-           val streamers = when (tab) {
-                HomeTab.IN_LIVE -> streamerRepository.getInLiveStreamers()
-                HomeTab.DISCOVERY -> streamerRepository.getRandomStreamers()
-            }
 
-            _state.update {
-                it.copy(
-                    streamers = streamers,
-                    loading = false,
-                )
+        fetchStreamersJob =
+            viewModelScope.launch {
+                val streamers = when (tab) {
+                    HomeTab.IN_LIVE -> streamerRepository.getInLiveStreamers()
+                    HomeTab.DISCOVERY -> streamerRepository.getRandomStreamers()
+                }
+
+                _state.update {
+                    it.copy(
+                        streamers = streamers,
+                        loading = false,
+                    )
+                }
             }
-        }
     }
 
 }
