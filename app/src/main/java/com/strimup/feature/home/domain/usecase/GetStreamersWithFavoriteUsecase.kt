@@ -11,10 +11,7 @@ class GetStreamersWithFavoriteUsecase @Inject constructor(
     override suspend fun invoke(filter: FilterEntity): List<StreamerEntity> {
         val favoriteStreamerIds = repository.getFavoriteStreamerIds()
 
-        val streamers = when (filter) {
-            FilterEntity.Discovery -> repository.getRandomStreamers(favoriteStreamerIds = favoriteStreamerIds)
-            FilterEntity.Live -> repository.getInLiveStreamers(favoriteStreamerIds = favoriteStreamerIds)
-        }
+        val streamers = repository.getStreamers(FilterEntity.Live, favoriteStreamerIds)
         return streamers
     }
 }

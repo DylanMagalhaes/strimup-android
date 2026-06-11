@@ -2,6 +2,7 @@ package com.strimup.feature.home.data
 
 import com.strimup.feature.home.data.mapper.toEntity
 import com.strimup.feature.home.domain.StreamerRepository
+import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity
 import javax.inject.Inject
 import okio.IOException
@@ -10,18 +11,25 @@ class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService,
 ) : StreamerRepository {
 
-    override suspend fun getRandomStreamers(favoriteStreamerIds: List<String>): List<StreamerEntity> {
-        return service.getRandomStreamers()
-            .items
-            ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-            ?: throw IOException("error fetching random streamers")
-    }
+    override suspend fun getStreamers(
+        filter: FilterEntity,
+        favoriteStreamerIds: List<String>
+    ): List<StreamerEntity> {
+        return when (filter) {
+            FilterEntity.Discovery -> {
+                service.getRandomStreamers()
+                    .items
+                    ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
+                    ?: throw IOException("error fetching random streamers")
+            }
 
-    override suspend fun getInLiveStreamers(favoriteStreamerIds: List<String>): List<StreamerEntity> {
-        return service.getInliveStreamers()
-            .items
-            ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-            ?: throw IOException("error fetching random streamers")
+            FilterEntity.Live -> {
+                service.getInliveStreamers()
+                    .items
+                    ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
+                    ?: throw IOException("error fetching random streamers")
+            }
+        }
     }
 
     override suspend fun getFavoriteStreamerIds(): List<String> {
