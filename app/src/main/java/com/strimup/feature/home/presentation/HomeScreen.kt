@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social
 import com.strimup.feature.home.presentation.component.HomeTabs
 import com.strimup.feature.home.presentation.component.StreamerCard
-import com.strimup.feature.home.presentation.model.HomeTab
 
 @Composable
 fun HomeScreen(
@@ -51,7 +51,7 @@ private fun HomeScreen(
     state: UiState,
     onStreamerFavoriteClick: (StreamerEntity) -> Unit,
     onStreamerSocialClick: (Social) -> Unit,
-    onTabClick: (HomeTab) -> Unit,
+    onTabClick: (FilterEntity) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(

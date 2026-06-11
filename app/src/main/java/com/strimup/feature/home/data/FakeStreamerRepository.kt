@@ -6,12 +6,13 @@ import javax.inject.Inject
 
 class FakeStreamerRepository @Inject constructor() : StreamerRepository {
 
-    override suspend fun getRandomStreamers(): List<StreamerEntity> {
+    override suspend fun getRandomStreamers(favoriteStreamerIds: List<String>): List<StreamerEntity> {
         return listOf(
             StreamerEntity(
                 isLive = true,
                 liveTitle = "lore ipsum dolores",
                 userName = "Squeezie",
+                isFavorite = true,
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMW1ej_GeDal7F5wF9obJX-34O1-_9-VqpDk_o_NAnyYVUHFbGH-ayQ25e6j549GpqNTlWLOcOWUtqkExn3pmptkpPdMfZnp0TQ4lLsw&s=10",
                 socials = listOf(
                     StreamerEntity.Social(
@@ -33,6 +34,7 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
                 isLive = false,
                 liveTitle = null,
                 userName = "Gotaga",
+                isFavorite = false,
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwZvRGAD3H9tbtJLc5dd-Y4uxt2CbAWxZs60ZrSQWAbg8JrBHecFaiwbr6qJeS6pwpIA-1VIwuZ_4VWdQ_DB3siF4ugHiXf2NriIPeHes&s=10",
                 socials = listOf(
                     StreamerEntity.Social(
@@ -52,12 +54,13 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
         )
     }
 
-    override suspend fun getInLiveStreamers(): List<StreamerEntity> {
+    override suspend fun getInLiveStreamers(favoriteStreamerIds: List<String>): List<StreamerEntity> {
         return listOf(
             StreamerEntity(
                 isLive = true,
                 liveTitle = "lore ipsum dolores",
                 userName = "Squeezie",
+                isFavorite = true,
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMW1ej_GeDal7F5wF9obJX-34O1-_9-VqpDk_o_NAnyYVUHFbGH-ayQ25e6j549GpqNTlWLOcOWUtqkExn3pmptkpPdMfZnp0TQ4lLsw&s=10",
                 socials = listOf(
                     StreamerEntity.Social(
@@ -79,6 +82,7 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
                 isLive = true,
                 liveTitle = "lore ipsum dolores",
                 userName = "Gotaga",
+                isFavorite = true,
                 imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwZvRGAD3H9tbtJLc5dd-Y4uxt2CbAWxZs60ZrSQWAbg8JrBHecFaiwbr6qJeS6pwpIA-1VIwuZ_4VWdQ_DB3siF4ugHiXf2NriIPeHes&s=10",
                 socials = listOf(
                     StreamerEntity.Social(

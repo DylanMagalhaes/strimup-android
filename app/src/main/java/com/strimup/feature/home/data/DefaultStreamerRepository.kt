@@ -10,17 +10,17 @@ class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService,
 ) : StreamerRepository {
 
-    override suspend fun getRandomStreamers(): List<StreamerEntity> {
+    override suspend fun getRandomStreamers(favoriteStreamerIds: List<String>): List<StreamerEntity> {
         return service.getRandomStreamers()
             .items
-            ?.map { it.toEntity() }
+            ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
             ?: throw IOException("error fetching random streamers")
     }
 
-    override suspend fun getInLiveStreamers(): List<StreamerEntity> {
+    override suspend fun getInLiveStreamers(favoriteStreamerIds: List<String>): List<StreamerEntity> {
         return service.getInliveStreamers()
             .items
-            ?.map { it.toEntity() }
+            ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
             ?: throw IOException("error fetching random streamers")
     }
 

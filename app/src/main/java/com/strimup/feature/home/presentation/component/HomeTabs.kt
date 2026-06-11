@@ -15,13 +15,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.home.presentation.model.HomeTab
+import com.strimup.feature.home.domain.entity.FilterEntity
 
 @Composable
 fun HomeTabs(
     modifier: Modifier = Modifier,
-    currentTab: HomeTab,
-    onButtonClick: (HomeTab) -> Unit,
+    currentTab: FilterEntity,
+    onButtonClick: (FilterEntity) -> Unit,
 ) {
     Row(
         modifier = modifier.padding(bottom = 16.dp),
@@ -29,7 +29,7 @@ fun HomeTabs(
     ) {
         Button(
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (currentTab == HomeTab.DISCOVERY) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                containerColor = if (currentTab == FilterEntity.Discovery) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
             ),
             shape = RoundedCornerShape(
                 topStart = 8.dp,
@@ -37,7 +37,7 @@ fun HomeTabs(
                 topEnd = 0.dp,
                 bottomEnd = 0.dp
             ),
-            onClick = { onButtonClick(HomeTab.DISCOVERY) }
+            onClick = { onButtonClick(FilterEntity.Discovery) }
         ) {
             Text(
                 text = "Découvrir",
@@ -49,7 +49,7 @@ fun HomeTabs(
         Button(
 
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (currentTab == HomeTab.IN_LIVE) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+                containerColor = if (currentTab == FilterEntity.Live) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
             ),
             shape = RoundedCornerShape(
                 topStart = 0.dp,
@@ -57,7 +57,7 @@ fun HomeTabs(
                 topEnd = 8.dp,
                 bottomEnd = 8.dp
             ),
-            onClick = { onButtonClick(HomeTab.IN_LIVE) }
+            onClick = { onButtonClick(FilterEntity.Live) }
 
         ) {
             Text(
@@ -74,7 +74,7 @@ fun HomeTabs(
 fun HomeTabsPreview() {
     StrimupTheme {
         HomeTabs(
-            currentTab = HomeTab.DISCOVERY,
+            currentTab = FilterEntity.Live,
             onButtonClick = {}
         )
     }

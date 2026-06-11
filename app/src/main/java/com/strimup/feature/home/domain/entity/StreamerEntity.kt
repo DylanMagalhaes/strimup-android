@@ -6,6 +6,7 @@ data class StreamerEntity(
     val imageUrl: String,
     val isLive: Boolean,
     val liveTitle: String?,
+    val isFavorite: Boolean,
 ) {
     data class Social(
         val url: String?,
