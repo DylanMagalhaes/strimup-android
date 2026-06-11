@@ -97,4 +97,8 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
             ),
         )
     }
+
+    override suspend fun getFavoriteStreamerIds(): List<String> {
+        throw NotImplementedError()
+    }
 }

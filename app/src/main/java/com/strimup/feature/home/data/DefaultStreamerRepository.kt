@@ -24,6 +24,9 @@ class DefaultStreamerRepository @Inject constructor(
             ?: throw IOException("error fetching random streamers")
     }
 
-
+    override suspend fun getFavoriteStreamerIds(): List<String> {
+        return service.getFavoriteStreamers()
+            .map { requireNotNull(it.streamerId) }
+    }
 }
 

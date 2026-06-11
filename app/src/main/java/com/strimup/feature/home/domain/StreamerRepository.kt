@@ -6,4 +6,6 @@ interface StreamerRepository {
     suspend fun getRandomStreamers(): List<StreamerEntity>
 
     suspend fun getInLiveStreamers(): List<StreamerEntity>
+
+    suspend fun getFavoriteStreamerIds(): List<String>
 }
