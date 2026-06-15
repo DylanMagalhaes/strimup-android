@@ -47,7 +47,9 @@ import com.strimup.feature.home.presentation.mapper.getIconRes
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier, shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {

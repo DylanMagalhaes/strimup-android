@@ -1,12 +1,16 @@
 package com.strimup.feature.profile.domain.entity
 
+import com.strimup.feature.home.domain.entity.StreamerEntity
+
 data class ProfileStreamerEntity(
     val userName: String,
     val socials: List<Social>,
     val imageUrl: String,
     val isLive: Boolean,
     val bio: String,
-    val tags: List<Tag>,
+    val dailyStatus: String,
+    val tags: List<Tag>?,
+    val videos: List<Video>?
 ) {
     data class Social(
         val url: String?,
@@ -24,5 +28,12 @@ data class ProfileStreamerEntity(
     data class Tag(
         val name: String,
         val category: String
+    )
+
+    data class Video(
+        val title: String,
+        val description: String,
+        val url: String,
+        val order: Int
     )
 }
