@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,12 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.profile.domain.entity.ProfileStreamerEntity
-import com.strimup.feature.profile.presentation.mapper.getIconRes
 
 @Composable
 fun StreamerHero(
@@ -42,8 +41,6 @@ fun StreamerHero(
     pseudo: String,
     tags: List<ProfileStreamerEntity.Tag>?,
     dailyStatus: String,
-    socials: List<ProfileStreamerEntity.Social>,
-    onSocialClick: (ProfileStreamerEntity.Social) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -58,7 +55,7 @@ fun StreamerHero(
             Box() {
                 AsyncImage(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(160.dp)
                         .clip(shape = RoundedCornerShape(8.dp))
                         .background(
                             MaterialTheme.colorScheme.onBackground.copy(alpha = .4f)
@@ -116,27 +113,31 @@ fun StreamerHero(
                 fontWeight = FontWeight.Bold,
             )
 
-            Row() {
-                Text(
-                    text = " \" ",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontFamily = zalandoFontFamily,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
-                )
-                Text(
-                    text = dailyStatus,
-                    fontSize = 12.sp,
-                )
-                Text(
-                    text = " \" ",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontFamily = zalandoFontFamily,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
-                )
+            if(dailyStatus != ""){
+
+                Row() {
+                    Text(
+                        text = " \" ",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontFamily = zalandoFontFamily,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        text = dailyStatus,
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        text = " \" ",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontFamily = zalandoFontFamily,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                    )
+                }
+
             }
 
             FlowRow(
@@ -150,17 +151,7 @@ fun StreamerHero(
 
             VerticalSpacer(4.dp)
 
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                socials.forEach { social ->
-                    SocialIconButton(
-                        iconRes = social.getIconRes(), onClick = { onSocialClick(social) })
-                }
-            }
-
-
+            HorizontalDivider()
         }
     }
 }
@@ -181,28 +172,6 @@ private fun StreamerHeroPreview() {
                 ProfileStreamerEntity.Tag(name = "Cuisine", category = "dolk"),
             ),
             dailyStatus = "Hello la compagnie",
-            socials = listOf(
-                ProfileStreamerEntity.Social(
-                    url = "",
-                    type = ProfileStreamerEntity.Social.Type.Twitch
-                ),
-                ProfileStreamerEntity.Social(
-                    url = "",
-                    type = ProfileStreamerEntity.Social.Type.Youtube
-                ),
-                ProfileStreamerEntity.Social(
-                    url = "",
-                    type = ProfileStreamerEntity.Social.Type.Instagram
-                ),
-                ProfileStreamerEntity.Social(
-                    url = "",
-                    type = ProfileStreamerEntity.Social.Type.Kick
-                ),
-
-                ),
-            onSocialClick = {}
         )
-
-
     }
 }

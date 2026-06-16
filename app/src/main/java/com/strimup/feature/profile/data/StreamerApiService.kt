@@ -7,6 +7,6 @@ import retrofit2.http.Path
 interface StreamerApiService {
     @GET("api/streamer/{id}")
     suspend fun getStreamerById(
-        @Path("id") id: Int
+        @Path("id") id: String
     ): StreamerResponse
 }

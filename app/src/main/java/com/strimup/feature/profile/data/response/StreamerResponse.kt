@@ -2,8 +2,10 @@ package com.strimup.feature.profile.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class StreamerResponse(
     @SerialName("id")
     val id: String?,
@@ -13,9 +15,14 @@ data class StreamerResponse(
     val role: String?,
     @SerialName("streamerProfile")
     val streamerProfile: StreamerProfile?,
+    @SerialName("oauthAccounts")
+    val oauthAccounts: List<OAuthAccount>? = emptyList(),
+    @SerialName("is_twitch_connected")
+    val isTwitchConnected: Boolean? = false
 ) {
 
     @Serializable
+    @JsonIgnoreUnknownKeys
     data class StreamerProfile(
         @SerialName("id")
         val id: String?,
@@ -50,6 +57,7 @@ data class StreamerResponse(
     )
 
     @Serializable
+    @JsonIgnoreUnknownKeys
     data class Tag(
         @SerialName("id")
         val id: Int?,
@@ -60,10 +68,11 @@ data class StreamerResponse(
     )
 
     @Serializable
+    @JsonIgnoreUnknownKeys
     data class Video(
         @SerialName("id")
-        val id: Int?,
-        @SerialName("name")
+        val id: String?,
+        @SerialName("title")
         val title: String?,
         @SerialName("description")
         val description: String?,
@@ -71,5 +80,14 @@ data class StreamerResponse(
         val order: Int?,
         @SerialName("url")
         val url: String?,
+    )
+
+    @Serializable
+    @JsonIgnoreUnknownKeys
+    data class OAuthAccount(
+        @SerialName("id")
+        val id: String?,
+        @SerialName("provider")
+        val provider: String?
     )
 }

@@ -4,5 +4,5 @@ import com.strimup.feature.profile.domain.entity.ProfileStreamerEntity
 
 data class UiState(
     val loading: Boolean = true,
-    val streamer: ProfileStreamerEntity
+    val streamer: ProfileStreamerEntity? = null
 )

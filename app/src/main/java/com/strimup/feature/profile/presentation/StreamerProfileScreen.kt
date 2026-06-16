@@ -1,11 +1,17 @@
 package com.strimup.feature.profile.presentation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.profile.domain.entity.ProfileStreamerEntity
 import com.strimup.feature.profile.presentation.component.StreamerContent
@@ -13,27 +19,47 @@ import com.strimup.feature.profile.presentation.component.StreamerHero
 
 @Composable
 fun StreamerProfileScreen(
-    state: com.strimup.feature.profile.presentation.UiState,
+    modifier: Modifier = Modifier,
+    viewModel: StreamerProfileViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    StreamerProfileScreen(
+        modifier = modifier,
+        state = state,
+    )
+}
+
+@Composable
+fun StreamerProfileScreen(
+    state: UiState,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    if (state.loading || state.streamer == null) {
 
-        modifier = modifier.fillMaxSize()
-    ) {
-        StreamerHero(
-            modifier = Modifier.fillMaxWidth(),
-            isLive = state.streamer.isLive,
-            imageUrl = state.streamer.imageUrl,
-            pseudo = state.streamer.userName,
-            tags = state.streamer.tags,
-            dailyStatus = state.streamer.dailyStatus,
-            socials = state.streamer.socials,
-            onSocialClick = {},
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
 
-        StreamerContent(
-            description = state.streamer.bio
-        )
+    } else {
+        Column(
+            modifier = modifier.fillMaxSize()
+        ) {
+            StreamerHero(
+                modifier = Modifier.fillMaxWidth(),
+                isLive = state.streamer.isLive,
+                imageUrl = state.streamer.imageUrl,
+                pseudo = state.streamer.userName,
+                tags = state.streamer.tags,
+                dailyStatus = state.streamer.dailyStatus,
+            )
+
+            StreamerContent(
+                modifier = Modifier.fillMaxSize(),
+                description = state.streamer.bio,
+                socials = state.streamer.socials,
+                onSocialClick = {},
+            )
+        }
     }
 }
 
@@ -74,8 +100,7 @@ private fun StreamerProfileScreenPreview() {
                             url = "",
                             type = ProfileStreamerEntity.Social.Type.Kick
                         ),
-
-                        ),
+                    ),
                 )
             )
         )
