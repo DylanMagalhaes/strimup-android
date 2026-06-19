@@ -4,8 +4,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,31 +29,66 @@ import com.strimup.feature.profile.presentation.component.StreamerHero
 
 @Composable
 fun StreamerProfileScreen(
+    streamerId: String,
+    onNavUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
+    LaunchedEffect(streamerId) {
+        viewModel.load(streamerId)
+    }
+
     val state by viewModel.state.collectAsStateWithLifecycle()
+
     StreamerProfileScreen(
         modifier = modifier,
         state = state,
+        onNavUp = onNavUp
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StreamerProfileScreen(
+private fun StreamerProfileScreen(
     state: UiState,
-    modifier: Modifier = Modifier
+    onNavUp: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = { Text(text = state.streamer?.userName ?: "") },
+                navigationIcon = {
+                    IconButton(onClick = onNavUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                })
+        },
+    ) { padding ->
+        StreamerProfileContent(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
+            state = state,
+        )
+    }
+}
+
+@Composable
+private fun StreamerProfileContent(
+    state: UiState,
+    modifier: Modifier = Modifier,
 ) {
     if (state.loading || state.streamer == null) {
-
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-
     } else {
-        Column(
-            modifier = modifier.fillMaxSize()
-        ) {
+        Column(modifier = modifier.fillMaxSize()) {
             StreamerHero(
                 modifier = Modifier.fillMaxWidth(),
                 isLive = state.streamer.isLive,
@@ -68,7 +113,8 @@ fun StreamerProfileScreen(
 private fun StreamerProfileScreenPreview() {
     StrimupTheme {
         StreamerProfileScreen(
-            state = com.strimup.feature.profile.presentation.UiState(
+            onNavUp = {},
+            state = UiState(
                 loading = false,
                 streamer = ProfileStreamerEntity(
                     isLive = false,

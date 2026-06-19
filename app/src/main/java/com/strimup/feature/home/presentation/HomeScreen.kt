@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,6 +35,7 @@ import com.strimup.feature.home.presentation.component.StreamerCard
 
 @Composable
 fun HomeScreen(
+    onStreamerClick: (id: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -40,15 +44,42 @@ fun HomeScreen(
     HomeScreen(
         modifier = modifier,
         state = state,
+        onStreamerClick = onStreamerClick,
         onStreamerSocialClick = { TODO() },
         onStreamerFavoriteClick = { TODO() },
-        onTabClick = { viewModel.onTabClick(it) }
+        onTabClick = { viewModel.onTabClick(it) },
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreen(
     state: UiState,
+    onStreamerClick: (id: String) -> Unit,
+    onStreamerFavoriteClick: (StreamerEntity) -> Unit,
+    onStreamerSocialClick: (Social) -> Unit,
+    onTabClick: (FilterEntity) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Scaffold(
+        modifier = modifier,
+        topBar = { TopAppBar(title = { Text(text = "Home") }) },
+    ) { padding ->
+        HomeContent(
+            modifier = Modifier.padding(padding),
+            state = state,
+            onStreamerClick = onStreamerClick,
+            onStreamerSocialClick = onStreamerSocialClick,
+            onStreamerFavoriteClick = onStreamerFavoriteClick,
+            onTabClick = onTabClick,
+        )
+    }
+}
+
+@Composable
+private fun HomeContent(
+    state: UiState,
+    onStreamerClick: (id: String) -> Unit,
     onStreamerFavoriteClick: (StreamerEntity) -> Unit,
     onStreamerSocialClick: (Social) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
@@ -84,9 +115,10 @@ private fun HomeScreen(
                                 pseudo = streamer.userName,
                                 socials = streamer.socials,
                                 imageUrl = streamer.imageUrl,
-                                saved = false, //Todo
+                                saved = false,
                                 isLive = streamer.isLive,
                                 liveTitle = streamer.liveTitle,
+                                onClick = { onStreamerClick(streamer.id) },
                                 onSocialClick = onStreamerSocialClick,
                                 onFavoriteClick = { onStreamerFavoriteClick(streamer) },
                             )
@@ -94,7 +126,6 @@ private fun HomeScreen(
                     }
                 }
             }
-
         }
     }
 }
@@ -103,12 +134,13 @@ private fun HomeScreen(
 @Preview
 private fun HomeScreenPreview() {
     StrimupTheme {
-        HomeScreen(
+        HomeContent(
             modifier = Modifier.fillMaxSize(),
             state = UiState(),
+            onStreamerClick = {},
             onStreamerFavoriteClick = {},
             onStreamerSocialClick = {},
-            onTabClick = {}
+            onTabClick = {},
         )
     }
 }

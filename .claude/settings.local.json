@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//private/tmp/**)",
+      "Bash(jar xf *)",
+      "Bash(./gradlew assembleDebug *)"
+    ]
+  }
+}

@@ -42,11 +42,13 @@ import com.strimup.feature.home.presentation.mapper.getIconRes
     imageUrl: String,
     isLive: Boolean,
     liveTitle: String?,
+    onClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onSocialClick: (Social) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
@@ -171,6 +173,7 @@ import com.strimup.feature.home.presentation.mapper.getIconRes
             imageUrl = "",
             isLive = true,
             liveTitle = "lorem ipsum dolores ombrage",
+            onClick = {},
             onSocialClick = {},
             onFavoriteClick = {},
         )

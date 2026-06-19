@@ -18,19 +18,11 @@ class StreamerProfileViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
 
-    init {
+    fun load(id: String) {
         viewModelScope.launch {
-            val streamer = getStreamer("39f1159e-9259-4e38-b72c-57d6792a6995")
-
-            _state.update {
-                it.copy(
-                    loading = false,
-                    streamer = streamer,
-                )
-            }
-
+            _state.update { it.copy(loading = true) }
+            val streamer = getStreamer(id)
+            _state.update { it.copy(loading = false, streamer = streamer) }
         }
-
     }
-
 }

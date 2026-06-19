@@ -28,14 +28,14 @@ fun RandomStreamersResponse.StreamerData.toEntity(isFavorite: Boolean): Streamer
     }
 
     return StreamerEntity(
+        id = requireNotNull(this.id),
         userName = requireNotNull(this.pseudo),
         socials = socialsList,
         imageUrl = this.streamerProfile?.avatarUrl ?: "",
         isLive = requireNotNull(this.streamerProfile?.isLive),
         liveTitle = this.streamerProfile.liveTitle,
         isFavorite = isFavorite,
-
-        )
+    )
 }
 
 fun InLiveStreamersResponse.StreamerData.toEntity(isFavorite: Boolean): StreamerEntity {
@@ -61,6 +61,7 @@ fun InLiveStreamersResponse.StreamerData.toEntity(isFavorite: Boolean): Streamer
     }
 
     return StreamerEntity(
+        id = requireNotNull(this.id),
         userName = requireNotNull(this.pseudo),
         socials = socialsList,
         imageUrl = this.streamerProfile?.avatarUrl ?: "",

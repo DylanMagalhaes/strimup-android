@@ -1,6 +1,7 @@
 package com.strimup.feature.home.domain.entity
 
 data class StreamerEntity(
+    val id: String,
     val userName: String,
     val socials: List<Social>,
     val imageUrl: String,

@@ -29,10 +29,10 @@ fun StreamerResponse.toEntity(): ProfileStreamerEntity {
 
     return ProfileStreamerEntity(
         userName = requireNotNull(this.pseudo),
-        imageUrl = requireNotNull(this.streamerProfile?.avatarUrl),
+        imageUrl = this.streamerProfile?.avatarUrl ?: "",
         isLive = requireNotNull(this.streamerProfile?.isLive),
-        bio = requireNotNull(this.streamerProfile.bio),
-        dailyStatus = requireNotNull(this.streamerProfile.dailyStatus),
+        bio = this.streamerProfile.bio ?: "",
+        dailyStatus = this.streamerProfile.dailyStatus ?: "",
         socials = socialsList,
         tags = this.streamerProfile?.tags?.map {
             ProfileStreamerEntity.Tag(
