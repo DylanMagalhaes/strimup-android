@@ -7,7 +7,7 @@ interface StreamerRepository {
     suspend fun getStreamers(
         filter: FilterEntity,
         favoriteStreamerIds: List<String>
-    ): List<StreamerEntity>
+    ): Result<List<StreamerEntity>>
 
     suspend fun getFavoriteStreamerIds(): List<String>
 }

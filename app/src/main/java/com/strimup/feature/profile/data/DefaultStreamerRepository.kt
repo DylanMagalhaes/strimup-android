@@ -8,8 +8,12 @@ import javax.inject.Inject
 class DefaultStreamerRepository @Inject constructor(
     val service: StreamerApiService
 ): StreamerRepository {
-    override suspend fun getStreamerById(id: String): ProfileStreamerEntity {
-         return service.getStreamerById(id).toEntity()
+    override suspend fun getStreamerById(id: String): Result<ProfileStreamerEntity> {
+
+        return runCatching {
+            service.getStreamerById(id).toEntity()
+        }
+
     }
 
 }

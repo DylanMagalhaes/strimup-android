@@ -14,20 +14,24 @@ class DefaultStreamerRepository @Inject constructor(
     override suspend fun getStreamers(
         filter: FilterEntity,
         favoriteStreamerIds: List<String>
-    ): List<StreamerEntity> {
+    ): Result<List<StreamerEntity>> {
         return when (filter) {
             FilterEntity.Discovery -> {
-                service.getRandomStreamers()
-                    .items
-                    ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-                    ?: throw IOException("error fetching random streamers")
+                runCatching {
+                    service.getRandomStreamers()
+                        .items
+                        ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
+                        ?: throw IOException("error fetching random streamers")
+                }
             }
 
             FilterEntity.Live -> {
-                service.getInliveStreamers()
-                    .items
-                    ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-                    ?: throw IOException("error fetching random streamers")
+                runCatching {
+                    service.getInliveStreamers()
+                        .items
+                        ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
+                        ?: throw IOException("error fetching random streamers")
+                }
             }
         }
     }

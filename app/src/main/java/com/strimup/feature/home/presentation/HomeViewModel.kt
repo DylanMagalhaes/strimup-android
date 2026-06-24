@@ -7,8 +7,10 @@ import com.strimup.feature.home.domain.usecase.GetStreamersUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -19,18 +21,14 @@ class HomeViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
 
+    private val _events = Channel<UiEvent>()
+    val events = _events.receiveAsFlow()
+
     private var fetchStreamersJob: Job? = null
 
     init {
         viewModelScope.launch {
-            val streamers = getStreamers(FilterEntity.Discovery)
-
-            _state.update {
-                it.copy(
-                    streamers = streamers,
-                    loading = false,
-                )
-            }
+            fetchStreamers(_state.value.currentTab)
         }
     }
 
@@ -44,17 +42,24 @@ class HomeViewModel @Inject constructor(
             )
         }
 
-        fetchStreamersJob =
-            viewModelScope.launch {
-                val streamers = getStreamers(filter)
-
-                _state.update {
-                    it.copy(
-                        streamers = streamers,
-                        loading = false,
-                    )
-                }
-            }
+        fetchStreamersJob = fetchStreamers(filter)
     }
 
+    private fun fetchStreamers(filter: FilterEntity): Job {
+        return viewModelScope.launch {
+            getStreamers(filter)
+                .onSuccess { streamers ->
+                    _state.update {
+                        it.copy(
+                            streamers = streamers,
+                            loading = false,
+                        )
+                    }
+                }
+                .onFailure {
+                    _events.send(UiEvent.ShowSnackBar("Une erreur s'est produite"))
+
+                }
+        }
+    }
 }

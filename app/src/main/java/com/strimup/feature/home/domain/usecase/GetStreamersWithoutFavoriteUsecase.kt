@@ -8,8 +8,7 @@ import javax.inject.Inject
 class GetStreamersWithoutFavoriteUsecase @Inject constructor(
     private val repository: StreamerRepository,
 ) : GetStreamersUsecase {
-    override suspend fun invoke(filter: FilterEntity): List<StreamerEntity> {
-
+    override suspend fun invoke(filter: FilterEntity): Result<List<StreamerEntity>> {
         val streamers = repository.getStreamers(filter, emptyList())
         return streamers
     }

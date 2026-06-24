@@ -10,7 +10,7 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
     override suspend fun getStreamers(
         filter: FilterEntity,
         favoriteStreamerIds: List<String>
-    ): List<StreamerEntity> {
+    ): Result<List<StreamerEntity>> {
         TODO("Not yet implemented")
     }
 

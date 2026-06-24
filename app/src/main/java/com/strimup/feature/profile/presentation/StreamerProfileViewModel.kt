@@ -21,8 +21,11 @@ class StreamerProfileViewModel @Inject constructor(
     fun load(id: String) {
         viewModelScope.launch {
             _state.update { it.copy(loading = true) }
-            val streamer = getStreamer(id)
-            _state.update { it.copy(loading = false, streamer = streamer) }
+            getStreamer(id)
+                .onSuccess { streamer ->
+                    _state.update { it.copy(loading = false, streamer = streamer) }
+                }
+
         }
     }
 }

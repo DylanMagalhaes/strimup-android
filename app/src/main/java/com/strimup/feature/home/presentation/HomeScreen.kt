@@ -15,11 +15,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,10 +44,22 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
+        }
+    }
 
     HomeScreen(
         modifier = modifier,
         state = state,
+        snackBarHostState = snackBarHostState,
         onStreamerClick = onStreamerClick,
         onStreamerSocialClick = { TODO() },
         onStreamerFavoriteClick = { TODO() },
@@ -55,6 +71,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreen(
     state: UiState,
+    snackBarHostState: SnackbarHostState,
     onStreamerClick: (id: String) -> Unit,
     onStreamerFavoriteClick: (StreamerEntity) -> Unit,
     onStreamerSocialClick: (Social) -> Unit,
@@ -64,6 +81,9 @@ private fun HomeScreen(
     Scaffold(
         modifier = modifier,
         topBar = { TopAppBar(title = { Text(text = "Home") }) },
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
+        },
     ) { padding ->
         HomeContent(
             modifier = Modifier.padding(padding),
