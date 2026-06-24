@@ -1,4 +1,4 @@
-package com.strimup.feature.profile.presentation.component
+package com.strimup.feature.streamerdetail.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,14 +19,14 @@ import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.profile.domain.entity.ProfileStreamerEntity
-import com.strimup.feature.profile.presentation.mapper.getIconRes
+import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
+import com.strimup.feature.streamerdetail.presentation.mapper.getIconRes
 
 @Composable
 fun StreamerContent(
     description: String,
-    socials: List<ProfileStreamerEntity.Social>,
-    onSocialClick: (ProfileStreamerEntity.Social) -> Unit,
+    socials: List<StreamerDetailEntity.Social>,
+    onSocialClick: (StreamerDetailEntity.Social) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -89,21 +89,21 @@ private fun StreamerContentPreview() {
     StrimupTheme {
         StreamerContent(
             socials = listOf(
-                ProfileStreamerEntity.Social(
+                StreamerDetailEntity.Social(
                     url = "",
-                    type = ProfileStreamerEntity.Social.Type.Twitch
+                    type = StreamerDetailEntity.Social.Type.Twitch
                 ),
-                ProfileStreamerEntity.Social(
+                StreamerDetailEntity.Social(
                     url = "",
-                    type = ProfileStreamerEntity.Social.Type.Youtube
+                    type = StreamerDetailEntity.Social.Type.Youtube
                 ),
-                ProfileStreamerEntity.Social(
+                StreamerDetailEntity.Social(
                     url = "",
-                    type = ProfileStreamerEntity.Social.Type.Instagram
+                    type = StreamerDetailEntity.Social.Type.Instagram
                 ),
-                ProfileStreamerEntity.Social(
+                StreamerDetailEntity.Social(
                     url = "",
-                    type = ProfileStreamerEntity.Social.Type.Kick
+                    type = StreamerDetailEntity.Social.Type.Kick
                 ),
             ),
             description = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting (Petit bonus si t'aimes t'enjailler en musique). Je partage également toutes mes activités (Création graphique, montage vidéo), session cinéma sur Discord, ainsi que montage Lego ou activités communautaires. Contact: moontsuki.pro@gmail.com",

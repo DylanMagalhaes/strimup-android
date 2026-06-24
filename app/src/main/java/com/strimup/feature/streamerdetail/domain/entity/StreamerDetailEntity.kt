@@ -1,8 +1,6 @@
-package com.strimup.feature.profile.domain.entity
+package com.strimup.feature.streamerdetail.domain.entity
 
-import com.strimup.feature.home.domain.entity.StreamerEntity
-
-data class ProfileStreamerEntity(
+data class StreamerDetailEntity(
     val userName: String,
     val socials: List<Social>,
     val imageUrl: String,

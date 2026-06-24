@@ -1,4 +1,4 @@
-package com.strimup.feature.profile.presentation.component
+package com.strimup.feature.streamerdetail.presentation.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -13,7 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
-import org.w3c.dom.Text
 
 @Composable
 fun TagBadge(

@@ -1,6 +1,6 @@
-package com.strimup.feature.profile.data
+package com.strimup.feature.streamerdetail.data
 
-import com.strimup.feature.profile.data.response.StreamerResponse
+import com.strimup.feature.streamerdetail.data.response.StreamerResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 

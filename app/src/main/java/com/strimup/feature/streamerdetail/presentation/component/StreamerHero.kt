@@ -1,4 +1,4 @@
-package com.strimup.feature.profile.presentation.component
+package com.strimup.feature.streamerdetail.presentation.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,14 +32,14 @@ import coil3.compose.AsyncImage
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.profile.domain.entity.ProfileStreamerEntity
+import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
 
 @Composable
 fun StreamerHero(
     isLive: Boolean,
     imageUrl: String,
     pseudo: String,
-    tags: List<ProfileStreamerEntity.Tag>?,
+    tags: List<StreamerDetailEntity.Tag>?,
     dailyStatus: String,
     modifier: Modifier = Modifier,
 ) {
@@ -166,10 +166,10 @@ private fun StreamerHeroPreview() {
             imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
             pseudo = "Squeezi",
             tags = listOf(
-                ProfileStreamerEntity.Tag(name = "Gamming", category = "dolk"),
-                ProfileStreamerEntity.Tag(name = "Dev", category = "dolk"),
-                ProfileStreamerEntity.Tag(name = "Cuisine", category = "dolk"),
-                ProfileStreamerEntity.Tag(name = "Cuisine", category = "dolk"),
+                StreamerDetailEntity.Tag(name = "Gamming", category = "dolk"),
+                StreamerDetailEntity.Tag(name = "Dev", category = "dolk"),
+                StreamerDetailEntity.Tag(name = "Cuisine", category = "dolk"),
+                StreamerDetailEntity.Tag(name = "Cuisine", category = "dolk"),
             ),
             dailyStatus = "Hello la compagnie",
         )

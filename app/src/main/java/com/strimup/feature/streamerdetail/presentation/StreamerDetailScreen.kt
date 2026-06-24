@@ -1,4 +1,4 @@
-package com.strimup.feature.profile.presentation
+package com.strimup.feature.streamerdetail.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,24 +22,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.feature.profile.domain.entity.ProfileStreamerEntity
-import com.strimup.feature.profile.presentation.component.StreamerContent
-import com.strimup.feature.profile.presentation.component.StreamerHero
+import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
+import com.strimup.feature.streamerdetail.presentation.component.StreamerContent
+import com.strimup.feature.streamerdetail.presentation.component.StreamerHero
 
 @Composable
-fun StreamerProfileScreen(
+fun StreamerDetailScreen(
     streamerId: String,
     onNavUp: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: StreamerProfileViewModel = hiltViewModel(),
+    viewModel: StreamerDetailViewModel = hiltViewModel(
+        creationCallback = { factory: StreamerDetailViewModel.Factory -> factory.create(streamerId) }
+    ),
 ) {
-    LaunchedEffect(streamerId) {
-        viewModel.load(streamerId)
-    }
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    StreamerProfileScreen(
+    StreamerDetailScreen(
         modifier = modifier,
         state = state,
         onNavUp = onNavUp
@@ -49,7 +47,7 @@ fun StreamerProfileScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun StreamerProfileScreen(
+private fun StreamerDetailScreen(
     state: UiState,
     onNavUp: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,7 +67,7 @@ private fun StreamerProfileScreen(
                 })
         },
     ) { padding ->
-        StreamerProfileContent(
+        StreamerDetailContent(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize(),
@@ -79,7 +77,7 @@ private fun StreamerProfileScreen(
 }
 
 @Composable
-private fun StreamerProfileContent(
+private fun StreamerDetailContent(
     state: UiState,
     modifier: Modifier = Modifier,
 ) {
@@ -110,41 +108,41 @@ private fun StreamerProfileContent(
 
 @Preview
 @Composable
-private fun StreamerProfileScreenPreview() {
+private fun StreamerDetailScreenPreview() {
     StrimupTheme {
-        StreamerProfileScreen(
+        StreamerDetailScreen(
             onNavUp = {},
             state = UiState(
                 loading = false,
-                streamer = ProfileStreamerEntity(
+                streamer = StreamerDetailEntity(
                     isLive = false,
                     bio = "lorem ipsum doloreoji enierjfi nejr jhzunf hjznf hbuzhjfzbef hzef ",
                     imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
                     userName = "Squeezi",
                     tags = listOf(
-                        ProfileStreamerEntity.Tag(name = "Gamming", category = "dolk"),
-                        ProfileStreamerEntity.Tag(name = "Dev", category = "dolk"),
-                        ProfileStreamerEntity.Tag(name = "Cuisine", category = "dolk"),
-                        ProfileStreamerEntity.Tag(name = "Cuisine", category = "dolk"),
+                        StreamerDetailEntity.Tag(name = "Gamming", category = "dolk"),
+                        StreamerDetailEntity.Tag(name = "Dev", category = "dolk"),
+                        StreamerDetailEntity.Tag(name = "Cuisine", category = "dolk"),
+                        StreamerDetailEntity.Tag(name = "Cuisine", category = "dolk"),
                     ),
                     dailyStatus = "Hello la compagnie",
                     videos = null,
                     socials = listOf(
-                        ProfileStreamerEntity.Social(
+                        StreamerDetailEntity.Social(
                             url = "",
-                            type = ProfileStreamerEntity.Social.Type.Twitch
+                            type = StreamerDetailEntity.Social.Type.Twitch
                         ),
-                        ProfileStreamerEntity.Social(
+                        StreamerDetailEntity.Social(
                             url = "",
-                            type = ProfileStreamerEntity.Social.Type.Youtube
+                            type = StreamerDetailEntity.Social.Type.Youtube
                         ),
-                        ProfileStreamerEntity.Social(
+                        StreamerDetailEntity.Social(
                             url = "",
-                            type = ProfileStreamerEntity.Social.Type.Instagram
+                            type = StreamerDetailEntity.Social.Type.Instagram
                         ),
-                        ProfileStreamerEntity.Social(
+                        StreamerDetailEntity.Social(
                             url = "",
-                            type = ProfileStreamerEntity.Social.Type.Kick
+                            type = StreamerDetailEntity.Social.Type.Kick
                         ),
                     ),
                 )
