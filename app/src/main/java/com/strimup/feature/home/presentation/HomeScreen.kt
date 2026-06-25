@@ -127,7 +127,7 @@ private fun HomeContent(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        items(items = state.streamers) { streamer ->
+                        items(items = state.streamers, key = { streamer -> streamer.id }) { streamer ->
                             StreamerCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
