@@ -1,6 +1,6 @@
 package com.strimup.feature.auth.domain.entity
 
-data class UserLoggedEntity(
+data class UserEntity(
     val id: String,
     val userName: String,
     val email: String,

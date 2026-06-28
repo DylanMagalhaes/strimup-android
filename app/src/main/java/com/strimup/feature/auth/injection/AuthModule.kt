@@ -1,8 +1,8 @@
 package com.strimup.feature.auth.injection
 
 import com.strimup.feature.auth.data.AuthApiService
-import com.strimup.feature.auth.data.DefaultSessionRepository
-import com.strimup.feature.auth.domain.SessionRepository
+import com.strimup.feature.auth.data.DefaultAuthRepository
+import com.strimup.feature.auth.domain.AuthRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -14,7 +14,7 @@ import retrofit2.Retrofit
 @InstallIn(ViewModelComponent::class)
 interface AuthModule {
     @Binds
-    fun bindsSessionRepository(impl: DefaultSessionRepository): SessionRepository
+    fun bindsSessionRepository(impl: DefaultAuthRepository): AuthRepository
 
     companion object {
         @Provides

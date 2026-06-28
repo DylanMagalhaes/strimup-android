@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.material.icons)
+
     implementation(libs.coil)
     implementation(libs.coil.network)
     implementation(libs.retrofit)
@@ -63,6 +64,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     annotationProcessor(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.hilt.viewmodel.compose)
     implementation(libs.hilt.android)
