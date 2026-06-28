@@ -6,6 +6,7 @@ import com.strimup.feature.auth.domain.entity.UserEntity
 fun UserLoggedResponse.toEntity(): UserEntity {
     return UserEntity(
         id = this.userLogged.id,
+        token = this.token,
         userName = this.userLogged.userName,
         gender = this.userLogged.gender,
         birthDate = this.userLogged.birthDate,
