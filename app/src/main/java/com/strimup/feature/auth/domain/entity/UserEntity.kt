@@ -7,7 +7,7 @@ data class UserEntity(
     val token: String,
     val userName: String,
     val email: String,
-    val role: String,
+    val role: UserRole,
     val birthDate: String,
     val gender: String
 )
