@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.feature.auth.domain.usecase.LoginUsecase
 import com.strimup.feature.auth.presentation.UiEvent
 import com.strimup.feature.auth.presentation.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@HiltViewModel
 class LoginViewModel @Inject constructor(
     private val login: LoginUsecase
 ) : ViewModel() {

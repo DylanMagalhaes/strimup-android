@@ -3,6 +3,8 @@ package com.strimup.feature.auth.injection
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.domain.AuthRepository
+import com.strimup.feature.auth.domain.usecase.LoginUsecase
+import com.strimup.feature.auth.domain.usecase.DefaultLoginUsecase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -13,8 +15,12 @@ import retrofit2.Retrofit
 @Module
 @InstallIn(ViewModelComponent::class)
 interface AuthModule {
+
     @Binds
     fun bindsSessionRepository(impl: DefaultAuthRepository): AuthRepository
+
+    @Binds
+    fun bindsLoginUsecase(impl: DefaultLoginUsecase): LoginUsecase
 
     companion object {
         @Provides
