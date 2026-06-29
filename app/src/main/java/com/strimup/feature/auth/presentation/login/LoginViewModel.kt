@@ -1,10 +1,48 @@
 package com.strimup.feature.auth.presentation.login
 
 import androidx.lifecycle.ViewModel
-import com.strimup.feature.auth.domain.AuthRepository
+import androidx.lifecycle.viewModelScope
+import com.strimup.feature.auth.domain.usecase.LoginUsecase
+import com.strimup.feature.auth.presentation.UiEvent
+import com.strimup.feature.auth.presentation.UiState
 import javax.inject.Inject
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class LoginViewModel @Inject constructor(
-    private val repository: AuthRepository
-): ViewModel() {
+    private val login: LoginUsecase
+) : ViewModel() {
+
+    private val _state = MutableStateFlow(UiState())
+    val state = _state.asStateFlow()
+
+    private val _events = Channel<UiEvent>()
+    val event = _events.receiveAsFlow()
+
+    fun onLoginButtonClick(email: String, password: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(loading = true) }
+            login(email, password)
+                .onSuccess { response ->
+                    _state.update {
+                        it.copy(
+                            loading = false,
+                            user = response.user,
+                            isLoggedIn = true,
+                            message = response.message
+                        )
+                    }
+                }
+                .onFailure { exception ->
+                    _state.update { it.copy(loading = false) }
+
+                    val errorMessage = exception.message ?: "Une erreur est survenue"
+                    _events.send(UiEvent.ShowSnackBar(text = errorMessage))
+                }
+        }
+    }
 }

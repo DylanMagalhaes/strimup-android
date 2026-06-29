@@ -10,10 +10,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,15 +33,56 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
 import com.strimup.common.ui.component.button.PrimaryButton
-import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.textfield.StrimupTextField
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.feature.auth.presentation.UiEvent
+import com.strimup.feature.auth.presentation.UiState
 
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    var emailValue by remember { mutableStateOf("") }
+    var passwordValue by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+    ) { padding ->
+        LoginContent(
+            modifier = Modifier.padding(padding),
+            state = state,
+            emailValue = emailValue,
+            onEmailChange = { emailValue = it },
+            passwordValue = passwordValue,
+            onPasswordChange = { passwordValue = it },
+            onForgetPasswordClick = { /* TODO */ },
+            onLoginClick = { viewModel.onLoginButtonClick(emailValue, passwordValue) },
+            onRegisterClick = { /* TODO */ }
+        )
+    }
+}
+
+@Composable
+fun LoginContent(
+    state: UiState,
     emailValue: String,
     onEmailChange: (String) -> Unit,
     passwordValue: String,
@@ -104,7 +153,8 @@ fun LoginScreen(
 
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
-                label = "Se connecter",
+                // Correction de la condition logique ici 👇
+                label = if (state.loading) "Connexion en cours..." else "Se connecter",
                 onClick = onLoginClick,
             )
 
@@ -131,11 +181,7 @@ fun LoginScreen(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )
-
             }
-
-
-
 
             Text(
                 text = "Pas encore de compte ?",
@@ -147,7 +193,6 @@ fun LoginScreen(
             ) {
                 Text(text = "S'inscrire maintenant")
             }
-
         }
     }
 }
@@ -156,7 +201,7 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenPreview() {
     StrimupTheme {
-        LoginScreen(
+        LoginContent(
             emailValue = "",
             onEmailChange = {},
             passwordValue = "",
@@ -164,6 +209,7 @@ private fun LoginScreenPreview() {
             onForgetPasswordClick = {},
             onLoginClick = {},
             onRegisterClick = {},
+            state = UiState()
         )
     }
 }
