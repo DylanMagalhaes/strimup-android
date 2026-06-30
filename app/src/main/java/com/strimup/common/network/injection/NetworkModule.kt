@@ -18,10 +18,11 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 object NetworkModule {
 
     @Provides
-    fun providesRetrofit(): Retrofit =
+    fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit =
         Retrofit
             .Builder()
             .baseUrl("https://strimup-back-fd5v.onrender.com/")
+            .client(okHttpClient)
             .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
             .build()
 
