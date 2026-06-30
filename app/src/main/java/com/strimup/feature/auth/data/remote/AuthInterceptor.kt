@@ -9,7 +9,7 @@ import okhttp3.Response
 
 class AuthInterceptor @Inject constructor(
     private val preferences: AuthPreferencesDataSource
-): Interceptor {
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
 
@@ -21,7 +21,7 @@ class AuthInterceptor @Inject constructor(
             .header("X-Requested-With", "com.strimup.app")
             .header("Accept", "application/json")
 
-        if(!token.isNullOrBlank()){
+        if (!token.isNullOrBlank()) {
             requestBuilder.header("Authorization", "Bearer $token")
         }
 

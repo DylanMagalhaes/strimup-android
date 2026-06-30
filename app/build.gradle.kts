@@ -65,6 +65,8 @@ dependencies {
     annotationProcessor(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.okhttp3)
+    implementation(libs.okhttp3.logging.interceptor)
 
     implementation(libs.hilt.viewmodel.compose)
     implementation(libs.hilt.android)
