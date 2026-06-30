@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.feature.auth.presentation.login.LoginScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -18,8 +17,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             StrimupTheme {
-                // StrimupNavDisplay(modifier = Modifier.fillMaxSize())
-                LoginScreen()
+                StrimupNavDisplay(modifier = Modifier.fillMaxSize())
             }
         }
     }

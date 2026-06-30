@@ -45,6 +45,8 @@ import com.strimup.feature.auth.presentation.UiState
 
 @Composable
 fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -63,7 +65,14 @@ fun LoginScreen(
         }
     }
 
+    LaunchedEffect(state.isLoggedIn) {
+        if(state.isLoggedIn){
+            onLoginSuccess()
+        }
+    }
+
     Scaffold(
+        modifier = modifier,
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { padding ->
         LoginContent(
