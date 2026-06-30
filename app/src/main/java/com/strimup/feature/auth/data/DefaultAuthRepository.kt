@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class DefaultAuthRepository @Inject constructor(
     private val service: AuthApiService,
-    private val preferences: AuthPreferencesDataSource
+    private val preferences: AuthPreferencesDataSource,
 ) : AuthRepository {
     override suspend fun login(email: String, password: String): Result<LoginResultEntity> {
         return runCatching {
