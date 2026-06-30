@@ -8,5 +8,4 @@ data class UiState(
     val user: UserEntity? = null,
     val loading: Boolean = false,
     val isLoggedIn: Boolean = false,
-    val message: String? = null
 )

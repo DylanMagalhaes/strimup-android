@@ -35,14 +35,14 @@ class LoginViewModel @Inject constructor(
                             loading = false,
                             user = response.user,
                             isLoggedIn = true,
-                            message = response.message
                         )
                     }
+
                 }
                 .onFailure { exception ->
                     _state.update { it.copy(loading = false) }
 
-                    val errorMessage = exception.message ?: "Une erreur est survenue"
+                    val errorMessage = "Une erreur est survenue"
                     _events.send(UiEvent.ShowSnackBar(text = errorMessage))
                 }
         }
