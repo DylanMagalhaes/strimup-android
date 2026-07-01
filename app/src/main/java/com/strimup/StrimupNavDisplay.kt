@@ -9,12 +9,13 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.strimup.common.navigation.Destination
+import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 
 @Composable
 fun StrimupNavDisplay(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(Destination.Home)
+    val backStack = rememberNavBackStack(Destination.Login)
 
     NavDisplay(
         modifier = modifier,
@@ -30,6 +31,16 @@ fun StrimupNavDisplay(modifier: Modifier = Modifier) {
                     onStreamerClick = { id ->
                         backStack.add(Destination.StreamerDetail(streamerId = id))
                     },
+                )
+            }
+
+            entry<Destination.Login> {
+                LoginScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    onLoginSuccess = {
+                        backStack.clear()
+                        backStack.add(Destination.Home)
+                    }
                 )
             }
 
