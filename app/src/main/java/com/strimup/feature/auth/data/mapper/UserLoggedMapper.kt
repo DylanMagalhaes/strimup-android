@@ -9,9 +9,9 @@ fun UserLoggedResponse.toEntity(): LoginResultEntity {
     val userLogged = this.userLogged
     return LoginResultEntity(
         message = this.message,
+        token = this.token,
         user = UserEntity(
             id = userLogged.id,
-            token = this.token,
             userName = userLogged.userName,
             email = userLogged.email,
             role = UserRole.valueOf(userLogged.role.uppercase()),
