@@ -15,7 +15,10 @@ class DefaultAuthRepository @Inject constructor(
         return runCatching {
             val response = service.login(LoginRequest(email, password))
 
-            preferences.saveAuthToken(response.token)
+            preferences.saveTokens(
+                accessToken = response.token,
+                refreshToken = response.refreshToken
+            )
 
             response.toEntity()
         }
