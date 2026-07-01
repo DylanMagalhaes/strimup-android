@@ -1,5 +1,6 @@
 package com.strimup.common.network.injection
 
+import com.strimup.feature.auth.data.remote.AuthAuthenticator
 import com.strimup.feature.auth.data.remote.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -29,7 +30,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        authInterceptor: AuthInterceptor
+        authInterceptor: AuthInterceptor,
+        authAuthenticator: AuthAuthenticator
     ): OkHttpClient {
 
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -39,6 +41,7 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
+            .authenticator(authAuthenticator)
             .build()
     }
 }

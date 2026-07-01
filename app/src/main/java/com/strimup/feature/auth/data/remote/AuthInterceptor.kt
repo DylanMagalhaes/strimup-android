@@ -13,8 +13,12 @@ class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
 
+        if (request.url.encodedPath.contains("api/auth/refresh")) {
+            return chain.proceed(request)
+        }
+
         val token = runBlocking {
-            preferences.authToken.firstOrNull()
+            preferences.getAccessToken()
         }
 
         val requestBuilder = request.newBuilder()

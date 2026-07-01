@@ -5,6 +5,7 @@ import com.strimup.feature.auth.data.response.UserLoggedResponse
 import com.strimup.feature.auth.data.response.UserMeResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface AuthApiService {
@@ -13,4 +14,9 @@ interface AuthApiService {
 
     @GET("api/auth/me")
     suspend fun getCurrentUser(): UserMeResponse
+
+    @POST("api/auth/refresh")
+    suspend fun refreshToken(
+        @Header("Authorization") refreshToken: String
+    ): UserLoggedResponse
 }
