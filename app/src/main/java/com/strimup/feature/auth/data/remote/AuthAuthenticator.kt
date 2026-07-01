@@ -11,7 +11,6 @@ import okhttp3.Response
 import okhttp3.Route
 
 class AuthAuthenticator @Inject constructor(
-    // On utilise Provider pour éviter la dépendance circulaire (le serpent qui se mord la queue)
     private val apiService: Provider<AuthApiService>,
     private val preferences: AuthPreferencesDataSource
 ) : Authenticator {

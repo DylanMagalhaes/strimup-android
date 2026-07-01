@@ -19,7 +19,7 @@ import retrofit2.Retrofit
 object AuthNetworkModule {
 
     @Provides
-    @Singleton // 👈 On dit à Hilt de garder une seule instance globale
+    @Singleton
     fun providesAuthApiService(retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
     }
