@@ -10,22 +10,28 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
+import jakarta.inject.Singleton
 import retrofit2.Retrofit
 
 @Module
+@InstallIn(SingletonComponent::class)
+object AuthNetworkModule {
+
+    @Provides
+    @Singleton
+    fun providesAuthApiService(retrofit: Retrofit): AuthApiService {
+        return retrofit.create(AuthApiService::class.java)
+    }
+}
+
+@Module
 @InstallIn(ViewModelComponent::class)
-interface AuthModule {
+interface AuthDomainModule {
 
     @Binds
     fun bindsSessionRepository(impl: DefaultAuthRepository): AuthRepository
 
     @Binds
     fun bindsLoginUsecase(impl: DefaultLoginUsecase): LoginUsecase
-
-    companion object {
-        @Provides
-        fun providesAuthApiService(retrofit: Retrofit): AuthApiService {
-            return retrofit.create(AuthApiService::class.java)
-        }
-    }
 }

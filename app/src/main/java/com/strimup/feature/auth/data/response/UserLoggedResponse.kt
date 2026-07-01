@@ -9,6 +9,8 @@ data class UserLoggedResponse(
     val message: String,
     @SerialName("token")
     val token: String,
+    @SerialName("refreshToken")
+    val refreshToken: String,
     @SerialName("user")
     val userLogged: UserLogged
 ) {
