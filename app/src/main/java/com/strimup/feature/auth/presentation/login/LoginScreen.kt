@@ -45,7 +45,7 @@ import com.strimup.feature.auth.presentation.UiState
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onNavToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -61,13 +61,11 @@ fun LoginScreen(
                 is UiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(event.text)
                 }
-            }
-        }
-    }
 
-    LaunchedEffect(state.isLoggedIn) {
-        if(state.isLoggedIn){
-            onLoginSuccess()
+                UiEvent.ShowHomeUi -> {
+                    onNavToHome()
+                }
+            }
         }
     }
 

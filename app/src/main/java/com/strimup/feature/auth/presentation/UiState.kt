@@ -7,5 +7,4 @@ data class UiState(
     val loginResultEntity: LoginResultEntity? = null,
     val user: UserEntity? = null,
     val loading: Boolean = false,
-    val isLoggedIn: Boolean = false,
 )

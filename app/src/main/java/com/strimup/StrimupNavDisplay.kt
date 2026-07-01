@@ -37,7 +37,7 @@ fun StrimupNavDisplay(modifier: Modifier = Modifier) {
             entry<Destination.Login> {
                 LoginScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onLoginSuccess = {
+                    onNavToHome = {
                         backStack.clear()
                         backStack.add(Destination.Home)
                     }
