@@ -19,6 +19,9 @@ retrofit = "2.11.0"
 room = "2.6.1"
 datastore = "1.1.1"
 okhttp = "4.12.0"
+room3CommonJvm = "3.0.0-rc01"
+room3Runtime = "3.0.0-rc01"
+room3Compiler = "3.0.0-rc01"
 
 
 [libraries]
@@ -59,6 +62,9 @@ okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room3-common-jvm = { group = "androidx.room3", name = "room3-common-jvm", version.ref = "room3CommonJvm" }
+androidx-room3-runtime = { group = "androidx.room3", name = "room3-runtime", version.ref = "room3Runtime" }
+androidx-room3-compiler = { group = "androidx.room3", name = "room3-compiler", version.ref = "room3Compiler" }
 
 
 [plugins]

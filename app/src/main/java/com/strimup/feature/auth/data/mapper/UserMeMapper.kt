@@ -8,8 +8,6 @@ fun UserMeResponse.UserMeData.toEntity(): UserEntity {
     return UserEntity(
         id = this.id,
         userName = this.userName,
-        gender = this.gender,
-        birthDate = this.birthDate,
         email = this.email,
         role = UserRole.valueOf(this.role),
     )

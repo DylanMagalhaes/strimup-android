@@ -2,6 +2,7 @@ package com.strimup.feature.auth.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.feature.auth.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.domain.usecase.LoginUsecase
 import com.strimup.feature.auth.presentation.UiEvent
 import com.strimup.feature.auth.presentation.UiState
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val login: LoginUsecase
+    private val login: LoginUsecase,
+
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -33,7 +35,7 @@ class LoginViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             loading = false,
-                            user = response.user, //TODO: store locally
+                            user = response.user,
                         )
                     }
 
