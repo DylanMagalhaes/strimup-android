@@ -15,7 +15,7 @@ import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 
 @Composable
 fun StrimupNavDisplay(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(Destination.Login)
+    val backStack = rememberNavBackStack(Destination.Home)
 
     NavDisplay(
         modifier = modifier,

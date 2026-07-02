@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerdetail.presentation.component
+package com.strimup.common.ui.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding

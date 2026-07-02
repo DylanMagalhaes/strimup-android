@@ -8,6 +8,7 @@ data class StreamerEntity(
     val isLive: Boolean,
     val liveTitle: String?,
     val isFavorite: Boolean,
+    val tags: List<Tags>?,
 ) {
     data class Social(
         val url: String?,
@@ -21,4 +22,8 @@ data class StreamerEntity(
             Tiktok,
         }
     }
+    data class Tags(
+        val id: Int,
+        val name: String
+    )
 }

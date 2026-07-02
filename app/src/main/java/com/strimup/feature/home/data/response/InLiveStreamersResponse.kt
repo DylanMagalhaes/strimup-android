@@ -15,7 +15,7 @@ data class InLiveStreamersResponse(
         @SerialName("id")
         val id: String?,
         @SerialName("pseudo")
-        val pseudo: String?,
+        val userName: String?,
         @SerialName("streamerProfile")
         val streamerProfile: StreamerProfile?
     ) {
@@ -24,7 +24,7 @@ data class InLiveStreamersResponse(
             @SerialName("id")
             val id: String?,
             @SerialName("avatar_url")
-            val avatarUrl: String?,
+            val imageUrl: String?,
             @SerialName("is_verified")
             val isVerified: Boolean?,
             @SerialName("is_live")
