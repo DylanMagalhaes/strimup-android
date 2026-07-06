@@ -17,4 +17,8 @@ class FakeStreamerRepository @Inject constructor() : StreamerRepository {
     override suspend fun getFavoriteStreamerIds(): List<String> {
         throw NotImplementedError()
     }
+
+    override suspend fun searchStreamers(query: String): Result<List<StreamerEntity>> {
+        TODO("Not yet implemented")
+    }
 }

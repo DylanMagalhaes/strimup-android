@@ -40,5 +40,17 @@ class DefaultStreamerRepository @Inject constructor(
         return service.getFavoriteStreamers()
             .map { requireNotNull(it.streamerId) }
     }
+
+    override suspend fun searchStreamers(query: String): Result<List<StreamerEntity>> {
+        return runCatching {
+            val response =service.searchStreamers(query)
+
+            response.map { dataStreamer ->
+                dataStreamer.toEntity()
+            }
+        }
+    }
+
+
 }
 

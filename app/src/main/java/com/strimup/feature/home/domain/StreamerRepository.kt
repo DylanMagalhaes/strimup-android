@@ -10,4 +10,6 @@ interface StreamerRepository {
     ): Result<List<StreamerEntity>>
 
     suspend fun getFavoriteStreamerIds(): List<String>
+
+    suspend fun searchStreamers(query: String): Result<List<StreamerEntity>>
 }

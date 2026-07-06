@@ -19,7 +19,7 @@ data class RandomStreamersResponse(
         @SerialName("id")
         val id: String?,
         @SerialName("pseudo")
-        val pseudo: String?,
+        val userName: String?,
         @SerialName("streamerProfile")
         val streamerProfile: StreamerProfile?
     ) {
@@ -28,7 +28,7 @@ data class RandomStreamersResponse(
             @SerialName("id")
             val id: String?,
             @SerialName("avatar_url")
-            val avatarUrl: String?,
+            val imageUrl: String?,
             @SerialName("is_verified")
             val isVerified: Boolean?,
             @SerialName("is_live")
@@ -47,16 +47,7 @@ data class RandomStreamersResponse(
             val instagramUrl: String?,
             @SerialName("kick_url")
             val kickUrl: String?,
-            @SerialName("tags")
-            val tags: List<Tag>?
         )
 
-        @Serializable
-        data class Tag(
-            @SerialName("id")
-            val id: Int?,
-            @SerialName("name")
-            val name: String?
-        )
     }
 }
