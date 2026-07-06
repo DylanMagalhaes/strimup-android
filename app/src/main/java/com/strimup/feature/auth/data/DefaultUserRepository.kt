@@ -31,5 +31,4 @@ class DefaultUserRepository @Inject constructor(
             userEntity
         }
     }
-
 }
