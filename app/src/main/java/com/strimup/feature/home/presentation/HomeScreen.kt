@@ -111,6 +111,7 @@ private fun HomeScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 title = {
                     OutlinedTextField(
                         value = state.searchQuery,
