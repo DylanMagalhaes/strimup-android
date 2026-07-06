@@ -106,15 +106,6 @@ private fun HomeScreen(
                         singleLine = true
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-
-                }
             )
         },
         snackbarHost = {
