@@ -11,11 +11,13 @@ import androidx.navigation3.ui.NavDisplay
 import com.strimup.common.navigation.Destination
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.home.presentation.HomeScreen
+import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 
 @Composable
 fun StrimupNavDisplay(modifier: Modifier = Modifier) {
     val backStack = rememberNavBackStack(Destination.Home)
+
 
     NavDisplay(
         modifier = modifier,
@@ -28,6 +30,8 @@ fun StrimupNavDisplay(modifier: Modifier = Modifier) {
             entry<Destination.Home> {
                 HomeScreen(
                     modifier = Modifier.fillMaxSize(),
+                    onNavSearch = { backStack.add(Destination.Search) },
+                    onNavLogin = { backStack.add(Destination.Login) },
                     onStreamerClick = { id ->
                         backStack.add(Destination.StreamerDetail(streamerId = id))
                     },
@@ -51,6 +55,13 @@ fun StrimupNavDisplay(modifier: Modifier = Modifier) {
                     onNavUp = { backStack.removeLastOrNull() },
                 )
             }
+
+            entry<Destination.Search> {
+                SearchScreen(
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
+
     )
 }

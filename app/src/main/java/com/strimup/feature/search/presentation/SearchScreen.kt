@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,20 +35,32 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.search.domain.entity.StreamerEntity
 
 @Composable
-fun SearchScreen(modifier: Modifier = Modifier) {
+fun SearchScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SearchViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
+    SearchScreen(
+        modifier = modifier,
+        state = state,
+        onSearchInputChange = { viewModel.onSearchInputChange(it) }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchScreen(
     state: UiState,
+    onSearchInputChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -57,8 +70,10 @@ private fun SearchScreen(
                 modifier = Modifier.padding(16.dp),
                 title = {
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = state.searchQuery,
+                        onValueChange = { newText ->
+                            onSearchInputChange(newText)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .onFocusChanged { },
@@ -83,7 +98,7 @@ private fun SearchScreen(
 
 @Composable
 private fun SearchContent(
-    state: com.strimup.feature.search.presentation.UiState,
+    state: UiState,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -179,7 +194,8 @@ fun SearchScreenPreview(modifier: Modifier = Modifier) {
                         imageUrl = ""
                     )
                 )
-            )
+            ),
+            onSearchInputChange = TODO()
         )
     }
 }
