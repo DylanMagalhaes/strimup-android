@@ -54,7 +54,7 @@ private fun SearchScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(16.dp),
                 title = {
                     OutlinedTextField(
                         value = "",
@@ -88,6 +88,7 @@ private fun SearchContent(
 ) {
     Surface(
         modifier = modifier,
+        color = MaterialTheme.colorScheme.background
     ) {
 
         if (state.loading) {
