@@ -92,7 +92,7 @@ private fun HomeScreen(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 title = {
                     OutlinedTextField(
-                        value = state.searchQuery,
+                        value = "",
                         onValueChange = {},
                         modifier = Modifier
                             .fillMaxWidth()
