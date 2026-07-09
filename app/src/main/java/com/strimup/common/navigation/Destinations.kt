@@ -14,4 +14,7 @@ sealed interface Destination : NavKey {
 
     @Serializable
     object Login : Destination
+
+    @Serializable
+    object Search : Destination
 }

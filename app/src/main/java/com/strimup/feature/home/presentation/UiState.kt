@@ -9,8 +9,4 @@ data class UiState(
     val streamers: List<StreamerEntity> = emptyList(),
     val currentTab: FilterEntity = FilterEntity.Discovery,
     val loading: Boolean = true,
-    val searchQuery: String = "",
-    val isSearchMode: Boolean = false,
-    val streamersResultSearch: List<StreamerEntity> = emptyList(),
-    val loadingSearch: Boolean = true,
 )

@@ -18,7 +18,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val login: LoginUsecase,
-
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())

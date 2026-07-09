@@ -2,7 +2,6 @@ package com.strimup.feature.home.data.mapper
 
 import com.strimup.feature.home.data.response.InLiveStreamersResponse
 import com.strimup.feature.home.data.response.RandomStreamersResponse
-import com.strimup.feature.home.data.response.StreamersFoundResponse
 import com.strimup.feature.home.domain.entity.StreamerEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social
 
@@ -72,25 +71,5 @@ fun InLiveStreamersResponse.StreamerData.toEntity(isFavorite: Boolean): Streamer
         liveTitle = this.streamerProfile.liveTitle,
         isFavorite = isFavorite,
         tags = null
-    )
-}
-
-fun StreamersFoundResponse.toEntity(): StreamerEntity {
-    val tagsList = this.streamerProfile.tags?.map { tag ->
-        StreamerEntity.Tags(
-            id = tag.id,
-            name = tag.name
-        )
-    } ?: emptyList()
-
-    return StreamerEntity(
-        id = requireNotNull(this.id),
-        userName = requireNotNull(this.userName),
-        socials = emptyList(),
-        imageUrl = this.streamerProfile.imageUrl ?: "",
-        isLive = false,
-        liveTitle = null,
-        isFavorite = false,
-        tags = tagsList
     )
 }
