@@ -11,17 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -44,8 +35,6 @@ import com.strimup.feature.home.presentation.component.StreamerCard
 @Composable
 fun HomeScreen(
     onStreamerClick: (id: String) -> Unit,
-    onNavSearch: () -> Unit,
-    onNavLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -62,67 +51,14 @@ fun HomeScreen(
         }
     }
 
-    HomeScreen(
-        modifier = modifier,
+    HomeContent(
+        modifier = modifier.fillMaxSize(),
         state = state,
-        snackBarHostState = snackBarHostState,
         onStreamerClick = onStreamerClick,
-        onStreamerSocialClick = { TODO() },
-        onStreamerFavoriteClick = { TODO() },
+        onStreamerSocialClick = { /* TODO */ },
+        onStreamerFavoriteClick = { /* TODO */ },
         onTabClick = { viewModel.onTabClick(it) },
-        onNavSearch = onNavSearch,
-        onNavLogin = onNavLogin,
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeScreen(
-    state: UiState,
-    snackBarHostState: SnackbarHostState,
-    onStreamerClick: (id: String) -> Unit,
-    onStreamerFavoriteClick: (StreamerEntity) -> Unit,
-    onStreamerSocialClick: (Social) -> Unit,
-    onTabClick: (FilterEntity) -> Unit,
-    onNavSearch: () -> Unit,
-    onNavLogin: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Scaffold(
-        modifier = modifier,
-        bottomBar = {
-            BottomAppBar {
-                IconButton(onClick =  onNavSearch ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Rechercher"
-                    )
-                }
-
-                IconButton(onClick = onNavLogin) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Connexion"
-                    )
-                }
-            }
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-            HomeContent(
-                modifier = Modifier.fillMaxSize(),
-                state = state,
-                onStreamerClick = onStreamerClick,
-                onStreamerSocialClick = onStreamerSocialClick,
-                onStreamerFavoriteClick = onStreamerFavoriteClick,
-                onTabClick = onTabClick,
-            )
-
-        }
-    }
 }
 
 @Composable
@@ -145,7 +81,7 @@ private fun HomeContent(
                 currentTab = state.currentTab,
             )
 
-            Crossfade(targetState = state.loading) { loading ->
+            Crossfade(targetState = state.loading, label = "loading_crossfade") { loading ->
                 if (loading) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -158,7 +94,8 @@ private fun HomeContent(
                     ) {
                         items(
                             items = state.streamers,
-                            key = { streamer -> streamer.id }) { streamer ->
+                            key = { streamer -> streamer.id }
+                        ) { streamer ->
                             StreamerCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -193,6 +130,5 @@ private fun HomeScreenPreview() {
             onStreamerSocialClick = {},
             onTabClick = {},
         )
-
     }
 }
