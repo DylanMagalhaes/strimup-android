@@ -1,7 +1,7 @@
-package com.strimup.feature.auth.domain.usecase
+package com.strimup.common.user.domain.usecase
 
-import com.strimup.feature.auth.domain.UserRepository
-import com.strimup.feature.auth.domain.entity.UserEntity
+import com.strimup.common.user.domain.UserRepository
+import com.strimup.common.user.domain.entity.UserEntity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 

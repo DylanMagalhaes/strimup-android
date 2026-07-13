@@ -2,7 +2,6 @@ package com.strimup.feature.auth.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.feature.auth.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.domain.usecase.LoginUsecase
 import com.strimup.feature.auth.presentation.UiEvent
 import com.strimup.feature.auth.presentation.UiState

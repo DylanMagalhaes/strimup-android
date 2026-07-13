@@ -1,6 +1,6 @@
-package com.strimup.feature.auth.domain
+package com.strimup.common.user.domain
 
-import com.strimup.feature.auth.domain.entity.UserEntity
+import com.strimup.common.user.domain.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {

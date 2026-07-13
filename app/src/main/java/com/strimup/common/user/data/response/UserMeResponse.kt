@@ -1,4 +1,4 @@
-package com.strimup.feature.auth.data.response
+package com.strimup.common.user.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

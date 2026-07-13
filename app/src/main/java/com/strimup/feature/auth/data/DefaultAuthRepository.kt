@@ -1,7 +1,7 @@
 package com.strimup.feature.auth.data
 
+import com.strimup.common.user.data.local.dao.UserDao
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
-import com.strimup.feature.auth.data.local.dao.UserDao
 import com.strimup.feature.auth.data.mapper.toEntity
 import com.strimup.feature.auth.data.mapper.toRoomEntity
 import com.strimup.feature.auth.data.request.LoginRequest

@@ -2,8 +2,8 @@ package com.strimup.common.database
 
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
-import com.strimup.feature.auth.data.local.dao.UserDao
-import com.strimup.feature.auth.data.local.model.UserRoomEntity
+import com.strimup.common.user.data.local.dao.UserDao
+import com.strimup.common.user.data.local.model.UserRoomEntity
 
 @Database(
     entities = [UserRoomEntity::class],
