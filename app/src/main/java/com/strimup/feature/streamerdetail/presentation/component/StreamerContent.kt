@@ -1,5 +1,7 @@
 package com.strimup.feature.streamerdetail.presentation.component
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -9,9 +11,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,55 +35,68 @@ fun StreamerContent(
     onSocialClick: (StreamerDetailEntity.Social) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surface,
     ) {
         Column(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxWidth()
         ) {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                socials.forEach { social ->
-                    SocialIconButton(
-                        iconRes = social.getIconRes(), onClick = { onSocialClick(social) })
+            if (socials.isNotEmpty()) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    socials.forEach { social ->
+                        SocialIconButton(
+                            iconRes = social.getIconRes(),
+                            onClick = { onSocialClick(social) }
+                        )
+                    }
                 }
+                VerticalSpacer(24.dp)
             }
 
-            VerticalSpacer(16.dp)
-
             Text(
-                text = "Description",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
+                text = "À propos",
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
-                fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
             )
 
-            VerticalSpacer(12.dp)
+            VerticalSpacer(8.dp)
 
             Text(
                 text = description,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .animateContentSize()
+                    .clickable { isExpanded = !isExpanded }
             )
 
-            VerticalSpacer(16.dp)
+            if (description.length > 120) {
+                Text(
+                    text = if (isExpanded) "Voir moins" else "Lire la suite",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .clickable { isExpanded = !isExpanded }
+                )
+            }
 
-            Text(
-                text = "Video",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleSmall,
-                fontFamily = zalandoFontFamily,
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold,
-            )
-
-            VerticalSpacer(12.dp)
+            VerticalSpacer(24.dp)
 
         }
     }
@@ -90,19 +109,19 @@ private fun StreamerContentPreview() {
         StreamerContent(
             socials = listOf(
                 StreamerDetailEntity.Social(
-                    url = "",
+                    url = "https://twitch.tv",
                     type = StreamerDetailEntity.Social.Type.Twitch
                 ),
                 StreamerDetailEntity.Social(
-                    url = "",
+                    url = "https://youtube.com",
                     type = StreamerDetailEntity.Social.Type.Youtube
                 ),
                 StreamerDetailEntity.Social(
-                    url = "",
+                    url = "https://instagram.com",
                     type = StreamerDetailEntity.Social.Type.Instagram
                 ),
                 StreamerDetailEntity.Social(
-                    url = "",
+                    url = "https://kick.com",
                     type = StreamerDetailEntity.Social.Type.Kick
                 ),
             ),

@@ -23,10 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.common.ui.component.StreamerHero
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
 import com.strimup.feature.streamerdetail.presentation.component.StreamerContent
-import com.strimup.feature.streamerdetail.presentation.component.StreamerHero
 
 @Composable
 fun StreamerDetailScreen(
@@ -37,7 +37,6 @@ fun StreamerDetailScreen(
         creationCallback = { factory: StreamerDetailViewModel.Factory -> factory.create(streamerId) }
     ),
 ) {
-
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     StreamerDetailScreen(
@@ -66,7 +65,8 @@ private fun StreamerDetailScreen(
                             contentDescription = null
                         )
                     }
-                })
+                }
+            )
         },
     ) { padding ->
         StreamerDetailContent(
@@ -83,11 +83,20 @@ private fun StreamerDetailContent(
     state: UiState,
     modifier: Modifier = Modifier,
 ) {
-    if (state.loading || state.streamer == null) {
+
+    if (state.loading) {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-    } else {
+    }
+
+    else if (state.streamer == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = "Impossible de charger les informations du streamer.")
+        }
+    }
+
+    else {
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -98,12 +107,12 @@ private fun StreamerDetailContent(
                 isLive = state.streamer.isLive,
                 imageUrl = state.streamer.imageUrl,
                 pseudo = state.streamer.userName,
-                tags = state.streamer.tags,
+                tags = state.streamer.tags?.map { it.name },
                 dailyStatus = state.streamer.dailyStatus,
             )
 
             StreamerContent(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxWidth(),
                 description = state.streamer.bio,
                 socials = state.streamer.socials,
                 onSocialClick = {},
@@ -121,35 +130,19 @@ private fun StreamerDetailScreenPreview() {
             state = UiState(
                 loading = false,
                 streamer = StreamerDetailEntity(
-                    isLive = false,
-                    bio = "lorem ipsum doloreoji enierjfi nejr jhzunf hjznf hbuzhjfzbef hzef ",
+                    isLive = true,
+                    bio = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting. Je partage également toutes mes activités (Création graphique, montage vidéo)...",
                     imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
-                    userName = "Squeezi",
+                    userName = "Squeezie",
                     tags = listOf(
-                        StreamerDetailEntity.Tag(name = "Gamming", category = "dolk"),
-                        StreamerDetailEntity.Tag(name = "Dev", category = "dolk"),
-                        StreamerDetailEntity.Tag(name = "Cuisine", category = "dolk"),
-                        StreamerDetailEntity.Tag(name = "Cuisine", category = "dolk"),
+                        StreamerDetailEntity.Tag(name = "Gaming", category = "dolk"),
+                        StreamerDetailEntity.Tag(name = "Dev", category = "dolk")
                     ),
-                    dailyStatus = "Hello la compagnie",
+                    dailyStatus = "Hello la compagnie !",
                     videos = null,
                     socials = listOf(
-                        StreamerDetailEntity.Social(
-                            url = "",
-                            type = StreamerDetailEntity.Social.Type.Twitch
-                        ),
-                        StreamerDetailEntity.Social(
-                            url = "",
-                            type = StreamerDetailEntity.Social.Type.Youtube
-                        ),
-                        StreamerDetailEntity.Social(
-                            url = "",
-                            type = StreamerDetailEntity.Social.Type.Instagram
-                        ),
-                        StreamerDetailEntity.Social(
-                            url = "",
-                            type = StreamerDetailEntity.Social.Type.Kick
-                        ),
+                        StreamerDetailEntity.Social(url = "", type = StreamerDetailEntity.Social.Type.Twitch),
+                        StreamerDetailEntity.Social(url = "", type = StreamerDetailEntity.Social.Type.Youtube)
                     ),
                 )
             )
