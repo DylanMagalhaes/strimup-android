@@ -2,12 +2,12 @@ package com.strimup.feature.auth.injection
 
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
-import com.strimup.feature.auth.data.DefaultUserRepository
+import com.strimup.common.user.data.DefaultUserRepository
 import com.strimup.feature.auth.domain.AuthRepository
-import com.strimup.feature.auth.domain.UserRepository
-import com.strimup.feature.auth.domain.usecase.DefaultGetUserFlowUseCase
+import com.strimup.common.user.domain.UserRepository
+import com.strimup.common.user.domain.usecase.DefaultGetUserFlowUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultLoginUsecase
-import com.strimup.feature.auth.domain.usecase.GetUserFlowUseCase
+import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.domain.usecase.LoginUsecase
 import dagger.Binds
 import dagger.Module

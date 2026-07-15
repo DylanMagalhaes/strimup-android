@@ -1,12 +1,13 @@
 package com.strimup.common.network.injection
 
+import com.strimup.common.user.data.UserApiService
 import com.strimup.feature.auth.data.remote.AuthAuthenticator
 import com.strimup.feature.auth.data.remote.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
+import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -19,6 +20,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 object NetworkModule {
 
     @Provides
+    @Singleton
     fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val jsonConfig = Json {
             ignoreUnknownKeys = true
@@ -48,5 +50,11 @@ object NetworkModule {
             .addInterceptor(authInterceptor)
             .authenticator(authAuthenticator)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserApiService(retrofit: Retrofit): UserApiService {
+        return retrofit.create(UserApiService::class.java)
     }
 }

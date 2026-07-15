@@ -1,18 +1,18 @@
-package com.strimup.feature.auth.data
+package com.strimup.common.user.data
 
-import com.strimup.feature.auth.data.local.dao.UserDao
-import com.strimup.feature.auth.data.mapper.toDomainEntity
-import com.strimup.feature.auth.data.mapper.toEntity
-import com.strimup.feature.auth.data.mapper.toRoomEntity
-import com.strimup.feature.auth.domain.UserRepository
-import com.strimup.feature.auth.domain.entity.UserEntity
+import com.strimup.common.user.data.local.dao.UserDao
+import com.strimup.common.user.data.mapper.toDomainEntity
+import com.strimup.common.user.data.mapper.toEntity
+import com.strimup.common.user.data.mapper.toRoomEntity
+import com.strimup.common.user.domain.UserRepository
+import com.strimup.common.user.domain.entity.UserEntity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class DefaultUserRepository @Inject constructor(
     private val userDao: UserDao,
-    private val service: AuthApiService
+    private val service: UserApiService
 ) : UserRepository {
     override fun getCurrentUser(): Flow<UserEntity?> {
         return userDao.getUserFlow().map { userRoomEntity ->

@@ -1,6 +1,4 @@
-package com.strimup.feature.auth.domain.entity
-
-import android.util.JsonToken
+package com.strimup.common.user.domain.entity
 
 data class UserEntity(
     val id: String,

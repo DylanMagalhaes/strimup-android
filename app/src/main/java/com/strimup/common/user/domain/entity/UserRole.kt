@@ -1,4 +1,4 @@
-package com.strimup.feature.auth.domain.entity
+package com.strimup.common.user.domain.entity
 
 enum class UserRole {
     ADMIN,

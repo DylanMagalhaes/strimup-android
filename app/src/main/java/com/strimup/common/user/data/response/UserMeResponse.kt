@@ -1,4 +1,4 @@
-package com.strimup.feature.auth.data.response
+package com.strimup.common.user.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -23,6 +23,8 @@ data class UserMeResponse(
         @SerialName("gender")
         val gender: String,
         @SerialName("is_twitch_connected")
-        val isTwitchConnected: Boolean
+        val isTwitchConnected: Boolean,
+        @SerialName("avatar_url")
+        val imageUrl: String
     )
 }
