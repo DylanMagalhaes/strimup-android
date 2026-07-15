@@ -3,6 +3,7 @@ package com.strimup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomAppBar
@@ -16,6 +17,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import com.strimup.common.navigation.Destination
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.home.presentation.HomeScreen
@@ -32,32 +35,51 @@ fun StrimupNavDisplay(modifier: Modifier = Modifier) {
         modifier = modifier,
         bottomBar = {
             if (currentDestination != Destination.Login && currentDestination !is Destination.StreamerDetail) {
-                BottomAppBar {
-                    IconButton(
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = currentDestination == Destination.Home,
+                        onClick = {
+                            if (currentDestination != Destination.Home) {
+                                backStack.add(Destination.Home)
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Home"
+                            )
+                        }
+                    )
+
+                    NavigationBarItem(
+                        selected = currentDestination == Destination.Search,
                         onClick = {
                             if (currentDestination != Destination.Search) {
                                 backStack.add(Destination.Search)
                             }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Rechercher"
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Rechercher"
-                        )
-                    }
+                    )
 
-                    IconButton(
+                    NavigationBarItem(
+                        selected = currentDestination == Destination.Login,
                         onClick = {
                             if (currentDestination != Destination.Login) {
                                 backStack.add(Destination.Login)
                             }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Connexion"
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Connexion"
-                        )
-                    }
+                    )
                 }
             }
         }

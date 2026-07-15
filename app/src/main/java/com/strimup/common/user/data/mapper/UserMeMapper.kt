@@ -20,6 +20,7 @@ fun UserEntity.toRoomEntity(): UserRoomEntity {
         userName = this.userName,
         email = this.email,
         role = this.role.name,
+
     )
 }
 
