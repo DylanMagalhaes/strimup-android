@@ -6,7 +6,7 @@ import com.strimup.feature.search.domain.entity.StreamerEntity
 fun StreamersResponse.toEntity(): StreamerEntity {
     val sp = this.streamerProfile
     return StreamerEntity(
-        id = sp.id,
+        id = this.id,
         userName = this.userName,
         imageUrl = sp.imageUrl
     )

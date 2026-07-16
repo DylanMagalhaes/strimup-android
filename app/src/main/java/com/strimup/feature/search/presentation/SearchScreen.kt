@@ -45,6 +45,7 @@ import com.strimup.feature.search.domain.entity.StreamerEntity
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
+    onStreamerClick: (String) -> Unit,
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -52,6 +53,7 @@ fun SearchScreen(
     SearchScreen(
         modifier = modifier,
         state = state,
+        onStreamerClick = onStreamerClick,
         onSearchInputChange = { viewModel.onSearchInputChange(it) }
     )
 }
@@ -61,6 +63,7 @@ fun SearchScreen(
 private fun SearchScreen(
     state: UiState,
     onSearchInputChange: (String) -> Unit,
+    onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -89,7 +92,8 @@ private fun SearchScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             SearchContent(
-                state = state
+                state = state,
+                onStreamerClick = onStreamerClick
             )
 
         }
@@ -99,6 +103,7 @@ private fun SearchScreen(
 @Composable
 private fun SearchContent(
     state: UiState,
+    onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -120,7 +125,7 @@ private fun SearchContent(
                     items = state.streamers,
                     key = { streamer -> streamer.id }) { streamer ->
                     Surface(
-                        onClick = { },
+                        onClick = {onStreamerClick(streamer.id)},
                         modifier = modifier,
                     ) {
                         Row(
@@ -176,6 +181,7 @@ fun SearchScreenPreview(modifier: Modifier = Modifier) {
     StrimupTheme {
         SearchScreen(
             modifier = Modifier.fillMaxSize(),
+            onStreamerClick = {},
             state = UiState(
                 streamers = listOf(
                     StreamerEntity(

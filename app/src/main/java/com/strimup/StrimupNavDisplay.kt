@@ -124,7 +124,9 @@ fun StrimupNavDisplay(modifier: Modifier = Modifier) {
 
                 entry<Destination.Search> {
                     SearchScreen(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        onStreamerClick = { id ->
+                            backStack.add(Destination.StreamerDetail(streamerId = id)) }
                     )
                 }
             }

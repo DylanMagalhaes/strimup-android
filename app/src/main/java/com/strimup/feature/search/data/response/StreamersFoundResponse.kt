@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class StreamersResponse(
+    @SerialName("id")
+    val id: String,
     @SerialName("pseudo")
     val userName: String,
     @SerialName("streamerProfile")
@@ -13,8 +15,6 @@ data class StreamersResponse(
     ) {
     @Serializable
     data class StreamerProfile(
-        @SerialName("id")
-        val id: String,
         @SerialName("avatar_url")
         val imageUrl: String?,
     )
