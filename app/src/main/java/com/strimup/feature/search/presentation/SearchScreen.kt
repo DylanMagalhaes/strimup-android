@@ -12,26 +12,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,7 +55,6 @@ fun SearchScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchScreen(
     state: UiState,
@@ -68,34 +64,32 @@ private fun SearchScreen(
 ) {
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.padding(16.dp),
-                title = {
-                    OutlinedTextField(
-                        value = state.searchQuery,
-                        onValueChange = { newText ->
-                            onSearchInputChange(newText)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onFocusChanged { },
-                        placeholder = { Text("Rechercher un streamer...") },
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Default.Search, contentDescription = null)
-                        },
-                        singleLine = true
-                    )
-                },
-            )
-        },
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            OutlinedTextField(
+                value = state.searchQuery,
+                onValueChange = onSearchInputChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+                placeholder = { Text("Rechercher un streamer...") },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = null)
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
+
             SearchContent(
+                modifier = Modifier.weight(1f),
                 state = state,
                 onStreamerClick = onStreamerClick
             )
-
         }
     }
 }
@@ -106,102 +100,79 @@ private fun SearchContent(
     onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.background
-    ) {
-
-        if (state.loading) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                items(
-                    items = state.streamers,
-                    key = { streamer -> streamer.id }) { streamer ->
-                    Surface(
-                        onClick = {onStreamerClick(streamer.id)},
-                        modifier = modifier,
+    if (state.loading) {
+        Box(modifier = modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(
+                items = state.streamers,
+                key = { streamer -> streamer.id }
+            ) { streamer ->
+                Surface(
+                    onClick = { onStreamerClick(streamer.id) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Row(
+                        AsyncImage(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp)
-                                .padding(
-                                    start = 16.dp, end = 12.dp
-                                ),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(shape = RoundedCornerShape(8.dp))
-                                    .background(
-                                        MaterialTheme.colorScheme.onBackground.copy(alpha = .4f)
-                                    ),
-                                model = streamer.imageUrl,
-                                contentScale = ContentScale.Crop,
-                                contentDescription = null,
-                            )
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                .size(52.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)),
+                            model = streamer.imageUrl,
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null,
+                        )
 
-                            ) {
-                                Text(
-                                    text = streamer.userName,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontFamily = zalandoFontFamily,
-                                    fontStyle = FontStyle.Italic,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(
+                                text = streamer.userName,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = zalandoFontFamily,
+                                fontWeight = FontWeight.Bold,
+                            )
                         }
                     }
                 }
             }
         }
-
     }
 }
 
-
 @Composable
 @Preview
-fun SearchScreenPreview(modifier: Modifier = Modifier) {
+fun SearchScreenPreview() {
     StrimupTheme {
         SearchScreen(
             modifier = Modifier.fillMaxSize(),
             onStreamerClick = {},
             state = UiState(
+                searchQuery = "",
+                loading = false,
                 streamers = listOf(
-                    StreamerEntity(
-                        id = "e",
-                        userName = "raziuu",
-                        imageUrl = ""
-                    ),
-                    StreamerEntity(
-                        id = "r",
-                        userName = "raziuu",
-                        imageUrl = ""
-                    ),
-                    StreamerEntity(
-                        id = "t",
-                        userName = "raziu",
-                        imageUrl = ""
-                    )
+                    StreamerEntity(id = "1", userName = "Squeezie", imageUrl = ""),
+                    StreamerEntity(id = "2", userName = "Gotaga", imageUrl = ""),
+                    StreamerEntity(id = "3", userName = "Kameto", imageUrl = "")
                 )
             ),
-            onSearchInputChange = TODO()
+            onSearchInputChange = {}
         )
     }
 }
