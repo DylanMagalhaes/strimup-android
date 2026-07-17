@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@HiltViewModel class HomeViewModel @Inject constructor(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val getStreamers: GetStreamersUsecase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(UiState())

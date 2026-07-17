@@ -4,5 +4,5 @@ import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 
 interface GetStreamerUsecase {
-    suspend fun invoke(id: String): Result<StreamerProfileEntity>
+    suspend operator fun invoke(id: String): Result<StreamerProfileEntity>
 }

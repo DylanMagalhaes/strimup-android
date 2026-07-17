@@ -13,6 +13,9 @@ sealed interface Destination : NavKey {
     data class StreamerDetail(val streamerId: String) : Destination
 
     @Serializable
+    data class StreamerProfile(val streamerId: String?): Destination
+
+    @Serializable
     object Login : Destination
 
     @Serializable
