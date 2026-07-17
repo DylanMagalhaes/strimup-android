@@ -127,7 +127,7 @@ private fun StreamerProfileContent(
                 imageUrl = state.streamer.imageUrl,
                 pseudo = state.streamer.userName,
                 tags = state.streamer.tags?.map { it.name },
-                dailyStatus = state.streamer.dailyStatus,
+                dailyStatus = state.streamer.dailyStatus ?: "",
             )
 
             Surface(
@@ -187,28 +187,32 @@ private fun StreamerProfileContent(
 
                     VerticalSpacer(8.dp)
 
-                    Text(
-                        text = state.streamer.bio,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = if (isExpanded) Int.MAX_VALUE else 3,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .animateContentSize()
-                            .clickable { isExpanded = !isExpanded }
-                    )
-
-                    if (state.streamer.bio.length > 120) {
+                    state.streamer.bio?.let {
                         Text(
-                            text = if (isExpanded) "Voir moins" else "Lire la suite",
-                            color = MaterialTheme.colorScheme.primary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            text = it,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
-                                .padding(top = 4.dp)
+                                .animateContentSize()
                                 .clickable { isExpanded = !isExpanded }
                         )
+                    }
+
+                    state.streamer.bio?.length?.let {
+                        if (it > 120) {
+                            Text(
+                                text = if (isExpanded) "Voir moins" else "Lire la suite",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(top = 4.dp)
+                                    .clickable { isExpanded = !isExpanded }
+                            )
+                        }
                     }
 
                     VerticalSpacer(24.dp)
@@ -246,6 +250,11 @@ private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
                             type = StreamerProfileEntity.Social.Type.Youtube
                         )
                     ),
+                    averageViewers = 4,
+                    languages = emptyList(),
+                    personality = "",
+                    personalitySecondary = "",
+                    streamFrequency = "",
                 )
             ),
             onNavUp = {}
