@@ -29,6 +29,7 @@ data class StreamerProfileEntity(
     }
 
     data class Tag(
+        val id: Int,
         val name: String,
         val category: String
     )

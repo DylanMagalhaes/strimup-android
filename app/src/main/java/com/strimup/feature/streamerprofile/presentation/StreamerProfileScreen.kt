@@ -235,8 +235,8 @@ private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
                     imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
                     userName = "Squeezie",
                     tags = listOf(
-                        StreamerProfileEntity.Tag(name = "Gaming", category = "dolk"),
-                        StreamerProfileEntity.Tag(name = "Dev", category = "dolk")
+                        StreamerProfileEntity.Tag(name = "Gaming", category = "dolk", id = 3),
+                        StreamerProfileEntity.Tag(name = "Dev", category = "dolk", id = 34)
                     ),
                     dailyStatus = "Hello la compagnie !",
                     videos = null,

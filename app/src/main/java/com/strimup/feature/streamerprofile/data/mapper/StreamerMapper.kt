@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerprofile.data.mapper
 
+import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
 import com.strimup.feature.streamerprofile.data.response.StreamerResponse
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 
@@ -33,6 +34,7 @@ fun StreamerResponse.toEntity(): StreamerProfileEntity {
         socials = socialsList,
         tags = profile?.tags?.map {
             StreamerProfileEntity.Tag(
+                id = it.id ?: 0,
                 name = it.name ?: "",
                 category = it.category ?: ""
             )
@@ -50,5 +52,30 @@ fun StreamerResponse.toEntity(): StreamerProfileEntity {
         personality = profile?.personality,
         personalitySecondary = profile?.personalitySecondary,
         streamFrequency = profile?.streamFrequency
+    )
+}
+
+fun StreamerProfileEntity.toRequest(): UpdateProfileRequest {
+    val twitchUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Twitch }?.url
+    val youtubeUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Youtube }?.url
+    val instagramUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Instagram }?.url
+    val tiktokUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Tiktok }?.url
+    val kickUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Kick }?.url
+
+    return UpdateProfileRequest(
+        bio = bio?.takeIf { it.isNotBlank() },
+        dailyStatus = dailyStatus?.takeIf { it.isNotBlank() },
+        twitchUrl = twitchUrl?.takeIf { it.isNotBlank() },
+        youtubeUrl = youtubeUrl?.takeIf { it.isNotBlank() },
+        instagramUrl = instagramUrl?.takeIf { it.isNotBlank() },
+        tiktokUrl = tiktokUrl?.takeIf { it.isNotBlank() },
+        kickUrl = kickUrl?.takeIf { it.isNotBlank() },
+        personality = personality,
+        personalitySecondary = personalitySecondary,
+        streamFrequency = streamFrequency,
+        averageViewers = averageViewers,
+        languages = languages?.filter { it.isNotBlank() },
+        tags = tags?.map { it.id } ?: emptyList(),
+        videos = emptyList()
     )
 }
