@@ -1,11 +1,22 @@
 package com.strimup.feature.streamerprofile.data
 
+import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
+import com.strimup.feature.streamerprofile.data.response.StreamerResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface StreamerApiService {
     @GET("api/streamer/{id}")
     suspend fun getStreamerById(
         @Path("id") id: String
-    ): com.strimup.feature.streamerprofile.data.response.StreamerResponse
+    ): StreamerResponse
+
+    @PUT("api/streamer/update")
+    suspend fun updateProfile(
+        @Body request: UpdateProfileRequest
+    ): StreamerResponse
+
+
 }
