@@ -53,9 +53,7 @@ fun StreamerProfileScreen(
     streamerId: String?,
     modifier: Modifier = Modifier,
     onNavUp: () -> Unit,
-    viewModel: StreamerProfileViewModel = hiltViewModel(
-        creationCallback = { factory: StreamerProfileViewModel.Factory -> factory.create(streamerId) }
-    ),
+    viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
