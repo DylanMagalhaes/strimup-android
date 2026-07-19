@@ -3,6 +3,7 @@ package com.strimup.feature.streamerprofile.injection
 import com.strimup.feature.streamerprofile.data.StreamerApiService
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultGetStreamerUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUsecase
+import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.UpdateProfileUsecase
 import dagger.Binds
 import dagger.Module

@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerprofile.presentation
 
+import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 
 sealed interface EditProfileUiState {
@@ -7,6 +8,8 @@ sealed interface EditProfileUiState {
 
     data class Success(
         val originalProfile: StreamerProfileEntity,
+
+        val availableOptions: StreamerOptionsEntity,
 
         val bio: String,
         val dailyStatus: String,
