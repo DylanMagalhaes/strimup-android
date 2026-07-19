@@ -1,7 +1,9 @@
 package com.strimup.feature.streamerprofile.data.mapper
 
 import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
+import com.strimup.feature.streamerprofile.data.response.StreamerOptionsResponse
 import com.strimup.feature.streamerprofile.data.response.StreamerResponse
+import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 
 fun StreamerResponse.toEntity(): StreamerProfileEntity {
@@ -77,5 +79,14 @@ fun StreamerProfileEntity.toRequest(): UpdateProfileRequest {
         languages = languages?.filter { it.isNotBlank() },
         tags = tags?.map { it.id } ?: emptyList(),
         videos = emptyList()
+    )
+}
+
+fun StreamerOptionsResponse.toEntity(): StreamerOptionsEntity{
+    return StreamerOptionsEntity(
+        averageViewers = this.averageViewers,
+        languages = this.languages,
+        personalities = this.personalities,
+        streamFrequencies = this.streamFrequencies,
     )
 }

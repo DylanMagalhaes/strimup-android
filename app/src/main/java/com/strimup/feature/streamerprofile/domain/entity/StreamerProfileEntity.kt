@@ -9,7 +9,7 @@ data class StreamerProfileEntity(
     val socials: List<Social>,
     val tags: List<Tag>?,
     val videos: List<Video>?,
-    val averageViewers: Int?,
+    val averageViewers: String?,
     val languages: List<String>?,
     val personality: String?,
     val personalitySecondary: String?,

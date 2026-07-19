@@ -16,7 +16,7 @@ sealed interface EditProfileUiState {
         val personality: String?,
         val personalitySecondary: String?,
         val streamFrequency: String?,
-        val averageViewers: Int?,
+        val averageViewers: String?,
 
         val isSaving: Boolean = false,
         val error: String? = null,

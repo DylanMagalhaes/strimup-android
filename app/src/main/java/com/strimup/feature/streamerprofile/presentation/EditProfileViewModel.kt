@@ -107,7 +107,7 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun onAverageViewersChanged(average: Int) {
+    fun onAverageViewersChanged(average: String) {
         _state.update { currentState ->
             if (currentState is EditProfileUiState.Success) {
                 currentState.copy(averageViewers = average)

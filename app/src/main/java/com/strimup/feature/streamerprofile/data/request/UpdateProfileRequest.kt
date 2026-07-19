@@ -26,7 +26,7 @@ data class UpdateProfileRequest(
     @SerialName("stream_frequency")
     val streamFrequency: String?,
     @SerialName("average_viewers")
-    val averageViewers: Int?,
+    val averageViewers: String?,
     @SerialName("languages")
     val languages: List<String>?,
     @SerialName("tags")

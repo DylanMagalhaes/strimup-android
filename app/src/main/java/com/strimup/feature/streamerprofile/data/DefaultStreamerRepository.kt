@@ -2,14 +2,14 @@ package com.strimup.feature.streamerprofile.data
 
 import com.strimup.feature.streamerprofile.data.mapper.toEntity
 import com.strimup.feature.streamerprofile.data.mapper.toRequest
-import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
 import com.strimup.feature.streamerprofile.domain.StreamerRepository
+import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import javax.inject.Inject
 
-data class DefaultStreamerRepository @Inject constructor(
+ class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService
-): StreamerRepository {
+) : StreamerRepository {
     override suspend fun getStreamerById(id: String): Result<StreamerProfileEntity> {
         return runCatching {
             service.getStreamerById(id).toEntity()
@@ -20,6 +20,12 @@ data class DefaultStreamerRepository @Inject constructor(
         return runCatching {
             val request = req.toRequest()
             service.updateProfile(request).toEntity()
+        }
+    }
+
+    override suspend fun getStreamerOptions(): Result<StreamerOptionsEntity> {
+        return runCatching {
+            service.getStreamerOptions().toEntity()
         }
     }
 }

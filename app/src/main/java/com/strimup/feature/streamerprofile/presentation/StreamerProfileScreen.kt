@@ -246,7 +246,7 @@ private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
                             type = StreamerProfileEntity.Social.Type.Youtube
                         )
                     ),
-                    averageViewers = 4,
+                    averageViewers = "4",
                     languages = emptyList(),
                     personality = "",
                     personalitySecondary = "",

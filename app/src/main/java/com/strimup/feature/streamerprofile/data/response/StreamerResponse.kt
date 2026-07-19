@@ -54,7 +54,7 @@ data class StreamerResponse(
         @SerialName("stream_frequency")
         val streamFrequency: String?,
         @SerialName("average_viewers")
-        val averageViewers: Int?,
+        val averageViewers: String?,
         @SerialName("languages")
         val languages: List<String>? = emptyList(),
         @SerialName("profile_reminder_sent")

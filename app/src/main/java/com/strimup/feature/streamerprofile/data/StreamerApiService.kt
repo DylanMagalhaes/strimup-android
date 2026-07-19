@@ -1,6 +1,7 @@
 package com.strimup.feature.streamerprofile.data
 
 import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
+import com.strimup.feature.streamerprofile.data.response.StreamerOptionsResponse
 import com.strimup.feature.streamerprofile.data.response.StreamerResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -18,5 +19,6 @@ interface StreamerApiService {
         @Body request: UpdateProfileRequest
     ): StreamerResponse
 
-
+    @GET("/api/streamer/options")
+    suspend fun getStreamerOptions(): StreamerOptionsResponse
 }
