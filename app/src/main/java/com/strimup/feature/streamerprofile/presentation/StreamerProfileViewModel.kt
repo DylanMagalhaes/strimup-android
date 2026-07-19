@@ -18,7 +18,7 @@ class StreamerProfileViewModel @AssistedInject constructor(
     private val getStreamer: GetStreamerUsecase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UiState())
+    private val _state = MutableStateFlow(ProfileUiState())
     val state = _state.asStateFlow()
 
     init {

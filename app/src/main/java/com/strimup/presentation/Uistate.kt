@@ -7,3 +7,5 @@ data class Uistate(
     val loading: Boolean = true,
     val errorMessage: String? = null
 )
+
+

@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.component.StreamerHero
-import com.strimup.common.ui.component.button.PrimaryButton
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
@@ -71,7 +69,7 @@ fun StreamerProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StreamerProfileScreen(
-    state: UiState,
+    state: ProfileUiState,
     onNavUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -102,7 +100,7 @@ private fun StreamerProfileScreen(
 
 @Composable
 private fun StreamerProfileContent(
-    state: UiState,
+    state: ProfileUiState,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -227,7 +225,7 @@ private fun StreamerProfileContent(
 private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
     StrimupTheme {
         StreamerProfileScreen(
-            state = UiState(
+            state = ProfileUiState(
                 loading = false,
                 streamer = StreamerProfileEntity(
                     isLive = true,
