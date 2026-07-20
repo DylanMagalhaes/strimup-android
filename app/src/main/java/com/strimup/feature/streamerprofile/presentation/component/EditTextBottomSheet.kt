@@ -26,8 +26,9 @@ import com.strimup.common.ui.theme.zalandoFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditBioBottomSheet(
-    currentBio: String,
+fun EditTextBottomSheet(
+    title: String,
+    currentText: String,
     onSave: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
@@ -37,14 +38,16 @@ fun EditBioBottomSheet(
         onDismissRequest = onDismiss,
     ) {
         EditBioContent(
-            currentBio = currentBio,
-            onSave = onSave
+            currentBio = currentText,
+            onSave = onSave,
+            title = title
         )
     }
 }
 
 @Composable
 fun EditBioContent(
+    title: String,
     currentBio: String,
     onSave: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -59,7 +62,7 @@ fun EditBioContent(
             .imePadding()
     ) {
         Text(
-            text = "Modifier la bio",
+            text = title,
             style = MaterialTheme.typography.titleMedium,
             fontFamily = zalandoFontFamily,
             fontWeight = FontWeight.Bold
@@ -97,7 +100,8 @@ fun EditBioBottomSheetPreview() {
         Surface {
             EditBioContent(
                 currentBio = "Joueuse roleplay (Gtarp), multigaming et Just Chatting...",
-                onSave = {}
+                onSave = {},
+                title = "Modifier la bio"
             )
         }
     }

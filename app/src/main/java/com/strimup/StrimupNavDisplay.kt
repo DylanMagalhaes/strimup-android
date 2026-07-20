@@ -154,7 +154,6 @@ fun StrimupNavDisplay(
                     EditProfileScreen(
                         modifier = Modifier.fillMaxSize(),
                         onNavigateToEditLanguages = {},
-                        onNavigateToEditBio = {},
                         onNavUp = { backStack.removeLastOrNull() }
                     )
                 }

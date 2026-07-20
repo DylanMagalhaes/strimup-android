@@ -40,13 +40,12 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.feature.streamerprofile.presentation.component.EditBioBottomSheet
+import com.strimup.feature.streamerprofile.presentation.component.EditTextBottomSheet
 import com.strimup.feature.streamerprofile.presentation.component.ProfileEditRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
-    onNavigateToEditBio: () -> Unit,
     onNavigateToEditLanguages: () -> Unit,
     onNavUp: () -> Unit,
     modifier: Modifier = Modifier,
@@ -102,12 +101,14 @@ fun EditProfileScreen(
                         .fillMaxSize(),
                     state = currentState,
                     onNavigateToEditBio = { activeEditType = ActiveEditType.Bio },
+                    onNavigateToEditDailyStatus = { activeEditType = ActiveEditType.DailyStatus },
                     onNavigateToEditLanguages = onNavigateToEditLanguages,
                 )
 
                 if (activeEditType is ActiveEditType.Bio) {
-                    EditBioBottomSheet(
-                        currentBio = currentState.bio,
+                    EditTextBottomSheet(
+                        title = "Modifier la bio",
+                        currentText = currentState.bio,
                         onSave = { newBio ->
                             viewModel.onBioChanged(newBio)
                             activeEditType = null
@@ -116,6 +117,17 @@ fun EditProfileScreen(
                     )
                 }
 
+                if (activeEditType is ActiveEditType.DailyStatus) {
+                    EditTextBottomSheet(
+                        title = "Modifier le status du jour",
+                        currentText = currentState.dailyStatus,
+                        onSave = { newStatus ->
+                            viewModel.onDailyStatusChanged(newStatus)
+                            activeEditType = null
+                        },
+                        onDismiss = { activeEditType = null }
+                    )
+                }
 
             }
         }
@@ -125,6 +137,7 @@ fun EditProfileScreen(
 @Composable
 fun EditProfileContent(
     state: EditProfileUiState.Success,
+    onNavigateToEditDailyStatus: () -> Unit,
     onNavigateToEditBio: () -> Unit,
     onNavigateToEditLanguages: () -> Unit,
     modifier: Modifier = Modifier
@@ -160,7 +173,7 @@ fun EditProfileContent(
                     ProfileEditRow(
                         label = "Statut du jour",
                         value = state.dailyStatus,
-                        onClick = onNavigateToEditBio
+                        onClick = onNavigateToEditDailyStatus
                     )
                 }
             }
@@ -291,7 +304,8 @@ fun EditProfileScreenPreview() {
             state = mockSuccessState,
             modifier = Modifier.fillMaxSize(),
             onNavigateToEditBio = {},
-            onNavigateToEditLanguages = {}
+            onNavigateToEditLanguages = {},
+            onNavigateToEditDailyStatus = {}
         )
     }
 }
