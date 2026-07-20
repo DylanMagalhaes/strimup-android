@@ -87,102 +87,103 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-        fun onBioChanged(newBio: String) {
-            _state.update { currentState ->
-                if (currentState is EditProfileUiState.Success) {
-                    currentState.copy(bio = newBio)
-                } else currentState
-            }
-        }
-
-        fun onDailyStatusChanged(newStatus: String) {
-            _state.update { currentState ->
-                if (currentState is EditProfileUiState.Success) {
-                    currentState.copy(dailyStatus = newStatus)
-                } else currentState
-            }
-        }
-
-        fun onLanguageSelected(language: String) {
-            _state.update { currentState ->
-                if (currentState is EditProfileUiState.Success) {
-                    val currentLanguages = currentState.selectedLanguages
-
-                    val updatedLanguages = if (currentLanguages.contains(language)) {
-                        currentLanguages - language
-                    } else {
-                        currentLanguages + language
-                    }
-                    currentState.copy(selectedLanguages = updatedLanguages)
-                } else currentState
-            }
-        }
-
-        fun onPrimaryPersonalityChanged(personality: String) {
-            _state.update { currentState ->
-                if (currentState is EditProfileUiState.Success) {
-                    currentState.copy(personality = personality)
-                } else currentState
-            }
-        }
-
-        fun onSecondaryPersonalityChanged(personality: String) {
-            _state.update { currentState ->
-                if (currentState is EditProfileUiState.Success) {
-                    currentState.copy(personalitySecondary = personality)
-                } else currentState
-            }
-        }
-
-        fun onAverageViewersChanged(average: String) {
-            _state.update { currentState ->
-                if (currentState is EditProfileUiState.Success) {
-                    currentState.copy(averageViewers = average)
-                } else currentState
-            }
-        }
-
-        fun onStreamFrequencyChaged(frequency: String) {
-            _state.update { currentState ->
-                if (currentState is EditProfileUiState.Success) {
-                    currentState.copy(streamFrequency = frequency)
-                } else currentState
-            }
-        }
-
-        fun saveProfile() {
-            val currentState = _state.value
-            if (currentState !is EditProfileUiState.Success) return
-
-            viewModelScope.launch {
-                _state.value = currentState.copy(isSaving = true, error = null)
-
-                val updatedProfile = currentState.originalProfile.copy(
-                    bio = currentState.bio.takeIf { it.isNotBlank() },
-                    dailyStatus = currentState.dailyStatus.takeIf { it.isNotBlank() },
-                    languages = currentState.selectedLanguages,
-                    tags = currentState.selectedTags,
-                    personality = currentState.personality,
-                    personalitySecondary = currentState.personalitySecondary,
-                    averageViewers = currentState.averageViewers,
-                    streamFrequency = currentState.streamFrequency
-                )
-
-                updateProfile(updatedProfile)
-                    .onSuccess { updatedStreamer ->
-                        _state.value = currentState.copy(
-                            isSaving = false,
-                            isSaveSuccess = true,
-                            originalProfile = updatedStreamer
-                        )
-                    }
-                    .onFailure { exception ->
-                        _state.value = currentState.copy(
-                            isSaving = false,
-                            error = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
-                        )
-                    }
-            }
+    fun onBioChanged(newBio: String) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                currentState.copy(bio = newBio)
+            } else currentState
         }
 
     }
+
+    fun onDailyStatusChanged(newStatus: String) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                currentState.copy(dailyStatus = newStatus)
+            } else currentState
+        }
+    }
+
+    fun onLanguageSelected(language: String) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                val currentLanguages = currentState.selectedLanguages
+
+                val updatedLanguages = if (currentLanguages.contains(language)) {
+                    currentLanguages - language
+                } else {
+                    currentLanguages + language
+                }
+                currentState.copy(selectedLanguages = updatedLanguages)
+            } else currentState
+        }
+    }
+
+    fun onPrimaryPersonalityChanged(personality: String) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                currentState.copy(personality = personality)
+            } else currentState
+        }
+    }
+
+    fun onSecondaryPersonalityChanged(personality: String) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                currentState.copy(personalitySecondary = personality)
+            } else currentState
+        }
+    }
+
+    fun onAverageViewersChanged(average: String) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                currentState.copy(averageViewers = average)
+            } else currentState
+        }
+    }
+
+    fun onStreamFrequencyChaged(frequency: String) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                currentState.copy(streamFrequency = frequency)
+            } else currentState
+        }
+    }
+
+    fun saveProfile() {
+        val currentState = _state.value
+        if (currentState !is EditProfileUiState.Success) return
+
+        viewModelScope.launch {
+            _state.value = currentState.copy(isSaving = true, error = null)
+
+            val updatedProfile = currentState.originalProfile.copy(
+                bio = currentState.bio.takeIf { it.isNotBlank() },
+                dailyStatus = currentState.dailyStatus.takeIf { it.isNotBlank() },
+                languages = currentState.selectedLanguages,
+                tags = currentState.selectedTags,
+                personality = currentState.personality,
+                personalitySecondary = currentState.personalitySecondary,
+                averageViewers = currentState.averageViewers,
+                streamFrequency = currentState.streamFrequency
+            )
+
+            updateProfile(updatedProfile)
+                .onSuccess { updatedStreamer ->
+                    _state.value = currentState.copy(
+                        isSaving = false,
+                        isSaveSuccess = true,
+                        originalProfile = updatedStreamer
+                    )
+                }
+                .onFailure { exception ->
+                    _state.value = currentState.copy(
+                        isSaving = false,
+                        error = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
+                    )
+                }
+        }
+    }
+
+}

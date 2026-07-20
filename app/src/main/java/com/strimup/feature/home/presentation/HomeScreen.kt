@@ -72,11 +72,13 @@ private fun HomeContent(
 ) {
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.background,
+        color = MaterialTheme
+            .colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(top = 32.dp)) {
             HomeTabs(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 onButtonClick = onTabClick,
                 currentTab = state.currentTab,
             )

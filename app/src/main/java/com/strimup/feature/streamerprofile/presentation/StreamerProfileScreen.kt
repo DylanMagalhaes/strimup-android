@@ -50,9 +50,9 @@ import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 
 @Composable
 fun StreamerProfileScreen(
-    streamerId: String?,
     modifier: Modifier = Modifier,
     onNavUp: () -> Unit,
+    onEditProfileNav: () -> Unit,
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -60,6 +60,7 @@ fun StreamerProfileScreen(
     StreamerProfileScreen(
         state = state,
         onNavUp = onNavUp,
+        onEditProfileNav = onEditProfileNav,
         modifier = modifier
     )
 }
@@ -69,6 +70,7 @@ fun StreamerProfileScreen(
 private fun StreamerProfileScreen(
     state: ProfileUiState,
     onNavUp: () -> Unit,
+    onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -91,6 +93,7 @@ private fun StreamerProfileScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize(),
+            onEditProfileNav = onEditProfileNav,
             state = state,
         )
     }
@@ -99,6 +102,7 @@ private fun StreamerProfileScreen(
 @Composable
 private fun StreamerProfileContent(
     state: ProfileUiState,
+    onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -136,14 +140,17 @@ private fun StreamerProfileContent(
                         .fillMaxWidth()
                 ) {
                     OutlinedButton(
-                        onClick = { },
+                        onClick = onEditProfileNav,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp),
                         shape = RoundedCornerShape(8.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                        ),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary ,
+                            containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
@@ -220,7 +227,7 @@ private fun StreamerProfileContent(
 
 @Preview
 @Composable
-private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
+private fun StreamerProfileScreenPreview() {
     StrimupTheme {
         StreamerProfileScreen(
             state = ProfileUiState(
@@ -253,7 +260,8 @@ private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
                     streamFrequency = "",
                 )
             ),
-            onNavUp = {}
+            onNavUp = {},
+            onEditProfileNav = {}
         )
     }
 }
