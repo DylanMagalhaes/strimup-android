@@ -3,6 +3,7 @@ package com.strimup.feature.streamerprofile.data.mapper
 import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
 import com.strimup.feature.streamerprofile.data.response.StreamerOptionsResponse
 import com.strimup.feature.streamerprofile.data.response.StreamerResponse
+import com.strimup.feature.streamerprofile.data.response.UpdateProfileResponse
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 
@@ -88,5 +89,31 @@ fun StreamerOptionsResponse.toEntity(): StreamerOptionsEntity{
         languages = this.languages,
         personalities = this.personalities,
         streamFrequencies = this.streamFrequencies,
+    )
+}
+
+fun UpdateProfileResponse.Streamer.toEntity(): StreamerProfileEntity {
+    val socialsList = buildList {
+        twitchUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Twitch)) }
+        youtubeUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Youtube)) }
+        instagramUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Instagram)) }
+        tiktokUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Tiktok)) }
+        kickUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Kick)) }
+    }
+
+    return StreamerProfileEntity(
+        userName = "",
+        imageUrl = avatarUrl ?: "",
+        isLive = isLive,
+        bio = bio,
+        dailyStatus = dailyStatus,
+        socials = socialsList,
+        tags = tags.map { StreamerProfileEntity.Tag(id = it.id, name = it.name, category = it.category) },
+        videos = emptyList(),
+        averageViewers = averageViewers,
+        languages = languages,
+        personality = personality,
+        personalitySecondary = personalitySecondary,
+        streamFrequency = streamFrequency
     )
 }

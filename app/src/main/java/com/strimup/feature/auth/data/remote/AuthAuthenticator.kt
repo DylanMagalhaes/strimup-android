@@ -4,6 +4,7 @@ import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -16,31 +17,41 @@ class AuthAuthenticator @Inject constructor(
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
+        if (response.request.url.encodedPath.contains("api/auth/refresh")) {
+            runBlocking(Dispatchers.IO) { preferences.clear() }
+            return null
+        }
 
-        val refreshToken = runBlocking { preferences.getRefreshToken() }
+        if (responseCount(response) >= 3) {
+            return null
+        }
+
+        val refreshToken = runBlocking(Dispatchers.IO) { preferences.getRefreshToken() }
 
         if (refreshToken.isNullOrBlank()) {
             return null
         }
 
         return synchronized(this) {
-            val currentToken = runBlocking { preferences.getAccessToken() }
+            val currentToken = runBlocking(Dispatchers.IO) { preferences.getAccessToken() }
 
-            if (response.request.header("Authorization") != "Bearer $currentToken") {
-                return response.request.newBuilder()
+            val requestToken = response.request.header("Authorization")?.removePrefix("Bearer ")?.trim()
+
+            if (currentToken != null && currentToken != requestToken) {
+                return@synchronized response.request.newBuilder()
                     .header("Authorization", "Bearer $currentToken")
                     .build()
             }
 
             try {
-                val refreshResponse = runBlocking {
+                val refreshResponse = runBlocking(Dispatchers.IO) {
                     apiService.get().refreshToken("Bearer $refreshToken")
                 }
 
                 val newToken = refreshResponse.token
 
-                if (newToken.isNotEmpty()) {
-                    runBlocking {
+                if (newToken.isNotBlank()) {
+                    runBlocking(Dispatchers.IO) {
                         preferences.saveAuthToken(newToken)
                     }
 
@@ -48,12 +59,23 @@ class AuthAuthenticator @Inject constructor(
                         .header("Authorization", "Bearer $newToken")
                         .build()
                 } else {
+                    runBlocking(Dispatchers.IO) { preferences.clear() }
                     null
                 }
             } catch (e: Exception) {
-                runBlocking { preferences.clear() }
+                runBlocking(Dispatchers.IO) { preferences.clear() }
                 null
             }
         }
+    }
+
+    private fun responseCount(response: Response): Int {
+        var result = 1
+        var prior = response.priorResponse
+        while (prior != null) {
+            result++
+            prior = prior.priorResponse
+        }
+        return result
     }
 }

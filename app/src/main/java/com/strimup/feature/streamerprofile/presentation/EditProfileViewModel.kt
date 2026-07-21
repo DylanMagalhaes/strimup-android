@@ -122,7 +122,16 @@ class EditProfileViewModel @Inject constructor(
     fun onPrimaryPersonalityChanged(personality: String) {
         _state.update { currentState ->
             if (currentState is EditProfileUiState.Success) {
-                currentState.copy(personality = personality)
+                val updatedSecondary = if (currentState.personalitySecondary == personality) {
+                    currentState.personality
+                } else {
+                    currentState.personalitySecondary
+                }
+
+                currentState.copy(
+                    personality = personality,
+                    personalitySecondary = updatedSecondary
+                )
             } else currentState
         }
     }
@@ -130,7 +139,16 @@ class EditProfileViewModel @Inject constructor(
     fun onSecondaryPersonalityChanged(personality: String) {
         _state.update { currentState ->
             if (currentState is EditProfileUiState.Success) {
-                currentState.copy(personalitySecondary = personality)
+                val updatedPrimary = if (currentState.personality == personality) {
+                    currentState.personalitySecondary
+                } else {
+                    currentState.personality
+                }
+
+                currentState.copy(
+                    personality = personality,
+                    personalitySecondary = updatedPrimary
+                )
             } else currentState
         }
     }
@@ -143,7 +161,7 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun onStreamFrequencyChaged(frequency: String) {
+    fun onStreamFrequencyChanged(frequency: String) {
         _state.update { currentState ->
             if (currentState is EditProfileUiState.Success) {
                 currentState.copy(streamFrequency = frequency)
@@ -153,36 +171,63 @@ class EditProfileViewModel @Inject constructor(
 
     fun saveProfile() {
         val currentState = _state.value
-        if (currentState !is EditProfileUiState.Success) return
+        if (currentState !is EditProfileUiState.Success) {
+            return
+        }
 
         viewModelScope.launch {
-            _state.value = currentState.copy(isSaving = true, error = null)
+            _state.update { state ->
+                if (state is EditProfileUiState.Success) {
+                    state.copy(isSaving = true, isSaveSuccess = false, error = null)
+                } else state
+            }
 
             val updatedProfile = currentState.originalProfile.copy(
                 bio = currentState.bio.takeIf { it.isNotBlank() },
                 dailyStatus = currentState.dailyStatus.takeIf { it.isNotBlank() },
                 languages = currentState.selectedLanguages,
                 tags = currentState.selectedTags,
+                socials = currentState.socials,
                 personality = currentState.personality,
                 personalitySecondary = currentState.personalitySecondary,
                 averageViewers = currentState.averageViewers,
                 streamFrequency = currentState.streamFrequency
             )
 
-            updateProfile(updatedProfile)
-                .onSuccess { updatedStreamer ->
-                    _state.value = currentState.copy(
-                        isSaving = false,
-                        isSaveSuccess = true,
-                        originalProfile = updatedStreamer
-                    )
+            try {
+                val result = updateProfile(updatedProfile)
+                result
+                    .onSuccess { updatedStreamer ->
+                        _state.update { state ->
+                            if (state is EditProfileUiState.Success) {
+                                state.copy(
+                                    isSaving = false,
+                                    isSaveSuccess = true,
+                                    originalProfile = updatedStreamer
+                                )
+                            } else state
+                        }
+                    }
+                    .onFailure { exception ->
+                        _state.update { state ->
+                            if (state is EditProfileUiState.Success) {
+                                state.copy(
+                                    isSaving = false,
+                                    error = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
+                                )
+                            } else state
+                        }
+                    }
+            } catch (t: Throwable) {
+                _state.update { state ->
+                    if (state is EditProfileUiState.Success) {
+                        state.copy(
+                            isSaving = false,
+                            error = t.localizedMessage ?: "Une erreur inattendue est survenue"
+                        )
+                    } else state
                 }
-                .onFailure { exception ->
-                    _state.value = currentState.copy(
-                        isSaving = false,
-                        error = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
-                    )
-                }
+            }
         }
     }
 

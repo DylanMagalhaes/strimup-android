@@ -1,6 +1,7 @@
 package com.strimup.feature.streamerprofile.domain
 
 import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
+import com.strimup.feature.streamerprofile.data.response.UpdateProfileResponse
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 

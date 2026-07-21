@@ -2,7 +2,7 @@ package com.strimup.feature.auth.data.remote
 
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
 import javax.inject.Inject
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -17,7 +17,7 @@ class AuthInterceptor @Inject constructor(
             return chain.proceed(request)
         }
 
-        val token = runBlocking {
+        val token: String? = runBlocking(Dispatchers.IO) {
             preferences.getAccessToken()
         }
 

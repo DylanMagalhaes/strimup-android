@@ -2,6 +2,7 @@ package com.strimup.feature.streamerprofile.data
 
 import com.strimup.feature.streamerprofile.data.mapper.toEntity
 import com.strimup.feature.streamerprofile.data.mapper.toRequest
+import com.strimup.feature.streamerprofile.data.response.UpdateProfileResponse
 import com.strimup.feature.streamerprofile.domain.StreamerRepository
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
@@ -16,12 +17,16 @@ import javax.inject.Inject
         }
     }
 
-    override suspend fun updateProfile(req: StreamerProfileEntity): Result<StreamerProfileEntity> {
-        return runCatching {
-            val request = req.toRequest()
-            service.updateProfile(request).toEntity()
-        }
-    }
+     override suspend fun updateProfile(profile: StreamerProfileEntity): Result<StreamerProfileEntity> {
+         return runCatching {
+             val request = profile.toRequest()
+
+             val response = service.updateProfile(request)
+
+             val entity = response.streamer.toEntity()
+             entity
+         }
+     }
 
     override suspend fun getStreamerOptions(): Result<StreamerOptionsEntity> {
         return runCatching {

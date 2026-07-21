@@ -29,7 +29,7 @@ import com.strimup.common.ui.theme.zalandoFontFamily
 fun EditTextBottomSheet(
     title: String,
     currentText: String,
-    onSave: (String) -> Unit,
+    onDone: (String) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -39,7 +39,7 @@ fun EditTextBottomSheet(
     ) {
         EditBioContent(
             currentBio = currentText,
-            onSave = onSave,
+            onSave = onDone,
             title = title
         )
     }

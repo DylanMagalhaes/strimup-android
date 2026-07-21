@@ -22,8 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +44,7 @@ import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.feature.streamerprofile.presentation.component.EditTextBottomSheet
 import com.strimup.feature.streamerprofile.presentation.component.ProfileEditRow
+import com.strimup.feature.streamerprofile.presentation.component.SingleSelectBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +56,13 @@ fun EditProfileScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var activeEditType by remember { mutableStateOf<ActiveEditType?>(null) }
+
+    LaunchedEffect(state) {
+        val currentState = state
+        if (currentState is EditProfileUiState.Success && currentState.isSaveSuccess) {
+            onNavUp()
+        }
+    }
 
     when (val currentState = state) {
         is EditProfileUiState.Error -> {
@@ -91,6 +101,23 @@ fun EditProfileScreen(
                                     contentDescription = "Retour"
                                 )
                             }
+                        },
+                        actions = {
+                            if (currentState.isSaving) {
+                                    CircularProgressIndicator()
+                            } else {
+                                TextButton(
+                                    onClick = { viewModel.saveProfile() },
+                                    enabled = !currentState.isSaving
+                                ) {
+                                    Text(
+                                        text = "Enregistrer",
+                                        fontFamily = zalandoFontFamily,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
                         }
                     )
                 },
@@ -100,35 +127,111 @@ fun EditProfileScreen(
                         .padding(padding)
                         .fillMaxSize(),
                     state = currentState,
-                    onNavigateToEditBio = { activeEditType = ActiveEditType.Bio },
-                    onNavigateToEditDailyStatus = { activeEditType = ActiveEditType.DailyStatus },
-                    onNavigateToEditLanguages = onNavigateToEditLanguages,
+                    onEditBioClicked = { activeEditType = ActiveEditType.Bio },
+                    onEditDailyStatusClicked = { activeEditType = ActiveEditType.DailyStatus },
+                    onEditPrimaryPersonalityClicked = { activeEditType = ActiveEditType.PrimaryPersonality },
+                    onEditSecondaryPersonalityClicked = { activeEditType = ActiveEditType.SecondaryPersonality },
+                    onEditStreamFrequencyClicked = { activeEditType = ActiveEditType.StreamFrequency },
+                    onEditAverageViewersClicked = { activeEditType = ActiveEditType.AverageViewers },
+                    onEditLanguagesClicked = onNavigateToEditLanguages,
+                    onEditSocialClicked = { socialType ->
+                        activeEditType = ActiveEditType.Social(socialType)
+                    }
                 )
 
-                if (activeEditType is ActiveEditType.Bio) {
-                    EditTextBottomSheet(
-                        title = "Modifier la bio",
-                        currentText = currentState.bio,
-                        onSave = { newBio ->
-                            viewModel.onBioChanged(newBio)
-                            activeEditType = null
-                        },
-                        onDismiss = { activeEditType = null }
-                    )
-                }
+                when (val editType = activeEditType) {
+                    ActiveEditType.Bio -> {
+                        EditTextBottomSheet(
+                            title = "Modifier la bio",
+                            currentText = currentState.bio,
+                            onDone = { newBio ->
+                                viewModel.onBioChanged(newBio)
+                                activeEditType = null
+                            },
+                            onDismiss = { activeEditType = null }
+                        )
+                    }
 
-                if (activeEditType is ActiveEditType.DailyStatus) {
-                    EditTextBottomSheet(
-                        title = "Modifier le status du jour",
-                        currentText = currentState.dailyStatus,
-                        onSave = { newStatus ->
-                            viewModel.onDailyStatusChanged(newStatus)
-                            activeEditType = null
-                        },
-                        onDismiss = { activeEditType = null }
-                    )
-                }
+                    ActiveEditType.DailyStatus -> {
+                        EditTextBottomSheet(
+                            title = "Modifier le statut du jour",
+                            currentText = currentState.dailyStatus,
+                            onDone = { newStatus ->
+                                viewModel.onDailyStatusChanged(newStatus)
+                                activeEditType = null
+                            },
+                            onDismiss = { activeEditType = null }
+                        )
+                    }
 
+                    ActiveEditType.PrimaryPersonality -> {
+                        val availablePersonalities = currentState.availableOptions.personalities.filter {
+                            it != currentState.personalitySecondary
+                        }
+
+                        SingleSelectBottomSheet(
+                            title = "Personnalité principale",
+                            options = availablePersonalities,
+                            selectedOption = currentState.personality,
+                            onOptionSelected = { newPersonality ->
+                                viewModel.onPrimaryPersonalityChanged(newPersonality)
+                            },
+                            onDismiss = { activeEditType = null }
+                        )
+                    }
+
+                    ActiveEditType.SecondaryPersonality -> {
+                        val availablePersonalities = currentState.availableOptions.personalities.filter {
+                            it != currentState.personality
+                        }
+
+                        SingleSelectBottomSheet(
+                            title = "Personnalité secondaire",
+                            options = availablePersonalities,
+                            selectedOption = currentState.personalitySecondary,
+                            onOptionSelected = { newPersonality ->
+                                viewModel.onSecondaryPersonalityChanged(newPersonality)
+                            },
+                            onDismiss = { activeEditType = null }
+                        )
+                    }
+
+                    ActiveEditType.StreamFrequency -> {
+                        SingleSelectBottomSheet(
+                            title = "Fréquence de stream",
+                            options = currentState.availableOptions.streamFrequencies,
+                            selectedOption = currentState.streamFrequency,
+                            onOptionSelected = { newFrequency ->
+                                viewModel.onStreamFrequencyChanged(newFrequency)
+                            },
+                            onDismiss = { activeEditType = null }
+                        )
+                    }
+
+                    ActiveEditType.AverageViewers -> {
+                        SingleSelectBottomSheet(
+                            title = "Nombre de viewers moyen",
+                            options = currentState.availableOptions.averageViewers,
+                            selectedOption = currentState.averageViewers,
+                            onOptionSelected = { newAverage ->
+                                viewModel.onAverageViewersChanged(newAverage)
+                            },
+                            onDismiss = { activeEditType = null }
+                        )
+                    }
+
+                    is ActiveEditType.Social -> {
+                        val existingUrl = currentState.socials.find { it.type == editType.type }?.url ?: ""
+                        EditTextBottomSheet(
+                            title = "Lien ${editType.type.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                            currentText = existingUrl,
+                            onDone = { activeEditType = null },
+                            onDismiss = { activeEditType = null }
+                        )
+                    }
+
+                    else -> {}
+                }
             }
         }
     }
@@ -137,9 +240,14 @@ fun EditProfileScreen(
 @Composable
 fun EditProfileContent(
     state: EditProfileUiState.Success,
-    onNavigateToEditDailyStatus: () -> Unit,
-    onNavigateToEditBio: () -> Unit,
-    onNavigateToEditLanguages: () -> Unit,
+    onEditBioClicked: () -> Unit,
+    onEditDailyStatusClicked: () -> Unit,
+    onEditPrimaryPersonalityClicked: () -> Unit,
+    onEditSecondaryPersonalityClicked: () -> Unit,
+    onEditStreamFrequencyClicked: () -> Unit,
+    onEditAverageViewersClicked: () -> Unit,
+    onEditLanguagesClicked: () -> Unit,
+    onEditSocialClicked: (StreamerProfileEntity.Social.Type) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -168,12 +276,12 @@ fun EditProfileContent(
                     ProfileEditRow(
                         label = "Bio",
                         value = state.bio,
-                        onClick = onNavigateToEditBio
+                        onClick = onEditBioClicked
                     )
                     ProfileEditRow(
                         label = "Statut du jour",
                         value = state.dailyStatus,
-                        onClick = onNavigateToEditDailyStatus
+                        onClick = onEditDailyStatusClicked
                     )
                 }
             }
@@ -200,29 +308,29 @@ fun EditProfileContent(
                     ProfileEditRow(
                         label = "Personnalité principale",
                         value = state.personality ?: "Non renseigné",
-                        onClick = onNavigateToEditLanguages
+                        onClick = onEditPrimaryPersonalityClicked
                     )
                     ProfileEditRow(
                         label = "Personnalité secondaire",
                         value = state.personalitySecondary ?: "Non renseigné",
-                        onClick = onNavigateToEditLanguages
+                        onClick = onEditSecondaryPersonalityClicked
                     )
                     ProfileEditRow(
                         label = "Fréquence de stream",
                         value = state.streamFrequency ?: "Non renseigné",
-                        onClick = onNavigateToEditLanguages
+                        onClick = onEditStreamFrequencyClicked
                     )
                     ProfileEditRow(
                         label = "Nombre de viewers moyen",
                         value = state.averageViewers ?: "Non renseigné",
-                        onClick = onNavigateToEditLanguages
+                        onClick = onEditAverageViewersClicked
                     )
                     ProfileEditRow(
                         label = "Langues",
                         value = state.selectedLanguages.ifEmpty { listOf("Non renseigné") }.joinToString(
                             ", "
                         ),
-                        onClick = onNavigateToEditLanguages
+                        onClick = onEditLanguagesClicked
                     )
                 }
             }
@@ -239,9 +347,6 @@ fun EditProfileContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-        }
-
-        item {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -252,9 +357,9 @@ fun EditProfileContent(
                     StreamerProfileEntity.Social.Type.entries.forEach { socialType ->
                         val existingSocial = state.socials.find { it.type == socialType }
                         ProfileEditRow(
-                            label = socialType.name,
+                            label = socialType.name.lowercase().replaceFirstChar { it.uppercase() },
                             value = existingSocial?.url ?: "Non renseigné",
-                            onClick = {}
+                            onClick = { onEditSocialClicked(socialType) }
                         )
                     }
                 }
@@ -285,8 +390,8 @@ fun EditProfileScreenPreview() {
         availableOptions = StreamerOptionsEntity(
             averageViewers = emptyList(),
             languages = listOf("Français", "Anglais"),
-            personalities = emptyList(),
-            streamFrequencies = emptyList()
+            personalities = listOf("Chill", "Tryhard", "Drôle"),
+            streamFrequencies = listOf("1-2x/semaine", "3x par semaine")
         ),
         bio = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting...",
         dailyStatus = "En live ce soir à 21h !",
@@ -303,9 +408,14 @@ fun EditProfileScreenPreview() {
         EditProfileContent(
             state = mockSuccessState,
             modifier = Modifier.fillMaxSize(),
-            onNavigateToEditBio = {},
-            onNavigateToEditLanguages = {},
-            onNavigateToEditDailyStatus = {}
+            onEditBioClicked = {},
+            onEditDailyStatusClicked = {},
+            onEditPrimaryPersonalityClicked = {},
+            onEditSecondaryPersonalityClicked = {},
+            onEditStreamFrequencyClicked = {},
+            onEditAverageViewersClicked = {},
+            onEditLanguagesClicked = {},
+            onEditSocialClicked = {}
         )
     }
 }
