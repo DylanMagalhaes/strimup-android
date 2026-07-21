@@ -43,6 +43,7 @@ import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.feature.streamerprofile.presentation.component.EditTextBottomSheet
+import com.strimup.feature.streamerprofile.presentation.component.MultipleSelectBottomSheet
 import com.strimup.feature.streamerprofile.presentation.component.ProfileEditRow
 import com.strimup.feature.streamerprofile.presentation.component.SingleSelectBottomSheet
 
@@ -133,7 +134,7 @@ fun EditProfileScreen(
                     onEditSecondaryPersonalityClicked = { activeEditType = ActiveEditType.SecondaryPersonality },
                     onEditStreamFrequencyClicked = { activeEditType = ActiveEditType.StreamFrequency },
                     onEditAverageViewersClicked = { activeEditType = ActiveEditType.AverageViewers },
-                    onEditLanguagesClicked = onNavigateToEditLanguages,
+                    onEditLanguagesClicked = { activeEditType = ActiveEditType.Languages },
                     onEditSocialClicked = { socialType ->
                         activeEditType = ActiveEditType.Social(socialType)
                     }
@@ -148,7 +149,8 @@ fun EditProfileScreen(
                                 viewModel.onBioChanged(newBio)
                                 activeEditType = null
                             },
-                            onDismiss = { activeEditType = null }
+                            onDismiss = { activeEditType = null },
+                            description = ""
                         )
                     }
 
@@ -160,7 +162,8 @@ fun EditProfileScreen(
                                 viewModel.onDailyStatusChanged(newStatus)
                                 activeEditType = null
                             },
-                            onDismiss = { activeEditType = null }
+                            onDismiss = { activeEditType = null },
+                            description = ""
                         )
                     }
 
@@ -220,13 +223,28 @@ fun EditProfileScreen(
                         )
                     }
 
+                    is ActiveEditType.Languages -> {
+                        MultipleSelectBottomSheet(
+                            title = "Langues",
+                            options = currentState.availableOptions.languages,
+                            selectedOptions = currentState.selectedLanguages,
+                            onOptionSelected = { language ->
+                                viewModel.onLanguageSelected(language)
+                            },
+                            onDismiss = { activeEditType = null },
+                        )
+                    }
+
                     is ActiveEditType.Social -> {
                         val existingUrl = currentState.socials.find { it.type == editType.type }?.url ?: ""
                         EditTextBottomSheet(
                             title = "Lien ${editType.type.name.lowercase().replaceFirstChar { it.uppercase() }}",
                             currentText = existingUrl,
-                            onDone = { activeEditType = null },
-                            onDismiss = { activeEditType = null }
+                            onDone = { newUrl ->
+                                viewModel.onSocialUrlChanged(newUrl, editType.type)
+                                activeEditType = null },
+                            onDismiss = { activeEditType = null },
+                            description = "Collez l'URL de votre compte ici"
                         )
                     }
 

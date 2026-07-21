@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
+import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.UpdateProfileUsecase
@@ -165,6 +166,37 @@ class EditProfileViewModel @Inject constructor(
         _state.update { currentState ->
             if (currentState is EditProfileUiState.Success) {
                 currentState.copy(streamFrequency = frequency)
+            } else currentState
+        }
+    }
+
+    fun onSocialUrlChanged(url: String, targetSocial: StreamerProfileEntity.Social.Type) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                val cleanUrl = url.trim()
+                val exists = currentState.socials.any { it.type == targetSocial }
+
+                val updatedSocials = if (exists) {
+                    if (cleanUrl.isBlank()) {
+                        currentState.socials.filterNot { it.type == targetSocial }
+                    } else {
+                        currentState.socials.map { social ->
+                            if (social.type == targetSocial) {
+                                social.copy(url = cleanUrl)
+                            } else {
+                                social
+                            }
+                        }
+                    }
+                } else {
+                    if (cleanUrl.isNotBlank()) {
+                        currentState.socials + StreamerProfileEntity.Social(url = cleanUrl, type = targetSocial)
+                    } else {
+                        currentState.socials
+                    }
+                }
+
+                currentState.copy(socials = updatedSocials)
             } else currentState
         }
     }
