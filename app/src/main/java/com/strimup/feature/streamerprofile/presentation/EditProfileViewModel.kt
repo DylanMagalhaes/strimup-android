@@ -123,7 +123,7 @@ class EditProfileViewModel @Inject constructor(
         _state.update { currentState ->
             if (currentState is EditProfileUiState.Success) {
                 val updatedSecondary = if (currentState.personalitySecondary == personality) {
-                    currentState.personality
+                    null
                 } else {
                     currentState.personalitySecondary
                 }
@@ -140,14 +140,14 @@ class EditProfileViewModel @Inject constructor(
         _state.update { currentState ->
             if (currentState is EditProfileUiState.Success) {
                 val updatedPrimary = if (currentState.personality == personality) {
-                    currentState.personalitySecondary
+                    null
                 } else {
                     currentState.personality
                 }
 
                 currentState.copy(
-                    personality = personality,
-                    personalitySecondary = updatedPrimary
+                    personality = updatedPrimary,
+                    personalitySecondary = personality
                 )
             } else currentState
         }
