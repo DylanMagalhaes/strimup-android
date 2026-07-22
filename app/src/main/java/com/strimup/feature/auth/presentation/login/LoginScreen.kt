@@ -101,7 +101,7 @@ fun LoginContent(
 ) {
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceVariant
+        color = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier

@@ -8,7 +8,10 @@ sealed interface EditProfileUiState {
 
     data class Success(
         val originalProfile: StreamerProfileEntity,
+
         val availableOptions: StreamerOptionsEntity,
+
+        val imageUrl: Any,
         val bio: String,
         val dailyStatus: String,
         val selectedLanguages: List<String>,

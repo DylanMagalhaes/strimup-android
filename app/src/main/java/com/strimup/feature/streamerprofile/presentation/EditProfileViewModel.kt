@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUsecase
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
-import com.strimup.feature.streamerprofile.domain.usecase.UpdateProfileUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,11 +20,11 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     private val getStreamer: GetStreamerUsecase,
-    private val updateProfile: UpdateProfileUsecase,
+    private val updateProfile: DefaultUpdateProfileUsecase,
+    private val updateAvatar: DefaultUpdateAvatarUsecase,
     private val getUser: GetUserFlowUseCase,
-    private val getOptions: GetStreamerOptionsUseCase,
-
-    ) : ViewModel() {
+    private val getOptions: GetStreamerOptionsUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow<EditProfileUiState>(EditProfileUiState.Loading)
     val state: StateFlow<EditProfileUiState> = _state.asStateFlow()
@@ -77,14 +78,23 @@ class EditProfileViewModel @Inject constructor(
                         personality = streamer.personality,
                         personalitySecondary = streamer.personalitySecondary,
                         streamFrequency = streamer.streamFrequency,
-                        averageViewers = streamer.averageViewers
+                        averageViewers = streamer.averageViewers,
+                        imageUrl = streamer.imageUrl
                     )
                 }
                 .onFailure {
                     _state.value = EditProfileUiState.Error(
-                        message = "Erreur pendant la récupération du profile"
+                        message = "Erreur pendant la récupération du profil"
                     )
                 }
+        }
+    }
+
+    fun onImageSelected(newPhoto: Any) {
+        _state.update { currentState ->
+            if (currentState is EditProfileUiState.Success) {
+                currentState.copy(imageUrl = newPhoto)
+            } else currentState
         }
     }
 
@@ -94,7 +104,6 @@ class EditProfileViewModel @Inject constructor(
                 currentState.copy(bio = newBio)
             } else currentState
         }
-
     }
 
     fun onDailyStatusChanged(newStatus: String) {
@@ -203,18 +212,42 @@ class EditProfileViewModel @Inject constructor(
 
     fun saveProfile() {
         val currentState = _state.value
-        if (currentState !is EditProfileUiState.Success) {
-            return
-        }
+        if (currentState !is EditProfileUiState.Success) return
 
         viewModelScope.launch {
+
             _state.update { state ->
                 if (state is EditProfileUiState.Success) {
                     state.copy(isSaving = true, isSaveSuccess = false, error = null)
                 } else state
             }
 
+            var finalImageUrl = currentState.originalProfile.imageUrl
+            val selectedImage = currentState.imageUrl.toString()
+
+            if (selectedImage.startsWith("content://") || selectedImage.startsWith("file://")) {
+                val avatarResult = updateAvatar(selectedImage)
+
+                if (avatarResult.isFailure) {
+                    _state.update { state ->
+                        if (state is EditProfileUiState.Success) {
+                            state.copy(
+                                isSaving = false,
+                                error = avatarResult.exceptionOrNull()?.localizedMessage
+                                    ?: "Erreur lors de l'envoi de la photo de profil"
+                            )
+                        } else state
+                    }
+                    return@launch
+                }
+
+                avatarResult.getOrNull()?.let { uploadedUrl ->
+                    finalImageUrl = uploadedUrl
+                }
+            }
+
             val updatedProfile = currentState.originalProfile.copy(
+                imageUrl = finalImageUrl,
                 bio = currentState.bio.takeIf { it.isNotBlank() },
                 dailyStatus = currentState.dailyStatus.takeIf { it.isNotBlank() },
                 languages = currentState.selectedLanguages,
@@ -226,41 +259,30 @@ class EditProfileViewModel @Inject constructor(
                 streamFrequency = currentState.streamFrequency
             )
 
-            try {
-                val result = updateProfile(updatedProfile)
-                result
-                    .onSuccess { updatedStreamer ->
-                        _state.update { state ->
-                            if (state is EditProfileUiState.Success) {
-                                state.copy(
-                                    isSaving = false,
-                                    isSaveSuccess = true,
-                                    originalProfile = updatedStreamer
-                                )
-                            } else state
-                        }
+            updateProfile(updatedProfile)
+                .onSuccess { updatedStreamer ->
+                    _state.update { state ->
+                        if (state is EditProfileUiState.Success) {
+                            state.copy(
+                                isSaving = false,
+                                isSaveSuccess = true,
+                                originalProfile = updatedStreamer,
+                                imageUrl = updatedStreamer.imageUrl
+                            )
+                        } else state
                     }
-                    .onFailure { exception ->
-                        _state.update { state ->
-                            if (state is EditProfileUiState.Success) {
-                                state.copy(
-                                    isSaving = false,
-                                    error = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
-                                )
-                            } else state
-                        }
-                    }
-            } catch (t: Throwable) {
-                _state.update { state ->
-                    if (state is EditProfileUiState.Success) {
-                        state.copy(
-                            isSaving = false,
-                            error = t.localizedMessage ?: "Une erreur inattendue est survenue"
-                        )
-                    } else state
+
                 }
-            }
+                .onFailure { exception ->
+                    _state.update { state ->
+                        if (state is EditProfileUiState.Success) {
+                            state.copy(
+                                isSaving = false,
+                                error = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
+                            )
+                        } else state
+                    }
+                }
         }
     }
-
 }

@@ -4,7 +4,6 @@ import com.strimup.feature.streamerprofile.data.StreamerApiService
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultGetStreamerUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
-import com.strimup.feature.streamerprofile.domain.usecase.UpdateProfileUsecase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -21,9 +20,6 @@ interface ProfileModule {
 
     @Binds
     fun bindsStreamerUsecase(impl: DefaultGetStreamerUsecase): com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
-
-    @Binds
-    fun bindsUpdateProfileUsecase(impl: DefaultUpdateProfileUsecase): UpdateProfileUsecase
 
     companion object {
         @Provides

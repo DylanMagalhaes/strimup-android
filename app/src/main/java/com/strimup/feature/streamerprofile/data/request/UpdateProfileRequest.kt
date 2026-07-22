@@ -34,3 +34,9 @@ data class UpdateProfileRequest(
     @SerialName("videos")
     val videos: List<String> = emptyList()
 )
+
+@Serializable
+data class UpdateAvatarRequest(
+    @SerialName("avatar_url")
+    val uri: String,
+)

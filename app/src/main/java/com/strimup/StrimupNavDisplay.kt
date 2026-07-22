@@ -44,7 +44,7 @@ fun StrimupNavDisplay(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            if (currentDestination != Destination.Login && currentDestination !is Destination.StreamerDetail) {
+            if (currentDestination != Destination.Login && currentDestination !is Destination.StreamerDetail && currentDestination !is Destination.StreamerEditProfile) {
                 NavigationBar {
                     NavigationBarItem(
                         selected = currentDestination == Destination.Home,
@@ -153,7 +153,6 @@ fun StrimupNavDisplay(
                 entry<Destination.StreamerEditProfile> {
                     EditProfileScreen(
                         modifier = Modifier.fillMaxSize(),
-                        onNavigateToEditLanguages = {},
                         onNavUp = { backStack.removeLastOrNull() }
                     )
                 }

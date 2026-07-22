@@ -52,3 +52,11 @@ data class UpdateProfileResponse(
         )
     }
 }
+
+@Serializable
+data class UpdateAvatarResponse(
+    @SerialName("message")
+    val message: String,
+    @SerialName("avatar_url")
+    val avatarUrl: String,
+)

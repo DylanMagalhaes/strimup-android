@@ -1,6 +1,5 @@
 package com.strimup.feature.streamerprofile.domain.usecase
 
-import com.strimup.feature.streamerprofile.data.DefaultStreamerRepository
 import com.strimup.feature.streamerprofile.domain.StreamerRepository
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import javax.inject.Inject

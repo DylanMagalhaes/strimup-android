@@ -52,12 +52,10 @@ fun StreamerHero(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Coin gauche : L'avatar avec son Badge Live
             Box(contentAlignment = Alignment.BottomCenter) {
                 AsyncImage(
                     modifier = Modifier
                         .size(88.dp)
-                        // Un cercle ou un arrondi prononcé fait tout de suite plus moderne
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .1f))
                         .then(
@@ -93,7 +91,6 @@ fun StreamerHero(
                 }
             }
 
-            // Coin droit : Les infos empilées naturellement
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)

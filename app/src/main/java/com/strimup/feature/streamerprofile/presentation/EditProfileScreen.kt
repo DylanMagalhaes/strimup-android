@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerprofile.presentation
 
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +43,7 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.presentation.component.EditProfileImageSection
 import com.strimup.feature.streamerprofile.presentation.component.EditTextBottomSheet
 import com.strimup.feature.streamerprofile.presentation.component.MultipleSelectBottomSheet
 import com.strimup.feature.streamerprofile.presentation.component.ProfileEditRow
@@ -50,7 +52,6 @@ import com.strimup.feature.streamerprofile.presentation.component.SingleSelectBo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
-    onNavigateToEditLanguages: () -> Unit,
     onNavUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditProfileViewModel = hiltViewModel()
@@ -137,6 +138,9 @@ fun EditProfileScreen(
                     onEditLanguagesClicked = { activeEditType = ActiveEditType.Languages },
                     onEditSocialClicked = { socialType ->
                         activeEditType = ActiveEditType.Social(socialType)
+                    },
+                    onImageSelected = { newPhoto ->
+                        viewModel.onImageSelected(newPhoto)
                     }
                 )
 
@@ -265,6 +269,7 @@ fun EditProfileContent(
     onEditStreamFrequencyClicked: () -> Unit,
     onEditAverageViewersClicked: () -> Unit,
     onEditLanguagesClicked: () -> Unit,
+    onImageSelected: (Uri) -> Unit,
     onEditSocialClicked: (StreamerProfileEntity.Social.Type) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -273,6 +278,31 @@ fun EditProfileContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        item {
+        Text(
+            text = "Photo de profil",
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleMedium,
+            fontFamily = zalandoFontFamily,
+            fontWeight = FontWeight.Bold,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            EditProfileImageSection(
+                imageUrl = state.imageUrl,
+                onImageSelected = onImageSelected,
+            )
+        }
+    }
+
+
         item {
             Text(
                 text = "Informations Générales",
@@ -419,7 +449,8 @@ fun EditProfileScreenPreview() {
         personality = "Chill",
         personalitySecondary = "Tryhard",
         streamFrequency = "3x par semaine",
-        averageViewers = "10-50"
+        averageViewers = "10-50",
+        imageUrl = "",
     )
 
     StrimupTheme {
@@ -433,7 +464,8 @@ fun EditProfileScreenPreview() {
             onEditStreamFrequencyClicked = {},
             onEditAverageViewersClicked = {},
             onEditLanguagesClicked = {},
-            onEditSocialClicked = {}
+            onEditSocialClicked = {},
+            onImageSelected = {}
         )
     }
 }

@@ -20,6 +20,8 @@ class StreamerProfileViewModel @Inject constructor(
     private val _state = MutableStateFlow(ProfileUiState())
     val state = _state.asStateFlow()
 
+    private var currentUserId: String? = null
+
     init {
         viewModelScope.launch {
             getUser().collect { user ->
@@ -40,6 +42,8 @@ class StreamerProfileViewModel @Inject constructor(
                     loading = true
                 )
             }
+            currentUserId = id
+
             getStreamer(id)
                 .onSuccess { streamer ->
                     _state.update {
@@ -49,6 +53,12 @@ class StreamerProfileViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    fun refresh() {
+        currentUserId?.let { id ->
+            loadStreamer(id)
         }
     }
 

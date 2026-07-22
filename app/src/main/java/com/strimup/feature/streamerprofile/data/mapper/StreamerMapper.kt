@@ -3,6 +3,7 @@ package com.strimup.feature.streamerprofile.data.mapper
 import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
 import com.strimup.feature.streamerprofile.data.response.StreamerOptionsResponse
 import com.strimup.feature.streamerprofile.data.response.StreamerResponse
+import com.strimup.feature.streamerprofile.data.response.UpdateAvatarResponse
 import com.strimup.feature.streamerprofile.data.response.UpdateProfileResponse
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
@@ -117,3 +118,5 @@ fun UpdateProfileResponse.Streamer.toEntity(): StreamerProfileEntity {
         streamFrequency = streamFrequency
     )
 }
+
+fun UpdateAvatarResponse.toDomain(): String = avatarUrl
