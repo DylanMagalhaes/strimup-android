@@ -3,6 +3,7 @@ package com.strimup.feature.streamerprofile.data
 import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
 import com.strimup.feature.streamerprofile.data.response.StreamerOptionsResponse
 import com.strimup.feature.streamerprofile.data.response.StreamerResponse
+import com.strimup.feature.streamerprofile.data.response.TagResponse
 import com.strimup.feature.streamerprofile.data.response.UpdateAvatarResponse
 import com.strimup.feature.streamerprofile.data.response.UpdateProfileResponse
 import okhttp3.MultipartBody
@@ -32,4 +33,7 @@ interface StreamerApiService {
 
     @GET("/api/streamer/options")
     suspend fun getStreamerOptions(): StreamerOptionsResponse
+
+    @GET("api/tag")
+    suspend fun getTags(): List<TagResponse>
 }
