@@ -2,27 +2,37 @@ package com.strimup.feature.streamerprofile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = StreamerProfileViewModel.Factory::class)
-class StreamerProfileViewModel @AssistedInject constructor(
-    @Assisted val streamerId: String,
+@HiltViewModel
+class StreamerProfileViewModel @Inject constructor(
+    private val getUser: GetUserFlowUseCase,
     private val getStreamer: GetStreamerUsecase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UiState())
+    private val _state = MutableStateFlow(ProfileUiState())
     val state = _state.asStateFlow()
 
+    private var currentUserId: String? = null
+
     init {
-        loadStreamer(streamerId)
+        viewModelScope.launch {
+            getUser().collect { user ->
+                val id = user?.id
+                if (!id.isNullOrBlank()) {
+                    loadStreamer(id)
+                } else {
+                    _state.update { it.copy(loading = false) }
+                }
+            }
+        }
     }
 
     private fun loadStreamer(id: String) {
@@ -32,6 +42,8 @@ class StreamerProfileViewModel @AssistedInject constructor(
                     loading = true
                 )
             }
+            currentUserId = id
+
             getStreamer(id)
                 .onSuccess { streamer ->
                     _state.update {
@@ -44,7 +56,10 @@ class StreamerProfileViewModel @AssistedInject constructor(
         }
     }
 
-    @AssistedFactory interface Factory {
-        fun create(streamerId: String?): StreamerProfileViewModel
+    fun refresh() {
+        currentUserId?.let { id ->
+            loadStreamer(id)
+        }
     }
+
 }

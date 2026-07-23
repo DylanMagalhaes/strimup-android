@@ -2,10 +2,8 @@ package com.strimup.feature.streamerprofile.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
-@JsonIgnoreUnknownKeys
 data class StreamerResponse(
     @SerialName("id")
     val id: String?,
@@ -22,7 +20,6 @@ data class StreamerResponse(
 ) {
 
     @Serializable
-    @JsonIgnoreUnknownKeys
     data class StreamerProfile(
         @SerialName("id")
         val id: String?,
@@ -48,16 +45,33 @@ data class StreamerResponse(
         val isLive: Boolean?,
         @SerialName("live_title")
         val liveTitle: String?,
+        @SerialName("birth_date")
+        val birthDate: String?,
+        @SerialName("personality")
+        val personality: String?,
+        @SerialName("personality_secondary")
+        val personalitySecondary: String?,
+        @SerialName("stream_frequency")
+        val streamFrequency: String?,
+        @SerialName("average_viewers")
+        val averageViewers: String?,
+        @SerialName("languages")
+        val languages: List<String>? = emptyList(),
+        @SerialName("profile_reminder_sent")
+        val profileReminderSent: Boolean?,
+        @SerialName("createdAt")
+        val createdAt: String?,
+        @SerialName("updatedAt")
+        val updatedAt: String?,
         @SerialName("followers_count")
         val followersCount: Int?,
         @SerialName("tags")
-        val tags: List<Tag>?,
+        val tags: List<Tag>? = emptyList(),
         @SerialName("videos")
-        val videos: List<Video>?
+        val videos: List<Video>? = emptyList()
     )
 
     @Serializable
-    @JsonIgnoreUnknownKeys
     data class Tag(
         @SerialName("id")
         val id: Int?,
@@ -68,7 +82,6 @@ data class StreamerResponse(
     )
 
     @Serializable
-    @JsonIgnoreUnknownKeys
     data class Video(
         @SerialName("id")
         val id: String?,
@@ -83,7 +96,6 @@ data class StreamerResponse(
     )
 
     @Serializable
-    @JsonIgnoreUnknownKeys
     data class OAuthAccount(
         @SerialName("id")
         val id: String?,

@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.component.StreamerHero
-import com.strimup.common.ui.component.button.PrimaryButton
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
@@ -52,18 +51,21 @@ import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 
 @Composable
 fun StreamerProfileScreen(
-    streamerId: String?,
     modifier: Modifier = Modifier,
     onNavUp: () -> Unit,
-    viewModel: StreamerProfileViewModel = hiltViewModel(
-        creationCallback = { factory: StreamerProfileViewModel.Factory -> factory.create(streamerId) }
-    ),
+    onEditProfileNav: () -> Unit,
+    viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
 
     StreamerProfileScreen(
         state = state,
         onNavUp = onNavUp,
+        onEditProfileNav = onEditProfileNav,
         modifier = modifier
     )
 }
@@ -71,8 +73,9 @@ fun StreamerProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StreamerProfileScreen(
-    state: UiState,
+    state: ProfileUiState,
     onNavUp: () -> Unit,
+    onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -95,6 +98,7 @@ private fun StreamerProfileScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize(),
+            onEditProfileNav = onEditProfileNav,
             state = state,
         )
     }
@@ -102,7 +106,8 @@ private fun StreamerProfileScreen(
 
 @Composable
 private fun StreamerProfileContent(
-    state: UiState,
+    state: ProfileUiState,
+    onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -127,7 +132,7 @@ private fun StreamerProfileContent(
                 imageUrl = state.streamer.imageUrl,
                 pseudo = state.streamer.userName,
                 tags = state.streamer.tags?.map { it.name },
-                dailyStatus = state.streamer.dailyStatus,
+                dailyStatus = state.streamer.dailyStatus ?: "",
             )
 
             Surface(
@@ -140,14 +145,17 @@ private fun StreamerProfileContent(
                         .fillMaxWidth()
                 ) {
                     OutlinedButton(
-                        onClick = { },
+                        onClick = onEditProfileNav,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 8.dp),
                         shape = RoundedCornerShape(8.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+                        border = BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                        ),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary ,
+                            containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
@@ -187,28 +195,32 @@ private fun StreamerProfileContent(
 
                     VerticalSpacer(8.dp)
 
-                    Text(
-                        text = state.streamer.bio,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = if (isExpanded) Int.MAX_VALUE else 3,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .animateContentSize()
-                            .clickable { isExpanded = !isExpanded }
-                    )
-
-                    if (state.streamer.bio.length > 120) {
+                    state.streamer.bio?.let {
                         Text(
-                            text = if (isExpanded) "Voir moins" else "Lire la suite",
-                            color = MaterialTheme.colorScheme.primary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
+                            text = it,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
-                                .padding(top = 4.dp)
+                                .animateContentSize()
                                 .clickable { isExpanded = !isExpanded }
                         )
+                    }
+
+                    state.streamer.bio?.length?.let {
+                        if (it > 120) {
+                            Text(
+                                text = if (isExpanded) "Voir moins" else "Lire la suite",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(top = 4.dp)
+                                    .clickable { isExpanded = !isExpanded }
+                            )
+                        }
                     }
 
                     VerticalSpacer(24.dp)
@@ -220,10 +232,10 @@ private fun StreamerProfileContent(
 
 @Preview
 @Composable
-private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
+private fun StreamerProfileScreenPreview() {
     StrimupTheme {
         StreamerProfileScreen(
-            state = UiState(
+            state = ProfileUiState(
                 loading = false,
                 streamer = StreamerProfileEntity(
                     isLive = true,
@@ -231,8 +243,8 @@ private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
                     imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
                     userName = "Squeezie",
                     tags = listOf(
-                        StreamerProfileEntity.Tag(name = "Gaming", category = "dolk"),
-                        StreamerProfileEntity.Tag(name = "Dev", category = "dolk")
+                        StreamerProfileEntity.Tag(name = "Gaming", category = "dolk", id = 3),
+                        StreamerProfileEntity.Tag(name = "Dev", category = "dolk", id = 34)
                     ),
                     dailyStatus = "Hello la compagnie !",
                     videos = null,
@@ -246,9 +258,15 @@ private fun StreamerProfileScreenPreview(modifier: Modifier = Modifier) {
                             type = StreamerProfileEntity.Social.Type.Youtube
                         )
                     ),
+                    averageViewers = "4",
+                    languages = emptyList(),
+                    personality = "",
+                    personalitySecondary = "",
+                    streamFrequency = "",
                 )
             ),
-            onNavUp = {}
+            onNavUp = {},
+            onEditProfileNav = {}
         )
     }
 }

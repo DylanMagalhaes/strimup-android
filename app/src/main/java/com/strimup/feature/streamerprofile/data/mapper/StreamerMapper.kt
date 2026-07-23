@@ -1,53 +1,122 @@
 package com.strimup.feature.streamerprofile.data.mapper
 
-import com.strimup.feature.streamerdetail.data.response.StreamerResponse
-import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
+import com.strimup.feature.streamerprofile.data.request.UpdateProfileRequest
+import com.strimup.feature.streamerprofile.data.response.StreamerOptionsResponse
+import com.strimup.feature.streamerprofile.data.response.StreamerResponse
+import com.strimup.feature.streamerprofile.data.response.UpdateAvatarResponse
+import com.strimup.feature.streamerprofile.data.response.UpdateProfileResponse
+import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 
 fun StreamerResponse.toEntity(): StreamerProfileEntity {
-
     val profile = this.streamerProfile
+
     val socialsList = listOf(
         StreamerProfileEntity.Social(
             url = profile?.twitchUrl, type = StreamerProfileEntity.Social.Type.Twitch
         ),
         StreamerProfileEntity.Social(
-            url = profile?.youtubeUrl, type = StreamerProfileEntity.Social.Type.Youtube,
+            url = profile?.youtubeUrl, type = StreamerProfileEntity.Social.Type.Youtube
         ),
         StreamerProfileEntity.Social(
-            url = profile?.instagramUrl, type = StreamerProfileEntity.Social.Type.Instagram,
+            url = profile?.instagramUrl, type = StreamerProfileEntity.Social.Type.Instagram
         ),
         StreamerProfileEntity.Social(
-            url = profile?.tiktokUrl, type = StreamerProfileEntity.Social.Type.Tiktok,
+            url = profile?.tiktokUrl, type = StreamerProfileEntity.Social.Type.Tiktok
         ),
         StreamerProfileEntity.Social(
-            url = profile?.kickUrl, type = StreamerProfileEntity.Social.Type.Kick,
+            url = profile?.kickUrl, type = StreamerProfileEntity.Social.Type.Kick
         )
-    ).filter {
-        it.url != null
-    }
-
+    ).filter { !it.url.isNullOrBlank() }
 
     return StreamerProfileEntity(
-        userName = requireNotNull(this.pseudo),
-        imageUrl = this.streamerProfile?.avatarUrl ?: "",
-        isLive = requireNotNull(this.streamerProfile?.isLive),
-        bio = this.streamerProfile.bio ?: "",
-        dailyStatus = this.streamerProfile.dailyStatus ?: "",
+        userName = this.pseudo ?: "Inconnu",
+        imageUrl = profile?.avatarUrl ?: "",
+        isLive = profile?.isLive ?: false,
+        bio = profile?.bio,
+        dailyStatus = profile?.dailyStatus,
         socials = socialsList,
-        tags = this.streamerProfile?.tags?.map {
+        tags = profile?.tags?.map {
             StreamerProfileEntity.Tag(
-                name = requireNotNull(it.name),
-                category = requireNotNull(it.category)
+                id = it.id ?: 0,
+                name = it.name ?: "",
+                category = it.category ?: ""
             )
         },
-        videos = this.streamerProfile?.videos?.map {
+        videos = profile?.videos?.map {
             StreamerProfileEntity.Video(
-                title = requireNotNull(it.title),
-                description = requireNotNull(it.description),
-                url = requireNotNull(it.url),
-                order = requireNotNull(it.order),
+                title = it.title ?: "",
+                description = it.description ?: "",
+                url = it.url ?: "",
+                order = it.order ?: 0
             )
-        }
+        },
+        averageViewers = profile?.averageViewers,
+        languages = profile?.languages,
+        personality = profile?.personality,
+        personalitySecondary = profile?.personalitySecondary,
+        streamFrequency = profile?.streamFrequency
     )
 }
+
+fun StreamerProfileEntity.toRequest(): UpdateProfileRequest {
+    val twitchUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Twitch }?.url
+    val youtubeUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Youtube }?.url
+    val instagramUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Instagram }?.url
+    val tiktokUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Tiktok }?.url
+    val kickUrl = socials.firstOrNull { it.type == StreamerProfileEntity.Social.Type.Kick }?.url
+
+    return UpdateProfileRequest(
+        bio = bio?.takeIf { it.isNotBlank() },
+        dailyStatus = dailyStatus?.takeIf { it.isNotBlank() },
+        twitchUrl = twitchUrl?.takeIf { it.isNotBlank() },
+        youtubeUrl = youtubeUrl?.takeIf { it.isNotBlank() },
+        instagramUrl = instagramUrl?.takeIf { it.isNotBlank() },
+        tiktokUrl = tiktokUrl?.takeIf { it.isNotBlank() },
+        kickUrl = kickUrl?.takeIf { it.isNotBlank() },
+        personality = personality,
+        personalitySecondary = personalitySecondary,
+        streamFrequency = streamFrequency,
+        averageViewers = averageViewers,
+        languages = languages?.filter { it.isNotBlank() },
+        tags = tags?.map { it.id } ?: emptyList(),
+        videos = emptyList()
+    )
+}
+
+fun StreamerOptionsResponse.toEntity(): StreamerOptionsEntity{
+    return StreamerOptionsEntity(
+        averageViewers = this.averageViewers,
+        languages = this.languages,
+        personalities = this.personalities,
+        streamFrequencies = this.streamFrequencies,
+    )
+}
+
+fun UpdateProfileResponse.Streamer.toEntity(): StreamerProfileEntity {
+    val socialsList = buildList {
+        twitchUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Twitch)) }
+        youtubeUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Youtube)) }
+        instagramUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Instagram)) }
+        tiktokUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Tiktok)) }
+        kickUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Kick)) }
+    }
+
+    return StreamerProfileEntity(
+        userName = "",
+        imageUrl = avatarUrl ?: "",
+        isLive = isLive,
+        bio = bio,
+        dailyStatus = dailyStatus,
+        socials = socialsList,
+        tags = tags.map { StreamerProfileEntity.Tag(id = it.id, name = it.name, category = it.category) },
+        videos = emptyList(),
+        averageViewers = averageViewers,
+        languages = languages,
+        personality = personality,
+        personalitySecondary = personalitySecondary,
+        streamFrequency = streamFrequency
+    )
+}
+
+fun UpdateAvatarResponse.toDomain(): String = avatarUrl

@@ -25,6 +25,7 @@ import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
+import com.strimup.feature.streamerprofile.presentation.EditProfileScreen
 import com.strimup.feature.streamerprofile.presentation.StreamerProfileScreen
 import com.strimup.presentation.MainViewModel
 
@@ -43,7 +44,7 @@ fun StrimupNavDisplay(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            if (currentDestination != Destination.Login && currentDestination !is Destination.StreamerDetail) {
+            if (currentDestination != Destination.Login && currentDestination !is Destination.StreamerDetail && currentDestination !is Destination.StreamerEditProfile) {
                 NavigationBar {
                     NavigationBarItem(
                         selected = currentDestination == Destination.Home,
@@ -144,7 +145,14 @@ fun StrimupNavDisplay(
                 entry<Destination.StreamerProfile> {
                     StreamerProfileScreen(
                         modifier = Modifier.fillMaxSize(),
-                        streamerId = it.streamerId,
+                        onNavUp = { backStack.removeLastOrNull() },
+                        onEditProfileNav = { backStack.add(Destination.StreamerEditProfile) }
+                    )
+                }
+
+                entry<Destination.StreamerEditProfile> {
+                    EditProfileScreen(
+                        modifier = Modifier.fillMaxSize(),
                         onNavUp = { backStack.removeLastOrNull() }
                     )
                 }

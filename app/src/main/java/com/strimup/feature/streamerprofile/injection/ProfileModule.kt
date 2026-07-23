@@ -1,7 +1,9 @@
 package com.strimup.feature.streamerprofile.injection
 
 import com.strimup.feature.streamerprofile.data.StreamerApiService
-import com.strimup.feature.streamerprofile.domain.usecase.DefaultGetStreamerUseCase
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultGetStreamerUsecase
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUsecase
+import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -17,7 +19,7 @@ interface ProfileModule {
     fun bindsStreamerRepository(impl: com.strimup.feature.streamerprofile.data.DefaultStreamerRepository): com.strimup.feature.streamerprofile.domain.StreamerRepository
 
     @Binds
-    fun bindsStreamerUseCase(impl: DefaultGetStreamerUseCase): com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
+    fun bindsStreamerUsecase(impl: DefaultGetStreamerUsecase): com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
 
     companion object {
         @Provides
