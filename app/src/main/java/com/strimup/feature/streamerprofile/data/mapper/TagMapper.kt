@@ -1,10 +1,10 @@
 package com.strimup.feature.streamerprofile.data.mapper
 
 import com.strimup.feature.streamerprofile.data.response.TagResponse
-import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.domain.entity.TagEntity
 
-fun TagResponse.toEntity(): StreamerProfileEntity.Tag {
-    return StreamerProfileEntity.Tag(
+fun TagResponse.toEntity(): TagEntity {
+    return TagEntity(
         id = this.id,
         name = this.name,
         category = this.category

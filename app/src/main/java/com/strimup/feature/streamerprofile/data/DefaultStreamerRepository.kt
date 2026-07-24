@@ -8,6 +8,7 @@ import com.strimup.feature.streamerprofile.data.mapper.toRequest
 import com.strimup.feature.streamerprofile.domain.StreamerRepository
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.domain.entity.TagEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -24,16 +25,16 @@ class DefaultStreamerRepository @Inject constructor(
         }
     }
 
-     override suspend fun updateProfile(profile: StreamerProfileEntity): Result<StreamerProfileEntity> {
-         return runCatching {
-             val request = profile.toRequest()
+    override suspend fun updateProfile(profile: StreamerProfileEntity): Result<StreamerProfileEntity> {
+        return runCatching {
+            val request = profile.toRequest()
 
-             val response = service.updateProfile(request)
+            val response = service.updateProfile(request)
 
-             val entity = response.streamer.toEntity()
-             entity
-         }
-     }
+            val entity = response.streamer.toEntity()
+            entity
+        }
+    }
 
     override suspend fun getStreamerOptions(): Result<StreamerOptionsEntity> {
         return runCatching {
@@ -41,19 +42,31 @@ class DefaultStreamerRepository @Inject constructor(
         }
     }
 
-     override suspend fun updateAvatar(uri: String): Result<String> {
-         return runCatching {
-             val parsedUri = Uri.parse(uri)
-             val contentResolver = context.contentResolver
-             val mimeType = contentResolver.getType(parsedUri) ?: "image/jpeg"
+    override suspend fun updateAvatar(uri: String): Result<String> {
+        return runCatching {
+            val parsedUri = Uri.parse(uri)
+            val contentResolver = context.contentResolver
+            val mimeType = contentResolver.getType(parsedUri) ?: "image/jpeg"
 
-             val bytes = contentResolver.openInputStream(parsedUri)?.use { it.readBytes() }
-                 ?: throw IllegalArgumentException("Impossible de lire l'image")
+            val bytes = contentResolver.openInputStream(parsedUri)?.use { it.readBytes() }
+                ?: throw IllegalArgumentException("Impossible de lire l'image")
 
-             val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
-             val bodyPart = MultipartBody.Part.createFormData("avatar", "profile_avatar.jpg", requestBody)
+            val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+            val bodyPart = MultipartBody.Part.createFormData(
+                "avatar",
+                "profile_avatar.jpg",
+                requestBody
+            )
 
-             service.updateAvatar(bodyPart).toDomain()
-         }
-     }
- }
+            service.updateAvatar(bodyPart).toDomain()
+        }
+    }
+
+    override suspend fun getTags(): Result<List<TagEntity>> {
+        return runCatching {
+            service.getTags().map {
+                it.toEntity()
+            }
+        }
+    }
+}

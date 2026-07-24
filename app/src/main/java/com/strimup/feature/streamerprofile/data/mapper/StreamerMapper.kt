@@ -7,6 +7,7 @@ import com.strimup.feature.streamerprofile.data.response.UpdateAvatarResponse
 import com.strimup.feature.streamerprofile.data.response.UpdateProfileResponse
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.domain.entity.TagEntity
 
 fun StreamerResponse.toEntity(): StreamerProfileEntity {
     val profile = this.streamerProfile
@@ -37,7 +38,7 @@ fun StreamerResponse.toEntity(): StreamerProfileEntity {
         dailyStatus = profile?.dailyStatus,
         socials = socialsList,
         tags = profile?.tags?.map {
-            StreamerProfileEntity.Tag(
+            TagEntity(
                 id = it.id ?: 0,
                 name = it.name ?: "",
                 category = it.category ?: ""
@@ -84,7 +85,7 @@ fun StreamerProfileEntity.toRequest(): UpdateProfileRequest {
     )
 }
 
-fun StreamerOptionsResponse.toEntity(): StreamerOptionsEntity{
+fun StreamerOptionsResponse.toEntity(): StreamerOptionsEntity {
     return StreamerOptionsEntity(
         averageViewers = this.averageViewers,
         languages = this.languages,
@@ -95,11 +96,46 @@ fun StreamerOptionsResponse.toEntity(): StreamerOptionsEntity{
 
 fun UpdateProfileResponse.Streamer.toEntity(): StreamerProfileEntity {
     val socialsList = buildList {
-        twitchUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Twitch)) }
-        youtubeUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Youtube)) }
-        instagramUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Instagram)) }
-        tiktokUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Tiktok)) }
-        kickUrl?.let { add(StreamerProfileEntity.Social(it, StreamerProfileEntity.Social.Type.Kick)) }
+        twitchUrl?.let {
+            add(
+                StreamerProfileEntity.Social(
+                    it,
+                    StreamerProfileEntity.Social.Type.Twitch
+                )
+            )
+        }
+        youtubeUrl?.let {
+            add(
+                StreamerProfileEntity.Social(
+                    it,
+                    StreamerProfileEntity.Social.Type.Youtube
+                )
+            )
+        }
+        instagramUrl?.let {
+            add(
+                StreamerProfileEntity.Social(
+                    it,
+                    StreamerProfileEntity.Social.Type.Instagram
+                )
+            )
+        }
+        tiktokUrl?.let {
+            add(
+                StreamerProfileEntity.Social(
+                    it,
+                    StreamerProfileEntity.Social.Type.Tiktok
+                )
+            )
+        }
+        kickUrl?.let {
+            add(
+                StreamerProfileEntity.Social(
+                    it,
+                    StreamerProfileEntity.Social.Type.Kick
+                )
+            )
+        }
     }
 
     return StreamerProfileEntity(
@@ -109,7 +145,7 @@ fun UpdateProfileResponse.Streamer.toEntity(): StreamerProfileEntity {
         bio = bio,
         dailyStatus = dailyStatus,
         socials = socialsList,
-        tags = tags.map { StreamerProfileEntity.Tag(id = it.id, name = it.name, category = it.category) },
+        tags = tags.map { TagEntity(id = it.id, name = it.name, category = it.category) },
         videos = emptyList(),
         averageViewers = averageViewers,
         languages = languages,
