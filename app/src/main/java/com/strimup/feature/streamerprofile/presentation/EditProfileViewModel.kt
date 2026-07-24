@@ -26,7 +26,7 @@ class EditProfileViewModel @Inject constructor(
     private val getOptions: GetStreamerOptionsUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<EditProfileUiState>(EditProfileUiState.Loading)
+    private val _state = MutableStateFlow(EditProfileUiState())
     val state: StateFlow<EditProfileUiState> = _state.asStateFlow()
 
     private var fetchedOptions: StreamerOptionsEntity? = null
@@ -50,9 +50,7 @@ class EditProfileViewModel @Inject constructor(
                 .onSuccess { options ->
                     fetchedOptions = options
                     _state.update { currentState ->
-                        if (currentState is EditProfileUiState.Success) {
-                            currentState.copy(availableOptions = options)
-                        } else currentState
+                        currentState.copy(availableOptions = options)
                     }
                 }
         }
@@ -60,169 +58,164 @@ class EditProfileViewModel @Inject constructor(
 
     private fun loadStreamer(id: String) {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+
             getStreamer(id)
                 .onSuccess { streamer ->
-                    _state.value = EditProfileUiState.Success(
-                        originalProfile = streamer,
-                        availableOptions = fetchedOptions ?: StreamerOptionsEntity(
-                            averageViewers = emptyList(),
-                            languages = emptyList(),
-                            personalities = emptyList(),
-                            streamFrequencies = emptyList()
-                        ),
-                        bio = streamer.bio ?: "",
-                        dailyStatus = streamer.dailyStatus ?: "",
-                        selectedLanguages = streamer.languages ?: emptyList(),
-                        selectedTags = streamer.tags ?: emptyList(),
-                        socials = streamer.socials,
-                        personality = streamer.personality,
-                        personalitySecondary = streamer.personalitySecondary,
-                        streamFrequency = streamer.streamFrequency,
-                        averageViewers = streamer.averageViewers,
-                        imageUrl = streamer.imageUrl
-                    )
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isLoading = false,
+                            originalProfile = streamer,
+                            availableOptions = fetchedOptions ?: StreamerOptionsEntity(
+                                averageViewers = emptyList(),
+                                languages = emptyList(),
+                                personalities = emptyList(),
+                                streamFrequencies = emptyList()
+                            ),
+                            bio = streamer.bio ?: "",
+                            dailyStatus = streamer.dailyStatus ?: "",
+                            selectedLanguages = streamer.languages ?: emptyList(),
+                            selectedTags = streamer.tags ?: emptyList(),
+                            socials = streamer.socials,
+                            personality = streamer.personality,
+                            personalitySecondary = streamer.personalitySecondary,
+                            streamFrequency = streamer.streamFrequency,
+                            averageViewers = streamer.averageViewers,
+                            imageUrl = streamer.imageUrl
+                        )
+                    }
                 }
                 .onFailure {
-                    _state.value = EditProfileUiState.Error(
-                        message = "Erreur pendant la récupération du profil"
-                    )
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isLoading = false,
+                            errorMessage = "Erreur pendant la récupération du profil"
+                        )
+                    }
                 }
         }
     }
 
     fun onImageSelected(newPhoto: Any) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                currentState.copy(imageUrl = newPhoto)
-            } else currentState
+            currentState.copy(imageUrl = newPhoto)
         }
     }
 
     fun onBioChanged(newBio: String) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                currentState.copy(bio = newBio)
-            } else currentState
+            currentState.copy(bio = newBio)
         }
     }
 
     fun onDailyStatusChanged(newStatus: String) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                currentState.copy(dailyStatus = newStatus)
-            } else currentState
+            currentState.copy(dailyStatus = newStatus)
         }
     }
 
     fun onLanguageSelected(language: String) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                val currentLanguages = currentState.selectedLanguages
+            val currentLanguages = currentState.selectedLanguages
 
-                val updatedLanguages = if (currentLanguages.contains(language)) {
-                    currentLanguages - language
-                } else {
-                    currentLanguages + language
-                }
-                currentState.copy(selectedLanguages = updatedLanguages)
-            } else currentState
+            val updatedLanguages = if (currentLanguages.contains(language)) {
+                currentLanguages - language
+            } else {
+                currentLanguages + language
+            }
+            currentState.copy(selectedLanguages = updatedLanguages)
         }
     }
 
     fun onPrimaryPersonalityChanged(personality: String) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                val updatedSecondary = if (currentState.personalitySecondary == personality) {
-                    null
-                } else {
-                    currentState.personalitySecondary
-                }
+            val updatedSecondary = if (currentState.personalitySecondary == personality) {
+                null
+            } else {
+                currentState.personalitySecondary
+            }
 
-                currentState.copy(
-                    personality = personality,
-                    personalitySecondary = updatedSecondary
-                )
-            } else currentState
+            currentState.copy(
+                personality = personality,
+                personalitySecondary = updatedSecondary
+            )
         }
     }
 
     fun onSecondaryPersonalityChanged(personality: String) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                val updatedPrimary = if (currentState.personality == personality) {
-                    null
-                } else {
-                    currentState.personality
-                }
+            val updatedPrimary = if (currentState.personality == personality) {
+                null
+            } else {
+                currentState.personality
+            }
 
-                currentState.copy(
-                    personality = updatedPrimary,
-                    personalitySecondary = personality
-                )
-            } else currentState
+            currentState.copy(
+                personality = updatedPrimary,
+                personalitySecondary = personality
+            )
         }
     }
 
     fun onAverageViewersChanged(average: String) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                currentState.copy(averageViewers = average)
-            } else currentState
+            currentState.copy(averageViewers = average)
         }
     }
 
     fun onStreamFrequencyChanged(frequency: String) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                currentState.copy(streamFrequency = frequency)
-            } else currentState
+            currentState.copy(streamFrequency = frequency)
         }
     }
 
     fun onSocialUrlChanged(url: String, targetSocial: StreamerProfileEntity.Social.Type) {
         _state.update { currentState ->
-            if (currentState is EditProfileUiState.Success) {
-                val cleanUrl = url.trim()
-                val exists = currentState.socials.any { it.type == targetSocial }
+            val cleanUrl = url.trim()
+            val exists = currentState.socials.any { it.type == targetSocial }
 
-                val updatedSocials = if (exists) {
-                    if (cleanUrl.isBlank()) {
-                        currentState.socials.filterNot { it.type == targetSocial }
-                    } else {
-                        currentState.socials.map { social ->
-                            if (social.type == targetSocial) {
-                                social.copy(url = cleanUrl)
-                            } else {
-                                social
-                            }
+            val updatedSocials = if (exists) {
+                if (cleanUrl.isBlank()) {
+                    currentState.socials.filterNot { it.type == targetSocial }
+                } else {
+                    currentState.socials.map { social ->
+                        if (social.type == targetSocial) {
+                            social.copy(url = cleanUrl)
+                        } else {
+                            social
                         }
                     }
-                } else {
-                    if (cleanUrl.isNotBlank()) {
-                        currentState.socials + StreamerProfileEntity.Social(url = cleanUrl, type = targetSocial)
-                    } else {
-                        currentState.socials
-                    }
                 }
+            } else {
+                if (cleanUrl.isNotBlank()) {
+                    currentState.socials + StreamerProfileEntity.Social(url = cleanUrl, type = targetSocial)
+                } else {
+                    currentState.socials
+                }
+            }
 
-                currentState.copy(socials = updatedSocials)
-            } else currentState
+            currentState.copy(socials = updatedSocials)
         }
+    }
+
+    fun openEdit(editType: ActiveEditType) {
+        _state.update { it.copy(activeEdit = editType) }
+    }
+
+    fun dismissEdit() {
+        _state.update { it.copy(activeEdit = null) }
     }
 
     fun saveProfile() {
         val currentState = _state.value
-        if (currentState !is EditProfileUiState.Success) return
+        val originalProfile = currentState.originalProfile ?: return
 
         viewModelScope.launch {
-
             _state.update { state ->
-                if (state is EditProfileUiState.Success) {
-                    state.copy(isSaving = true, isSaveSuccess = false, error = null)
-                } else state
+                state.copy(isSaving = true, isSaveSuccess = false, errorMessage = null)
             }
 
-            var finalImageUrl = currentState.originalProfile.imageUrl
+            var finalImageUrl = originalProfile.imageUrl
             val selectedImage = currentState.imageUrl.toString()
 
             if (selectedImage.startsWith("content://") || selectedImage.startsWith("file://")) {
@@ -230,13 +223,11 @@ class EditProfileViewModel @Inject constructor(
 
                 if (avatarResult.isFailure) {
                     _state.update { state ->
-                        if (state is EditProfileUiState.Success) {
-                            state.copy(
-                                isSaving = false,
-                                error = avatarResult.exceptionOrNull()?.localizedMessage
-                                    ?: "Erreur lors de l'envoi de la photo de profil"
-                            )
-                        } else state
+                        state.copy(
+                            isSaving = false,
+                            errorMessage = avatarResult.exceptionOrNull()?.localizedMessage
+                                ?: "Erreur lors de l'envoi de la photo de profil"
+                        )
                     }
                     return@launch
                 }
@@ -246,7 +237,7 @@ class EditProfileViewModel @Inject constructor(
                 }
             }
 
-            val updatedProfile = currentState.originalProfile.copy(
+            val updatedProfile = originalProfile.copy(
                 imageUrl = finalImageUrl,
                 bio = currentState.bio.takeIf { it.isNotBlank() },
                 dailyStatus = currentState.dailyStatus.takeIf { it.isNotBlank() },
@@ -262,25 +253,20 @@ class EditProfileViewModel @Inject constructor(
             updateProfile(updatedProfile)
                 .onSuccess { updatedStreamer ->
                     _state.update { state ->
-                        if (state is EditProfileUiState.Success) {
-                            state.copy(
-                                isSaving = false,
-                                isSaveSuccess = true,
-                                originalProfile = updatedStreamer,
-                                imageUrl = updatedStreamer.imageUrl
-                            )
-                        } else state
+                        state.copy(
+                            isSaving = false,
+                            isSaveSuccess = true,
+                            originalProfile = updatedStreamer,
+                            imageUrl = updatedStreamer.imageUrl
+                        )
                     }
-
                 }
                 .onFailure { exception ->
                     _state.update { state ->
-                        if (state is EditProfileUiState.Success) {
-                            state.copy(
-                                isSaving = false,
-                                error = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
-                            )
-                        } else state
+                        state.copy(
+                            isSaving = false,
+                            errorMessage = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
+                        )
                     }
                 }
         }

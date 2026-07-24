@@ -2,33 +2,32 @@ package com.strimup.feature.streamerprofile.presentation
 
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.domain.entity.TagEntity
 
-sealed interface EditProfileUiState {
-    data object Loading : EditProfileUiState
+data class EditProfileUiState(
 
-    data class Success(
-        val originalProfile: StreamerProfileEntity,
+    val isLoading: Boolean = true,
+    val isSaving: Boolean = false,
+    val isSaveSuccess: Boolean = false,
+    val errorMessage: String? = null,
 
-        val availableOptions: StreamerOptionsEntity,
+    val originalProfile: StreamerProfileEntity? = null,
+    val availableOptions: StreamerOptionsEntity? = null,
+    val availableTags: List<TagEntity> = emptyList(),
 
-        val imageUrl: Any,
-        val bio: String,
-        val dailyStatus: String,
-        val selectedLanguages: List<String>,
-        val selectedTags: List<StreamerProfileEntity.Tag>,
-        val socials: List<StreamerProfileEntity.Social>,
-        val personality: String?,
-        val personalitySecondary: String?,
-        val streamFrequency: String?,
-        val averageViewers: String?,
-        val activeEdit: ActiveEditType? = null,
-        val isSaving: Boolean = false,
-        val error: String? = null,
-        val isSaveSuccess: Boolean = false
-    ) : EditProfileUiState
+    val imageUrl: Any? = null,
+    val bio: String = "",
+    val dailyStatus: String = "",
+    val selectedLanguages: List<String> = emptyList(),
+    val selectedTags: List<TagEntity> = emptyList(),
+    val socials: List<StreamerProfileEntity.Social> = emptyList(),
+    val personality: String? = null,
+    val personalitySecondary: String? = null,
+    val streamFrequency: String? = null,
+    val averageViewers: String? = null,
 
-    data class Error(val message: String) : EditProfileUiState
-}
+    val activeEdit: ActiveEditType? = null,
+)
 
 sealed interface ActiveEditType {
     data object Bio : ActiveEditType
