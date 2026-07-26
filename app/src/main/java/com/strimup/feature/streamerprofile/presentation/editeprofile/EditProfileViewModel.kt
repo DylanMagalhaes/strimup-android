@@ -1,16 +1,19 @@
-package com.strimup.feature.streamerprofile.presentation
+package com.strimup.feature.streamerprofile.presentation.editeprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.domain.entity.TagEntity
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultGetTags
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.collections.plus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,17 +26,20 @@ class EditProfileViewModel @Inject constructor(
     private val updateProfile: DefaultUpdateProfileUsecase,
     private val updateAvatar: DefaultUpdateAvatarUsecase,
     private val getUser: GetUserFlowUseCase,
-    private val getOptions: GetStreamerOptionsUseCase
+    private val getOptions: GetStreamerOptionsUseCase,
+    private val getTags: DefaultGetTags,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EditProfileUiState())
     val state: StateFlow<EditProfileUiState> = _state.asStateFlow()
 
     private var fetchedOptions: StreamerOptionsEntity? = null
+    private var fetchedTags: List<TagEntity> = emptyList()
 
     init {
         viewModelScope.launch {
             loadOptions()
+            loadTags()
 
             getUser().collect { user ->
                 val id = user?.id
@@ -56,6 +62,21 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
+    private fun loadTags() {
+        viewModelScope.launch {
+            getTags()
+                .onSuccess { tags ->
+                    fetchedTags = tags
+                    _state.update { currentState ->
+                        currentState.copy(
+                            availableCategories = tags.distinctBy { it.category },
+                            availableTags = tags
+                        )
+                    }
+                }
+        }
+    }
+
     private fun loadStreamer(id: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
@@ -66,6 +87,7 @@ class EditProfileViewModel @Inject constructor(
                         currentState.copy(
                             isLoading = false,
                             originalProfile = streamer,
+                            availableTags = fetchedTags,
                             availableOptions = fetchedOptions ?: StreamerOptionsEntity(
                                 averageViewers = emptyList(),
                                 languages = emptyList(),
@@ -114,6 +136,31 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
+    fun onCategorySelected(categorySelected: TagEntity){
+        _state.update { it ->
+            it.copy(
+                selectedCategory = categorySelected,
+                availableTags = fetchedTags.filter {
+                    it.category == categorySelected.category
+                }
+            )
+        }
+    }
+
+    fun onTagSelected(tag: TagEntity){
+        _state.update { currentState ->
+            val currentTags = currentState.selectedTags
+            val updatedTag = if (currentTags.contains(tag)){
+                currentTags - tag
+            } else {
+                currentTags + tag
+            }
+            currentState.copy(
+                selectedTags = updatedTag
+            )
+        }
+    }
+
     fun onLanguageSelected(language: String) {
         _state.update { currentState ->
             val currentLanguages = currentState.selectedLanguages
@@ -126,6 +173,7 @@ class EditProfileViewModel @Inject constructor(
             currentState.copy(selectedLanguages = updatedLanguages)
         }
     }
+
 
     fun onPrimaryPersonalityChanged(personality: String) {
         _state.update { currentState ->
@@ -188,7 +236,10 @@ class EditProfileViewModel @Inject constructor(
                 }
             } else {
                 if (cleanUrl.isNotBlank()) {
-                    currentState.socials + StreamerProfileEntity.Social(url = cleanUrl, type = targetSocial)
+                    currentState.socials + StreamerProfileEntity.Social(
+                        url = cleanUrl,
+                        type = targetSocial
+                    )
                 } else {
                     currentState.socials
                 }

@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation.component
+package com.strimup.feature.streamerprofile.presentation.editeprofile.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -83,7 +82,7 @@ fun EditBioContent(
                 style = MaterialTheme.typography.titleSmall,
                 fontFamily = zalandoFontFamily,
                 fontStyle = FontStyle.Italic,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
@@ -131,7 +130,7 @@ fun EditBioBottomSheetPreview() {
                 currentBio = "Joueuse roleplay (Gtarp), multigaming et Just Chatting...",
                 onSave = {},
                 title = "Modifier la bio",
-                description = "lorem ipsum dolores"
+                description = ""
             )
         }
     }

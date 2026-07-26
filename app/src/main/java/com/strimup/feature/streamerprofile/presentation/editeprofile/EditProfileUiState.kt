@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation
+package com.strimup.feature.streamerprofile.presentation.editeprofile
 
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
@@ -13,6 +13,7 @@ data class EditProfileUiState(
 
     val originalProfile: StreamerProfileEntity? = null,
     val availableOptions: StreamerOptionsEntity? = null,
+    val availableCategories: List<TagEntity> = emptyList(),
     val availableTags: List<TagEntity> = emptyList(),
 
     val imageUrl: Any? = null,
@@ -20,6 +21,7 @@ data class EditProfileUiState(
     val dailyStatus: String = "",
     val selectedLanguages: List<String> = emptyList(),
     val selectedTags: List<TagEntity> = emptyList(),
+    val selectedCategory: TagEntity? = null,
     val socials: List<StreamerProfileEntity.Social> = emptyList(),
     val personality: String? = null,
     val personalitySecondary: String? = null,
@@ -38,4 +40,5 @@ sealed interface ActiveEditType {
     data object AverageViewers : ActiveEditType
     data object Languages : ActiveEditType
     data class Social(val type: StreamerProfileEntity.Social.Type) : ActiveEditType
+    data object Tags: ActiveEditType
 }

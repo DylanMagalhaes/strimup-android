@@ -1,9 +1,10 @@
-package com.strimup.feature.streamerprofile.presentation
+package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
+import com.strimup.feature.streamerprofile.presentation.streamerprofile.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

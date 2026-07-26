@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation
+package com.strimup.feature.streamerprofile.presentation.editeprofile
 
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -40,11 +40,13 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.feature.streamerprofile.presentation.component.EditProfileImageSection
-import com.strimup.feature.streamerprofile.presentation.component.EditTextBottomSheet
-import com.strimup.feature.streamerprofile.presentation.component.MultipleSelectBottomSheet
+import com.strimup.feature.streamerprofile.domain.entity.TagEntity
+import com.strimup.feature.streamerprofile.presentation.editeprofile.component.EditProfileImageSection
+import com.strimup.feature.streamerprofile.presentation.editeprofile.component.EditTextBottomSheet
+import com.strimup.feature.streamerprofile.presentation.editeprofile.component.MultipleSelectBottomSheet
+import com.strimup.feature.streamerprofile.presentation.component.MultipleSelectedTags
 import com.strimup.feature.streamerprofile.presentation.component.ProfileEditRow
-import com.strimup.feature.streamerprofile.presentation.component.SingleSelectBottomSheet
+import com.strimup.feature.streamerprofile.presentation.editeprofile.component.SingleSelectBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,7 +133,8 @@ fun EditProfileScreen(
                 },
                 onImageSelected = { newPhoto ->
                     viewModel.onImageSelected(newPhoto)
-                }
+                },
+                onEditTagsClicked = { viewModel.openEdit(ActiveEditType.Tags) }
             )
 
             val availableOptions = state.availableOptions ?: StreamerOptionsEntity(
@@ -166,6 +169,22 @@ fun EditProfileScreen(
                         onDismiss = { viewModel.dismissEdit() },
                         description = ""
                     )
+                }
+
+                ActiveEditType.Tags -> {
+                    MultipleSelectedTags(
+                        onDismiss = { viewModel.dismissEdit() },
+                        category = state.availableCategories,
+                        selectedCategory = state.selectedCategory,
+                        tags = state.availableTags,
+                        selectedTags = state.selectedTags,
+                        onCategorySelected = {categorySelected -> viewModel.onCategorySelected(categorySelected)},
+                        onTagClick = { tag ->
+                            viewModel.onTagSelected(tag)
+                        },
+                        onDone = {},
+                    )
+
                 }
 
                 ActiveEditType.PrimaryPersonality -> {
@@ -272,6 +291,7 @@ fun EditProfileContent(
     onEditLanguagesClicked: () -> Unit,
     onImageSelected: (Uri) -> Unit,
     onEditSocialClicked: (StreamerProfileEntity.Social.Type) -> Unit,
+    onEditTagsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -337,7 +357,7 @@ fun EditProfileContent(
 
         item {
             Text(
-                text = "Détails de la chaîne",
+                text = "Détails du profil",
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -353,6 +373,11 @@ fun EditProfileContent(
                 color = MaterialTheme.colorScheme.surface
             ) {
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
+                    ProfileEditRow(
+                        label = "Mes tags",
+                        value = state.selectedTags.map { it.name }.ifEmpty { listOf("Non renseigné") }.joinToString(", "),
+                        onClick = onEditTagsClicked
+                    )
                     ProfileEditRow(
                         label = "Personnalité principale",
                         value = state.personality ?: "Non renseigné",
@@ -427,6 +452,11 @@ fun EditProfileScreenPreview() {
         streamFrequency = "3x par semaine",
         averageViewers = "10-50",
         imageUrl = "",
+        selectedCategory = TagEntity(
+            id = 1,
+            category = "",
+            name = ""
+        ),
         availableOptions = StreamerOptionsEntity(
             averageViewers = emptyList(),
             languages = listOf("Français", "Anglais"),
@@ -447,7 +477,8 @@ fun EditProfileScreenPreview() {
             onEditAverageViewersClicked = {},
             onEditLanguagesClicked = {},
             onEditSocialClicked = {},
-            onImageSelected = {}
+            onImageSelected = {},
+            onEditTagsClicked = {},
         )
     }
 }

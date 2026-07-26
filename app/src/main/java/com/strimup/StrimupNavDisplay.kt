@@ -25,8 +25,8 @@ import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
-import com.strimup.feature.streamerprofile.presentation.EditProfileScreen
-import com.strimup.feature.streamerprofile.presentation.StreamerProfileScreen
+import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileScreen
+import com.strimup.feature.streamerprofile.presentation.streamerprofile.StreamerProfileScreen
 import com.strimup.presentation.MainViewModel
 
 @Composable
@@ -44,7 +44,7 @@ fun StrimupNavDisplay(
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            if (currentDestination != Destination.Login && currentDestination !is Destination.StreamerDetail && currentDestination !is Destination.StreamerEditProfile) {
+            if ( currentDestination !is Destination.StreamerDetail && currentDestination !is Destination.StreamerEditProfile) {
                 NavigationBar {
                     NavigationBarItem(
                         selected = currentDestination == Destination.Home,

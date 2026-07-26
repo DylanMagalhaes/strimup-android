@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation
+package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -48,6 +48,8 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.feature.streamerprofile.domain.entity.TagEntity
+import com.strimup.feature.streamerprofile.presentation.streamerprofile.ProfileUiState
+import com.strimup.feature.streamerprofile.presentation.streamerprofile.StreamerProfileViewModel
 import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 
 @Composable
