@@ -1,9 +1,12 @@
 package com.strimup.common.ui.component
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Badge
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,47 +14,71 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 
 @Composable
 fun TagBadge(
     tag: String,
+    isSelected: Boolean = false,
+    onTagClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Badge(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
-    ) {
-        Row(modifier = Modifier.padding(2.dp)) {
-            Text(
-                text = "#",
-                color = MaterialTheme.colorScheme.primary,
-                fontFamily = zalandoFontFamily,
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold,
+    val containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val hashtagColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
 
-            )
-            Text(
-                text = "$tag",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontFamily = zalandoFontFamily,
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold,
+    Surface(
+        onClick = onTagClick,
+        modifier = modifier
+    ) {
+        Badge(
+            containerColor = containerColor
+        ) {
+            Row(modifier = Modifier.padding(2.dp)) {
+                Text(
+                    text = "#",
+                    color = hashtagColor,
+                    fontFamily = zalandoFontFamily,
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Bold
                 )
+                Text(
+                    text = tag,
+                    color = textColor,
+                    fontFamily = zalandoFontFamily,
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
 
 @Preview
 @Composable
-private fun TagBadgPreview() {
+private fun TagBadgePreview() {
     StrimupTheme {
+        Surface {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Column {
+                    TagBadge(
+                        isSelected = true,
+                        tag = "Gaming"
+                    )
 
-        TagBadge(
-            tag = "Gamming"
-        )
+                    VerticalSpacer(8.dp)
 
-
+                    TagBadge(
+                        isSelected = false,
+                        tag = "Gaming"
+                    )
+                }
+            }
+        }
     }
 }

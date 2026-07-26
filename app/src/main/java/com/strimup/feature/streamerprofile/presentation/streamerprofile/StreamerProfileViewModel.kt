@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation
+package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,7 +17,7 @@ class StreamerProfileViewModel @Inject constructor(
     private val getStreamer: GetStreamerUsecase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ProfileUiState())
+    private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
 
     private var currentUserId: String? = null

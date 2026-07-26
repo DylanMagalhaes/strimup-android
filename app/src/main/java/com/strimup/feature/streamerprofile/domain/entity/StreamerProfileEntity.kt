@@ -7,7 +7,7 @@ data class StreamerProfileEntity(
     val bio: String?,
     val dailyStatus: String?,
     val socials: List<Social>,
-    val tags: List<Tag>?,
+    val tags: List<TagEntity>?,
     val videos: List<Video>?,
     val averageViewers: String?,
     val languages: List<String>?,
@@ -27,12 +27,6 @@ data class StreamerProfileEntity(
             Tiktok,
         }
     }
-
-    data class Tag(
-        val id: Int,
-        val name: String,
-        val category: String
-    )
 
     data class Video(
         val title: String,

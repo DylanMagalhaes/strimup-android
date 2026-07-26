@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation
+package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
@@ -47,6 +47,7 @@ import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.feature.streamerprofile.domain.entity.TagEntity
 import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 
 @Composable
@@ -73,7 +74,7 @@ fun StreamerProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StreamerProfileScreen(
-    state: ProfileUiState,
+    state: UiState,
     onNavUp: () -> Unit,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier,
@@ -106,7 +107,7 @@ private fun StreamerProfileScreen(
 
 @Composable
 private fun StreamerProfileContent(
-    state: ProfileUiState,
+    state: UiState,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -235,7 +236,7 @@ private fun StreamerProfileContent(
 private fun StreamerProfileScreenPreview() {
     StrimupTheme {
         StreamerProfileScreen(
-            state = ProfileUiState(
+            state = UiState(
                 loading = false,
                 streamer = StreamerProfileEntity(
                     isLive = true,
@@ -243,8 +244,8 @@ private fun StreamerProfileScreenPreview() {
                     imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
                     userName = "Squeezie",
                     tags = listOf(
-                        StreamerProfileEntity.Tag(name = "Gaming", category = "dolk", id = 3),
-                        StreamerProfileEntity.Tag(name = "Dev", category = "dolk", id = 34)
+                        TagEntity(name = "Gaming", category = "dolk", id = 3),
+                        TagEntity(name = "Dev", category = "dolk", id = 34)
                     ),
                     dailyStatus = "Hello la compagnie !",
                     videos = null,

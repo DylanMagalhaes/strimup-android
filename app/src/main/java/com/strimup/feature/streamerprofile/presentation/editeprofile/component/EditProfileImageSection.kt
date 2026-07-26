@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation.component
+package com.strimup.feature.streamerprofile.presentation.editeprofile.component
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
