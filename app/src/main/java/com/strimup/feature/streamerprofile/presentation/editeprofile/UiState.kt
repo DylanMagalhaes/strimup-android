@@ -40,5 +40,4 @@ sealed interface ActiveEditType {
     data object AverageViewers : ActiveEditType
     data object Languages : ActiveEditType
     data class Social(val type: StreamerProfileEntity.Social.Type) : ActiveEditType
-    data object Tags: ActiveEditType
 }

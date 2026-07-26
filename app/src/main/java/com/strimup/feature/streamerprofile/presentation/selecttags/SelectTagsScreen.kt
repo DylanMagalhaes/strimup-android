@@ -1,9 +1,10 @@
-package com.strimup.feature.streamerprofile.presentation.component
+package com.strimup.feature.streamerprofile.presentation.selecttags
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -14,11 +15,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,44 +30,41 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.component.TagBadge
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.TagEntity
+import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MultipleSelectedTags(
-    onDismiss: () -> Unit,
-    category: List<TagEntity>,
-    selectedCategory: TagEntity?,
-    tags: List<TagEntity>,
-    selectedTags: List<TagEntity>,
-    onCategorySelected: (TagEntity) -> Unit = {},
-    onTagClick: (TagEntity) -> Unit = {},
-    onDone: () -> Unit = {},
+fun SelectTagsScreen(
+    viewModel: EditProfileViewModel,
+    onNavUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ModalBottomSheet(
-        modifier = modifier,
-        onDismissRequest = onDismiss,
-    ) {
-        MultipleSelectTagsContent(
-            categories = category,
-            selectedCategory = selectedCategory,
-            tags = tags,
-            selectedTags = selectedTags,
-            onCategorySelected = onCategorySelected,
-            onTagClick = onTagClick,
-            onDone = onDone
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    Scaffold(
+        modifier = modifier.fillMaxSize()
+    ) { innerPadding ->
+        SelectTagsContent(
+            categories = state.availableCategories,
+            selectedCategory = state.selectedCategory,
+            tags = state.availableTags,
+            selectedTags = state.selectedTags,
+            onCategorySelected = { viewModel.onCategorySelected(it) },
+            onTagClick = { viewModel.onTagSelected(it) },
+            onDone = { onNavUp() },
+            modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MultipleSelectTagsContent(
+fun SelectTagsContent(
     categories: List<TagEntity>,
     selectedCategory: TagEntity?,
     tags: List<TagEntity>,
@@ -79,11 +78,13 @@ fun MultipleSelectTagsContent(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(horizontal = 16.dp)
             .padding(bottom = 24.dp)
             .imePadding()
     ) {
+        VerticalSpacer(16.dp)
+
         Text(
             text = "Vos tags de stream",
             style = MaterialTheme.typography.titleMedium,
@@ -102,6 +103,42 @@ fun MultipleSelectTagsContent(
         )
 
         VerticalSpacer(16.dp)
+
+
+        Text(
+            text = "Tags sélectionnés (${selectedTags.size}/4) :",
+            style = MaterialTheme.typography.labelLarge,
+            fontFamily = zalandoFontFamily,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        VerticalSpacer(8.dp)
+
+        if (selectedTags.isEmpty()) {
+            Text(
+                text = "Aucun tag sélectionné pour le moment",
+                style = MaterialTheme.typography.bodyMedium,
+                fontFamily = zalandoFontFamily,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+        } else {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                selectedTags.forEach { selectedTag ->
+                    TagBadge(
+                        tag = selectedTag.name,
+                        isSelected = true,
+                        onTagClick = { onTagClick(selectedTag) }
+                    )
+                }
+            }
+        }
+
+        VerticalSpacer(24.dp)
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -156,12 +193,13 @@ fun MultipleSelectTagsContent(
 
         VerticalSpacer(16.dp)
 
+        // 🟢 Tags disponibles de la catégorie active
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            maxItemsInEachRow = 4
+            maxItemsInEachRow = 4,
+            modifier = Modifier.weight(1f)
         ) {
-
             tags.forEach { tag ->
                 TagBadge(
                     tag = tag.name,
@@ -170,8 +208,6 @@ fun MultipleSelectTagsContent(
                 )
             }
         }
-
-        VerticalSpacer(16.dp)
 
         OutlinedButton(
             onClick = onDone,
@@ -197,7 +233,7 @@ fun MultipleSelectTagsContent(
 
 @Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable
-fun MultipleSelectTagsPreview() {
+private fun SelectTagsScreenPreview() {
     val sampleCategories = listOf(
         TagEntity(id = 1, category = "Gaming", name = "Multi Gaming"),
         TagEntity(id = 2, category = "IRL", name = "Discussion")
@@ -210,7 +246,7 @@ fun MultipleSelectTagsPreview() {
     )
 
     StrimupTheme {
-        MultipleSelectTagsContent(
+        SelectTagsContent(
             categories = sampleCategories,
             selectedCategory = sampleCategories.first(),
             tags = sampleTags,

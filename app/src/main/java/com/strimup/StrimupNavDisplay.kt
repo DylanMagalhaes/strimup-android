@@ -1,5 +1,7 @@
 package com.strimup
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,6 +14,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,6 +31,8 @@ import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileScreen
+import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileViewModel
+import com.strimup.feature.streamerprofile.presentation.selecttags.SelectTagsScreen
 import com.strimup.feature.streamerprofile.presentation.streamerprofile.StreamerProfileScreen
 import com.strimup.presentation.MainViewModel
 
@@ -41,10 +48,13 @@ fun StrimupNavDisplay(
     val isLoggedIn = state.user != null
     val userId = state.user?.id
 
+    val shouldHideBottomBar = currentDestination is Destination.StreamerDetail ||
+            currentDestination is Destination.StreamerEditProfile
+
     Scaffold(
         modifier = modifier,
         bottomBar = {
-            if ( currentDestination !is Destination.StreamerDetail && currentDestination !is Destination.StreamerEditProfile) {
+            if (!shouldHideBottomBar) {
                 NavigationBar {
                     NavigationBarItem(
                         selected = currentDestination == Destination.Home,
@@ -151,10 +161,36 @@ fun StrimupNavDisplay(
                 }
 
                 entry<Destination.StreamerEditProfile> {
-                    EditProfileScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        onNavUp = { backStack.removeLastOrNull() }
-                    )
+                    val editProfileViewModel: EditProfileViewModel = hiltViewModel()
+
+                    var currentSubScreen by rememberSaveable { mutableStateOf("profile") }
+
+                    BackHandler(enabled = currentSubScreen == "tags") {
+                        currentSubScreen = "profile"
+                    }
+
+                    AnimatedContent(
+                        targetState = currentSubScreen,
+                        label = "EditFlow"
+                    ) { subScreen ->
+                        when (subScreen) {
+                            "profile" -> {
+                                EditProfileScreen(
+                                    viewModel = editProfileViewModel,
+                                    modifier = Modifier.fillMaxSize(),
+                                    onNavUp = { backStack.removeLastOrNull() },
+                                    onEditTagsNav = { currentSubScreen = "tags" }
+                                )
+                            }
+                            "tags" -> {
+                                SelectTagsScreen(
+                                    viewModel = editProfileViewModel,
+                                    modifier = Modifier.fillMaxSize(),
+                                    onNavUp = { currentSubScreen = "profile" }
+                                )
+                            }
+                        }
+                    }
                 }
 
                 entry<Destination.Search> {

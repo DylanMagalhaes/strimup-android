@@ -48,8 +48,6 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.feature.streamerprofile.domain.entity.TagEntity
-import com.strimup.feature.streamerprofile.presentation.streamerprofile.ProfileUiState
-import com.strimup.feature.streamerprofile.presentation.streamerprofile.StreamerProfileViewModel
 import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 
 @Composable
@@ -76,7 +74,7 @@ fun StreamerProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StreamerProfileScreen(
-    state: ProfileUiState,
+    state: UiState,
     onNavUp: () -> Unit,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier,
@@ -109,7 +107,7 @@ private fun StreamerProfileScreen(
 
 @Composable
 private fun StreamerProfileContent(
-    state: ProfileUiState,
+    state: UiState,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -238,7 +236,7 @@ private fun StreamerProfileContent(
 private fun StreamerProfileScreenPreview() {
     StrimupTheme {
         StreamerProfileScreen(
-            state = ProfileUiState(
+            state = UiState(
                 loading = false,
                 streamer = StreamerProfileEntity(
                     isLive = true,

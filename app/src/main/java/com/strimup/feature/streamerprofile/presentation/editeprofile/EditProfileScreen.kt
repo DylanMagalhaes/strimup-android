@@ -41,17 +41,17 @@ import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.feature.streamerprofile.domain.entity.TagEntity
+import com.strimup.feature.streamerprofile.presentation.component.ProfileEditRow
 import com.strimup.feature.streamerprofile.presentation.editeprofile.component.EditProfileImageSection
 import com.strimup.feature.streamerprofile.presentation.editeprofile.component.EditTextBottomSheet
 import com.strimup.feature.streamerprofile.presentation.editeprofile.component.MultipleSelectBottomSheet
-import com.strimup.feature.streamerprofile.presentation.component.MultipleSelectedTags
-import com.strimup.feature.streamerprofile.presentation.component.ProfileEditRow
 import com.strimup.feature.streamerprofile.presentation.editeprofile.component.SingleSelectBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
     onNavUp: () -> Unit,
+    onEditTagsNav: (List<TagEntity>) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
@@ -134,7 +134,7 @@ fun EditProfileScreen(
                 onImageSelected = { newPhoto ->
                     viewModel.onImageSelected(newPhoto)
                 },
-                onEditTagsClicked = { viewModel.openEdit(ActiveEditType.Tags) }
+                onEditTagsClicked = { onEditTagsNav(state.selectedTags) }
             )
 
             val availableOptions = state.availableOptions ?: StreamerOptionsEntity(
@@ -169,22 +169,6 @@ fun EditProfileScreen(
                         onDismiss = { viewModel.dismissEdit() },
                         description = ""
                     )
-                }
-
-                ActiveEditType.Tags -> {
-                    MultipleSelectedTags(
-                        onDismiss = { viewModel.dismissEdit() },
-                        category = state.availableCategories,
-                        selectedCategory = state.selectedCategory,
-                        tags = state.availableTags,
-                        selectedTags = state.selectedTags,
-                        onCategorySelected = {categorySelected -> viewModel.onCategorySelected(categorySelected)},
-                        onTagClick = { tag ->
-                            viewModel.onTagSelected(tag)
-                        },
-                        onDone = {},
-                    )
-
                 }
 
                 ActiveEditType.PrimaryPersonality -> {
@@ -375,7 +359,9 @@ fun EditProfileContent(
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
                     ProfileEditRow(
                         label = "Mes tags",
-                        value = state.selectedTags.map { it.name }.ifEmpty { listOf("Non renseigné") }.joinToString(", "),
+                        value = state.selectedTags.map { it.name }.ifEmpty { listOf("Non renseigné") }.joinToString(
+                            ", "
+                        ),
                         onClick = onEditTagsClicked
                     )
                     ProfileEditRow(
@@ -400,7 +386,9 @@ fun EditProfileContent(
                     )
                     ProfileEditRow(
                         label = "Langues",
-                        value = state.selectedLanguages.ifEmpty { listOf("Non renseigné") }.joinToString(", "),
+                        value = state.selectedLanguages.ifEmpty { listOf("Non renseigné") }.joinToString(
+                            ", "
+                        ),
                         onClick = onEditLanguagesClicked
                     )
                 }

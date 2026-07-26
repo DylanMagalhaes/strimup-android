@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
-import com.strimup.feature.streamerprofile.presentation.streamerprofile.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,7 @@ class StreamerProfileViewModel @Inject constructor(
     private val getStreamer: GetStreamerUsecase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ProfileUiState())
+    private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
 
     private var currentUserId: String? = null

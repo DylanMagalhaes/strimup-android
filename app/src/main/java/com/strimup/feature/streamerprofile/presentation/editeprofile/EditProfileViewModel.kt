@@ -13,7 +13,6 @@ import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseC
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.collections.plus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -136,7 +135,7 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun onCategorySelected(categorySelected: TagEntity){
+    fun onCategorySelected(categorySelected: TagEntity) {
         _state.update { it ->
             it.copy(
                 selectedCategory = categorySelected,
@@ -147,10 +146,10 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun onTagSelected(tag: TagEntity){
+    fun onTagSelected(tag: TagEntity) {
         _state.update { currentState ->
             val currentTags = currentState.selectedTags
-            val updatedTag = if (currentTags.contains(tag)){
+            val updatedTag = if (currentTags.contains(tag)) {
                 currentTags - tag
             } else {
                 currentTags + tag
