@@ -40,6 +40,7 @@ fun StreamerResponse.toEntity(): StreamerDetailEntity {
                 category = requireNotNull(it.category)
             )
         },
+        followersCount = this.streamerProfile?.followersCount,
         videos = this.streamerProfile?.videos?.map {
             StreamerDetailEntity.Video(
                 title = requireNotNull(it.title),

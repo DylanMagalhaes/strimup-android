@@ -7,6 +7,7 @@ data class StreamerDetailEntity(
     val isLive: Boolean,
     val bio: String,
     val dailyStatus: String,
+    val followersCount: Int?,
     val tags: List<Tag>?,
     val videos: List<Video>?
 ) {

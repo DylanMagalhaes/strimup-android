@@ -56,7 +56,8 @@ fun StreamerResponse.toEntity(): StreamerProfileEntity {
         languages = profile?.languages,
         personality = profile?.personality,
         personalitySecondary = profile?.personalitySecondary,
-        streamFrequency = profile?.streamFrequency
+        streamFrequency = profile?.streamFrequency,
+        followersCount = profile?.followersCount,
     )
 }
 
@@ -151,7 +152,8 @@ fun UpdateProfileResponse.Streamer.toEntity(): StreamerProfileEntity {
         languages = languages,
         personality = personality,
         personalitySecondary = personalitySecondary,
-        streamFrequency = streamFrequency
+        streamFrequency = streamFrequency,
+        followersCount = null,
     )
 }
 

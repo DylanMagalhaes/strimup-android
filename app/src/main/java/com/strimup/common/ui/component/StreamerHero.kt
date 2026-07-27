@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,6 +42,7 @@ fun StreamerHero(
     pseudo: String,
     tags: List<String>?,
     dailyStatus: String,
+    followersCount: Int?,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -52,40 +56,66 @@ fun StreamerHero(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Box(contentAlignment = Alignment.BottomCenter) {
-                AsyncImage(
-                    modifier = Modifier
-                        .size(88.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .1f))
-                        .then(
-                            if (isLive) {
-                                Modifier.border(
-                                    width = 2.5.dp,
-                                    color = MaterialTheme.colorScheme.tertiary,
-                                    shape = CircleShape
-                                )
-                            } else Modifier
-                        ),
-                    model = imageUrl,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Box(contentAlignment = Alignment.BottomCenter) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(88.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .1f))
+                            .then(
+                                if (isLive) {
+                                    Modifier.border(
+                                        width = 2.5.dp,
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        shape = CircleShape
+                                    )
+                                } else Modifier
+                            ),
+                        model = imageUrl,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                    )
 
-                if (isLive) {
-                    Surface(
-                        modifier = Modifier.offset(y = 4.dp),
-                        shape = RoundedCornerShape(4.dp),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        tonalElevation = 2.dp
+                    if (isLive) {
+                        Surface(
+                            modifier = Modifier.offset(y = 4.dp),
+                            shape = RoundedCornerShape(4.dp),
+                            color = MaterialTheme.colorScheme.tertiary,
+                            tonalElevation = 2.dp
+                        ) {
+                            Text(
+                                text = "LIVE",
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontFamily = zalandoFontFamily,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Black,
+                            )
+                        }
+                    }
+                }
+
+                if (followersCount != null) {
+                    Row(
+                        modifier = Modifier.padding(top = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = null,
+                            modifier = Modifier.size(12.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                         Text(
-                            text = "LIVE",
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontFamily = zalandoFontFamily,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Black,
+                            text = "$followersCount",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
                         )
                     }
                 }
@@ -148,6 +178,7 @@ private fun StreamerHeroPreview() {
             imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
             pseudo = "Squeezie",
             tags = listOf("Gaming", "Dev", "Cuisine"),
+            followersCount = 10,
             dailyStatus = "En live toute la nuit sur le nouveau DLC !",
         )
     }

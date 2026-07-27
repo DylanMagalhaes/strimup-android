@@ -109,6 +109,7 @@ private fun StreamerDetailContent(
                 pseudo = state.streamer.userName,
                 tags = state.streamer.tags?.map { it.name },
                 dailyStatus = state.streamer.dailyStatus,
+                followersCount = state.streamer.followersCount,
             )
 
             StreamerContent(
@@ -144,6 +145,7 @@ private fun StreamerDetailScreenPreview() {
                         StreamerDetailEntity.Social(url = "", type = StreamerDetailEntity.Social.Type.Twitch),
                         StreamerDetailEntity.Social(url = "", type = StreamerDetailEntity.Social.Type.Youtube)
                     ),
+                    followersCount = 10
                 )
             )
         )

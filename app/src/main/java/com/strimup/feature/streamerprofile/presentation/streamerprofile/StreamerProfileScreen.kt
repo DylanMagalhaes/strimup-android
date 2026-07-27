@@ -134,6 +134,7 @@ private fun StreamerProfileContent(
                 pseudo = state.streamer.userName,
                 tags = state.streamer.tags?.map { it.name },
                 dailyStatus = state.streamer.dailyStatus ?: "",
+                followersCount = state.streamer?.followersCount,
             )
 
             Surface(
@@ -259,6 +260,7 @@ private fun StreamerProfileScreenPreview() {
                             type = StreamerProfileEntity.Social.Type.Youtube
                         )
                     ),
+                    followersCount = 10,
                     averageViewers = "4",
                     languages = emptyList(),
                     personality = "",

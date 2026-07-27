@@ -13,7 +13,8 @@ data class StreamerProfileEntity(
     val languages: List<String>?,
     val personality: String?,
     val personalitySecondary: String?,
-    val streamFrequency: String?
+    val streamFrequency: String?,
+    val followersCount: Int?,
 ) {
     data class Social(
         val url: String?,
