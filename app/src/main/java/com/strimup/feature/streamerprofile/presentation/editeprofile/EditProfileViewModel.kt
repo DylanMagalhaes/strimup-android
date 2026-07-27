@@ -13,6 +13,7 @@ import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseC
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.collections.plus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -149,13 +150,17 @@ class EditProfileViewModel @Inject constructor(
     fun onTagSelected(tag: TagEntity) {
         _state.update { currentState ->
             val currentTags = currentState.selectedTags
-            val updatedTag = if (currentTags.contains(tag)) {
+
+            val updatedTags = if (currentTags.contains(tag)) {
                 currentTags - tag
-            } else {
+            } else if (currentTags.size < 4) {
                 currentTags + tag
+            } else {
+                currentTags
             }
+
             currentState.copy(
-                selectedTags = updatedTag
+                selectedTags = updatedTags
             )
         }
     }

@@ -32,7 +32,7 @@ import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileScreen
 import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileViewModel
-import com.strimup.feature.streamerprofile.presentation.selecttags.SelectTagsScreen
+import com.strimup.feature.streamerprofile.presentation.editeprofile.SelectTagsScreen
 import com.strimup.feature.streamerprofile.presentation.streamerprofile.StreamerProfileScreen
 import com.strimup.presentation.MainViewModel
 
