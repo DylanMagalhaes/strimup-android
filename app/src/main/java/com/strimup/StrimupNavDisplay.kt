@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -67,6 +68,21 @@ fun StrimupNavDisplay(
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = "Home"
+                            )
+                        }
+                    )
+
+                    NavigationBarItem(
+                        selected = currentDestination == Destination.NewFilter,
+                        onClick = {
+                            if (currentDestination != Destination.NewFilter) {
+                                backStack.add(Destination.NewFilter)
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = "Créer un filtre"
                             )
                         }
                     )
