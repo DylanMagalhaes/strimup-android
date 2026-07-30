@@ -14,18 +14,16 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class FilterViewModel @Inject constructor(
     private val getFilters: GetFiltersUsecase
-): ViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            loadFilters()
-        }
+        loadFilters()
     }
 
-    private fun loadFilters(): Job{
+    private fun loadFilters(): Job {
         return viewModelScope.launch {
             getFilters()
                 .onSuccess { filters ->
