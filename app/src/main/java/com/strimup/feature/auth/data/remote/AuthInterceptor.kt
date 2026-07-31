@@ -10,10 +10,11 @@ import okhttp3.Response
 class AuthInterceptor @Inject constructor(
     private val preferences: AuthPreferencesDataSource
 ) : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
 
-        if (request.url.encodedPath.contains("api/auth/refresh")) {
+        if (request.url.encodedPath.contains("refresh")) {
             return chain.proceed(request)
         }
 
@@ -29,8 +30,6 @@ class AuthInterceptor @Inject constructor(
             requestBuilder.header("Authorization", "Bearer $token")
         }
 
-        val newRequest = requestBuilder.build()
-
-        return chain.proceed(newRequest)
+        return chain.proceed(requestBuilder.build())
     }
 }

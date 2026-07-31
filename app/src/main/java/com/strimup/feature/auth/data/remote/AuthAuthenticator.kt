@@ -4,6 +4,7 @@ import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
 import javax.inject.Inject
 import javax.inject.Provider
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -11,13 +12,14 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
+@Singleton
 class AuthAuthenticator @Inject constructor(
     private val apiService: Provider<AuthApiService>,
     private val preferences: AuthPreferencesDataSource
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
-        if (response.request.url.encodedPath.contains("api/auth/refresh")) {
+        if (response.request.url.encodedPath.contains("refresh")) {
             runBlocking(Dispatchers.IO) { preferences.clear() }
             return null
         }
@@ -26,45 +28,45 @@ class AuthAuthenticator @Inject constructor(
             return null
         }
 
-        val refreshToken = runBlocking(Dispatchers.IO) { preferences.getRefreshToken() }
-
-        if (refreshToken.isNullOrBlank()) {
-            return null
-        }
-
         return synchronized(this) {
-            val currentToken = runBlocking(Dispatchers.IO) { preferences.getAccessToken() }
+            runBlocking(Dispatchers.IO) {
+                val currentAccessToken = preferences.getAccessToken()
+                val requestToken = response.request.header("Authorization")?.removePrefix("Bearer ")?.trim()
 
-            val requestToken = response.request.header("Authorization")?.removePrefix("Bearer ")?.trim()
-
-            if (currentToken != null && currentToken != requestToken) {
-                return@synchronized response.request.newBuilder()
-                    .header("Authorization", "Bearer $currentToken")
-                    .build()
-            }
-
-            try {
-                val refreshResponse = runBlocking(Dispatchers.IO) {
-                    apiService.get().refreshToken("Bearer $refreshToken")
+                if (!currentAccessToken.isNullOrBlank() && currentAccessToken != requestToken) {
+                    return@runBlocking response.request.newBuilder()
+                        .header("Authorization", "Bearer $currentAccessToken")
+                        .build()
                 }
 
-                val newToken = refreshResponse.token
+                val refreshToken = preferences.getRefreshToken()
 
-                if (newToken.isNotBlank()) {
-                    runBlocking(Dispatchers.IO) {
-                        preferences.saveAuthToken(newToken)
+                if (refreshToken.isNullOrBlank()) {
+                    return@runBlocking null
+                }
+
+                try {
+                    val refreshResponse = apiService.get().refreshToken("Bearer $refreshToken")
+                    val newAccessToken = refreshResponse.token
+                    val newRefreshToken = refreshResponse.refreshToken
+
+                    if (!newAccessToken.isNullOrBlank()) {
+                        preferences.saveTokens(
+                            accessToken = newAccessToken,
+                            refreshToken = newRefreshToken ?: refreshToken
+                        )
+
+                        response.request.newBuilder()
+                            .header("Authorization", "Bearer $newAccessToken")
+                            .build()
+                    } else {
+                        preferences.clear()
+                        null
                     }
-
-                    response.request.newBuilder()
-                        .header("Authorization", "Bearer $newToken")
-                        .build()
-                } else {
-                    runBlocking(Dispatchers.IO) { preferences.clear() }
+                } catch (e: Exception) {
+                    preferences.clear()
                     null
                 }
-            } catch (e: Exception) {
-                runBlocking(Dispatchers.IO) { preferences.clear() }
-                null
             }
         }
     }

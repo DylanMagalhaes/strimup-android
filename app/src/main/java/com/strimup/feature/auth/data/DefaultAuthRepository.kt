@@ -20,7 +20,7 @@ class DefaultAuthRepository @Inject constructor(
 
             preferences.saveTokens(
                 accessToken = response.token,
-                refreshToken = response.refreshToken
+                refreshToken = response.refreshToken ?: ""
             )
 
             val loginResult = response.toEntity()

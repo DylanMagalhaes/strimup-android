@@ -28,6 +28,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.strimup.common.navigation.Destination
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.filter.presentation.FilterListScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
@@ -73,10 +74,10 @@ fun StrimupNavDisplay(
                     )
 
                     NavigationBarItem(
-                        selected = currentDestination == Destination.NewFilter,
+                        selected = currentDestination == Destination.Filter,
                         onClick = {
-                            if (currentDestination != Destination.NewFilter) {
-                                backStack.add(Destination.NewFilter)
+                            if (currentDestination != Destination.Filter) {
+                                backStack.add(Destination.Filter)
                             }
                         },
                         icon = {
@@ -168,6 +169,22 @@ fun StrimupNavDisplay(
                     )
                 }
 
+                entry<Destination.Filter> {
+                    FilterListScreen(
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                }
+
+                entry<Destination.Search> {
+                    SearchScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onStreamerClick = { id ->
+                            backStack.add(Destination.StreamerDetail(streamerId = id))
+                        }
+                    )
+                }
+
                 entry<Destination.StreamerProfile> {
                     StreamerProfileScreen(
                         modifier = Modifier.fillMaxSize(),
@@ -207,15 +224,6 @@ fun StrimupNavDisplay(
                             }
                         }
                     }
-                }
-
-                entry<Destination.Search> {
-                    SearchScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        onStreamerClick = { id ->
-                            backStack.add(Destination.StreamerDetail(streamerId = id))
-                        }
-                    )
                 }
             }
         )

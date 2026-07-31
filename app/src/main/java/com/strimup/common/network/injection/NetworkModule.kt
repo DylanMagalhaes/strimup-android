@@ -46,8 +46,10 @@ object NetworkModule {
         }
 
         return OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
+            // 1. On injecte les headers d'authentification en premier
             .addInterceptor(authInterceptor)
+            // 2. On loggue la requête finale modifiée
+            .addInterceptor(loggingInterceptor)
             .authenticator(authAuthenticator)
             .build()
     }
