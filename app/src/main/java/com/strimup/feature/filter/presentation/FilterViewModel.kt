@@ -23,23 +23,15 @@ class FilterViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        Log.d(TAG, "init: Initialisation du FilterViewModel")
         loadFilters()
     }
 
     private fun loadFilters(): Job {
         return viewModelScope.launch {
-            Log.d(TAG, "loadFilters: Début de la récupération des filtres")
-
             _state.update { it.copy(isLoading = true) }
 
             getFilters()
                 .onSuccess { filters ->
-                    Log.d(TAG, "loadFilters SUCCESS: ${filters.size} filtre(s) trouvé(s)")
-                    filters.forEachIndexed { index, filter ->
-                        Log.d(TAG, " -> [$index] id=${filter.id} | name=${filter.name}")
-                    }
-
                     _state.update {
                         it.copy(
                             isLoading = false,
@@ -47,9 +39,7 @@ class FilterViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure { throwable ->
-                    Log.e(TAG, "loadFilters ERROR: Échec lors de la récupération", throwable)
-
+                .onFailure {
                     _state.update {
                         it.copy(isLoading = false)
                     }
