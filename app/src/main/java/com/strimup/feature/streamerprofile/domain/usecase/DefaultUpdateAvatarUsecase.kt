@@ -6,7 +6,7 @@ import javax.inject.Inject
 class DefaultUpdateAvatarUsecase @Inject constructor(
     private val repository: DefaultStreamerRepository
 ) {
-     suspend operator fun invoke(uri: String): Result<String> {
+    suspend operator fun invoke(uri: String): Result<String> {
         return repository.updateAvatar(uri)
     }
 }

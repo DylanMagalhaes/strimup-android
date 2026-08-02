@@ -13,7 +13,6 @@ import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseC
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.collections.plus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

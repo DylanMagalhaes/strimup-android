@@ -1,6 +1,5 @@
 package com.strimup.feature.filter.data.mapper
 
-import com.strimup.feature.filter.data.request.CreateFilterRequest
 import com.strimup.feature.filter.data.response.FilterJsonDto
 import com.strimup.feature.filter.data.response.FilterResponse
 import com.strimup.feature.filter.domain.entity.FilterCriteria

@@ -7,10 +7,10 @@ import javax.inject.Inject
 
 class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService
-): StreamerRepository {
+) : StreamerRepository {
     override suspend fun getStreamers(userName: String): Result<List<StreamerEntity>> {
         return runCatching {
-            service.searchStreamers(userName).map{ response ->
+            service.searchStreamers(userName).map { response ->
                 response.toEntity()
             }
         }

@@ -88,15 +88,11 @@ private fun StreamerDetailContent(
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
-    }
-
-    else if (state.streamer == null) {
+    } else if (state.streamer == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = "Impossible de charger les informations du streamer.")
         }
-    }
-
-    else {
+    } else {
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -142,8 +138,14 @@ private fun StreamerDetailScreenPreview() {
                     dailyStatus = "Hello la compagnie !",
                     videos = null,
                     socials = listOf(
-                        StreamerDetailEntity.Social(url = "", type = StreamerDetailEntity.Social.Type.Twitch),
-                        StreamerDetailEntity.Social(url = "", type = StreamerDetailEntity.Social.Type.Youtube)
+                        StreamerDetailEntity.Social(
+                            url = "",
+                            type = StreamerDetailEntity.Social.Type.Twitch
+                        ),
+                        StreamerDetailEntity.Social(
+                            url = "",
+                            type = StreamerDetailEntity.Social.Type.Youtube
+                        )
                     ),
                     followersCount = 10
                 )

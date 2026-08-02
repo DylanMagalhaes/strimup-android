@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 class DefaultGetUserFlowUseCase @Inject constructor(
     private val repository: UserRepository
-): GetUserFlowUseCase {
+) : GetUserFlowUseCase {
     override fun invoke(): Flow<UserEntity?> {
         return repository.getCurrentUser()
     }

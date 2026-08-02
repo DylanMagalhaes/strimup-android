@@ -25,12 +25,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.common.ui.component.StreamerCard
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social
 import com.strimup.feature.home.presentation.component.HomeTabs
-import com.strimup.common.ui.component.StreamerCard
 
 @Composable
 fun HomeScreen(

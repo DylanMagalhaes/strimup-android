@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class DefaultGetStreamerUsecase @Inject constructor(
     private val repository: DefaultStreamerRepository
-): GetStreamersUsecase {
+) : GetStreamersUsecase {
     override suspend fun invoke(username: String): Result<List<StreamerEntity>> {
         return repository.getStreamers(username)
     }

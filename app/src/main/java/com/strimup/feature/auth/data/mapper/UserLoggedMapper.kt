@@ -17,7 +17,7 @@ fun UserLoggedResponse.toEntity(): LoginResultEntity {
             email = userLogged.email,
             role = UserRole.valueOf(userLogged.role.uppercase()),
 
-        )
+            )
     )
 }
 

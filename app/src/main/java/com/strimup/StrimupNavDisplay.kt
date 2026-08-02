@@ -215,6 +215,7 @@ fun StrimupNavDisplay(
                                     onEditTagsNav = { currentSubScreen = "tags" }
                                 )
                             }
+
                             "tags" -> {
                                 SelectTagsScreen(
                                     viewModel = editProfileViewModel,
