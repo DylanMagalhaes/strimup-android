@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.data.mapper
 
+import com.strimup.feature.filter.data.request.CreateFilterRequest
 import com.strimup.feature.filter.data.response.FilterJsonDto
 import com.strimup.feature.filter.data.response.FilterResponse
 import com.strimup.feature.filter.domain.entity.FilterCriteria
@@ -18,7 +19,7 @@ fun FilterJsonDto.toDomain(): FilterCriteria {
     val age = if (ageRange != null && ageRange.size >= 2) {
         ageRange[0]..ageRange[1]
     } else {
-        18..99
+        18..80
     }
 
     return FilterCriteria(
@@ -32,3 +33,17 @@ fun FilterJsonDto.toDomain(): FilterCriteria {
         streamFrequency = streamFrequency.orEmpty()
     )
 }
+
+fun FilterCriteria.toDto(): FilterJsonDto {
+    return FilterJsonDto(
+        ageRange = ageRange?.let { listOf(it.first, it.last) },
+        category = category.ifBlank { null },
+        languages = languages.ifEmpty { null },
+        platforms = platforms.ifEmpty { null },
+        personalities = personalities.ifEmpty { null },
+        subCategories = subCategories.ifEmpty { null },
+        averageViewers = averageViewers.ifBlank { null },
+        streamFrequency = streamFrequency.ifBlank { null }
+    )
+}
+

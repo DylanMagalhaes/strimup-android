@@ -33,9 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun FilterItemCard(
+@OptIn(ExperimentalLayoutApi::class) @Composable fun FilterItemCard(
     filter: FilterEntity,
     onApply: () -> Unit,
     onDelete: (String) -> Unit,
@@ -56,8 +54,7 @@ fun FilterItemCard(
         listOfNotNull(
             filter.criteria.averageViewers?.takeIf { it.isNotBlank() }?.let { "$it viewers" },
             filter.criteria.streamFrequency?.takeIf { it.isNotBlank() },
-            filter.criteria.ageRange?.let { "${it.first}-${it.last} ans" }
-        ).joinToString(" • ")
+            filter.criteria.ageRange?.let { "${it.first}-${it.last} ans" }).joinToString(" • ")
     }
 
     Surface(
@@ -76,8 +73,7 @@ fun FilterItemCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     Text(
                         text = filter.name,
@@ -106,28 +102,21 @@ fun FilterItemCard(
                     }
 
                     DropdownMenu(
-                        expanded = isMenuExpanded,
-                        onDismissRequest = { isMenuExpanded = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = "Supprimer",
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.Delete,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            },
-                            onClick = {
-                                isMenuExpanded = false
-                                onDelete(filter.id)
-                            }
-                        )
+                        expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {
+                        DropdownMenuItem(text = {
+                            Text(
+                                text = "Supprimer", color = MaterialTheme.colorScheme.error
+                            )
+                        }, leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Outlined.Delete,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }, onClick = {
+                            isMenuExpanded = false
+                            onDelete(filter.id)
+                        })
                     }
                 }
             }
@@ -164,16 +153,10 @@ fun FilterItemCard(
 }
 
 @Preview(
-    name = "Dark Mode",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true
-)
-@Composable
-private fun FilterItemCardPreview() {
+    name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true
+) @Composable private fun FilterItemCardPreview() {
     val mockFilter = FilterEntity(
-        id = "1",
-        name = "Filtres Récents",
-        criteria = FilterCriteria(
+        id = "1", name = "Filtres Récents", criteria = FilterCriteria(
             ageRange = 18..35,
             category = "Gaming",
             languages = listOf("Français", "Anglais"),
@@ -182,19 +165,14 @@ private fun FilterItemCardPreview() {
             subCategories = listOf("FPS", "RPG"),
             averageViewers = "100-500",
             streamFrequency = "Quotidien"
-        ),
-        userId = ""
+        ), userId = ""
     )
 
     MaterialTheme {
         Surface(
             modifier = Modifier.padding(16.dp)
         ) {
-            FilterItemCard(
-                filter = mockFilter,
-                onApply = {},
-                onDelete = {}
-            )
+            FilterItemCard(filter = mockFilter, onApply = {}, onDelete = {})
         }
     }
 }

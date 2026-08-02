@@ -8,7 +8,7 @@ data class FilterEntity(
 )
 
 data class FilterCriteria(
-    val ageRange: IntRange = 18..99,
+    val ageRange: IntRange = 18..80,
     val category: String = "",
     val languages: List<String> = emptyList(),
     val platforms: List<String> = emptyList(),
