@@ -1,4 +1,4 @@
-package com.strimup.feature.home.presentation.component
+package com.strimup.common.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +33,7 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social.Type
+import com.strimup.feature.home.presentation.component.FavoriteIconButton
 import com.strimup.feature.home.presentation.mapper.getIconRes
 
 @Composable fun StreamerCard(

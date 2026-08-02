@@ -30,7 +30,7 @@ import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity
 import com.strimup.feature.home.domain.entity.StreamerEntity.Social
 import com.strimup.feature.home.presentation.component.HomeTabs
-import com.strimup.feature.home.presentation.component.StreamerCard
+import com.strimup.common.ui.component.StreamerCard
 
 @Composable
 fun HomeScreen(

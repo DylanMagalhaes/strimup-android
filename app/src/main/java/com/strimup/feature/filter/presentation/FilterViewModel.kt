@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-private const val TAG = "FilterViewModel"
-
 @HiltViewModel
 class FilterViewModel @Inject constructor(
     private val getFilters: GetFiltersUsecase
