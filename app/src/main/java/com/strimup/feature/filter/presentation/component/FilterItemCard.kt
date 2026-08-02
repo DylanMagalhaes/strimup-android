@@ -38,7 +38,7 @@ import com.strimup.feature.filter.domain.entity.FilterEntity
 fun FilterItemCard(
     filter: FilterEntity,
     onApply: () -> Unit,
-    onDelete: () -> Unit,
+    onDelete: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isMenuExpanded by remember { mutableStateOf(false) }
@@ -125,7 +125,7 @@ fun FilterItemCard(
                             },
                             onClick = {
                                 isMenuExpanded = false
-                                onDelete()
+                                onDelete(filter.id)
                             }
                         )
                     }

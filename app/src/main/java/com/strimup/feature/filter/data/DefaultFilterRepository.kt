@@ -15,4 +15,10 @@ class DefaultFilterRepository @Inject constructor(
         }
     }
 
+    override suspend fun deleteFilterById(id: String): Result<Unit> {
+        return runCatching {
+            service.deleteFilterById(id)
+        }
+    }
+
 }

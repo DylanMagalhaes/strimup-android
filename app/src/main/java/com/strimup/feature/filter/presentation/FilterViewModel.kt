@@ -1,8 +1,8 @@
 package com.strimup.feature.filter.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.feature.filter.domain.usecase.DeleteFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFiltersUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FilterViewModel @Inject constructor(
-    private val getFilters: GetFiltersUsecase
+    private val getFilters: GetFiltersUsecase,
+    private val deleteFilter: DeleteFilterUsecase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -40,6 +41,28 @@ class FilterViewModel @Inject constructor(
                 .onFailure {
                     _state.update {
                         it.copy(isLoading = false)
+                    }
+                }
+        }
+    }
+
+    fun onDeleteButtonClick(id: String): Job {
+        return viewModelScope.launch {
+            val previousFilters = _state.value.filters
+
+            _state.update { currentState ->
+                currentState.copy(
+                    filters = currentState.filters.filterNot { it.id == id }
+                )
+            }
+
+            deleteFilter(id)
+                .onFailure { error ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            filters = previousFilters,
+                            errorMessage = error.localizedMessage ?: "Impossible de supprimer le filtre"
+                        )
                     }
                 }
         }

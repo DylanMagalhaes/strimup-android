@@ -51,7 +51,7 @@ fun FilterListScreen(
         modifier = modifier,
         state = state,
         onApplyFilter = {},
-        onDeleteFilter = {},
+        onDeleteFilter = { viewModel.onDeleteButtonClick(it) },
         onCreateFilterClick = {}
     )
 }
@@ -62,7 +62,7 @@ private fun FiltersListContent(
     state: UiState,
     onCreateFilterClick: () -> Unit,
     onApplyFilter: (FilterEntity) -> Unit,
-    onDeleteFilter: (FilterEntity) -> Unit,
+    onDeleteFilter: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -133,7 +133,7 @@ private fun FiltersListContent(
                             FilterItemCard(
                                 filter = filter,
                                 onApply = { onApplyFilter(filter) },
-                                onDelete = { onDeleteFilter(filter) }
+                                onDelete = { onDeleteFilter(filter.id) }
                             )
                         }
                     }
