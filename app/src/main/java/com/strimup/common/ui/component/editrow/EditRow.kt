@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation.component
+package com.strimup.common.ui.component.editrow
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

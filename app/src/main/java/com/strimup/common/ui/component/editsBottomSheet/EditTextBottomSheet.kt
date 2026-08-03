@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation.editeprofile.component
+package com.strimup.common.ui.component.editsBottomSheet
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column

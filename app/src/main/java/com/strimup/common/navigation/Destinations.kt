@@ -19,7 +19,10 @@ sealed interface Destination : NavKey {
     object StreamerEditProfile : Destination
 
     @Serializable
-    object Filter : Destination
+    object FilterList : Destination
+
+    @Serializable
+    object CreateFilter : Destination
 
     @Serializable
     object Login : Destination

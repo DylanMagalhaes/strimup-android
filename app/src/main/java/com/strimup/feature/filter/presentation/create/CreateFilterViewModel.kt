@@ -16,8 +16,8 @@ class CreateFilterViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
 
-    fun onNameChange(name: String) {
-        _state.update { it.copy(name = name) }
+    fun onFilterNameChange(name: String) {
+        _state.update { it.copy(filterName = name) }
     }
 
     fun onPersonalitySelected(newPersonality: String) {
@@ -87,5 +87,13 @@ class CreateFilterViewModel @Inject constructor(
                 criteria = it.criteria.copy(status = newStatus)
             )
         }
+    }
+
+    fun openEdit(editType: com.strimup.feature.filter.presentation.create.ActiveEditType) {
+        _state.update { it.copy(activeEdit = editType) }
+    }
+
+    fun dismissEdit() {
+        _state.update { it.copy(activeEdit = null) }
     }
 }

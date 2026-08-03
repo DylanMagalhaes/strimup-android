@@ -28,6 +28,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.strimup.common.navigation.Destination
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.filter.presentation.create.CreateFilterScreen
 import com.strimup.feature.filter.presentation.list.FilterListScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
@@ -74,16 +75,16 @@ fun StrimupNavDisplay(
                     )
 
                     NavigationBarItem(
-                        selected = currentDestination == Destination.Filter,
+                        selected = currentDestination == Destination.FilterList,
                         onClick = {
-                            if (currentDestination != Destination.Filter) {
-                                backStack.add(Destination.Filter)
+                            if (currentDestination != Destination.FilterList) {
+                                backStack.add(Destination.FilterList)
                             }
                         },
                         icon = {
                             Icon(
                                 imageVector = Icons.Default.Tune,
-                                contentDescription = "Créer un filtre"
+                                contentDescription = "Mes filtres"
                             )
                         }
                     )
@@ -169,11 +170,18 @@ fun StrimupNavDisplay(
                     )
                 }
 
-                entry<Destination.Filter> {
+                entry<Destination.FilterList> {
                     FilterListScreen(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        onCreateFilterClick = { backStack.add(Destination.CreateFilter) }
                     )
 
+                }
+
+                entry<Destination.CreateFilter> {
+                    CreateFilterScreen(
+                        onNavUp = { backStack.removeLastOrNull() }
+                    )
                 }
 
                 entry<Destination.Search> {
