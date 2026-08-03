@@ -1,9 +1,10 @@
-package com.strimup.feature.filter.presentation
+package com.strimup.feature.filter.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFiltersUsecase
+import com.strimup.feature.filter.presentation.list.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class FilterViewModel @Inject constructor(
+class FilterListViewModel @Inject constructor(
     private val getFilters: GetFiltersUsecase,
     private val deleteFilter: DeleteFilterUsecase
 ) : ViewModel() {

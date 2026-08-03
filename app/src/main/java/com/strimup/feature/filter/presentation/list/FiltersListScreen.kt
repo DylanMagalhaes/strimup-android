@@ -1,4 +1,4 @@
-package com.strimup.feature.filter.presentation
+package com.strimup.feature.filter.presentation.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,12 +38,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
-import com.strimup.feature.filter.presentation.component.FilterItemCard
+import com.strimup.feature.filter.presentation.list.UiState
+import com.strimup.feature.filter.presentation.list.component.FilterItemCard
 
 @Composable
 fun FilterListScreen(
     modifier: Modifier = Modifier,
-    viewModel: FilterViewModel = hiltViewModel()
+    viewModel: FilterListViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 

@@ -15,5 +15,6 @@ data class FilterCriteria(
     val personalities: List<String> = emptyList(),
     val subCategories: List<String> = emptyList(),
     val averageViewers: String = "",
-    val streamFrequency: String = ""
+    val streamFrequency: String = "",
+    val status: String = ""
 )

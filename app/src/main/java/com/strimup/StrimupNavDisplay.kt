@@ -28,7 +28,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.strimup.common.navigation.Destination
 import com.strimup.feature.auth.presentation.login.LoginScreen
-import com.strimup.feature.filter.presentation.FilterListScreen
+import com.strimup.feature.filter.presentation.list.FilterListScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen

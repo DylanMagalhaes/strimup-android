@@ -1,4 +1,4 @@
-package com.strimup.feature.filter.presentation
+package com.strimup.feature.filter.presentation.list
 
 import com.strimup.feature.filter.domain.entity.FilterEntity
 

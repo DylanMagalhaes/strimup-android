@@ -1,4 +1,4 @@
-package com.strimup.feature.filter.presentation.component
+package com.strimup.feature.filter.presentation.list.component
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement

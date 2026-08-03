@@ -1,4 +1,4 @@
-package com.strimup.feature.filter.presentation.component
+package com.strimup.feature.filter.presentation.list.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
