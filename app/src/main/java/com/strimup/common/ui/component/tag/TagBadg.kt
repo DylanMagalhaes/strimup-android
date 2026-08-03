@@ -1,4 +1,4 @@
-package com.strimup.common.ui.component
+package com.strimup.common.ui.component.tag
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

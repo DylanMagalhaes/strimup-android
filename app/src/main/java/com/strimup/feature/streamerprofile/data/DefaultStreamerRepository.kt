@@ -8,7 +8,7 @@ import com.strimup.feature.streamerprofile.data.mapper.toRequest
 import com.strimup.feature.streamerprofile.domain.StreamerRepository
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.feature.streamerprofile.domain.entity.TagEntity
+import com.strimup.common.domain.entity.TagEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -62,11 +62,4 @@ class DefaultStreamerRepository @Inject constructor(
         }
     }
 
-    override suspend fun getTags(): Result<List<TagEntity>> {
-        return runCatching {
-            service.getTags().map {
-                it.toEntity()
-            }
-        }
-    }
 }

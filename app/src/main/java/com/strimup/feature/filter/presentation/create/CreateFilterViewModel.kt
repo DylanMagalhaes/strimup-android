@@ -2,11 +2,14 @@ package com.strimup.feature.filter.presentation.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.common.domain.entity.TagEntity
 import com.strimup.feature.filter.domain.usecase.CreateFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUsecase
+import com.strimup.common.domain.usecase.GetTagsUsecase // Ou le package où se trouve ton usecase partagé
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -14,14 +17,20 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class CreateFilterViewModel @Inject constructor(
     private val createFilter: CreateFilterUsecase,
-    private val getFilterOptionsUsecase: GetFilterOptionsUsecase
+    private val getFilterOptionsUsecase: GetFilterOptionsUsecase,
+    private val getTags: GetTagsUsecase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
-    val state = _state.asStateFlow()
+    val state: StateFlow<UiState> = _state.asStateFlow()
+
+    private var fetchedTags: List<TagEntity> = emptyList()
 
     init {
-        loadFilterOptions()
+        viewModelScope.launch {
+            loadFilterOptions()
+            loadTags()
+        }
     }
 
     private fun loadFilterOptions() {
@@ -29,7 +38,7 @@ class CreateFilterViewModel @Inject constructor(
             getFilterOptionsUsecase()
                 .onSuccess { options ->
                     _state.update {
-                        it.copy(filterOptions = options)
+                        it.copy(availableOptions = options)
                     }
                 }
                 .onFailure { error ->
@@ -39,6 +48,57 @@ class CreateFilterViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    private fun loadTags() {
+        viewModelScope.launch {
+            getTags()
+                .onSuccess { tags ->
+                    fetchedTags = tags
+                    _state.update { currentState ->
+                        currentState.copy(
+                            availableCategories = tags.distinctBy { it.category },
+                            availableTags = tags
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _state.update { currentState ->
+                        currentState.copy(
+                            errorMessage = error.localizedMessage ?: "Impossible de charger les tags"
+                        )
+                    }
+                }
+        }
+    }
+
+    fun onCategorySelected(categorySelected: TagEntity) {
+        _state.update { currentState ->
+            currentState.copy(
+                selectedCategory = categorySelected,
+                availableTags = fetchedTags.filter {
+                    it.category == categorySelected.category
+                }
+            )
+        }
+    }
+
+    fun onTagSelected(tag: TagEntity) {
+        _state.update { currentState ->
+            val currentTags = currentState.selectedFilterTags
+
+            val updatedTags = if (currentTags.contains(tag)) {
+                currentTags - tag
+            } else if (currentTags.size < 5) {
+                currentTags + tag
+            } else {
+                currentTags
+            }
+
+            currentState.copy(
+                selectedFilterTags = updatedTags
+            )
         }
     }
 

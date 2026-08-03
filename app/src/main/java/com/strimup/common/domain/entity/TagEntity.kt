@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.domain.entity
+package com.strimup.common.domain.entity
 
 import kotlinx.serialization.Serializable
 

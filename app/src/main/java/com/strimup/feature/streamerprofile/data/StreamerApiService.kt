@@ -34,6 +34,4 @@ interface StreamerApiService {
     @GET("/api/streamer/options")
     suspend fun getStreamerOptions(): StreamerOptionsResponse
 
-    @GET("api/tag")
-    suspend fun getTags(): List<TagResponse>
 }

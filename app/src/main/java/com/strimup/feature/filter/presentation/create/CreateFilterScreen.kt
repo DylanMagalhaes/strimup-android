@@ -50,7 +50,7 @@ fun CreateFilterScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val availableOptions = state.filterOptions ?: FilterOptionsEntity(
+    val availableOptions = state.availableOptions ?: FilterOptionsEntity(
         averageViewers = emptyList(),
         languages = emptyList(),
         personalities = emptyList(),

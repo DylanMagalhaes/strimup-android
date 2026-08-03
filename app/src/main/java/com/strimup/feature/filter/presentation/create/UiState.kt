@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.presentation.create
 
+import com.strimup.common.domain.entity.TagEntity
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
 
@@ -11,7 +12,11 @@ data class UiState(
     val isFormValid: Boolean = false,
     val isSuccess: Boolean = false,
     val errorMessage: String? = null,
-    val filterOptions: FilterOptionsEntity? = null,
+    val availableOptions: FilterOptionsEntity? = null,
+    val availableCategories: List<TagEntity> = emptyList(),
+    val selectedFilterTags: List<TagEntity> = emptyList(),
+    val selectedCategory: TagEntity? = null,
+    val availableTags: List<TagEntity> = emptyList(),
 
     val activeEdit: ActiveEditType? = null,
 )
@@ -24,4 +29,5 @@ sealed interface ActiveEditType {
     data object AverageViewers : ActiveEditType
     data object Languages : ActiveEditType
     data object Platforms : ActiveEditType
+
 }
