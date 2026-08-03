@@ -3,9 +3,9 @@ package com.strimup.feature.filter.presentation.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.common.domain.entity.TagEntity
+import com.strimup.common.domain.usecase.GetTagsUsecase
 import com.strimup.feature.filter.domain.usecase.CreateFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUsecase
-import com.strimup.common.domain.usecase.GetTagsUsecase // Ou le package où se trouve ton usecase partagé
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +30,43 @@ class CreateFilterViewModel @Inject constructor(
         viewModelScope.launch {
             loadFilterOptions()
             loadTags()
+        }
+    }
+
+    fun saveFilter() {
+        val filterName = _state.value.filterName.trim()
+        if (filterName.isBlank()) {
+            _state.update { it.copy(nameError = "Le nom du filtre ne peut pas être vide") }
+            return
+        }
+
+        val criteria = _state.value.criteria
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isSubmitting = true,
+                    errorMessage = null,
+                    nameError = null
+                )
+            }
+            createFilter(filterName, criteria)
+                .onSuccess {
+                    _state.update {
+                        it.copy(
+                            isSubmitting = false,
+                            isSuccess = true
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            isSubmitting = false,
+                            isSuccess = false,
+                            errorMessage = error.localizedMessage ?: "Erreur lors de la création du filtre"
+                        )
+                    }
+                }
         }
     }
 
@@ -86,7 +123,7 @@ class CreateFilterViewModel @Inject constructor(
 
     fun onTagSelected(tag: TagEntity) {
         _state.update { currentState ->
-            val currentTags = currentState.selectedFilterTags
+            val currentTags = currentState.criteria.tags
 
             val updatedTags = if (currentTags.contains(tag)) {
                 currentTags - tag
@@ -97,7 +134,9 @@ class CreateFilterViewModel @Inject constructor(
             }
 
             currentState.copy(
-                selectedFilterTags = updatedTags
+                criteria = currentState.criteria.copy(
+                    tags = updatedTags
+                )
             )
         }
     }

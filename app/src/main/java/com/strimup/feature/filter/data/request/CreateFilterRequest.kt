@@ -9,6 +9,6 @@ data class CreateFilterRequest(
     @SerialName("name")
     val name: String,
 
-    @SerialName("filter_json")
+    @SerialName("filter")
     val filterJson: FilterJsonDto
 )

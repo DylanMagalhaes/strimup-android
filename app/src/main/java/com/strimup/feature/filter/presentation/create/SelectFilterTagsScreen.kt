@@ -28,7 +28,7 @@ fun SelectFilterTagsScreen(
             categories = state.availableCategories,
             selectedCategory = state.selectedCategory,
             tags = state.availableTags,
-            selectedTags = state.selectedFilterTags,
+            selectedTags = state.criteria.tags,
             maxTags = 5,
             onCategorySelected = { viewModel.onCategorySelected(it) },
             onTagClick = { viewModel.onTagSelected(it) },

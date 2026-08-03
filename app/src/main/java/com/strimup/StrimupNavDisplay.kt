@@ -29,6 +29,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.strimup.common.navigation.Destination
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.filter.presentation.create.CreateFilterScreen
+import com.strimup.feature.filter.presentation.create.CreateFilterViewModel
+import com.strimup.feature.filter.presentation.create.SelectFilterTagsScreen
 import com.strimup.feature.filter.presentation.list.FilterListScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
@@ -179,9 +181,35 @@ fun StrimupNavDisplay(
                 }
 
                 entry<Destination.CreateFilter> {
-                    CreateFilterScreen(
-                        onNavUp = { backStack.removeLastOrNull() }
-                    )
+                    val createFilterViewModel: CreateFilterViewModel = hiltViewModel()
+
+                    var currentSubScreen by rememberSaveable { mutableStateOf("filters") }
+
+                    BackHandler(enabled = currentSubScreen == "tags") {
+                        currentSubScreen = "filter"
+                    }
+
+                    AnimatedContent(
+                        targetState = currentSubScreen,
+                        label = "EditFlow"
+                    ) { subScreen ->
+                        when (subScreen) {
+                            "filters" -> {
+                                CreateFilterScreen(
+                                   viewModel = createFilterViewModel,
+                                    onNavUp = { backStack.removeLastOrNull() },
+                                    onEditTagNav = { currentSubScreen = "tags" }
+                                    )
+                            }
+
+                            "tags" -> {
+                                SelectFilterTagsScreen(
+                                    viewModel = createFilterViewModel,
+                                    onNavUp = { currentSubScreen = "filters"  },
+                                )
+                            }
+                        }
+                    }
                 }
 
                 entry<Destination.Search> {

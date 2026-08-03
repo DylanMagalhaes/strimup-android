@@ -1,5 +1,7 @@
 package com.strimup.feature.filter.domain.entity
 
+import com.strimup.common.domain.entity.TagEntity
+
 data class FilterEntity(
     val id: String,
     val name: String,
@@ -14,6 +16,7 @@ data class FilterCriteria(
     val platforms: List<String> = emptyList(),
     val personalities: List<String> = emptyList(),
     val subCategories: List<String> = emptyList(),
+    val tags: List<TagEntity> = emptyList(),
     val averageViewers: String = "",
     val streamFrequency: String = "",
     val status: String = ""

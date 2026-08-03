@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -45,10 +46,17 @@ import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
 @Composable
 fun CreateFilterScreen(
     onNavUp: () -> Unit,
+    onEditTagNav: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CreateFilterViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) {
+            onNavUp()
+        }
+    }
 
     val availableOptions = state.availableOptions ?: FilterOptionsEntity(
         averageViewers = emptyList(),
@@ -82,7 +90,7 @@ fun CreateFilterScreen(
                         CircularProgressIndicator()
                     } else {
                         TextButton(
-                            onClick = { /* TODO: viewModel.saveFilter() */ },
+                            onClick = { viewModel.saveFilter() },
                             enabled = !state.isSubmitting
                         ) {
                             Text(
@@ -107,7 +115,8 @@ fun CreateFilterScreen(
             onEditStreamFrequencyClicked = { viewModel.openEdit(ActiveEditType.StreamFrequency) },
             onEditAverageViewersClicked = { viewModel.openEdit(ActiveEditType.AverageViewers) },
             onEditLanguagesClicked = { viewModel.openEdit(ActiveEditType.Languages) },
-            onEditPlatformsClicked = { viewModel.openEdit(ActiveEditType.Platforms) }
+            onEditPlatformsClicked = { viewModel.openEdit(ActiveEditType.Platforms) },
+            onEditTagClicked = onEditTagNav
         )
 
         when (state.activeEdit) {
@@ -187,7 +196,8 @@ fun CreateFilterScreen(
             }
 
             ActiveEditType.AgeRange,
-            null -> {}
+            null -> {
+            }
         }
     }
 }
@@ -201,6 +211,7 @@ fun CreateFilterContent(
     onEditAverageViewersClicked: () -> Unit,
     onEditLanguagesClicked: () -> Unit,
     onEditPlatformsClicked: () -> Unit,
+    onEditTagClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -254,8 +265,17 @@ fun CreateFilterContent(
             ) {
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
                     ProfileEditRow(
+                        label = "Tags",
+                        value = state.criteria.tags.map { it.name }.ifEmpty { listOf("Non renseigné") }.joinToString(
+                            ", "
+                        ),
+                        onClick = onEditTagClicked
+                    )
+                    ProfileEditRow(
                         label = "Personnalité",
-                        value = state.criteria.personalities.ifEmpty { listOf("Non renseigné") }.joinToString(", "),
+                        value = state.criteria.personalities.ifEmpty { listOf("Non renseigné") }.joinToString(
+                            ", "
+                        ),
                         onClick = onEditPersonalitiesClicked
                     )
                     ProfileEditRow(
@@ -270,12 +290,16 @@ fun CreateFilterContent(
                     )
                     ProfileEditRow(
                         label = "Langues",
-                        value = state.criteria.languages.ifEmpty { listOf("Non renseigné") }.joinToString(", "),
+                        value = state.criteria.languages.ifEmpty { listOf("Non renseigné") }.joinToString(
+                            ", "
+                        ),
                         onClick = onEditLanguagesClicked
                     )
                     ProfileEditRow(
                         label = "Plateformes",
-                        value = state.criteria.platforms.ifEmpty { listOf("Non renseigné") }.joinToString(", "),
+                        value = state.criteria.platforms.ifEmpty { listOf("Non renseigné") }.joinToString(
+                            ", "
+                        ),
                         onClick = onEditPlatformsClicked
                     )
                 }
@@ -305,7 +329,8 @@ fun CreateFilterScreenPreview() {
             onEditStreamFrequencyClicked = {},
             onEditAverageViewersClicked = {},
             onEditLanguagesClicked = {},
-            onEditPlatformsClicked = {}
+            onEditPlatformsClicked = {},
+            onEditTagClicked = {},
         )
     }
 }

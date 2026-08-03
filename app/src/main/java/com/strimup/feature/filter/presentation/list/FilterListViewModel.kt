@@ -26,7 +26,7 @@ class FilterListViewModel @Inject constructor(
         loadFilters()
     }
 
-    private fun loadFilters(): Job {
+     fun loadFilters(): Job {
         return viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 

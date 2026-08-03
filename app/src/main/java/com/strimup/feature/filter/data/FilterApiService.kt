@@ -12,7 +12,7 @@ interface FilterApiService {
     @GET("api/filters")
     suspend fun getFilters(): List<FilterResponse>
 
-    @POST("api/filter")
+    @POST("api/filters")
     suspend fun createFilter(@Body request: CreateFilterRequest): FilterResponse
 
     @DELETE("api/filters/{id}")

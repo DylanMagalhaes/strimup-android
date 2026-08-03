@@ -13,8 +13,8 @@ data class UiState(
     val isSuccess: Boolean = false,
     val errorMessage: String? = null,
     val availableOptions: FilterOptionsEntity? = null,
+
     val availableCategories: List<TagEntity> = emptyList(),
-    val selectedFilterTags: List<TagEntity> = emptyList(),
     val selectedCategory: TagEntity? = null,
     val availableTags: List<TagEntity> = emptyList(),
 
@@ -29,5 +29,4 @@ sealed interface ActiveEditType {
     data object AverageViewers : ActiveEditType
     data object Languages : ActiveEditType
     data object Platforms : ActiveEditType
-
 }
