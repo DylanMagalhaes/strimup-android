@@ -12,18 +12,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.common.ui.component.helper.animateDismiss
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
@@ -36,15 +40,24 @@ fun EditTextBottomSheet(
     currentText: String,
     onDone: (String) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState()
 ) {
+    val scope = rememberCoroutineScope()
+
     ModalBottomSheet(
         modifier = modifier,
-        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        onDismissRequest = onDismiss
     ) {
         EditBioContent(
             currentBio = currentText,
-            onSave = onDone,
+            onDone = { text ->
+                sheetState.animateDismiss(scope) {
+                    onDone(text)
+                    onDismiss()
+                }
+            },
             title = title,
             description = description
         )
@@ -56,7 +69,7 @@ fun EditBioContent(
     title: String,
     description: String?,
     currentBio: String,
-    onSave: (String) -> Unit,
+    onDone: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var text by remember { mutableStateOf(currentBio) }
@@ -99,9 +112,8 @@ fun EditBioContent(
         VerticalSpacer(16.dp)
 
         OutlinedButton(
-            onClick = { onSave(text) },
-            modifier = Modifier
-                .fillMaxWidth(),
+            onClick = { onDone(text) },
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             border = BorderStroke(
                 1.dp,
@@ -128,7 +140,7 @@ fun EditBioBottomSheetPreview() {
         Surface {
             EditBioContent(
                 currentBio = "Joueuse roleplay (Gtarp), multigaming et Just Chatting...",
-                onSave = {},
+                onDone = {},
                 title = "Modifier la bio",
                 description = ""
             )

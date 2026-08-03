@@ -12,15 +12,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.common.ui.component.helper.animateDismiss
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
@@ -33,11 +36,11 @@ fun SingleSelectBottomSheet(
     selectedOption: String?,
     onOptionSelected: (String) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val scope = rememberCoroutineScope()
+
     ModalBottomSheet(
         modifier = modifier,
         sheetState = sheetState,
@@ -47,7 +50,11 @@ fun SingleSelectBottomSheet(
             title = title,
             options = options,
             selectedOption = selectedOption,
-            onOptionSelected = onOptionSelected
+            onOptionSelected = { option ->
+                sheetState.animateDismiss(scope) {
+                    onOptionSelected(option)
+                }
+            }
         )
     }
 }

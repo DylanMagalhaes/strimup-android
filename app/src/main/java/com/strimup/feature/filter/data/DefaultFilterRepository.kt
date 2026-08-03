@@ -11,11 +11,10 @@ import javax.inject.Inject
 class DefaultFilterRepository @Inject constructor(
     private val service: FilterApiService
 ) : FilterRepository {
-    override suspend fun getFilters(): Result<List<com.strimup.feature.filter.domain.entity.FilterEntity>> {
+
+    override suspend fun getFilters(): Result<List<FilterEntity>> {
         return runCatching {
-            service.getFilters().map {
-                it.toDomain()
-            }
+            service.getFilters().map { it.toDomain() }
         }
     }
 
@@ -37,5 +36,4 @@ class DefaultFilterRepository @Inject constructor(
             service.createFilter(request).toDomain()
         }
     }
-
 }

@@ -33,19 +33,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.component.editrow.ProfileEditRow
+import com.strimup.common.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.common.ui.component.editsBottomSheet.MultipleSelectBottomSheet
 import com.strimup.common.ui.component.editsBottomSheet.SingleSelectBottomSheet
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.FilterCriteria
-import com.strimup.common.ui.component.editsBottomSheet.EditTextBottomSheet
-
-// TODO: Remplacer ces listes fictives par tes vraies options/UseCases plus tard
-private val TODO_PERSONALITIES = listOf("Tryhard", "Chill", "Pédagogue", "Drôle", "Compétitif")
-private val TODO_STREAM_FREQUENCIES = listOf("Tous les jours", "Régulier (3-4/semaine)", "Occasionnel")
-private val TODO_AVERAGE_VIEWERS = listOf("0 - 10", "10 - 50", "50 - 200", "200+")
-private val TODO_LANGUAGES = listOf("Français", "Anglais", "Espagnol", "Allemand")
-private val TODO_PLATFORMS = listOf("Twitch", "YouTube", "Kick")
+import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +49,13 @@ fun CreateFilterScreen(
     viewModel: CreateFilterViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val availableOptions = state.filterOptions ?: FilterOptionsEntity(
+        averageViewers = emptyList(),
+        languages = emptyList(),
+        personalities = emptyList(),
+        streamFrequencies = emptyList()
+    )
 
     Scaffold(
         modifier = modifier,
@@ -126,7 +127,7 @@ fun CreateFilterScreen(
             ActiveEditType.Personalities -> {
                 MultipleSelectBottomSheet(
                     title = "Personnalités",
-                    options = TODO_PERSONALITIES,
+                    options = availableOptions.personalities,
                     selectedOptions = state.criteria.personalities,
                     onOptionSelected = { personality ->
                         viewModel.onPersonalitySelected(personality)
@@ -138,7 +139,7 @@ fun CreateFilterScreen(
             ActiveEditType.StreamFrequency -> {
                 SingleSelectBottomSheet(
                     title = "Fréquence de stream",
-                    options = TODO_STREAM_FREQUENCIES,
+                    options = availableOptions.streamFrequencies,
                     selectedOption = state.criteria.streamFrequency,
                     onOptionSelected = { newFrequency ->
                         viewModel.onStreamFrequencySelected(newFrequency)
@@ -151,20 +152,20 @@ fun CreateFilterScreen(
             ActiveEditType.AverageViewers -> {
                 SingleSelectBottomSheet(
                     title = "Nombre de viewers moyen",
-                    options = TODO_AVERAGE_VIEWERS,
+                    options = availableOptions.averageViewers,
                     selectedOption = state.criteria.averageViewers,
                     onOptionSelected = { newAverage ->
                         viewModel.onAverageViewersSelected(newAverage)
                         viewModel.dismissEdit()
                     },
-                    onDismiss = { viewModel.dismissEdit()}
+                    onDismiss = { viewModel.dismissEdit() }
                 )
             }
 
             ActiveEditType.Languages -> {
                 MultipleSelectBottomSheet(
                     title = "Langues",
-                    options = TODO_LANGUAGES,
+                    options = availableOptions.languages,
                     selectedOptions = state.criteria.languages,
                     onOptionSelected = { language ->
                         viewModel.onLanguagesSelected(language)
@@ -176,7 +177,7 @@ fun CreateFilterScreen(
             ActiveEditType.Platforms -> {
                 MultipleSelectBottomSheet(
                     title = "Plateformes",
-                    options = TODO_PLATFORMS,
+                    options = availableOptions.platforms,
                     selectedOptions = state.criteria.platforms,
                     onOptionSelected = { platform ->
                         viewModel.onPlatformSelected(platform)
@@ -185,10 +186,7 @@ fun CreateFilterScreen(
                 )
             }
 
-            ActiveEditType.AgeRange -> {
-                // TODO: Implémenter le BottomSheet pour AgeRange si nécessaire
-            }
-
+            ActiveEditType.AgeRange,
             null -> {}
         }
     }

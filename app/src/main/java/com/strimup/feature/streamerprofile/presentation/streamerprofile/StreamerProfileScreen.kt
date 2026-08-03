@@ -83,7 +83,15 @@ private fun StreamerProfileScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(text = state.streamer?.userName ?: "") },
+                title = {
+                    Text(
+                        text = state.streamer?.userName ?: "",
+                        fontFamily = zalandoFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavUp) {
                         Icon(

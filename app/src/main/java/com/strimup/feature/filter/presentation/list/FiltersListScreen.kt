@@ -31,11 +31,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 import com.strimup.feature.filter.presentation.list.UiState
@@ -78,7 +81,9 @@ private fun FiltersListContent(
                 title = {
                     Text(
                         text = "Mes filtres",
-                        style = MaterialTheme.typography.titleLarge
+                        fontFamily = zalandoFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
                     )
                 },
                 scrollBehavior = scrollBehavior

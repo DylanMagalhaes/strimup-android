@@ -1,6 +1,7 @@
 package com.strimup.feature.filter.presentation.create
 
 import com.strimup.feature.filter.domain.entity.FilterCriteria
+import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
 
 data class UiState(
     val filterName: String = "",
@@ -10,6 +11,7 @@ data class UiState(
     val isFormValid: Boolean = false,
     val isSuccess: Boolean = false,
     val errorMessage: String? = null,
+    val filterOptions: FilterOptionsEntity? = null,
 
     val activeEdit: ActiveEditType? = null,
 )

@@ -1,20 +1,46 @@
 package com.strimup.feature.filter.presentation.create
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.strimup.feature.filter.domain.usecase.CreateFilterUsecase
+import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CreateFilterViewModel @Inject constructor(
-    private val createFilter: CreateFilterUsecase
+    private val createFilter: CreateFilterUsecase,
+    private val getFilterOptionsUsecase: GetFilterOptionsUsecase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
     val state = _state.asStateFlow()
+
+    init {
+        loadFilterOptions()
+    }
+
+    private fun loadFilterOptions() {
+        viewModelScope.launch {
+            getFilterOptionsUsecase()
+                .onSuccess { options ->
+                    _state.update {
+                        it.copy(filterOptions = options)
+                    }
+                }
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            errorMessage = error.localizedMessage ?: "Impossible de charger les options"
+                        )
+                    }
+                }
+        }
+    }
 
     fun onFilterNameChange(name: String) {
         _state.update { it.copy(filterName = name) }
@@ -89,7 +115,7 @@ class CreateFilterViewModel @Inject constructor(
         }
     }
 
-    fun openEdit(editType: com.strimup.feature.filter.presentation.create.ActiveEditType) {
+    fun openEdit(editType: ActiveEditType) {
         _state.update { it.copy(activeEdit = editType) }
     }
 
