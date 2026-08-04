@@ -41,6 +41,7 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
+import com.strimup.feature.filter.presentation.create.component.AgeRangePicker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +72,7 @@ fun CreateFilterScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Créer ton filtre",
+                        text = "Filtre",
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -116,7 +117,8 @@ fun CreateFilterScreen(
             onEditAverageViewersClicked = { viewModel.openEdit(ActiveEditType.AverageViewers) },
             onEditLanguagesClicked = { viewModel.openEdit(ActiveEditType.Languages) },
             onEditPlatformsClicked = { viewModel.openEdit(ActiveEditType.Platforms) },
-            onEditTagClicked = onEditTagNav
+            onEditTagClicked = onEditTagNav,
+            onRangeSelected = { range -> viewModel.onRangeSelected(range) }
         )
 
         when (state.activeEdit) {
@@ -212,6 +214,7 @@ fun CreateFilterContent(
     onEditLanguagesClicked: () -> Unit,
     onEditPlatformsClicked: () -> Unit,
     onEditTagClicked: () -> Unit,
+    onRangeSelected: (IntRange) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -221,7 +224,7 @@ fun CreateFilterContent(
     ) {
         item {
             Text(
-                text = "Informations Générales",
+                text = "Critère de recherche",
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -242,28 +245,11 @@ fun CreateFilterContent(
                         value = state.filterName.ifEmpty { "Non renseigné" },
                         onClick = onEditFilterNameClicked
                     )
-                }
-            }
-        }
 
-        item {
-            Text(
-                text = "Critères de recherche",
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.titleMedium,
-                fontFamily = zalandoFontFamily,
-                fontWeight = FontWeight.Bold,
-            )
+                    AgeRangePicker(
+                        onRangeSelected = { range -> onRangeSelected(range) }
+                    )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
-                color = MaterialTheme.colorScheme.surface
-            ) {
-                Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
                     ProfileEditRow(
                         label = "Tags",
                         value = state.criteria.tags.map { it.name }.ifEmpty { listOf("Non renseigné") }.joinToString(
@@ -331,6 +317,7 @@ fun CreateFilterScreenPreview() {
             onEditLanguagesClicked = {},
             onEditPlatformsClicked = {},
             onEditTagClicked = {},
+            onRangeSelected = {},
         )
     }
 }

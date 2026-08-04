@@ -110,6 +110,16 @@ class CreateFilterViewModel @Inject constructor(
         }
     }
 
+    fun onRangeSelected(range: IntRange){
+        _state.update { currentState ->
+            currentState.copy(
+                criteria = currentState.criteria.copy(
+                    ageRange = range
+                )
+            )
+        }
+    }
+
     fun onCategorySelected(categorySelected: TagEntity) {
         _state.update { currentState ->
             currentState.copy(
