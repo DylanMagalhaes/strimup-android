@@ -47,6 +47,7 @@ fun StrimupNavDisplay(
     modifier: Modifier = Modifier
 ) {
     val backStack = rememberNavBackStack(Destination.Home)
+
     val currentDestination = backStack.lastOrNull()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -134,6 +135,8 @@ fun StrimupNavDisplay(
             }
         }
     ) { innerPadding ->
+        val editProfileViewModel: EditProfileViewModel = hiltViewModel()
+        val createFilterViewModel: CreateFilterViewModel = hiltViewModel()
 
         NavDisplay(
             modifier = Modifier
@@ -181,35 +184,21 @@ fun StrimupNavDisplay(
                 }
 
                 entry<Destination.CreateFilter> {
-                    val createFilterViewModel: CreateFilterViewModel = hiltViewModel()
 
-                    var currentSubScreen by rememberSaveable { mutableStateOf("filters") }
 
-                    BackHandler(enabled = currentSubScreen == "tags") {
-                        currentSubScreen = "filter"
-                    }
-
-                    AnimatedContent(
-                        targetState = currentSubScreen,
-                        label = "EditFlow"
-                    ) { subScreen ->
-                        when (subScreen) {
-                            "filters" -> {
                                 CreateFilterScreen(
-                                   viewModel = createFilterViewModel,
-                                    onNavUp = { backStack.removeLastOrNull() },
-                                    onEditTagNav = { currentSubScreen = "tags" }
-                                    )
-                            }
-
-                            "tags" -> {
-                                SelectFilterTagsScreen(
                                     viewModel = createFilterViewModel,
-                                    onNavUp = { currentSubScreen = "filters"  },
+                                    onNavUp = { backStack.removeLastOrNull() },
+                                    onEditTagNav = { backStack.add(Destination.CreateFilterEditTag)}
                                 )
-                            }
-                        }
-                    }
+                }
+
+                entry <Destination.CreateFilterEditTag>{
+
+                    SelectFilterTagsScreen(
+                        viewModel = createFilterViewModel,
+                        onNavUp = { backStack.removeLastOrNull()},
+                    )
                 }
 
                 entry<Destination.Search> {
@@ -230,37 +219,20 @@ fun StrimupNavDisplay(
                 }
 
                 entry<Destination.StreamerEditProfile> {
-                    val editProfileViewModel: EditProfileViewModel = hiltViewModel()
+                    EditProfileScreen(
+                        viewModel = editProfileViewModel,
+                        modifier = Modifier.fillMaxSize(),
+                        onNavUp = { backStack.removeLastOrNull() },
+                        onEditTagsNav = { backStack.add(Destination.StreamerEditTags) }
+                    )
+                }
 
-                    var currentSubScreen by rememberSaveable { mutableStateOf("profile") }
-
-                    BackHandler(enabled = currentSubScreen == "tags") {
-                        currentSubScreen = "profile"
-                    }
-
-                    AnimatedContent(
-                        targetState = currentSubScreen,
-                        label = "EditFlow"
-                    ) { subScreen ->
-                        when (subScreen) {
-                            "profile" -> {
-                                EditProfileScreen(
-                                    viewModel = editProfileViewModel,
-                                    modifier = Modifier.fillMaxSize(),
-                                    onNavUp = { backStack.removeLastOrNull() },
-                                    onEditTagsNav = { currentSubScreen = "tags" }
-                                )
-                            }
-
-                            "tags" -> {
-                                SelectProfileTagsScreen(
-                                    viewModel = editProfileViewModel,
-                                    modifier = Modifier.fillMaxSize(),
-                                    onNavUp = { currentSubScreen = "profile" }
-                                )
-                            }
-                        }
-                    }
+                entry<Destination.StreamerEditTags> {
+                    SelectProfileTagsScreen(
+                        viewModel = editProfileViewModel,
+                        modifier = Modifier.fillMaxSize(),
+                        onNavUp = { backStack.removeLastOrNull() }
+                    )
                 }
             }
         )

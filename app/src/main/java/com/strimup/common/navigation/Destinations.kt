@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 sealed interface Destination : NavKey {
 
     @Serializable
-    object Home : Destination
+    data object Home : Destination
 
     @Serializable
     data class StreamerDetail(val streamerId: String) : Destination
@@ -16,17 +16,23 @@ sealed interface Destination : NavKey {
     data class StreamerProfile(val streamerId: String?) : Destination
 
     @Serializable
-    object StreamerEditProfile : Destination
+    data object StreamerEditProfile : Destination
 
     @Serializable
-    object FilterList : Destination
+    data object FilterList : Destination
 
     @Serializable
-    object CreateFilter : Destination
+    data object CreateFilter : Destination
 
     @Serializable
-    object Login : Destination
+    data object CreateFilterEditTag : Destination
 
     @Serializable
-    object Search : Destination
+    data object Login : Destination
+
+    @Serializable
+    data object Search : Destination
+
+    @Serializable
+    data object StreamerEditTags : Destination
 }
