@@ -167,7 +167,6 @@ fun SelectTagsContent(
 
         VerticalSpacer(16.dp)
 
-        // 🟢 Tags disponibles de la catégorie active
         Column(
             modifier = Modifier
                 .weight(1f)

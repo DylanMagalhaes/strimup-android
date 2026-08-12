@@ -1,7 +1,9 @@
 package com.strimup.feature.filter.data.mapper
 
+import com.strimup.common.domain.entity.TagEntity
 import com.strimup.feature.filter.data.response.FilterJsonDto
 import com.strimup.feature.filter.data.response.FilterResponse
+import com.strimup.feature.filter.data.response.TagDto
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 
@@ -23,26 +25,37 @@ fun FilterJsonDto.toDomain(): FilterCriteria {
 
     return FilterCriteria(
         ageRange = age,
-        category = category.orEmpty(),
         languages = languages ?: emptyList(),
         platforms = platforms ?: emptyList(),
         personalities = personalities ?: emptyList(),
-        subCategories = subCategories ?: emptyList(),
+        tags = tags?.map { it.toDomain() } ?: emptyList(),
         averageViewers = averageViewers.orEmpty(),
-        streamFrequency = streamFrequency.orEmpty()
+        streamFrequency = streamFrequency.orEmpty(),
+        status = status.orEmpty()
     )
 }
 
 fun FilterCriteria.toDto(): FilterJsonDto {
     return FilterJsonDto(
-        ageRange = ageRange?.let { listOf(it.first, it.last) },
-        category = category.ifBlank { null },
+        ageRange = listOf(ageRange.first, ageRange.last),
         languages = languages.ifEmpty { null },
         platforms = platforms.ifEmpty { null },
         personalities = personalities.ifEmpty { null },
-        subCategories = subCategories.ifEmpty { null },
+        tags = tags.map { it.toDto() }.ifEmpty { null },
         averageViewers = averageViewers.ifBlank { null },
-        streamFrequency = streamFrequency.ifBlank { null }
+        streamFrequency = streamFrequency.ifBlank { null },
+        status = status.ifBlank { null }
     )
 }
 
+fun TagDto.toDomain(): TagEntity = TagEntity(
+    id = id,
+    name = name,
+    category = category.orEmpty()
+)
+
+fun TagEntity.toDto(): TagDto = TagDto(
+    id = id,
+    name = name,
+    category = category.ifBlank { null }
+)

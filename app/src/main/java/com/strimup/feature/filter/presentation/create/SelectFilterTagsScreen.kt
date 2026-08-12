@@ -14,7 +14,8 @@ import com.strimup.common.ui.component.tag.SelectTagsContent
 import com.strimup.common.ui.theme.StrimupTheme
 
 @Composable
-fun SelectFilterTagsScreen(
+fun
+        SelectFilterTagsScreen(
     viewModel: CreateFilterViewModel,
     onNavUp: () -> Unit,
     modifier: Modifier = Modifier

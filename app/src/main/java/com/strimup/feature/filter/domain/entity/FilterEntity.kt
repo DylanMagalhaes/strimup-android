@@ -11,12 +11,10 @@ data class FilterEntity(
 
 data class FilterCriteria(
     val ageRange: IntRange = 18..80,
-    val category: String = "",
+    val tags: List<TagEntity> = emptyList(),
     val languages: List<String> = emptyList(),
     val platforms: List<String> = emptyList(),
     val personalities: List<String> = emptyList(),
-    val subCategories: List<String> = emptyList(),
-    val tags: List<TagEntity> = emptyList(),
     val averageViewers: String = "",
     val streamFrequency: String = "",
     val status: String = ""

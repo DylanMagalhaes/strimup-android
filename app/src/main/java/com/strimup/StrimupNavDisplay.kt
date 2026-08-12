@@ -1,7 +1,5 @@
 package com.strimup
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -15,9 +13,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -184,20 +179,18 @@ fun StrimupNavDisplay(
                 }
 
                 entry<Destination.CreateFilter> {
-
-
-                                CreateFilterScreen(
-                                    viewModel = createFilterViewModel,
-                                    onNavUp = { backStack.removeLastOrNull() },
-                                    onEditTagNav = { backStack.add(Destination.CreateFilterEditTag)}
-                                )
+                    CreateFilterScreen(
+                        viewModel = createFilterViewModel,
+                        onNavUp = { backStack.removeLastOrNull() },
+                        onEditTagNav = { backStack.add(Destination.CreateFilterEditTag) }
+                    )
                 }
 
-                entry <Destination.CreateFilterEditTag>{
+                entry<Destination.CreateFilterEditTag> {
 
                     SelectFilterTagsScreen(
                         viewModel = createFilterViewModel,
-                        onNavUp = { backStack.removeLastOrNull()},
+                        onNavUp = { backStack.removeLastOrNull() },
                     )
                 }
 

@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.presentation.create
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.common.domain.entity.TagEntity
@@ -33,14 +34,22 @@ class CreateFilterViewModel @Inject constructor(
         }
     }
 
+    private val TAG = "CreateFilterViewModel"
+
     fun saveFilter() {
         val filterName = _state.value.filterName.trim()
+        val criteria = _state.value.criteria
+
+        Log.d(TAG, "===> [SAVE FILTER START] Nom: '$filterName'")
+        Log.d(TAG, "===> [CRITERIA PAYLOAD] $criteria")
+        Log.d(TAG, "===> [TAGS DETAIL] Total tags: ${criteria.tags.size} -> ${criteria.tags.map { "id=${it.id}, name=${it.name}" }}")
+
         if (filterName.isBlank()) {
+            Log.w(TAG, "===> [VALIDATION ERROR] Le nom du filtre est vide !")
             _state.update { it.copy(nameError = "Le nom du filtre ne peut pas être vide") }
             return
         }
 
-        val criteria = _state.value.criteria
         viewModelScope.launch {
             _state.update {
                 it.copy(
@@ -49,8 +58,12 @@ class CreateFilterViewModel @Inject constructor(
                     nameError = null
                 )
             }
+
+            Log.d(TAG, "===> [CALL USECASE] Envoi de la requête au backend/repository...")
+
             createFilter(filterName, criteria)
-                .onSuccess {
+                .onSuccess { result ->
+                    Log.d(TAG, "===> [CREATE FILTER SUCCESS] Filtre enregistré avec succès : $result")
                     _state.update {
                         it.copy(
                             isSubmitting = false,
@@ -59,6 +72,8 @@ class CreateFilterViewModel @Inject constructor(
                     }
                 }
                 .onFailure { error ->
+                    Log.e(TAG, "===> [CREATE FILTER ERROR] Échec de l'enregistrement", error)
+                    Log.e(TAG, "===> Cause: ${error.cause?.message ?: "Pas de cause définie"}")
                     _state.update {
                         it.copy(
                             isSubmitting = false,
@@ -93,10 +108,18 @@ class CreateFilterViewModel @Inject constructor(
             getTags()
                 .onSuccess { tags ->
                     fetchedTags = tags
+                    val categories = tags.distinctBy { it.category }
+                    val defaultCategory = categories.firstOrNull()
+
                     _state.update { currentState ->
                         currentState.copy(
-                            availableCategories = tags.distinctBy { it.category },
-                            availableTags = tags
+                            availableCategories = categories,
+                            selectedCategory = currentState.selectedCategory ?: defaultCategory,
+                            availableTags = if (currentState.selectedCategory != null) {
+                                tags.filter { it.category == currentState.selectedCategory?.category }
+                            } else {
+                                tags.filter { it.category == defaultCategory?.category }
+                            }
                         )
                     }
                 }
@@ -107,6 +130,27 @@ class CreateFilterViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    fun onTagSelected(tag: TagEntity) {
+        _state.update { currentState ->
+            val currentTags = currentState.criteria.tags
+            val isAlreadySelected = currentTags.any { it.id == tag.id }
+
+            val updatedTags = if (isAlreadySelected) {
+                currentTags.filterNot { it.id == tag.id }
+            } else if (currentTags.size < 5) {
+                currentTags + tag
+            } else {
+                currentTags
+            }
+
+            currentState.copy(
+                criteria = currentState.criteria.copy(
+                    tags = updatedTags
+                )
+            )
         }
     }
 
@@ -127,26 +171,6 @@ class CreateFilterViewModel @Inject constructor(
                 availableTags = fetchedTags.filter {
                     it.category == categorySelected.category
                 }
-            )
-        }
-    }
-
-    fun onTagSelected(tag: TagEntity) {
-        _state.update { currentState ->
-            val currentTags = currentState.criteria.tags
-
-            val updatedTags = if (currentTags.contains(tag)) {
-                currentTags - tag
-            } else if (currentTags.size < 5) {
-                currentTags + tag
-            } else {
-                currentTags
-            }
-
-            currentState.copy(
-                criteria = currentState.criteria.copy(
-                    tags = updatedTags
-                )
             )
         }
     }
@@ -216,13 +240,6 @@ class CreateFilterViewModel @Inject constructor(
         }
     }
 
-    fun onStatusSelected(newStatus: String) {
-        _state.update {
-            it.copy(
-                criteria = it.criteria.copy(status = newStatus)
-            )
-        }
-    }
 
     fun openEdit(editType: ActiveEditType) {
         _state.update { it.copy(activeEdit = editType) }

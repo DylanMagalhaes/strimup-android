@@ -30,10 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.common.domain.entity.TagEntity
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 
-@OptIn(ExperimentalLayoutApi::class) @Composable fun FilterItemCard(
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FilterItemCard(
     filter: FilterEntity,
     onApply: () -> Unit,
     onDelete: (String) -> Unit,
@@ -45,16 +48,20 @@ import com.strimup.feature.filter.domain.entity.FilterEntity
         buildList {
             filter.criteria.platforms.forEach { add(it) }
             filter.criteria.languages.forEach { add(it) }
-            filter.criteria.subCategories.forEach { add(it) }
             filter.criteria.personalities.forEach { add(it) }
+            filter.criteria.tags.forEach { tag ->
+                if (tag.name.isNotBlank()) add(tag.name)
+            }
         }
     }
 
     val infoFooter = remember(filter.criteria) {
         listOfNotNull(
-            filter.criteria.averageViewers?.takeIf { it.isNotBlank() }?.let { "$it viewers" },
-            filter.criteria.streamFrequency?.takeIf { it.isNotBlank() },
-            filter.criteria.ageRange?.let { "${it.first}-${it.last} ans" }).joinToString(" • ")
+            filter.criteria.status.takeIf { it.isNotBlank() },
+            filter.criteria.averageViewers.takeIf { it.isNotBlank() }?.let { "$it viewers" },
+            filter.criteria.streamFrequency.takeIf { it.isNotBlank() },
+            filter.criteria.ageRange.let { "${it.first}-${it.last} ans" }
+        ).joinToString(" • ")
     }
 
     Surface(
@@ -72,25 +79,13 @@ import com.strimup.feature.filter.domain.entity.FilterEntity
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(
-                    modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    Text(
-                        text = filter.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    if (!filter.criteria.category.isNullOrBlank()) {
-                        Text(
-                            text = filter.criteria.category,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
+                Text(
+                    text = filter.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
 
                 Row {
                     IconButton(onClick = { isMenuExpanded = true }) {
@@ -102,21 +97,28 @@ import com.strimup.feature.filter.domain.entity.FilterEntity
                     }
 
                     DropdownMenu(
-                        expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {
-                        DropdownMenuItem(text = {
-                            Text(
-                                text = "Supprimer", color = MaterialTheme.colorScheme.error
-                            )
-                        }, leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Outlined.Delete,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }, onClick = {
-                            isMenuExpanded = false
-                            onDelete(filter.id)
-                        })
+                        expanded = isMenuExpanded,
+                        onDismissRequest = { isMenuExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = "Supprimer",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Outlined.Delete,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            },
+                            onClick = {
+                                isMenuExpanded = false
+                                onDelete(filter.id)
+                            }
+                        )
                     }
                 }
             }
@@ -153,26 +155,38 @@ import com.strimup.feature.filter.domain.entity.FilterEntity
 }
 
 @Preview(
-    name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true
-) @Composable private fun FilterItemCardPreview() {
+    name = "Dark Mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true
+)
+@Composable
+private fun FilterItemCardPreview() {
     val mockFilter = FilterEntity(
-        id = "1", name = "Filtres Récents", criteria = FilterCriteria(
+        id = "1",
+        name = "Filtres Récents",
+        criteria = FilterCriteria(
             ageRange = 18..35,
-            category = "Gaming",
             languages = listOf("Français", "Anglais"),
             platforms = listOf("Twitch", "YouTube"),
             personalities = listOf("Dynamique", "Compétitif"),
-            subCategories = listOf("FPS", "RPG"),
+            tags = listOf(
+                TagEntity(id = 1, name = "Tryhard", category = "Style"),
+                TagEntity(id = 2, name = "Chill", category = "Ambiance")
+            ),
             averageViewers = "100-500",
-            streamFrequency = "Quotidien"
-        ), userId = ""
+            streamFrequency = "Quotidien",
+            status = "En ligne"
+        ),
+        userId = "user_123"
     )
 
     MaterialTheme {
-        Surface(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            FilterItemCard(filter = mockFilter, onApply = {}, onDelete = {})
+        Surface(modifier = Modifier.padding(16.dp)) {
+            FilterItemCard(
+                filter = mockFilter,
+                onApply = {},
+                onDelete = {}
+            )
         }
     }
 }

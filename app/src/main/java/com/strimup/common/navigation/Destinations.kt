@@ -36,3 +36,45 @@ sealed interface Destination : NavKey {
     @Serializable
     data object StreamerEditTags : Destination
 }
+
+@Serializable
+sealed interface Destination2 : NavKey {
+    @Serializable
+    sealed interface Home : Destination2 {
+        @Serializable
+        data object StreamerList : Home
+    }
+
+    @Serializable
+    sealed interface Filter : Destination2 {
+        @Serializable
+        data object List : Filter
+
+        @Serializable
+        data object Create : Filter
+
+        @Serializable
+        data object SelectTags : Filter
+    }
+
+    @Serializable
+    data object Search : Destination2
+
+    @Serializable
+    sealed interface Profile : Destination2 {
+        @Serializable
+        data class View(val userId: String?) : Profile
+
+        @Serializable
+        data object Edit : Profile
+
+        @Serializable
+        data object EditTags : Profile
+    }
+
+    @Serializable
+    data class StreamerDetail(val streamerId: String) : Destination2
+
+    @Serializable
+    data object Login : Destination2
+}
