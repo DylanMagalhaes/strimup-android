@@ -1,6 +1,5 @@
 package com.strimup.feature.filter.presentation.create
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.common.domain.entity.TagEntity
@@ -9,8 +8,10 @@ import com.strimup.feature.filter.domain.usecase.CreateFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,6 +26,9 @@ class CreateFilterViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
 
+    private val _event = MutableSharedFlow<UiEvent>()
+    val events = _event.asSharedFlow()
+
     private var fetchedTags: List<TagEntity> = emptyList()
 
     init {
@@ -34,18 +38,11 @@ class CreateFilterViewModel @Inject constructor(
         }
     }
 
-    private val TAG = "CreateFilterViewModel"
-
     fun saveFilter() {
         val filterName = _state.value.filterName.trim()
         val criteria = _state.value.criteria
 
-        Log.d(TAG, "===> [SAVE FILTER START] Nom: '$filterName'")
-        Log.d(TAG, "===> [CRITERIA PAYLOAD] $criteria")
-        Log.d(TAG, "===> [TAGS DETAIL] Total tags: ${criteria.tags.size} -> ${criteria.tags.map { "id=${it.id}, name=${it.name}" }}")
-
         if (filterName.isBlank()) {
-            Log.w(TAG, "===> [VALIDATION ERROR] Le nom du filtre est vide !")
             _state.update { it.copy(nameError = "Le nom du filtre ne peut pas être vide") }
             return
         }
@@ -59,25 +56,19 @@ class CreateFilterViewModel @Inject constructor(
                 )
             }
 
-            Log.d(TAG, "===> [CALL USECASE] Envoi de la requête au backend/repository...")
-
             createFilter(filterName, criteria)
                 .onSuccess { result ->
-                    Log.d(TAG, "===> [CREATE FILTER SUCCESS] Filtre enregistré avec succès : $result")
                     _state.update {
                         it.copy(
                             isSubmitting = false,
-                            isSuccess = true
                         )
                     }
+                    _event.emit(UiEvent.Success)
                 }
                 .onFailure { error ->
-                    Log.e(TAG, "===> [CREATE FILTER ERROR] Échec de l'enregistrement", error)
-                    Log.e(TAG, "===> Cause: ${error.cause?.message ?: "Pas de cause définie"}")
                     _state.update {
                         it.copy(
                             isSubmitting = false,
-                            isSuccess = false,
                             errorMessage = error.localizedMessage ?: "Erreur lors de la création du filtre"
                         )
                     }
@@ -154,7 +145,7 @@ class CreateFilterViewModel @Inject constructor(
         }
     }
 
-    fun onRangeSelected(range: IntRange){
+    fun onRangeSelected(range: IntRange) {
         _state.update { currentState ->
             currentState.copy(
                 criteria = currentState.criteria.copy(
@@ -239,7 +230,6 @@ class CreateFilterViewModel @Inject constructor(
             )
         }
     }
-
 
     fun openEdit(editType: ActiveEditType) {
         _state.update { it.copy(activeEdit = editType) }

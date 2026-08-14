@@ -53,9 +53,11 @@ fun CreateFilterScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(state.isSuccess) {
-        if (state.isSuccess) {
-            onNavUp()
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is UiEvent.Success -> onNavUp()
+            }
         }
     }
 
