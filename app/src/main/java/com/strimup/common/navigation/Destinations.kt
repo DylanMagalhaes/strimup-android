@@ -1,6 +1,7 @@
 package com.strimup.common.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.strimup.feature.filter.domain.entity.FilterCriteria
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -49,6 +50,9 @@ sealed interface Destination2 : NavKey {
     sealed interface Filter : Destination2 {
         @Serializable
         data object List : Filter
+
+//        @Serializable
+//        data class Result(val criteria: FilterCriteria) : Filter
 
         @Serializable
         data object Create : Filter

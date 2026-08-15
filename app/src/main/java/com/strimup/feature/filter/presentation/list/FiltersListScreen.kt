@@ -42,12 +42,12 @@ import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
-import com.strimup.feature.filter.presentation.list.UiState
 import com.strimup.feature.filter.presentation.list.component.FilterItemCard
 
 @Composable
 fun FilterListScreen(
     modifier: Modifier = Modifier,
+    onFilterClick: (FilterEntity) -> Unit,
     onCreateFilterClick: () -> Unit,
     viewModel: FilterListViewModel = hiltViewModel()
 ) {
@@ -60,7 +60,7 @@ fun FilterListScreen(
     FiltersListContent(
         modifier = modifier,
         state = state,
-        onApplyFilter = {},
+        onFilterClick = onFilterClick,
         onDeleteFilter = { viewModel.onDeleteButtonClick(it) },
         onCreateFilterClick = onCreateFilterClick,
     )
@@ -71,7 +71,7 @@ fun FilterListScreen(
 private fun FiltersListContent(
     state: UiState,
     onCreateFilterClick: () -> Unit,
-    onApplyFilter: (FilterEntity) -> Unit,
+    onFilterClick: (FilterEntity) -> Unit,
     onDeleteFilter: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -144,7 +144,7 @@ private fun FiltersListContent(
                         ) { filter ->
                             FilterItemCard(
                                 filter = filter,
-                                onApply = { onApplyFilter(filter) },
+                                onApply = { onFilterClick(filter) },
                                 onDelete = { onDeleteFilter(filter.id) }
                             )
                         }
@@ -209,7 +209,7 @@ fun FiltersListPreview() {
                 )
             ),
             onCreateFilterClick = {},
-            onApplyFilter = {},
+            onFilterClick = {},
             onDeleteFilter = {}
         )
     }

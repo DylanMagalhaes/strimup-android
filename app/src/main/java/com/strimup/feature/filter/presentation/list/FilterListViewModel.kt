@@ -2,10 +2,8 @@ package com.strimup.feature.filter.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFiltersUsecase
-import com.strimup.feature.filter.presentation.list.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -14,10 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@HiltViewModel
-class FilterListViewModel @Inject constructor(
-    private val getFilters: GetFiltersUsecase,
-    private val deleteFilter: DeleteFilterUsecase
+@HiltViewModel class FilterListViewModel @Inject constructor(
+    private val getFilters: GetFiltersUsecase, private val deleteFilter: DeleteFilterUsecase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -27,24 +23,21 @@ class FilterListViewModel @Inject constructor(
         loadFilters()
     }
 
-     fun loadFilters(): Job {
+    fun loadFilters(): Job {
         return viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            getFilters()
-                .onSuccess { filters ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            filters = filters
-                        )
-                    }
+            getFilters().onSuccess { filters ->
+                _state.update {
+                    it.copy(
+                        isLoading = false, filters = filters
+                    )
                 }
-                .onFailure {
-                    _state.update {
-                        it.copy(isLoading = false)
-                    }
+            }.onFailure {
+                _state.update {
+                    it.copy(isLoading = false)
                 }
+            }
         }
     }
 
@@ -54,19 +47,17 @@ class FilterListViewModel @Inject constructor(
 
             _state.update { currentState ->
                 currentState.copy(
-                    filters = currentState.filters.filterNot { it.id == id }
-                )
+                    filters = currentState.filters.filterNot { it.id == id })
             }
 
-            deleteFilter(id)
-                .onFailure { error ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            filters = previousFilters,
-                            errorMessage = error.localizedMessage ?: "Impossible de supprimer le filtre"
-                        )
-                    }
+            deleteFilter(id).onFailure { error ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        filters = previousFilters,
+                        errorMessage = error.localizedMessage ?: "Impossible de supprimer le filtre"
+                    )
                 }
+            }
         }
     }
 
