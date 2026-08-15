@@ -4,8 +4,10 @@ import com.strimup.feature.filter.data.DefaultFilterOptionsRepository
 import com.strimup.feature.filter.data.DefaultFilterRepository
 import com.strimup.feature.filter.data.FilterApiService
 import com.strimup.feature.filter.data.StreamerApiService
+import com.strimup.feature.filter.data.DefaultStreamerRepository
 import com.strimup.feature.filter.domain.FilterOptionRepository
 import com.strimup.feature.filter.domain.FilterRepository
+import com.strimup.feature.filter.domain.StreamerRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -25,6 +27,10 @@ interface FilterModule {
     @Binds
     @Singleton
     fun bindFilterOptionRepository(impl: DefaultFilterOptionsRepository): FilterOptionRepository
+
+    @Binds
+    @Singleton
+    fun bindStreamerRepository(impl: DefaultStreamerRepository): StreamerRepository
 
     companion object {
         @Provides

@@ -3,9 +3,11 @@ package com.strimup.feature.filter.data.mapper
 import com.strimup.common.domain.entity.TagEntity
 import com.strimup.feature.filter.data.response.FilterJsonDto
 import com.strimup.feature.filter.data.response.FilterResponse
+import com.strimup.feature.filter.data.response.MatchedStreamerDto
 import com.strimup.feature.filter.data.response.TagDto
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
+import com.strimup.feature.filter.domain.entity.MatchedStreamerEntity
 
 fun FilterResponse.toDomain(): FilterEntity {
     return FilterEntity(
@@ -35,6 +37,7 @@ fun FilterJsonDto.toDomain(): FilterCriteria {
     )
 }
 
+
 fun FilterCriteria.toDto(): FilterJsonDto {
     return FilterJsonDto(
         ageRange = listOf(ageRange.first, ageRange.last),
@@ -59,3 +62,14 @@ fun TagEntity.toDto(): TagDto = TagDto(
     name = name,
     category = category.ifBlank { null }
 )
+
+
+fun MatchedStreamerDto.toDomain(): MatchedStreamerEntity {
+    return MatchedStreamerEntity(
+        id = id,
+        username = username,
+        imageUrl = imageUrl,
+        isVerified = isVerified,
+        isLive = isLive
+    )
+}

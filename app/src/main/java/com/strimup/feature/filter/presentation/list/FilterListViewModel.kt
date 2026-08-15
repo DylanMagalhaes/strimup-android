@@ -2,6 +2,7 @@ package com.strimup.feature.filter.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFiltersUsecase
 import com.strimup.feature.filter.presentation.list.UiState
@@ -68,4 +69,5 @@ class FilterListViewModel @Inject constructor(
                 }
         }
     }
+
 }

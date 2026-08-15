@@ -55,7 +55,6 @@ data class FilterJsonDto(
 data class TagDto(
     @SerialName("id")
     val id: Int,
-
     @SerialName("name")
     val name: String,
 
