@@ -1,13 +1,13 @@
 package com.strimup.feature.filter.data.mapper
 
 import com.strimup.common.domain.entity.TagEntity
+import com.strimup.feature.filter.data.local.model.FilterRoomEntity
+import com.strimup.feature.filter.data.local.model.TagRoomModel
 import com.strimup.feature.filter.data.response.FilterJsonDto
 import com.strimup.feature.filter.data.response.FilterResponse
-import com.strimup.feature.filter.data.response.MatchedStreamerDto
 import com.strimup.feature.filter.data.response.TagDto
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
-import com.strimup.feature.filter.domain.entity.MatchedStreamerEntity
 
 fun FilterResponse.toDomain(): FilterEntity {
     return FilterEntity(
@@ -64,12 +64,49 @@ fun TagEntity.toDto(): TagDto = TagDto(
 )
 
 
-fun MatchedStreamerDto.toDomain(): MatchedStreamerEntity {
-    return MatchedStreamerEntity(
+fun TagEntity.toRoomModel(): TagRoomModel = TagRoomModel(
+    id = id,
+    name = name,
+    category = category
+)
+
+fun TagRoomModel.toDomain(): TagEntity = TagEntity(
+    id = id,
+    name = name,
+    category = category
+)
+
+fun FilterEntity.toRoomEntity(): FilterRoomEntity {
+    return FilterRoomEntity(
         id = id,
-        username = username,
-        imageUrl = imageUrl,
-        isVerified = isVerified,
-        isLive = isLive
+        name = name,
+        userId = userId,
+        minAge = criteria.ageRange.first,
+        maxAge = criteria.ageRange.last,
+        languages = criteria.languages,
+        platforms = criteria.platforms,
+        personalities = criteria.personalities,
+        tags = criteria.tags.map { it.toRoomModel() },
+        averageViewers = criteria.averageViewers,
+        streamFrequency = criteria.streamFrequency,
+        status = criteria.status,
+    )
+}
+
+fun FilterRoomEntity.toDomainEntity(): FilterEntity {
+    return FilterEntity(
+        id = id,
+        name = name,
+        userId = userId,
+        criteria = FilterCriteria(
+            ageRange = minAge..maxAge,
+            languages = languages,
+            platforms = platforms,
+            personalities = personalities,
+            tags = tags.map { it.toDomain() },
+            averageViewers = averageViewers,
+            streamFrequency = streamFrequency,
+            status = status
+        )
     )
 }

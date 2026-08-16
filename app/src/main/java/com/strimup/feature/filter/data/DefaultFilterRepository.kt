@@ -1,7 +1,10 @@
 package com.strimup.feature.filter.data
 
+import com.strimup.feature.filter.data.local.dao.FilterDao
 import com.strimup.feature.filter.data.mapper.toDomain
+import com.strimup.feature.filter.data.mapper.toDomainEntity
 import com.strimup.feature.filter.data.mapper.toDto
+import com.strimup.feature.filter.data.mapper.toRoomEntity
 import com.strimup.feature.filter.data.request.CreateFilterRequest
 import com.strimup.feature.filter.domain.FilterRepository
 import com.strimup.feature.filter.domain.entity.FilterCriteria
@@ -9,18 +12,34 @@ import com.strimup.feature.filter.domain.entity.FilterEntity
 import javax.inject.Inject
 
 class DefaultFilterRepository @Inject constructor(
-    private val service: FilterApiService
+    private val service: FilterApiService,
+    private val filterDao: FilterDao
 ) : FilterRepository {
 
     override suspend fun getFilters(): Result<List<FilterEntity>> {
         return runCatching {
-            service.getFilters().map { it.toDomain() }
+            val remoteFilters = service.getFilters().map { it.toDomain() }
+
+            remoteFilters.forEach { filter ->
+                filterDao.insertFilter(filter.toRoomEntity())
+            }
+
+            remoteFilters
+        }.recoverCatching { throwable ->
+            val localEntities = filterDao.getAllFiltersOnce()
+
+            if (localEntities.isNotEmpty()) {
+                localEntities.map { it.toDomainEntity() }
+            } else {
+                throw throwable
+            }
         }
     }
 
     override suspend fun deleteFilterById(id: String): Result<Unit> {
         return runCatching {
-            service.deleteFilterById(id)
+             service.deleteFilterById(id)
+            filterDao.deleteFilter(id)
         }
     }
 
@@ -33,7 +52,11 @@ class DefaultFilterRepository @Inject constructor(
                 name = name,
                 filterJson = criteria.toDto()
             )
-            service.createFilter(request).toDomain()
+            val newFilter = service.createFilter(request).toDomain()
+
+            filterDao.insertFilter(newFilter.toRoomEntity())
+
+            newFilter
         }
     }
 }

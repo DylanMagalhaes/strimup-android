@@ -173,7 +173,8 @@ fun StrimupNavDisplay(
                 entry<Destination.FilterList> {
                     FilterListScreen(
                         modifier = Modifier.fillMaxSize(),
-                        onCreateFilterClick = { backStack.add(Destination.CreateFilter) }
+                        onCreateFilterClick = { backStack.add(Destination.CreateFilter) },
+                        onFilterClick = {}
                     )
 
                 }
