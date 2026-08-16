@@ -1,5 +1,7 @@
 package com.strimup.feature.streamerprofile.domain.entity
 
+import com.strimup.common.domain.entity.TagEntity
+
 data class StreamerProfileEntity(
     val userName: String,
     val imageUrl: String,

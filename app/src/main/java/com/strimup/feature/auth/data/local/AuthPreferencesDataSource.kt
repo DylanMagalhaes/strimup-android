@@ -5,10 +5,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
+@Singleton
 class AuthPreferencesDataSource @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
@@ -29,16 +31,12 @@ class AuthPreferencesDataSource @Inject constructor(
         return dataStore.data.first()[KEY_REFRESH_TOKEN]
     }
 
-    suspend fun saveAuthToken(token: String) {
-        dataStore.edit { preferences ->
-            preferences[KEY_AUTH_TOKEN] = token
-        }
-    }
-
-    suspend fun saveTokens(accessToken: String, refreshToken: String) {
+    suspend fun saveTokens(accessToken: String, refreshToken: String?) {
         dataStore.edit { preferences ->
             preferences[KEY_AUTH_TOKEN] = accessToken
-            preferences[KEY_REFRESH_TOKEN] = refreshToken
+            if (!refreshToken.isNullOrBlank()) {
+                preferences[KEY_REFRESH_TOKEN] = refreshToken
+            }
         }
     }
 

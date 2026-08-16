@@ -6,11 +6,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserLoggedResponse(
     @SerialName("message")
-    val message: String,
+    val message: String? = null,
+
     @SerialName("token")
     val token: String,
+
     @SerialName("refreshToken")
-    val refreshToken: String,
+    val refreshToken: String? = null,
+
     @SerialName("user")
     val userLogged: UserLogged
 ) {
@@ -25,8 +28,8 @@ data class UserLoggedResponse(
         @SerialName("role")
         val role: String,
         @SerialName("birth_date")
-        val birthDate: String,
+        val birthDate: String? = null,
         @SerialName("gender")
-        val gender: String,
+        val gender: String? = null,
     )
 }

@@ -1,12 +1,12 @@
 package com.strimup.feature.streamerdetail.presentation.mapper
 
 import com.strimup.R
+import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity.Social.Type.Instagram
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity.Social.Type.Kick
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity.Social.Type.Tiktok
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity.Social.Type.Twitch
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity.Social.Type.Youtube
-import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
 
 
 fun StreamerDetailEntity.Social.getIconRes(): Int =

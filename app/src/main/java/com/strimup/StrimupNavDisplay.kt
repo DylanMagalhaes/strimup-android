@@ -1,22 +1,18 @@
 package com.strimup
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,12 +23,16 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.strimup.common.navigation.Destination
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.filter.presentation.create.CreateFilterScreen
+import com.strimup.feature.filter.presentation.create.CreateFilterViewModel
+import com.strimup.feature.filter.presentation.create.SelectFilterTagsScreen
+import com.strimup.feature.filter.presentation.list.FilterListScreen
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileScreen
 import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileViewModel
-import com.strimup.feature.streamerprofile.presentation.editeprofile.SelectTagsScreen
+import com.strimup.feature.streamerprofile.presentation.editeprofile.SelectProfileTagsScreen
 import com.strimup.feature.streamerprofile.presentation.streamerprofile.StreamerProfileScreen
 import com.strimup.presentation.MainViewModel
 
@@ -42,6 +42,7 @@ fun StrimupNavDisplay(
     modifier: Modifier = Modifier
 ) {
     val backStack = rememberNavBackStack(Destination.Home)
+
     val currentDestination = backStack.lastOrNull()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -67,6 +68,21 @@ fun StrimupNavDisplay(
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = "Home"
+                            )
+                        }
+                    )
+
+                    NavigationBarItem(
+                        selected = currentDestination == Destination.FilterList,
+                        onClick = {
+                            if (currentDestination != Destination.FilterList) {
+                                backStack.add(Destination.FilterList)
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = "Mes filtres"
                             )
                         }
                     )
@@ -114,6 +130,8 @@ fun StrimupNavDisplay(
             }
         }
     ) { innerPadding ->
+        val editProfileViewModel: EditProfileViewModel = hiltViewModel()
+        val createFilterViewModel: CreateFilterViewModel = hiltViewModel()
 
         NavDisplay(
             modifier = Modifier
@@ -152,6 +170,40 @@ fun StrimupNavDisplay(
                     )
                 }
 
+                entry<Destination.FilterList> {
+                    FilterListScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onCreateFilterClick = { backStack.add(Destination.CreateFilter) },
+                        onFilterClick = {}
+                    )
+
+                }
+
+                entry<Destination.CreateFilter> {
+                    CreateFilterScreen(
+                        viewModel = createFilterViewModel,
+                        onNavUp = { backStack.removeLastOrNull() },
+                        onEditTagNav = { backStack.add(Destination.CreateFilterEditTag) }
+                    )
+                }
+
+                entry<Destination.CreateFilterEditTag> {
+
+                    SelectFilterTagsScreen(
+                        viewModel = createFilterViewModel,
+                        onNavUp = { backStack.removeLastOrNull() },
+                    )
+                }
+
+                entry<Destination.Search> {
+                    SearchScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onStreamerClick = { id ->
+                            backStack.add(Destination.StreamerDetail(streamerId = id))
+                        }
+                    )
+                }
+
                 entry<Destination.StreamerProfile> {
                     StreamerProfileScreen(
                         modifier = Modifier.fillMaxSize(),
@@ -161,44 +213,19 @@ fun StrimupNavDisplay(
                 }
 
                 entry<Destination.StreamerEditProfile> {
-                    val editProfileViewModel: EditProfileViewModel = hiltViewModel()
-
-                    var currentSubScreen by rememberSaveable { mutableStateOf("profile") }
-
-                    BackHandler(enabled = currentSubScreen == "tags") {
-                        currentSubScreen = "profile"
-                    }
-
-                    AnimatedContent(
-                        targetState = currentSubScreen,
-                        label = "EditFlow"
-                    ) { subScreen ->
-                        when (subScreen) {
-                            "profile" -> {
-                                EditProfileScreen(
-                                    viewModel = editProfileViewModel,
-                                    modifier = Modifier.fillMaxSize(),
-                                    onNavUp = { backStack.removeLastOrNull() },
-                                    onEditTagsNav = { currentSubScreen = "tags" }
-                                )
-                            }
-                            "tags" -> {
-                                SelectTagsScreen(
-                                    viewModel = editProfileViewModel,
-                                    modifier = Modifier.fillMaxSize(),
-                                    onNavUp = { currentSubScreen = "profile" }
-                                )
-                            }
-                        }
-                    }
+                    EditProfileScreen(
+                        viewModel = editProfileViewModel,
+                        modifier = Modifier.fillMaxSize(),
+                        onNavUp = { backStack.removeLastOrNull() },
+                        onEditTagsNav = { backStack.add(Destination.StreamerEditTags) }
+                    )
                 }
 
-                entry<Destination.Search> {
-                    SearchScreen(
+                entry<Destination.StreamerEditTags> {
+                    SelectProfileTagsScreen(
+                        viewModel = editProfileViewModel,
                         modifier = Modifier.fillMaxSize(),
-                        onStreamerClick = { id ->
-                            backStack.add(Destination.StreamerDetail(streamerId = id))
-                        }
+                        onNavUp = { backStack.removeLastOrNull() }
                     )
                 }
             }

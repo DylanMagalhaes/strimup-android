@@ -21,7 +21,7 @@ fun UserEntity.toRoomEntity(): UserRoomEntity {
         email = this.email,
         role = this.role.name,
 
-    )
+        )
 }
 
 fun UserRoomEntity.toDomainEntity(): UserEntity {

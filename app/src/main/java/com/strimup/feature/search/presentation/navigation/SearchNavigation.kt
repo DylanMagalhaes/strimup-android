@@ -1,0 +1,54 @@
+package com.strimup.feature.search.presentation.navigation
+
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
+import com.strimup.common.navigation.Destination2
+import com.strimup.feature.search.presentation.SearchScreen
+import com.strimup.feature.search.presentation.SearchViewModel
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+
+@Composable
+fun SearchNavigation(
+    onStreamerClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val searchBackStack = rememberNavBackStack(
+        configuration = SavedStateConfiguration {
+            serializersModule = SerializersModule {
+                polymorphic(NavKey::class) {
+                    subclass(Destination2.Search::class, Destination2.Search.serializer())
+                }
+            }
+        },
+        Destination2.Search
+    )
+
+    NavDisplay(
+        backStack = searchBackStack,
+        modifier = modifier,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
+        entryProvider = entryProvider {
+            entry<Destination2.Search> {
+                val searchViewModel: SearchViewModel = hiltViewModel()
+                SearchScreen(
+                    viewModel = searchViewModel,
+                    onStreamerClick = onStreamerClick,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    )
+}

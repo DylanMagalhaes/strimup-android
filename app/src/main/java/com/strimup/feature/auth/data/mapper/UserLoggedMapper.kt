@@ -9,7 +9,7 @@ import com.strimup.feature.auth.domain.entity.LoginResultEntity
 fun UserLoggedResponse.toEntity(): LoginResultEntity {
     val userLogged = this.userLogged
     return LoginResultEntity(
-        message = this.message,
+        message = this.message ?: "",
         token = this.token,
         user = UserEntity(
             id = userLogged.id,
@@ -17,7 +17,7 @@ fun UserLoggedResponse.toEntity(): LoginResultEntity {
             email = userLogged.email,
             role = UserRole.valueOf(userLogged.role.uppercase()),
 
-        )
+            )
     )
 }
 

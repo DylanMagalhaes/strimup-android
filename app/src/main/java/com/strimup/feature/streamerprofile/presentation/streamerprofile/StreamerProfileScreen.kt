@@ -47,7 +47,7 @@ import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.feature.streamerprofile.domain.entity.TagEntity
+import com.strimup.common.domain.entity.TagEntity
 import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 
 @Composable
@@ -83,7 +83,15 @@ private fun StreamerProfileScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(text = state.streamer?.userName ?: "") },
+                title = {
+                    Text(
+                        text = state.streamer?.userName ?: "",
+                        fontFamily = zalandoFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavUp) {
                         Icon(

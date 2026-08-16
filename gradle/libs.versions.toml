@@ -16,10 +16,10 @@ lifecycle = "2.11.0"
 kotlinxSerialization = "1.8.1"
 navigation3 = "1.1.2"
 retrofit = "2.11.0"
-room = "2.6.1"
 datastore = "1.1.1"
 okhttp = "4.12.0"
 room3 = "3.0.0"
+roomCommonJvm = "2.8.4"
 
 
 [libraries]
@@ -68,3 +68,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room3 = { id = "androidx.room3", version.ref = "room3" }
