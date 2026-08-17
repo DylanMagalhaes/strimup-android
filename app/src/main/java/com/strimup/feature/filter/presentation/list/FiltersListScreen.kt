@@ -47,7 +47,7 @@ import com.strimup.feature.filter.presentation.list.component.FilterItemCard
 @Composable
 fun FilterListScreen(
     modifier: Modifier = Modifier,
-    onFilterClick: (FilterEntity) -> Unit,
+    onFilterClick: (String) -> Unit,
     onCreateFilterClick: () -> Unit,
     viewModel: FilterListViewModel = hiltViewModel()
 ) {
@@ -71,7 +71,7 @@ fun FilterListScreen(
 private fun FiltersListContent(
     state: UiState,
     onCreateFilterClick: () -> Unit,
-    onFilterClick: (FilterEntity) -> Unit,
+    onFilterClick: (String) -> Unit,
     onDeleteFilter: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -144,7 +144,7 @@ private fun FiltersListContent(
                         ) { filter ->
                             FilterItemCard(
                                 filter = filter,
-                                onApply = { onFilterClick(filter) },
+                                onApply = { onFilterClick(filter.id) },
                                 onDelete = { onDeleteFilter(filter.id) }
                             )
                         }

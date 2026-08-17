@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@HiltViewModel class FilterListViewModel @Inject constructor(
+@HiltViewModel
+class FilterListViewModel @Inject constructor(
     private val getFilters: GetFiltersUsecase, private val deleteFilter: DeleteFilterUsecase
 ) : ViewModel() {
 

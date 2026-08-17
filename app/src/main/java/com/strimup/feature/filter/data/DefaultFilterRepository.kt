@@ -38,7 +38,7 @@ class DefaultFilterRepository @Inject constructor(
 
     override suspend fun deleteFilterById(id: String): Result<Unit> {
         return runCatching {
-             service.deleteFilterById(id)
+            service.deleteFilterById(id)
             filterDao.deleteFilter(id)
         }
     }
@@ -57,6 +57,13 @@ class DefaultFilterRepository @Inject constructor(
             filterDao.insertFilter(newFilter.toRoomEntity())
 
             newFilter
+        }
+    }
+
+    override suspend fun getFilterById(id: String): Result<FilterEntity> {
+        return runCatching {
+            filterDao.getFilterById(id)?.toDomainEntity()
+                ?: throw NoSuchElementException("Filtre introuvable")
         }
     }
 }

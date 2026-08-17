@@ -2,7 +2,7 @@ package com.strimup.feature.home.data
 
 import com.strimup.feature.home.domain.StreamerRepository
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.feature.home.domain.entity.StreamerEntity
+import com.strimup.common.domain.entity.StreamerEntity
 import javax.inject.Inject
 
 class FakeStreamerRepository @Inject constructor() : StreamerRepository {

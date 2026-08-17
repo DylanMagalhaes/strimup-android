@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
@@ -31,20 +32,17 @@ import coil3.compose.AsyncImage
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.home.domain.entity.StreamerEntity.Social
-import com.strimup.feature.home.domain.entity.StreamerEntity.Social.Type
-import com.strimup.feature.home.presentation.component.FavoriteIconButton
-import com.strimup.feature.home.presentation.mapper.getIconRes
+import com.strimup.common.domain.entity.StreamerEntity.Social
+import com.strimup.common.domain.entity.StreamerEntity.Social.Type
+import com.strimup.common.domain.mapper.getIconRes
 
 @Composable fun StreamerCard(
     pseudo: String,
     socials: List<Social>,
-    saved: Boolean,
-    imageUrl: String,
+    imageUrl: String?,
     isLive: Boolean,
     liveTitle: String?,
     onClick: () -> Unit,
-    onFavoriteClick: () -> Unit,
     onSocialClick: (Social) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -70,7 +68,7 @@ import com.strimup.feature.home.presentation.mapper.getIconRes
                 AsyncImage(
                     modifier = Modifier
                         .size(56.dp)
-                        .clip(shape = RoundedCornerShape(8.dp))
+                        .clip(CircleShape)
                         .background(
                             MaterialTheme.colorScheme.onBackground.copy(alpha = .4f)
                         )
@@ -79,7 +77,7 @@ import com.strimup.feature.home.presentation.mapper.getIconRes
                                 Modifier.border(
                                     width = 2.dp,
                                     color = MaterialTheme.colorScheme.tertiary,
-                                    shape = RoundedCornerShape(8.dp)
+                                    shape = CircleShape
                                 )
                             } else {
                                 Modifier
@@ -155,11 +153,6 @@ import com.strimup.feature.home.presentation.mapper.getIconRes
                     }
                 }
             }
-
-            FavoriteIconButton(
-                saved = saved,
-                onClick = onFavoriteClick,
-            )
         }
     }
 }
@@ -170,13 +163,11 @@ import com.strimup.feature.home.presentation.mapper.getIconRes
             modifier = Modifier.fillMaxWidth(),
             pseudo = "Mello",
             socials = listOf(Social(url = "", type = Type.Instagram)),
-            saved = false,
             imageUrl = "",
             isLive = true,
             liveTitle = "lorem ipsum dolores ombrage",
             onClick = {},
             onSocialClick = {},
-            onFavoriteClick = {},
         )
     }
 }

@@ -135,7 +135,6 @@ fun StrimupNavDisplay2(
                     ProfileNavigation(
                         userId = destination.userId,
                         modifier = Modifier.fillMaxSize(),
-                        onLoginClick = { backStack.add(Destination2.Login) }
                     )
                 }
 

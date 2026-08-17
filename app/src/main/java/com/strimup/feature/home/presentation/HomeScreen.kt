@@ -28,8 +28,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.component.StreamerCard
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.feature.home.domain.entity.StreamerEntity
-import com.strimup.feature.home.domain.entity.StreamerEntity.Social
+import com.strimup.common.domain.entity.StreamerEntity
+import com.strimup.common.domain.entity.StreamerEntity.Social
 import com.strimup.feature.home.presentation.component.HomeTabs
 
 @Composable
@@ -105,12 +105,10 @@ private fun HomeContent(
                                 pseudo = streamer.userName,
                                 socials = streamer.socials,
                                 imageUrl = streamer.imageUrl,
-                                saved = false,
                                 isLive = streamer.isLive,
                                 liveTitle = streamer.liveTitle,
                                 onClick = { onStreamerClick(streamer.id) },
                                 onSocialClick = onStreamerSocialClick,
-                                onFavoriteClick = { onStreamerFavoriteClick(streamer) },
                             )
                         }
                     }

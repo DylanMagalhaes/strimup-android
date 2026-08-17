@@ -2,7 +2,6 @@ package com.strimup.common.database.converter
 
 import androidx.room3.ColumnTypeConverter
 import com.strimup.feature.filter.data.local.model.TagRoomModel
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class CommonConverters {
