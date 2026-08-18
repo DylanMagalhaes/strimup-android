@@ -26,7 +26,6 @@ class DefaultStreamerRepository @Inject constructor(
            val result =  service.getFilteredStreamers(request)
 
             StreamerMatchResult(
-                page = result.page,
                 total = result.total,
                 streamers = result.matchedStreamers.map {
                     it.toDomain()
