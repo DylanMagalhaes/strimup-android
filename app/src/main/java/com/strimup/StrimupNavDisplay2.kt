@@ -91,7 +91,12 @@ fun StrimupNavDisplay2(
                                 backStack.add(Destination2.Login)
                             }
                         },
-                        icon = { Icon(Icons.Default.Person, contentDescription = if (isLoggedIn) "Profile" else "Connexion") }
+                        icon = {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = if (isLoggedIn) "Profile" else "Connexion"
+                            )
+                        }
                     )
                 }
             }
@@ -127,6 +132,9 @@ fun StrimupNavDisplay2(
 
                 entry<Destination2.Filter.List> {
                     FilterNavigation(
+                        onStreamerClick = { streamerId ->
+                            backStack.add(Destination2.StreamerDetail(streamerId = streamerId))
+                        },
                         modifier = Modifier.fillMaxSize()
                     )
                 }

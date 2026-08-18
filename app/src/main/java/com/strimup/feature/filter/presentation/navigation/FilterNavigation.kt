@@ -22,6 +22,7 @@ import kotlinx.serialization.modules.polymorphic
 
 @Composable
 fun FilterNavigation(
+    onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val filterBackStack = rememberNavBackStack(
@@ -72,6 +73,7 @@ fun FilterNavigation(
             entry<Destination2.Filter.Result> { destination ->
                 MatchedStreamersScreen(
                     onNavUp = { filterBackStack.removeLastOrNull() },
+                    onStreamerClick = onStreamerClick,
                     filterId = destination.filterId,
                 )
             }

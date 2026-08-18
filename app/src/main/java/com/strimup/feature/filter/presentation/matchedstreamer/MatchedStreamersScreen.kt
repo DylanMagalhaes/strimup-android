@@ -51,6 +51,7 @@ import com.strimup.feature.filter.domain.entity.StreamerMatchResult
 @Composable
 fun MatchedStreamersScreen(
     onNavUp: () -> Unit,
+    onStreamerClick: (String) -> Unit,
     filterId: String,
     viewModel: MatchedStreamerListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
@@ -66,7 +67,7 @@ fun MatchedStreamersScreen(
     MatchedStreamersScreen(
         state = state,
         onNavUp = onNavUp,
-        onStreamerClick = { streamerId -> },
+        onStreamerClick = onStreamerClick,
         onSocialClick = { socialUrl ->
             if (socialUrl != null) {
                 uriHandler.openUri(socialUrl)
