@@ -51,8 +51,8 @@ sealed interface Destination2 : NavKey {
         @Serializable
         data object List : Filter
 
-//        @Serializable
-//        data class Result(val criteria: FilterCriteria) : Filter
+        @Serializable
+        data class Result(val filterId: String) : Filter
 
         @Serializable
         data object Create : Filter

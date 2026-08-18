@@ -1,7 +1,7 @@
 package com.strimup.feature.home.domain
 
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.feature.home.domain.entity.StreamerEntity
+import com.strimup.common.domain.entity.StreamerEntity
 
 interface StreamerRepository {
     suspend fun getStreamers(

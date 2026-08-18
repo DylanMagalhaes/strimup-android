@@ -2,7 +2,7 @@ package com.strimup.feature.home.presentation
 
 import androidx.compose.runtime.Stable
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.feature.home.domain.entity.StreamerEntity
+import com.strimup.common.domain.entity.StreamerEntity
 
 @Stable
 data class UiState(

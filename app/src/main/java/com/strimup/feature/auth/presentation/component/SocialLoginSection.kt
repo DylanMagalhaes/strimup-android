@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.feature.home.domain.entity.StreamerEntity
+import com.strimup.common.domain.entity.StreamerEntity
 
 /*
 @Composable

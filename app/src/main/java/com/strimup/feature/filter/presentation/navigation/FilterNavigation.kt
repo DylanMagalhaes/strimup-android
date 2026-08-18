@@ -11,12 +11,12 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.strimup.common.navigation.Destination
 import com.strimup.common.navigation.Destination2
 import com.strimup.feature.filter.presentation.create.CreateFilterScreen
 import com.strimup.feature.filter.presentation.create.CreateFilterViewModel
 import com.strimup.feature.filter.presentation.create.SelectFilterTagsScreen
 import com.strimup.feature.filter.presentation.list.FilterListScreen
+import com.strimup.feature.filter.presentation.matchedstreamer.MatchedStreamersScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -36,6 +36,10 @@ fun FilterNavigation(
                     subclass(
                         Destination2.Filter.SelectTags::class,
                         Destination2.Filter.SelectTags.serializer()
+                    )
+                    subclass(
+                        Destination2.Filter.Result::class,
+                        Destination2.Filter.Result.serializer()
                     )
                 }
             }
@@ -59,9 +63,16 @@ fun FilterNavigation(
                     onCreateFilterClick = {
                         filterBackStack.add(Destination2.Filter.Create)
                     },
-                    onFilterClick = {
-
+                    onFilterClick = { filterId ->
+                        filterBackStack.add(Destination2.Filter.Result(filterId))
                     }
+                )
+            }
+
+            entry<Destination2.Filter.Result> { destination ->
+                MatchedStreamersScreen(
+                    onNavUp = { filterBackStack.removeLastOrNull() },
+                    filterId = destination.filterId,
                 )
             }
 

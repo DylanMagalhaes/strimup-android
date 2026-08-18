@@ -1,13 +1,13 @@
-package com.strimup.feature.home.domain.entity
+package com.strimup.common.domain.entity
 
 data class StreamerEntity(
     val id: String,
     val userName: String,
     val socials: List<Social>,
-    val imageUrl: String,
+    val imageUrl: String?,
     val isLive: Boolean,
     val liveTitle: String?,
-    val isFavorite: Boolean,
+    val isFavorite: Boolean?,
     val tags: List<Tags>?,
 ) {
     data class Social(

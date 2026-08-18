@@ -22,7 +22,6 @@ import kotlinx.serialization.modules.polymorphic
 @Composable
 fun ProfileNavigation(
     userId: String?,
-    onLoginClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val initialDestination = Destination2.Profile.View(userId = userId)
