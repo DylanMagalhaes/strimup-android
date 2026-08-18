@@ -13,13 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -41,19 +37,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.common.domain.entity.TagEntity
 import com.strimup.common.ui.component.StreamerHero
 import com.strimup.common.ui.component.button.SocialIconButton
 import com.strimup.common.ui.component.spacer.VerticalSpacer
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.common.domain.entity.TagEntity
 import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 
 @Composable
 fun StreamerProfileScreen(
     modifier: Modifier = Modifier,
-    onNavUp: () -> Unit,
     onEditProfileNav: () -> Unit,
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
@@ -65,7 +60,6 @@ fun StreamerProfileScreen(
 
     StreamerProfileScreen(
         state = state,
-        onNavUp = onNavUp,
         onEditProfileNav = onEditProfileNav,
         modifier = modifier
     )
@@ -75,7 +69,6 @@ fun StreamerProfileScreen(
 @Composable
 private fun StreamerProfileScreen(
     state: UiState,
-    onNavUp: () -> Unit,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -92,14 +85,6 @@ private fun StreamerProfileScreen(
                     )
 
                 },
-                navigationIcon = {
-                    IconButton(onClick = onNavUp) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-                }
             )
         },
     ) { padding ->
@@ -276,7 +261,6 @@ private fun StreamerProfileScreenPreview() {
                     streamFrequency = "",
                 )
             ),
-            onNavUp = {},
             onEditProfileNav = {}
         )
     }

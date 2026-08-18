@@ -207,7 +207,6 @@ fun StrimupNavDisplay(
                 entry<Destination.StreamerProfile> {
                     StreamerProfileScreen(
                         modifier = Modifier.fillMaxSize(),
-                        onNavUp = { backStack.removeLastOrNull() },
                         onEditProfileNav = { backStack.add(Destination.StreamerEditProfile) }
                     )
                 }

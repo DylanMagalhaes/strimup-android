@@ -52,10 +52,9 @@ fun ProfileNavigation(
             entry<Destination2.Profile.View> {
                 StreamerProfileScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onNavUp = { profileBackStack.removeLastOrNull() },
                     onEditProfileNav = {
                         profileBackStack.add(Destination2.Profile.Edit)
-                    }
+                    },
                 )
             }
 

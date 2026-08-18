@@ -21,15 +21,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.common.domain.entity.StreamerEntity
 import com.strimup.common.ui.component.StreamerCard
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.common.domain.entity.StreamerEntity
-import com.strimup.common.domain.entity.StreamerEntity.Social
 import com.strimup.feature.home.presentation.component.HomeTabs
 
 @Composable
@@ -40,6 +40,7 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -55,8 +56,12 @@ fun HomeScreen(
         modifier = modifier.fillMaxSize(),
         state = state,
         onStreamerClick = onStreamerClick,
-        onStreamerSocialClick = { /* TODO */ },
         onStreamerFavoriteClick = { /* TODO */ },
+        onSocialClick = { socialUrl ->
+            if (socialUrl != null) {
+                uriHandler.openUri(socialUrl)
+            }
+        },
         onTabClick = { viewModel.onTabClick(it) },
     )
 }
@@ -66,10 +71,11 @@ private fun HomeContent(
     state: UiState,
     onStreamerClick: (id: String) -> Unit,
     onStreamerFavoriteClick: (StreamerEntity) -> Unit,
-    onStreamerSocialClick: (Social) -> Unit,
+    onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     Surface(
         modifier = modifier,
         color = MaterialTheme
@@ -108,7 +114,7 @@ private fun HomeContent(
                                 isLive = streamer.isLive,
                                 liveTitle = streamer.liveTitle,
                                 onClick = { onStreamerClick(streamer.id) },
-                                onSocialClick = onStreamerSocialClick,
+                                onSocialClick = onSocialClick ,
                             )
                         }
                     }
@@ -127,7 +133,7 @@ private fun HomeScreenPreview() {
             state = UiState(),
             onStreamerClick = {},
             onStreamerFavoriteClick = {},
-            onStreamerSocialClick = {},
+            onSocialClick = {},
             onTabClick = {},
         )
     }

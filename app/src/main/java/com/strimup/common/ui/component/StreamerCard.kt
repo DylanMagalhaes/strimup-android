@@ -43,7 +43,7 @@ import com.strimup.common.domain.mapper.getIconRes
     isLive: Boolean,
     liveTitle: String?,
     onClick: () -> Unit,
-    onSocialClick: (Social) -> Unit,
+    onSocialClick: (String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -149,7 +149,7 @@ import com.strimup.common.domain.mapper.getIconRes
                 ) {
                     socials.forEach { social ->
                         SocialIconButton(
-                            iconRes = social.getIconRes(), onClick = { onSocialClick(social) })
+                            iconRes = social.getIconRes(), onClick = { onSocialClick(social.url) })
                     }
                 }
             }

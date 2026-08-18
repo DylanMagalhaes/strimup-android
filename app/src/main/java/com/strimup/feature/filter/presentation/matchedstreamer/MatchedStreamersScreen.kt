@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,8 @@ fun MatchedStreamersScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
+
 
     LaunchedEffect(filterId) {
         viewModel.initData(filterId)
@@ -64,7 +67,11 @@ fun MatchedStreamersScreen(
         state = state,
         onNavUp = onNavUp,
         onStreamerClick = { streamerId -> },
-        onSocialClick = { socialUrl -> },
+        onSocialClick = { socialUrl ->
+            if (socialUrl != null) {
+                uriHandler.openUri(socialUrl)
+            }
+        },
         onLoadNextPage = viewModel::loadNextPage,
         onLiveCheckedChange = viewModel::onLiveSwitch,
         modifier = modifier,
@@ -77,7 +84,7 @@ fun MatchedStreamersScreen(
     state: UiState,
     onNavUp: () -> Unit,
     onStreamerClick: (String) -> Unit,
-    onSocialClick: (String) -> Unit,
+    onSocialClick: (String?) -> Unit,
     onLoadNextPage: () -> Unit,
     onLiveCheckedChange: () -> Unit,
     modifier: Modifier = Modifier
@@ -122,7 +129,7 @@ fun MatchedStreamersScreen(
 fun MatchedStreamersContent(
     state: UiState,
     onStreamerClick: (String) -> Unit,
-    onSocialClick: (String) -> Unit,
+    onSocialClick: (String?) -> Unit,
     onLoadNextPage: () -> Unit,
     onLiveCheckedChange: () -> Unit,
     modifier: Modifier = Modifier
@@ -169,7 +176,7 @@ fun MatchedStreamersContent(
                     isLive = streamer.isLive,
                     liveTitle = streamer.liveTitle,
                     onClick = { onStreamerClick(streamer.id) },
-                    onSocialClick = { social -> onSocialClick(social.url ?: "") },
+                    onSocialClick = onSocialClick,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
