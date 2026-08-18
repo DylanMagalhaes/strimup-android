@@ -20,11 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.ui.component.StreamerHero
 import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
 import com.strimup.feature.streamerdetail.presentation.component.StreamerContent
 
@@ -57,7 +60,14 @@ private fun StreamerDetailScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(text = state.streamer?.userName ?: "") },
+                title = {
+                    Text(
+                        text = state.streamer?.userName ?: "",
+                        fontFamily = zalandoFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavUp) {
                         Icon(
