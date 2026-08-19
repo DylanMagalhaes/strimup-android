@@ -38,8 +38,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
-import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.editrow.ProfileEditRow
 import com.strimup.feature.streamerprofile.presentation.editprofile.component.EditProfileImageSection
@@ -129,7 +129,7 @@ fun EditProfileScreen(
                 onEditAverageViewersClicked = { viewModel.openEdit(ActiveEditType.AverageViewers) },
                 onEditLanguagesClicked = { viewModel.openEdit(ActiveEditType.Languages) },
                 onEditSocialClicked = { socialType ->
-                    viewModel.openEdit(ActiveEditType.Social(socialType))
+                    viewModel.openEdit(ActiveEditType.SocialEdit(socialType))
                 },
                 onImageSelected = { newPhoto ->
                     viewModel.onImageSelected(newPhoto)
@@ -137,7 +137,7 @@ fun EditProfileScreen(
                 onEditTagsClicked = { onEditTagsNav(state.selectedTags) }
             )
 
-            val availableOptions = state.availableOptions ?: StreamerOptionsEntity(
+            val availableOptions = state.availableOptions ?: StreamerOptions(
                 averageViewers = emptyList(),
                 languages = emptyList(),
                 personalities = emptyList(),
@@ -243,7 +243,7 @@ fun EditProfileScreen(
                     )
                 }
 
-                is ActiveEditType.Social -> {
+                is ActiveEditType.SocialEdit -> {
                     val existingUrl = state.socials.find { it.type == editType.type }?.url ?: ""
                     EditTextBottomSheet(
                         title = "Lien ${editType.type.name.lowercase().replaceFirstChar { it.uppercase() }}",
@@ -274,7 +274,7 @@ fun EditProfileContent(
     onEditAverageViewersClicked: () -> Unit,
     onEditLanguagesClicked: () -> Unit,
     onImageSelected: (Uri) -> Unit,
-    onEditSocialClicked: (StreamerProfileEntity.Social.Type) -> Unit,
+    onEditSocialClicked: (Social.Type) -> Unit,
     onEditTagsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -413,7 +413,7 @@ fun EditProfileContent(
                 color = MaterialTheme.colorScheme.surface
             ) {
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
-                    StreamerProfileEntity.Social.Type.entries.forEach { socialType ->
+                    Social.Type.entries.forEach { socialType ->
                         val existingSocial = state.socials.find { it.type == socialType }
                         ProfileEditRow(
                             label = socialType.name.lowercase().replaceFirstChar { it.uppercase() },
@@ -445,7 +445,7 @@ fun EditProfileScreenPreview() {
             category = "",
             name = ""
         ),
-        availableOptions = StreamerOptionsEntity(
+        availableOptions = StreamerOptions(
             averageViewers = emptyList(),
             languages = listOf("Français", "Anglais"),
             personalities = listOf("Chill", "Tryhard", "Drôle"),

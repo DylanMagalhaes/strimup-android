@@ -3,8 +3,9 @@ package com.strimup.feature.streamerprofile.presentation.editprofile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
-import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
-import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.StreamerOptions
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUsecase
@@ -32,7 +33,7 @@ class EditProfileViewModel @Inject constructor(
     private val _state = MutableStateFlow(EditProfileUiState())
     val state: StateFlow<EditProfileUiState> = _state.asStateFlow()
 
-    private var fetchedOptions: StreamerOptionsEntity? = null
+    private var fetchedOptions: StreamerOptions? = null
     private var fetchedTags: List<TagEntity> = emptyList()
 
     init {
@@ -87,7 +88,7 @@ class EditProfileViewModel @Inject constructor(
                             isLoading = false,
                             originalProfile = streamer,
                             availableTags = fetchedTags,
-                            availableOptions = fetchedOptions ?: StreamerOptionsEntity(
+                            availableOptions = fetchedOptions ?: StreamerOptions(
                                 averageViewers = emptyList(),
                                 languages = emptyList(),
                                 personalities = emptyList(),
@@ -220,7 +221,7 @@ class EditProfileViewModel @Inject constructor(
         }
     }
 
-    fun onSocialUrlChanged(url: String, targetSocial: StreamerProfileEntity.Social.Type) {
+    fun onSocialUrlChanged(url: String, targetSocial: Social.Type) {
         _state.update { currentState ->
             val cleanUrl = url.trim()
             val exists = currentState.socials.any { it.type == targetSocial }
@@ -239,7 +240,7 @@ class EditProfileViewModel @Inject constructor(
                 }
             } else {
                 if (cleanUrl.isNotBlank()) {
-                    currentState.socials + StreamerProfileEntity.Social(
+                    currentState.socials + Social(
                         url = cleanUrl,
                         type = targetSocial
                     )

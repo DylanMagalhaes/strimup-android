@@ -25,13 +25,13 @@ import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
-import com.strimup.feature.streamerdetail.presentation.mapper.getIconRes
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.mapper.getIconRes
 
 @Composable
 fun StreamerContent(
     description: String,
-    socials: List<StreamerDetailEntity.Social>,
+    socials: List<Social>,
     onSocialClick: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -108,21 +108,21 @@ private fun StreamerContentPreview() {
     StrimupTheme {
         StreamerContent(
             socials = listOf(
-                StreamerDetailEntity.Social(
+                Social(
                     url = "https://twitch.tv",
-                    type = StreamerDetailEntity.Social.Type.Twitch
+                    type = Social.Type.Twitch
                 ),
-                StreamerDetailEntity.Social(
+                Social(
                     url = "https://youtube.com",
-                    type = StreamerDetailEntity.Social.Type.Youtube
+                    type = Social.Type.Youtube
                 ),
-                StreamerDetailEntity.Social(
+                Social(
                     url = "https://instagram.com",
-                    type = StreamerDetailEntity.Social.Type.Instagram
+                    type = Social.Type.Instagram
                 ),
-                StreamerDetailEntity.Social(
+                Social(
                     url = "https://kick.com",
-                    type = StreamerDetailEntity.Social.Type.Kick
+                    type = Social.Type.Kick
                 ),
             ),
             description = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting (Petit bonus si t'aimes t'enjailler en musique). Je partage également toutes mes activités (Création graphique, montage vidéo), session cinéma sur Discord, ainsi que montage Lego ou activités communautaires. Contact: moontsuki.pro@gmail.com",

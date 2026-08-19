@@ -1,8 +1,8 @@
 package com.strimup.feature.home.domain.usecase
 
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.core.streamer.domain.entity.StreamerEntity
 
 fun interface GetStreamersUsecase {
-    suspend operator fun invoke(filter: FilterEntity): Result<List<StreamerEntity>>
+    suspend operator fun invoke(filter: FilterEntity): Result<List<Streamer>>
 }

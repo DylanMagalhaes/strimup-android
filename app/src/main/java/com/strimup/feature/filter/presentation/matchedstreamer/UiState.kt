@@ -1,6 +1,6 @@
 package com.strimup.feature.filter.presentation.matchedstreamer
 
-import com.strimup.feature.filter.domain.entity.StreamerMatchResult
+import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 
 data class UiState(
     val isLoading: Boolean = false,

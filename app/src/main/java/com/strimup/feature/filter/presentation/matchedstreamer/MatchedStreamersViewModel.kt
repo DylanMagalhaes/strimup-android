@@ -2,8 +2,8 @@ package com.strimup.feature.filter.presentation.matchedstreamer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.feature.filter.domain.entity.FilterCriteria
-import com.strimup.feature.filter.domain.entity.StreamerMatchResult
 import com.strimup.feature.filter.domain.usecase.GetFilterByIdUsecase
 import com.strimup.feature.filter.domain.usecase.GetStreamersByFilterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

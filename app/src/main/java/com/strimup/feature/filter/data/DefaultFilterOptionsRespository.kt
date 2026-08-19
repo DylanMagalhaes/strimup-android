@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.data
 
+import com.strimup.core.streamer.data.StreamerApiService
 import com.strimup.feature.filter.data.mapper.toEntity
 import com.strimup.feature.filter.domain.FilterOptionRepository
 import com.strimup.feature.filter.domain.entity.FilterOptionsEntity

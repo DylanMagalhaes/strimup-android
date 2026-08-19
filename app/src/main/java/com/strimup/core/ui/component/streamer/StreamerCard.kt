@@ -32,8 +32,8 @@ import coil3.compose.AsyncImage
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.core.streamer.domain.entity.StreamerEntity.Social
-import com.strimup.core.streamer.domain.entity.StreamerEntity.Social.Type
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.Social.Type
 import com.strimup.core.streamer.domain.mapper.getIconRes
 
 @Composable fun StreamerCard(

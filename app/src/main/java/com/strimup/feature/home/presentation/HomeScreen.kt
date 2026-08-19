@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.core.streamer.domain.entity.StreamerEntity
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.FilterEntity
@@ -70,7 +70,7 @@ fun HomeScreen(
 private fun HomeContent(
     state: UiState,
     onStreamerClick: (id: String) -> Unit,
-    onStreamerFavoriteClick: (StreamerEntity) -> Unit,
+    onStreamerFavoriteClick: (Streamer) -> Unit,
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
     modifier: Modifier = Modifier,

@@ -29,7 +29,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.streamer.StreamerContent
 
 @Composable
@@ -121,16 +123,16 @@ private fun StreamerDetailContent(
             StreamerHero(
                 modifier = Modifier.fillMaxWidth(),
                 isLive = state.streamer.isLive,
-                imageUrl = state.streamer.imageUrl,
+                imageUrl = state.streamer.imageUrl ?: "",
                 pseudo = state.streamer.userName,
                 tags = state.streamer.tags?.map { it.name },
-                dailyStatus = state.streamer.dailyStatus,
+                dailyStatus = state.streamer.dailyStatus ?: "",
                 followersCount = state.streamer.followersCount,
             )
 
             StreamerContent(
                 modifier = Modifier.fillMaxWidth(),
-                description = state.streamer.bio,
+                description = state.streamer.bio ?: "",
                 socials = state.streamer.socials,
                 onSocialClick = onSocialClick,
             )
@@ -147,25 +149,26 @@ private fun StreamerDetailScreenPreview() {
             onSocialClick = {},
             state = UiState(
                 loading = false,
-                streamer = StreamerDetailEntity(
+                streamer = Streamer(
+                    id = "1",
                     isLive = true,
                     bio = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting. Je partage également toutes mes activités (Création graphique, montage vidéo)...",
                     imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
                     userName = "Squeezie",
                     tags = listOf(
-                        StreamerDetailEntity.Tag(name = "Gaming", category = "dolk"),
-                        StreamerDetailEntity.Tag(name = "Dev", category = "dolk")
+                        TagEntity(id = 1, name = "Gaming", category = "dolk"),
+                        TagEntity(id = 2, name = "Dev", category = "dolk")
                     ),
                     dailyStatus = "Hello la compagnie !",
                     videos = null,
                     socials = listOf(
-                        StreamerDetailEntity.Social(
+                        Social(
                             url = "",
-                            type = StreamerDetailEntity.Social.Type.Twitch
+                            type = Social.Type.Twitch
                         ),
-                        StreamerDetailEntity.Social(
+                        Social(
                             url = "",
-                            type = StreamerDetailEntity.Social.Type.Youtube
+                            type = Social.Type.Youtube
                         )
                     ),
                     followersCount = 10

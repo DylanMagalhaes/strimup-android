@@ -1,15 +1,14 @@
 package com.strimup.feature.search.domain.usecase
 
-
-import com.strimup.feature.search.data.DefaultStreamerRepository
-import com.strimup.feature.search.domain.entity.StreamerEntity
+import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.streamer.domain.repository.StreamerRepository
 import javax.inject.Inject
 
 class DefaultGetStreamerUsecase @Inject constructor(
-    private val repository: DefaultStreamerRepository
+    private val repository: StreamerRepository
 ) : GetStreamersUsecase {
-    override suspend fun invoke(username: String): Result<List<StreamerEntity>> {
-        return repository.getStreamers(username)
+    override suspend fun invoke(username: String): Result<List<Streamer>> {
+        return repository.searchStreamers(username)
     }
 
 }

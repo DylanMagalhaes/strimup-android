@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.feature.search.domain.entity.StreamerEntity
+import com.strimup.core.streamer.domain.entity.Streamer
 
 @Composable
 fun SearchScreen(
@@ -167,9 +167,9 @@ fun SearchScreenPreview() {
                 searchQuery = "",
                 loading = false,
                 streamers = listOf(
-                    StreamerEntity(id = "1", userName = "Squeezie", imageUrl = ""),
-                    StreamerEntity(id = "2", userName = "Gotaga", imageUrl = ""),
-                    StreamerEntity(id = "3", userName = "Kameto", imageUrl = "")
+                    Streamer(id = "1", userName = "Squeezie", imageUrl = ""),
+                    Streamer(id = "2", userName = "Gotaga", imageUrl = ""),
+                    Streamer(id = "3", userName = "Kameto", imageUrl = "")
                 )
             ),
             onSearchInputChange = {}
