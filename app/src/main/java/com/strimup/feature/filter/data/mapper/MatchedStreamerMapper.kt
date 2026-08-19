@@ -1,7 +1,7 @@
 package com.strimup.feature.filter.data.mapper
 
-import com.strimup.common.domain.entity.StreamerEntity
-import com.strimup.common.domain.entity.StreamerEntity.Social
+import com.strimup.core.streamer.domain.entity.StreamerEntity
+import com.strimup.core.streamer.domain.entity.StreamerEntity.Social
 import com.strimup.feature.filter.data.response.MatchedStreamerDto
 
 fun MatchedStreamerDto.toDomain(): StreamerEntity {

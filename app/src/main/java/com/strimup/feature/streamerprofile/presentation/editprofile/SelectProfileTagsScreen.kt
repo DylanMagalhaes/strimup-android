@@ -9,9 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.common.domain.entity.TagEntity
-import com.strimup.common.ui.component.tag.SelectTagsContent
-import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.tag.SelectTagsContent
+import com.strimup.core.ui.theme.StrimupTheme
 
 @Composable
 fun SelectProfileTagsScreen(

@@ -2,7 +2,7 @@ package com.strimup.feature.streamerprofile.domain
 
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.tag.domain.entity.TagEntity
 
 interface StreamerRepository {
     suspend fun getStreamerById(id: String): Result<StreamerProfileEntity>

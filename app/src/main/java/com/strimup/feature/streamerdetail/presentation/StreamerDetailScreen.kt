@@ -26,11 +26,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.common.ui.component.streamer.StreamerHero
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.core.ui.component.streamer.StreamerHero
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
-import com.strimup.common.ui.component.streamer.StreamerContent
+import com.strimup.core.ui.component.streamer.StreamerContent
 
 @Composable
 fun StreamerDetailScreen(

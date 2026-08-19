@@ -11,7 +11,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.strimup.common.navigation.Destination2
+import com.strimup.core.navigation.Destination2
 import com.strimup.feature.filter.presentation.create.CreateFilterScreen
 import com.strimup.feature.filter.presentation.create.CreateFilterViewModel
 import com.strimup.feature.filter.presentation.create.SelectFilterTagsScreen

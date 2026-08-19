@@ -3,7 +3,7 @@ package com.strimup.feature.home.data
 import com.strimup.feature.home.data.mapper.toEntity
 import com.strimup.feature.home.domain.StreamerRepository
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.common.domain.entity.StreamerEntity
+import com.strimup.core.streamer.domain.entity.StreamerEntity
 import javax.inject.Inject
 import okio.IOException
 

@@ -1,6 +1,6 @@
 package com.strimup.presentation
 
-import com.strimup.common.user.domain.entity.UserEntity
+import com.strimup.core.user.domain.entity.UserEntity
 
 data class Uistate(
     val user: UserEntity? = null,

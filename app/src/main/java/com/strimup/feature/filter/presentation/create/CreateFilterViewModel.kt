@@ -2,8 +2,8 @@ package com.strimup.feature.filter.presentation.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.common.domain.entity.TagEntity
-import com.strimup.common.domain.usecase.GetTagsUsecase
+import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.tag.domain.usecase.GetTagsUsecase
 import com.strimup.feature.filter.domain.usecase.CreateFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel

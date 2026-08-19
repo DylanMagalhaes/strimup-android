@@ -1,6 +1,6 @@
 package com.strimup.feature.auth.presentation
 
-import com.strimup.common.user.domain.entity.UserEntity
+import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
 
 data class UiState(

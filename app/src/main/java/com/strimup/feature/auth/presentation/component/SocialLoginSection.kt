@@ -12,10 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.strimup.common.ui.component.button.SocialIconButton
-import com.strimup.common.ui.component.spacer.VerticalSpacer
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.domain.entity.StreamerEntity
+import com.strimup.core.ui.component.button.SocialIconButton
+import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.streamer.domain.entity.StreamerEntity
 
 /*
 @Composable

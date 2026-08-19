@@ -1,6 +1,6 @@
 package com.strimup.feature.filter.data.mapper
 
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.feature.filter.data.local.model.FilterRoomEntity
 import com.strimup.feature.filter.data.local.model.TagRoomModel
 import com.strimup.feature.filter.data.response.FilterJsonDto

@@ -2,8 +2,8 @@ package com.strimup.feature.home.data.mapper
 
 import com.strimup.feature.home.data.response.InLiveStreamersResponse
 import com.strimup.feature.home.data.response.RandomStreamersResponse
-import com.strimup.common.domain.entity.StreamerEntity
-import com.strimup.common.domain.entity.StreamerEntity.Social
+import com.strimup.core.streamer.domain.entity.StreamerEntity
+import com.strimup.core.streamer.domain.entity.StreamerEntity.Social
 
 fun RandomStreamersResponse.StreamerData.toEntity(isFavorite: Boolean): StreamerEntity {
     val profile = this.streamerProfile

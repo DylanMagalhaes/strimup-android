@@ -37,12 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.common.domain.entity.TagEntity
-import com.strimup.common.ui.component.streamer.StreamerHero
-import com.strimup.common.ui.component.button.SocialIconButton
-import com.strimup.common.ui.component.spacer.VerticalSpacer
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.streamer.StreamerHero
+import com.strimup.core.ui.component.button.SocialIconButton
+import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
 

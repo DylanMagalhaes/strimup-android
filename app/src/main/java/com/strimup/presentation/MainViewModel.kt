@@ -2,7 +2,7 @@ package com.strimup.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
+import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

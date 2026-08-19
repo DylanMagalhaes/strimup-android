@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import com.strimup.common.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.StrimupTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

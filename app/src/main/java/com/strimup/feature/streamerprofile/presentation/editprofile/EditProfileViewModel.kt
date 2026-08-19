@@ -2,11 +2,11 @@ package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
+import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.common.domain.entity.TagEntity
-import com.strimup.common.domain.usecase.GetTagsUsecase
+import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.tag.domain.usecase.GetTagsUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUsecase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase

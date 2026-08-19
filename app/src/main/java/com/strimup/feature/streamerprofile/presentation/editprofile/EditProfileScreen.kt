@@ -36,16 +36,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.common.domain.entity.TagEntity
-import com.strimup.common.ui.component.editrow.ProfileEditRow
+import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.editrow.ProfileEditRow
 import com.strimup.feature.streamerprofile.presentation.editprofile.component.EditProfileImageSection
-import com.strimup.common.ui.component.editsBottomSheet.EditTextBottomSheet
-import com.strimup.common.ui.component.editsBottomSheet.MultipleSelectBottomSheet
-import com.strimup.common.ui.component.editsBottomSheet.SingleSelectBottomSheet
+import com.strimup.core.ui.component.editsBottomSheet.EditTextBottomSheet
+import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
+import com.strimup.core.ui.component.editsBottomSheet.SingleSelectBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

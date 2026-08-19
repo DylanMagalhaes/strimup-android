@@ -1,6 +1,6 @@
 package com.strimup.feature.filter.presentation.create
 
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
 

@@ -2,7 +2,7 @@ package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.tag.domain.entity.TagEntity
 
 data class EditProfileUiState(
 

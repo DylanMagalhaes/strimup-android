@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.core.ui.theme.zalandoFontFamily
 
 @Composable
 fun FilterBadge(

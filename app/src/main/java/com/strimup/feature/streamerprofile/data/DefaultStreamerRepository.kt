@@ -8,7 +8,7 @@ import com.strimup.feature.streamerprofile.data.mapper.toRequest
 import com.strimup.feature.streamerprofile.domain.StreamerRepository
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.tag.domain.entity.TagEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
