@@ -1,4 +1,4 @@
-package com.strimup.common.ui.component
+package com.strimup.common.ui.component.streamer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

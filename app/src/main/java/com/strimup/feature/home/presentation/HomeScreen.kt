@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.domain.entity.StreamerEntity
-import com.strimup.common.ui.component.StreamerCard
+import com.strimup.common.ui.component.streamer.StreamerCard
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.presentation.component.HomeTabs

@@ -20,16 +20,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.common.ui.component.StreamerHero
+import com.strimup.common.ui.component.streamer.StreamerHero
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerdetail.domain.entity.StreamerDetailEntity
-import com.strimup.feature.streamerdetail.presentation.component.StreamerContent
+import com.strimup.common.ui.component.streamer.StreamerContent
 
 @Composable
 fun StreamerDetailScreen(
@@ -41,11 +42,17 @@ fun StreamerDetailScreen(
     ),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val uriHandler = LocalUriHandler.current
 
     StreamerDetailScreen(
         modifier = modifier,
         state = state,
-        onNavUp = onNavUp
+        onNavUp = onNavUp,
+        onSocialClick = { socialUrl ->
+            if (socialUrl != null) {
+                uriHandler.openUri(socialUrl)
+            }
+        },
     )
 }
 
@@ -54,6 +61,7 @@ fun StreamerDetailScreen(
 private fun StreamerDetailScreen(
     state: UiState,
     onNavUp: () -> Unit,
+    onSocialClick: (String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -84,6 +92,7 @@ private fun StreamerDetailScreen(
                 .padding(padding)
                 .fillMaxSize(),
             state = state,
+            onSocialClick = onSocialClick
         )
     }
 }
@@ -91,6 +100,7 @@ private fun StreamerDetailScreen(
 @Composable
 private fun StreamerDetailContent(
     state: UiState,
+    onSocialClick: (String?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -122,7 +132,7 @@ private fun StreamerDetailContent(
                 modifier = Modifier.fillMaxWidth(),
                 description = state.streamer.bio,
                 socials = state.streamer.socials,
-                onSocialClick = {},
+                onSocialClick = onSocialClick,
             )
         }
     }
@@ -134,6 +144,7 @@ private fun StreamerDetailScreenPreview() {
     StrimupTheme {
         StreamerDetailScreen(
             onNavUp = {},
+            onSocialClick = {},
             state = UiState(
                 loading = false,
                 streamer = StreamerDetailEntity(

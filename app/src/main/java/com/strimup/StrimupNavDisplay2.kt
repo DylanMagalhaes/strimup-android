@@ -150,7 +150,7 @@ fun StrimupNavDisplay2(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = destination.streamerId,
-                        onNavUp = { backStack.removeLastOrNull() }
+                        onNavUp = { backStack.removeLastOrNull() },
                     )
                 }
 

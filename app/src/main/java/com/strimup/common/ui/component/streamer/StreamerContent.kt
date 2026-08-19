@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerdetail.presentation.component
+package com.strimup.common.ui.component.streamer
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -32,7 +32,7 @@ import com.strimup.feature.streamerdetail.presentation.mapper.getIconRes
 fun StreamerContent(
     description: String,
     socials: List<StreamerDetailEntity.Social>,
-    onSocialClick: (StreamerDetailEntity.Social) -> Unit,
+    onSocialClick: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -55,7 +55,7 @@ fun StreamerContent(
                     socials.forEach { social ->
                         SocialIconButton(
                             iconRes = social.getIconRes(),
-                            onClick = { onSocialClick(social) }
+                            onClick = { onSocialClick(social.url) }
                         )
                     }
                 }

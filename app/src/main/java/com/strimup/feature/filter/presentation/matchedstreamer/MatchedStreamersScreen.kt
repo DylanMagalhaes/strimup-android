@@ -26,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -43,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.common.domain.entity.StreamerEntity
-import com.strimup.common.ui.component.StreamerCard
+import com.strimup.common.ui.component.streamer.StreamerCard
 import com.strimup.common.ui.theme.StrimupTheme
 import com.strimup.common.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.StreamerMatchResult
