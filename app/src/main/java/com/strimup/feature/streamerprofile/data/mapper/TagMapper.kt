@@ -1,7 +1,7 @@
 package com.strimup.feature.streamerprofile.data.mapper
 
 import com.strimup.feature.streamerprofile.data.response.TagResponse
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.tag.domain.entity.TagEntity
 
 fun TagResponse.toEntity(): TagEntity {
     return TagEntity(

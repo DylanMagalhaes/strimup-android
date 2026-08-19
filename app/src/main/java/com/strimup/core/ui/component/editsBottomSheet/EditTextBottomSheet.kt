@@ -1,0 +1,149 @@
+package com.strimup.core.ui.component.editsBottomSheet
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.strimup.core.ui.component.helper.animateDismiss
+import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditTextBottomSheet(
+    title: String,
+    description: String?,
+    currentText: String,
+    onDone: (String) -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState()
+) {
+    val scope = rememberCoroutineScope()
+
+    ModalBottomSheet(
+        modifier = modifier,
+        sheetState = sheetState,
+        onDismissRequest = onDismiss
+    ) {
+        EditBioContent(
+            currentBio = currentText,
+            onDone = { text ->
+                sheetState.animateDismiss(scope) {
+                    onDone(text)
+                    onDismiss()
+                }
+            },
+            title = title,
+            description = description
+        )
+    }
+}
+
+@Composable
+fun EditBioContent(
+    title: String,
+    description: String?,
+    currentBio: String,
+    onDone: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var text by remember { mutableStateOf(currentBio) }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 24.dp)
+            .imePadding()
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontFamily = zalandoFontFamily,
+            fontWeight = FontWeight.Bold
+        )
+
+        if (!description.isNullOrBlank()) {
+            VerticalSpacer(8.dp)
+            Text(
+                text = description,
+                style = MaterialTheme.typography.titleSmall,
+                fontFamily = zalandoFontFamily,
+                fontStyle = FontStyle.Italic,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        VerticalSpacer(16.dp)
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { text = it },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 4,
+            maxLines = 6
+        )
+
+        VerticalSpacer(16.dp)
+
+        OutlinedButton(
+            onClick = { onDone(text) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+            ),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Text(
+                text = "Terminer",
+                fontFamily = zalandoFontFamily,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditBioBottomSheetPreview() {
+    StrimupTheme {
+        Surface {
+            EditBioContent(
+                currentBio = "Joueuse roleplay (Gtarp), multigaming et Just Chatting...",
+                onDone = {},
+                title = "Modifier la bio",
+                description = ""
+            )
+        }
+    }
+}

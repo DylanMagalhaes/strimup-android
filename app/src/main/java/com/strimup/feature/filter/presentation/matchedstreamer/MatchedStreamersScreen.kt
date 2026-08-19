@@ -41,11 +41,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.common.domain.entity.StreamerEntity
-import com.strimup.common.ui.component.streamer.StreamerCard
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.filter.domain.entity.StreamerMatchResult
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.streamer.domain.entity.StreamerMatchResult
+import com.strimup.core.ui.component.streamer.StreamerCard
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 
 @Composable
 fun MatchedStreamersScreen(
@@ -316,15 +317,15 @@ private fun MatchedStreamersScreenPreview() {
                 matchedResult = StreamerMatchResult(
                     total = 230,
                     streamers = listOf(
-                        StreamerEntity(
+                        Streamer(
                             id = "1",
                             userName = "squeezie",
                             imageUrl = "",
                             isLive = true,
                             socials = listOf(
-                                StreamerEntity.Social(
+                                Social(
                                     url = "https://twitch.tv/squeezie",
-                                    type = StreamerEntity.Social.Type.Twitch
+                                    type = Social.Type.Twitch
                                 )
                             ),
                             liveTitle = "Live spécial !",

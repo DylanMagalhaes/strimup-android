@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
-import com.strimup.common.ui.component.button.PrimaryButton
-import com.strimup.common.ui.component.textfield.StrimupTextField
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.core.ui.component.button.PrimaryButton
+import com.strimup.core.ui.component.textfield.StrimupTextField
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.auth.presentation.UiEvent
 import com.strimup.feature.auth.presentation.UiState
 

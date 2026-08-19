@@ -1,6 +1,6 @@
 package com.strimup.feature.filter.domain.entity
 
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.tag.domain.entity.TagEntity
 
 data class FilterEntity(
     val id: String,

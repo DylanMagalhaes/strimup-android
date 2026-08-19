@@ -1,6 +1,6 @@
 package com.strimup.feature.filter.data.mapper
 
-import com.strimup.feature.filter.data.response.FilterOptionsResponse
+import com.strimup.core.streamer.data.response.FilterOptionsResponse
 import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
 
 

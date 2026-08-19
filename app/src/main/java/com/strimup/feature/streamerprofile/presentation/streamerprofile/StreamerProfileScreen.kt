@@ -37,14 +37,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.common.domain.entity.TagEntity
-import com.strimup.common.ui.component.streamer.StreamerHero
-import com.strimup.common.ui.component.button.SocialIconButton
-import com.strimup.common.ui.component.spacer.VerticalSpacer
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.ui.theme.zalandoFontFamily
-import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
-import com.strimup.feature.streamerprofile.presentation.mapper.getIconRes
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.streamer.domain.mapper.getIconRes
+import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.streamer.StreamerHero
+import com.strimup.core.ui.component.button.SocialIconButton
+import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 
 @Composable
 fun StreamerProfileScreen(
@@ -123,11 +124,11 @@ private fun StreamerProfileContent(
             StreamerHero(
                 modifier = Modifier.fillMaxWidth(),
                 isLive = state.streamer.isLive,
-                imageUrl = state.streamer.imageUrl,
+                imageUrl = state.streamer.imageUrl ?: "",
                 pseudo = state.streamer.userName,
                 tags = state.streamer.tags?.map { it.name },
                 dailyStatus = state.streamer.dailyStatus ?: "",
-                followersCount = state.streamer?.followersCount,
+                followersCount = state.streamer.followersCount,
             )
 
             Surface(
@@ -232,7 +233,8 @@ private fun StreamerProfileScreenPreview() {
         StreamerProfileScreen(
             state = UiState(
                 loading = false,
-                streamer = StreamerProfileEntity(
+                streamer = Streamer(
+                    id = "1",
                     isLive = true,
                     bio = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting. Je partage également toutes mes activités (Création graphique, montage vidéo)...",
                     imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
@@ -244,13 +246,13 @@ private fun StreamerProfileScreenPreview() {
                     dailyStatus = "Hello la compagnie !",
                     videos = null,
                     socials = listOf(
-                        StreamerProfileEntity.Social(
+                        Social(
                             url = "",
-                            type = StreamerProfileEntity.Social.Type.Twitch
+                            type = Social.Type.Twitch
                         ),
-                        StreamerProfileEntity.Social(
+                        Social(
                             url = "",
-                            type = StreamerProfileEntity.Social.Type.Youtube
+                            type = Social.Type.Youtube
                         )
                     ),
                     followersCount = 10,

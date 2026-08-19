@@ -1,9 +1,9 @@
 package com.strimup.feature.auth.injection
 
-import com.strimup.common.user.data.DefaultUserRepository
-import com.strimup.common.user.domain.UserRepository
-import com.strimup.common.user.domain.usecase.DefaultGetUserFlowUseCase
-import com.strimup.common.user.domain.usecase.GetUserFlowUseCase
+import com.strimup.core.user.data.DefaultUserRepository
+import com.strimup.core.user.domain.UserRepository
+import com.strimup.core.user.domain.usecase.DefaultGetUserFlowUseCase
+import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.domain.AuthRepository

@@ -34,11 +34,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.strimup.common.ui.component.button.PrimaryButton
-import com.strimup.common.ui.component.spacer.VerticalSpacer
-import com.strimup.common.ui.component.textfield.StrimupTextField
-import com.strimup.common.ui.theme.StrimupTheme
-import com.strimup.common.ui.theme.zalandoFontFamily
+import com.strimup.core.ui.component.button.PrimaryButton
+import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.component.textfield.StrimupTextField
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

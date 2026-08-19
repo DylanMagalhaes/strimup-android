@@ -1,11 +1,12 @@
 package com.strimup.feature.filter.data.mapper
 
-import com.strimup.common.domain.entity.TagEntity
+import com.strimup.core.streamer.data.request.FilterJsonDto
+import com.strimup.core.streamer.data.request.StreamerMatchRequest
+import com.strimup.core.streamer.data.request.TagDto
+import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.feature.filter.data.local.model.FilterRoomEntity
 import com.strimup.feature.filter.data.local.model.TagRoomModel
-import com.strimup.feature.filter.data.response.FilterJsonDto
 import com.strimup.feature.filter.data.response.FilterResponse
-import com.strimup.feature.filter.data.response.TagDto
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 
@@ -48,6 +49,13 @@ fun FilterCriteria.toDto(): FilterJsonDto {
         averageViewers = averageViewers.ifBlank { null },
         streamFrequency = streamFrequency.ifBlank { null },
         status = status.ifBlank { null }
+    )
+}
+
+fun FilterCriteria.toStreamerMatchRequest(page: Int): StreamerMatchRequest {
+    return StreamerMatchRequest(
+        filter = toDto(),
+        page = page,
     )
 }
 
