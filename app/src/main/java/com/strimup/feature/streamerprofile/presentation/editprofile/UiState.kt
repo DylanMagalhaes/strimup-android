@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation.editeprofile
+package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity

@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation.editeprofile
+package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

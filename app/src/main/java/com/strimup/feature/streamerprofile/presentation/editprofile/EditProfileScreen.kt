@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.presentation.editeprofile
+package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -42,7 +42,7 @@ import com.strimup.feature.streamerprofile.domain.entity.StreamerOptionsEntity
 import com.strimup.feature.streamerprofile.domain.entity.StreamerProfileEntity
 import com.strimup.common.domain.entity.TagEntity
 import com.strimup.common.ui.component.editrow.ProfileEditRow
-import com.strimup.feature.streamerprofile.presentation.editeprofile.component.EditProfileImageSection
+import com.strimup.feature.streamerprofile.presentation.editprofile.component.EditProfileImageSection
 import com.strimup.common.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.common.ui.component.editsBottomSheet.MultipleSelectBottomSheet
 import com.strimup.common.ui.component.editsBottomSheet.SingleSelectBottomSheet

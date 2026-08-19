@@ -12,9 +12,9 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.strimup.common.navigation.Destination2
-import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileScreen
-import com.strimup.feature.streamerprofile.presentation.editeprofile.EditProfileViewModel
-import com.strimup.feature.streamerprofile.presentation.editeprofile.SelectProfileTagsScreen
+import com.strimup.feature.streamerprofile.presentation.editprofile.EditProfileScreen
+import com.strimup.feature.streamerprofile.presentation.editprofile.EditProfileViewModel
+import com.strimup.feature.streamerprofile.presentation.editprofile.SelectProfileTagsScreen
 import com.strimup.feature.streamerprofile.presentation.streamerprofile.StreamerProfileScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
