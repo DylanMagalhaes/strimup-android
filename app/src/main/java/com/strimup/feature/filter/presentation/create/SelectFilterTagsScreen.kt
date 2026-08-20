@@ -1,11 +1,14 @@
 package com.strimup.feature.filter.presentation.create
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -14,8 +17,7 @@ import com.strimup.core.ui.component.tag.SelectTagsContent
 import com.strimup.core.ui.theme.StrimupTheme
 
 @Composable
-fun
-        SelectFilterTagsScreen(
+fun SelectFilterTagsScreen(
     viewModel: CreateFilterViewModel,
     onNavUp: () -> Unit,
     modifier: Modifier = Modifier
@@ -23,19 +25,34 @@ fun
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
-        SelectTagsContent(
-            title = "Tags du filtre",
-            description = "Sélectionne les tags recherchés pour cibler des streamers spécifiques.",
-            categories = state.availableCategories,
-            selectedCategory = state.selectedCategory,
-            tags = state.availableTags,
-            selectedTags = state.criteria.tags,
-            maxTags = 5,
-            onCategorySelected = { viewModel.onCategorySelected(it) },
-            onTagClick = { viewModel.onTagSelected(it) },
-            onDone = onNavUp,
-            modifier = Modifier.padding(innerPadding)
-        )
+        when (val uiState = state) {
+            is CreateFilterUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is CreateFilterUiState.Content -> {
+                SelectTagsContent(
+                    title = "Tags du filtre",
+                    description = "Sélectionne les tags recherchés pour cibler des streamers spécifiques.",
+                    categories = uiState.availableCategories,
+                    selectedCategory = uiState.selectedCategory,
+                    tags = uiState.availableTags,
+                    selectedTags = uiState.criteria.tags,
+                    maxTags = 5,
+                    onCategorySelected = viewModel::onCategorySelected,
+                    onTagClick = viewModel::onTagSelected,
+                    onDone = onNavUp,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+        }
     }
 }
 

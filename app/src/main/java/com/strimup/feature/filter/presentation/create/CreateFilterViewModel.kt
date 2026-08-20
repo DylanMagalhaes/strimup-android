@@ -8,11 +8,13 @@ import com.strimup.feature.filter.domain.usecase.CreateFilterUsecase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -23,109 +25,91 @@ class CreateFilterViewModel @Inject constructor(
     private val getTags: GetTagsUsecase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UiState())
-    val state: StateFlow<UiState> = _state.asStateFlow()
+    private val _state = MutableStateFlow<CreateFilterUiState>(CreateFilterUiState.Loading)
+    val state: StateFlow<CreateFilterUiState> = _state.asStateFlow()
 
-    private val _event = MutableSharedFlow<UiEvent>()
-    val events = _event.asSharedFlow()
+    private val _events = Channel<CreateFilterUiEvent>()
+    val events = _events.receiveAsFlow()
 
     private var fetchedTags: List<TagEntity> = emptyList()
 
     init {
-        viewModelScope.launch {
-            loadFilterOptions()
-            loadTags()
-        }
+        loadInitialData()
     }
 
-    fun saveFilter() {
-        val filterName = _state.value.filterName.trim()
-        val criteria = _state.value.criteria
-
-        if (filterName.isBlank()) {
-            _state.update { it.copy(nameError = "Le nom du filtre ne peut pas être vide") }
-            return
-        }
-
+    private fun loadInitialData() {
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isSubmitting = true,
-                    errorMessage = null,
-                    nameError = null
-                )
-            }
+            _state.value = CreateFilterUiState.Loading
 
-            createFilter(filterName, criteria)
-                .onSuccess { result ->
-                    _state.update {
-                        it.copy(
-                            isSubmitting = false,
-                        )
-                    }
-                    _event.emit(UiEvent.Success)
-                }
-                .onFailure { error ->
-                    _state.update {
-                        it.copy(
-                            isSubmitting = false,
-                            errorMessage = error.localizedMessage ?: "Erreur lors de la création du filtre"
-                        )
-                    }
-                }
-        }
-    }
+            val optionsDeferred = async { getFilterOptionsUsecase() }
+            val tagsDeferred = async { getTags() }
 
-    private fun loadFilterOptions() {
-        viewModelScope.launch {
-            getFilterOptionsUsecase()
+            val optionsResult = optionsDeferred.await()
+            val tagsResult = tagsDeferred.await()
+
+            var contentState = CreateFilterUiState.Content()
+
+            optionsResult
                 .onSuccess { options ->
-                    _state.update {
-                        it.copy(availableOptions = options)
-                    }
+                    contentState = contentState.copy(availableOptions = options)
                 }
                 .onFailure { error ->
-                    _state.update {
-                        it.copy(
-                            errorMessage = error.localizedMessage ?: "Impossible de charger les options"
-                        )
-                    }
+                    _events.send(CreateFilterUiEvent.ShowSnackBar(error.localizedMessage ?: "Impossible de charger les options"))
                 }
-        }
-    }
 
-    private fun loadTags() {
-        viewModelScope.launch {
-            getTags()
+            tagsResult
                 .onSuccess { tags ->
                     fetchedTags = tags
                     val categories = tags.distinctBy { it.category }
                     val defaultCategory = categories.firstOrNull()
 
-                    _state.update { currentState ->
-                        currentState.copy(
-                            availableCategories = categories,
-                            selectedCategory = currentState.selectedCategory ?: defaultCategory,
-                            availableTags = if (currentState.selectedCategory != null) {
-                                tags.filter { it.category == currentState.selectedCategory?.category }
-                            } else {
-                                tags.filter { it.category == defaultCategory?.category }
-                            }
-                        )
-                    }
+                    contentState = contentState.copy(
+                        availableCategories = categories,
+                        selectedCategory = defaultCategory,
+                        availableTags = tags.filter { it.category == defaultCategory?.category }
+                    )
                 }
                 .onFailure { error ->
-                    _state.update { currentState ->
-                        currentState.copy(
-                            errorMessage = error.localizedMessage ?: "Impossible de charger les tags"
-                        )
-                    }
+                    _events.send(CreateFilterUiEvent.ShowSnackBar(error.localizedMessage ?: "Impossible de charger les tags"))
+                }
+
+            _state.value = contentState
+        }
+    }
+
+    fun saveFilter() {
+        val currentState = _state.value as? CreateFilterUiState.Content ?: return
+        val filterName = currentState.filterName.trim()
+        val criteria = currentState.criteria
+
+        if (filterName.isBlank()) {
+            updateContentState { it.copy(nameError = "Le nom du filtre ne peut pas être vide") }
+            return
+        }
+
+        viewModelScope.launch {
+            updateContentState {
+                it.copy(
+                    isSubmitting = true,
+                    nameError = null
+                )
+            }
+
+            createFilter(filterName, criteria)
+                .onSuccess {
+                    updateContentState { it.copy(isSubmitting = false) }
+                    _events.send(CreateFilterUiEvent.FilterCreated)
+                }
+                .onFailure { error ->
+                    updateContentState { it.copy(isSubmitting = false) }
+                    val message = error.localizedMessage ?: "Erreur lors de la création du filtre"
+                    _events.send(CreateFilterUiEvent.ShowSnackBar(message))
                 }
         }
     }
 
     fun onTagSelected(tag: TagEntity) {
-        _state.update { currentState ->
+        updateContentState { currentState ->
             val currentTags = currentState.criteria.tags
             val isAlreadySelected = currentTags.any { it.id == tag.id }
 
@@ -138,40 +122,39 @@ class CreateFilterViewModel @Inject constructor(
             }
 
             currentState.copy(
-                criteria = currentState.criteria.copy(
-                    tags = updatedTags
-                )
+                criteria = currentState.criteria.copy(tags = updatedTags)
             )
         }
     }
 
     fun onRangeSelected(range: IntRange) {
-        _state.update { currentState ->
+        updateContentState { currentState ->
             currentState.copy(
-                criteria = currentState.criteria.copy(
-                    ageRange = range
-                )
+                criteria = currentState.criteria.copy(ageRange = range)
             )
         }
     }
 
     fun onCategorySelected(categorySelected: TagEntity) {
-        _state.update { currentState ->
+        updateContentState { currentState ->
             currentState.copy(
                 selectedCategory = categorySelected,
-                availableTags = fetchedTags.filter {
-                    it.category == categorySelected.category
-                }
+                availableTags = fetchedTags.filter { it.category == categorySelected.category }
             )
         }
     }
 
     fun onFilterNameChange(name: String) {
-        _state.update { it.copy(filterName = name) }
+        updateContentState { currentState ->
+            currentState.copy(
+                filterName = name,
+                nameError = if (name.isNotBlank()) null else currentState.nameError
+            )
+        }
     }
 
     fun onPersonalitySelected(newPersonality: String) {
-        _state.update { currentState ->
+        updateContentState { currentState ->
             val currentPersonalities = currentState.criteria.personalities
             val updatedPersonalities = if (currentPersonalities.contains(newPersonality)) {
                 currentPersonalities - newPersonality
@@ -186,56 +169,66 @@ class CreateFilterViewModel @Inject constructor(
     }
 
     fun onAverageViewersSelected(newAverageViewers: String) {
-        _state.update {
-            it.copy(
-                criteria = it.criteria.copy(averageViewers = newAverageViewers)
+        updateContentState { currentState ->
+            currentState.copy(
+                criteria = currentState.criteria.copy(averageViewers = newAverageViewers)
             )
         }
     }
 
     fun onStreamFrequencySelected(newStreamFrequency: String) {
-        _state.update {
-            it.copy(
-                criteria = it.criteria.copy(streamFrequency = newStreamFrequency)
+        updateContentState { currentState ->
+            currentState.copy(
+                criteria = currentState.criteria.copy(streamFrequency = newStreamFrequency)
             )
         }
     }
 
     fun onLanguagesSelected(newLanguage: String) {
-        _state.update { currentState ->
+        updateContentState { currentState ->
             val currentLanguages = currentState.criteria.languages
-            val updateLanguages = if (currentLanguages.contains(newLanguage)) {
+            val updatedLanguages = if (currentLanguages.contains(newLanguage)) {
                 currentLanguages - newLanguage
             } else {
                 currentLanguages + newLanguage
             }
 
             currentState.copy(
-                criteria = currentState.criteria.copy(languages = updateLanguages)
+                criteria = currentState.criteria.copy(languages = updatedLanguages)
             )
         }
     }
 
     fun onPlatformSelected(platform: String) {
-        _state.update { currentState ->
+        updateContentState { currentState ->
             val currentPlatforms = currentState.criteria.platforms
-            val updatePlatforms = if (currentPlatforms.contains(platform)) {
+            val updatedPlatforms = if (currentPlatforms.contains(platform)) {
                 currentPlatforms - platform
             } else {
                 currentPlatforms + platform
             }
 
             currentState.copy(
-                criteria = currentState.criteria.copy(platforms = updatePlatforms)
+                criteria = currentState.criteria.copy(platforms = updatedPlatforms)
             )
         }
     }
 
     fun openEdit(editType: ActiveEditType) {
-        _state.update { it.copy(activeEdit = editType) }
+        updateContentState { it.copy(activeEdit = editType) }
     }
 
     fun dismissEdit() {
-        _state.update { it.copy(activeEdit = null) }
+        updateContentState { it.copy(activeEdit = null) }
+    }
+
+    private fun updateContentState(transform: (CreateFilterUiState.Content) -> CreateFilterUiState.Content) {
+        _state.update { currentState ->
+            if (currentState is CreateFilterUiState.Content) {
+                transform(currentState)
+            } else {
+                currentState
+            }
+        }
     }
 }
