@@ -30,14 +30,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.core.streamer.domain.entity.Streamer
 
 @Composable
 fun SearchScreen(
@@ -51,13 +52,13 @@ fun SearchScreen(
         modifier = modifier,
         state = state,
         onStreamerClick = onStreamerClick,
-        onSearchInputChange = { viewModel.onSearchInputChange(it) }
+        onSearchInputChange = viewModel::onSearchInputChange
     )
 }
 
 @Composable
 private fun SearchScreen(
-    state: UiState,
+    state: SearchUiState,
     onSearchInputChange: (String) -> Unit,
     onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -96,60 +97,58 @@ private fun SearchScreen(
 
 @Composable
 private fun SearchContent(
-    state: UiState,
+    state: SearchUiState,
     onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (state.loading) {
-        Box(modifier = modifier.fillMaxSize()) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+    when (state) {
+        is SearchUiState.Loading -> {
+            Box(modifier = modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
         }
-    } else {
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(
-                items = state.streamers,
-                key = { streamer -> streamer.id }
-            ) { streamer ->
-                Surface(
-                    onClick = { onStreamerClick(streamer.id) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surface
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .size(52.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)),
-                            model = streamer.imageUrl,
-                            contentScale = ContentScale.Crop,
-                            contentDescription = null,
-                        )
-
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            Text(
-                                text = streamer.userName,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = zalandoFontFamily,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
+        is SearchUiState.Empty -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Aucun streamer trouvé pour \"${state.searchQuery}\"",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+        is SearchUiState.Error -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+        is SearchUiState.Content -> {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(
+                    items = state.streamers,
+                    key = { streamer -> streamer.id }
+                ) { streamer ->
+                    StreamerSearchCard(
+                        streamer = streamer,
+                        onClick = { onStreamerClick(streamer.id) }
+                    )
                 }
             }
         }
@@ -157,15 +156,59 @@ private fun SearchContent(
 }
 
 @Composable
+private fun StreamerSearchCard(
+    streamer: Streamer,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(52.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = .1f)),
+                model = streamer.imageUrl,
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+            )
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                Text(
+                    text = streamer.userName,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = zalandoFontFamily,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 @Preview
-fun SearchScreenPreview() {
+private fun SearchScreenPreview() {
     StrimupTheme {
         SearchScreen(
             modifier = Modifier.fillMaxSize(),
             onStreamerClick = {},
-            state = UiState(
-                searchQuery = "",
-                loading = false,
+            state = SearchUiState.Content(
+                searchQuery = "Search",
                 streamers = listOf(
                     Streamer(id = "1", userName = "Squeezie", imageUrl = ""),
                     Streamer(id = "2", userName = "Gotaga", imageUrl = ""),
