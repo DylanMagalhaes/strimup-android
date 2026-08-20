@@ -2,8 +2,9 @@ package com.strimup.feature.filter.presentation.list
 
 import com.strimup.feature.filter.domain.entity.FilterEntity
 
-data class UiState(
-    val isLoading: Boolean = false,
+data class FilterListUiState(
     val filters: List<FilterEntity> = emptyList(),
-    val errorMessage: String? = null
-)
+    val isLoading: Boolean = true,
+) {
+    val isEmpty: Boolean get() = !isLoading && filters.isEmpty()
+}

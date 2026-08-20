@@ -22,13 +22,15 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -38,38 +40,49 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 import com.strimup.feature.filter.presentation.list.component.FilterItemCard
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun FilterListScreen(
-    modifier: Modifier = Modifier,
     onFilterClick: (String) -> Unit,
     onCreateFilterClick: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: FilterListViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.loadFilters()
+        viewModel.events.collectLatest { event ->
+            when (event) {
+                is FilterListUiEvent.ShowSnackBar -> {
+                    snackbarHostState.showSnackbar(message = event.text)
+                }
+            }
+        }
     }
 
     FiltersListContent(
-        modifier = modifier,
         state = state,
+        snackbarHostState = snackbarHostState,
         onFilterClick = onFilterClick,
-        onDeleteFilter = { viewModel.onDeleteButtonClick(it) },
+        onDeleteFilter = viewModel::onDeleteButtonClick,
         onCreateFilterClick = onCreateFilterClick,
+        modifier = modifier
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FiltersListContent(
-    state: UiState,
+    state: FilterListUiState,
+    snackbarHostState: SnackbarHostState,
     onCreateFilterClick: () -> Unit,
     onFilterClick: (String) -> Unit,
     onDeleteFilter: (String) -> Unit,
@@ -94,6 +107,7 @@ private fun FiltersListContent(
                 scrollBehavior = scrollBehavior
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             FloatingActionButton(
@@ -121,7 +135,7 @@ private fun FiltersListContent(
                     )
                 }
 
-                state.filters.isEmpty() -> {
+                state.isEmpty -> {
                     EmptyFilterState(
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -188,10 +202,10 @@ private fun EmptyFilterState(
 
 @Composable
 @Preview(showBackground = true)
-fun FiltersListPreview() {
+private fun FiltersListPreview() {
     StrimupTheme {
         FiltersListContent(
-            state = UiState(
+            state = FilterListUiState(
                 isLoading = false,
                 filters = listOf(
                     FilterEntity(
@@ -208,6 +222,7 @@ fun FiltersListPreview() {
                     )
                 )
             ),
+            snackbarHostState = remember { SnackbarHostState() },
             onCreateFilterClick = {},
             onFilterClick = {},
             onDeleteFilter = {}
