@@ -62,7 +62,6 @@ fun HomeScreen(
                 try {
                     uriHandler.openUri(socialUrl)
                 } catch (_: Exception) {
-                    // Ignorer si l'URL est invalide ou aucun navigateur disponible
                 }
             }
         },
