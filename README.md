@@ -1,3 +1,8 @@
+<p align="right">
+  <a href="README.md"><img src="https://img.shields.io/badge/Language-FR-blue?style=flat-square" alt="Français" /></a>
+  <a href="README.en.md"><img src="https://img.shields.io/badge/Language-EN-lightgrey?style=flat-square" alt="English" /></a>
+</p>
+
 # Strimup — Android Native
 
 > **Découvrez et connectez-vous avec les créateurs de contenu qui vous correspondent.**
