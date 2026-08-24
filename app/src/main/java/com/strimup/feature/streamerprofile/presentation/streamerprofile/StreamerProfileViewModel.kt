@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -17,7 +16,7 @@ class StreamerProfileViewModel @Inject constructor(
     private val getStreamer: GetStreamerUsecase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UiState())
+    private val _state = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val state = _state.asStateFlow()
 
     private var currentUserId: String? = null
@@ -29,7 +28,9 @@ class StreamerProfileViewModel @Inject constructor(
                 if (!id.isNullOrBlank()) {
                     loadStreamer(id)
                 } else {
-                    _state.update { it.copy(loading = false) }
+                    _state.value = ProfileUiState.Error(
+                        errorMessage = "Utilisateur non connecté"
+                    )
                 }
             }
         }
@@ -37,29 +38,24 @@ class StreamerProfileViewModel @Inject constructor(
 
     private fun loadStreamer(id: String) {
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    loading = true
-                )
-            }
             currentUserId = id
 
             getStreamer(id)
                 .onSuccess { streamer ->
-                    _state.update {
-                        it.copy(
-                            streamer = streamer,
-                            loading = false
-                        )
-                    }
+                    _state.value = ProfileUiState.Success(streamer = streamer)
+                }
+                .onFailure { throwable ->
+                    _state.value = ProfileUiState.Error(
+                        errorMessage = throwable.message ?: "Erreur de chargement du profil"
+                    )
                 }
         }
     }
 
     fun refresh() {
         currentUserId?.let { id ->
+            _state.value = ProfileUiState.Loading
             loadStreamer(id)
         }
     }
-
 }
