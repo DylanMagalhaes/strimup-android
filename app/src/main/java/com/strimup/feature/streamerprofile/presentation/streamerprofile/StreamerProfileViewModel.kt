@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -39,7 +40,6 @@ class StreamerProfileViewModel @Inject constructor(
     private fun loadStreamer(id: String) {
         viewModelScope.launch {
             currentUserId = id
-
             getStreamer(id)
                 .onSuccess { streamer ->
                     _state.value = ProfileUiState.Success(streamer = streamer)
