@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,7 +61,6 @@ fun MatchedStreamersScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uriHandler = LocalUriHandler.current
 
-
     LaunchedEffect(filterId) {
         viewModel.initData(filterId)
     }
@@ -75,14 +76,14 @@ fun MatchedStreamersScreen(
         },
         onLoadNextPage = viewModel::loadNextPage,
         onLiveCheckedChange = viewModel::onLiveSwitch,
-        modifier = modifier,
+        modifier = modifier
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatchedStreamersScreen(
-    state: UiState,
+    state: MatchedStreamersUiState,
     onNavUp: () -> Unit,
     onStreamerClick: (String) -> Unit,
     onSocialClick: (String?) -> Unit,
@@ -90,13 +91,18 @@ fun MatchedStreamersScreen(
     onLiveCheckedChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val topBarTitle = when (state) {
+        is MatchedStreamersUiState.Success -> state.filterName ?: "Résultat filtre"
+        else -> "Résultat filtre"
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = state.filterName ?: "Résultat filtre",
+                        text = topBarTitle,
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -111,44 +117,59 @@ fun MatchedStreamersScreen(
                     }
                 }
             )
-        },
+        }
     ) { innerPadding ->
-        MatchedStreamersContent(
-            state = state,
-            onStreamerClick = onStreamerClick,
-            onSocialClick = onSocialClick,
-            onLoadNextPage = onLoadNextPage,
-            onLiveCheckedChange = onLiveCheckedChange,
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-        )
+        ) {
+            when (state) {
+                is MatchedStreamersUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+
+                is MatchedStreamersUiState.Error -> {
+                    ErrorMatchedStreamers(
+                        errorMessage = state.errorMessage,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                is MatchedStreamersUiState.Success -> {
+                    MatchedStreamersContent(
+                        state = state,
+                        onStreamerClick = onStreamerClick,
+                        onSocialClick = onSocialClick,
+                        onLoadNextPage = onLoadNextPage,
+                        onLiveCheckedChange = onLiveCheckedChange,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun MatchedStreamersContent(
-    state: UiState,
+    state: MatchedStreamersUiState.Success,
     onStreamerClick: (String) -> Unit,
     onSocialClick: (String?) -> Unit,
     onLoadNextPage: () -> Unit,
     onLiveCheckedChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val streamers = state.matchedResult?.streamers.orEmpty()
-    val totalCount = state.matchedResult?.total ?: 0
+    val streamers = state.matchedResult.streamers.orEmpty()
+    val totalCount = state.matchedResult.total ?: 0
 
-    if (state.isLoading && streamers.isEmpty()) {
-        Box(modifier = modifier.fillMaxSize()) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    } else if (!state.isLoading && streamers.isEmpty()) {
+    if (streamers.isEmpty()) {
         EmptyMatchedStreamers(modifier = modifier)
     } else {
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item(key = "total_header") {
                 TotalStreamersHeader(
@@ -163,7 +184,6 @@ fun MatchedStreamersContent(
                 items = streamers,
                 key = { _, streamer -> streamer.id }
             ) { index, streamer ->
-
                 if (index >= streamers.size - 1) {
                     LaunchedEffect(index) {
                         onLoadNextPage()
@@ -182,7 +202,7 @@ fun MatchedStreamersContent(
                 )
             }
 
-            if (state.isLoading && streamers.isNotEmpty()) {
+            if (state.isLoadingNextPage) {
                 item(key = "pagination_loader") {
                     Box(
                         modifier = Modifier
@@ -302,6 +322,45 @@ private fun EmptyMatchedStreamers(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun ErrorMatchedStreamers(
+    errorMessage: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ErrorOutline,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Une erreur est survenue",
+                fontFamily = zalandoFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = errorMessage,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun MatchedStreamersScreenPreview() {
     StrimupTheme {
@@ -311,8 +370,8 @@ private fun MatchedStreamersScreenPreview() {
             onStreamerClick = {},
             onSocialClick = {},
             onLoadNextPage = {},
-            state = UiState(
-                isLoading = false,
+            state = MatchedStreamersUiState.Success(
+                filterName = "Mon Filtre",
                 isLiveOnly = true,
                 matchedResult = StreamerMatchResult(
                     total = 230,
@@ -333,6 +392,10 @@ private fun MatchedStreamersScreenPreview() {
                             tags = emptyList()
                         )
                     )
+                ),
+                originalMatchedResult = StreamerMatchResult(
+                    total = 230,
+                    streamers = emptyList()
                 )
             )
         )

@@ -19,10 +19,11 @@ class MatchedStreamerListViewModel @Inject constructor(
     private val getFilterByIdUsecase: GetFilterByIdUsecase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UiState())
+    private val _state = MutableStateFlow<MatchedStreamersUiState>(MatchedStreamersUiState.Loading)
     val state = _state.asStateFlow()
 
     private var filterId: String = ""
+    private var filterName: String? = null
     private var cachedCriteria: FilterCriteria? = null
     private var currentPage = 1
     private var isEndReached = false
@@ -36,27 +37,29 @@ class MatchedStreamerListViewModel @Inject constructor(
 
     private fun loadInitialData() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            _state.value = MatchedStreamersUiState.Loading
 
             getFilterByIdUsecase(filterId)
                 .onSuccess { filter ->
                     cachedCriteria = filter.criteria
-                    _state.update { it.copy(filterName = filter.name) }
-
+                    filterName = filter.name
                     fetchStreamersPage(pageNumber = 1)
                 }
                 .onFailure { throwable ->
-                    _state.update {
-                        it.copy(isLoading = false, errorMessage = throwable.message)
-                    }
+                    _state.value = MatchedStreamersUiState.Error(
+                        errorMessage = throwable.message ?: "Erreur de chargement du filtre"
+                    )
                 }
         }
     }
 
     fun loadNextPage() {
-        if (_state.value.isLoading || isEndReached || cachedCriteria == null) {
+        val currentState = _state.value as? MatchedStreamersUiState.Success ?: return
+
+        if (currentState.isLoadingNextPage || isEndReached || cachedCriteria == null) {
             return
         }
+
         currentPage++
         viewModelScope.launch {
             fetchStreamersPage(pageNumber = currentPage)
@@ -65,20 +68,21 @@ class MatchedStreamerListViewModel @Inject constructor(
 
     fun onLiveSwitch() {
         _state.update { currentState ->
-            val originalResult = currentState.originalMatchedResult ?: return@update currentState
+            if (currentState !is MatchedStreamersUiState.Success) return@update currentState
+
             val newIsLiveOnly = !currentState.isLiveOnly
+            val originalStreamers = currentState.originalMatchedResult.streamers.orEmpty()
 
             val filteredStreamers = if (newIsLiveOnly) {
-                originalResult.streamers?.filter { it.isLive }
+                originalStreamers.filter { it.isLive }
             } else {
-                originalResult.streamers
+                originalStreamers
             }
 
             currentState.copy(
                 isLiveOnly = newIsLiveOnly,
-                matchedResult = originalResult.copy(
-                    streamers = filteredStreamers ?: emptyList(),
-                    total = originalResult.total
+                matchedResult = currentState.matchedResult.copy(
+                    streamers = filteredStreamers
                 )
             )
         }
@@ -87,7 +91,13 @@ class MatchedStreamerListViewModel @Inject constructor(
     private suspend fun fetchStreamersPage(pageNumber: Int) {
         val criteria = cachedCriteria ?: return
 
-        _state.update { it.copy(isLoading = true) }
+        if (pageNumber > 1) {
+            _state.update { currentState ->
+                if (currentState is MatchedStreamersUiState.Success) {
+                    currentState.copy(isLoadingNextPage = true)
+                } else currentState
+            }
+        }
 
         getMatchedStreamers(page = pageNumber, filter = criteria)
             .onSuccess { response ->
@@ -98,33 +108,47 @@ class MatchedStreamerListViewModel @Inject constructor(
                 }
 
                 _state.update { currentState ->
-                    val currentOriginalStreamers = currentState.originalMatchedResult?.streamers.orEmpty()
+                    val previousSuccessState = currentState as? MatchedStreamersUiState.Success
+
+                    val currentOriginalStreamers = previousSuccessState?.originalMatchedResult?.streamers.orEmpty()
                     val updatedOriginalStreamers = if (pageNumber == 1) newStreamers else currentOriginalStreamers + newStreamers
+
+                    val isLiveOnly = previousSuccessState?.isLiveOnly ?: false
+
+                    val displayedStreamers = if (isLiveOnly) {
+                        updatedOriginalStreamers.filter { it.isLive }
+                    } else {
+                        updatedOriginalStreamers
+                    }
 
                     val newOriginalResult = StreamerMatchResult(
                         streamers = updatedOriginalStreamers,
                         total = response.total
                     )
 
-                    val displayedStreamers = if (currentState.isLiveOnly) {
-                        updatedOriginalStreamers.filter { it.isLive }
-                    } else {
-                        updatedOriginalStreamers
-                    }
-
-                    currentState.copy(
-                        isLoading = false,
-                        originalMatchedResult = newOriginalResult,
+                    MatchedStreamersUiState.Success(
+                        filterName = filterName,
                         matchedResult = StreamerMatchResult(
                             streamers = displayedStreamers,
                             total = response.total
-                        )
+                        ),
+                        originalMatchedResult = newOriginalResult,
+                        isLiveOnly = isLiveOnly,
+                        isLoadingNextPage = false
                     )
                 }
             }
             .onFailure { throwable ->
-                _state.update {
-                    it.copy(isLoading = false, errorMessage = throwable.message)
+                _state.update { currentState ->
+                    if (pageNumber == 1) {
+                        MatchedStreamersUiState.Error(
+                            errorMessage = throwable.message ?: "Une erreur est survenue"
+                        )
+                    } else if (currentState is MatchedStreamersUiState.Success) {
+                        currentState.copy(isLoadingNextPage = false)
+                    } else {
+                        currentState
+                    }
                 }
             }
     }
