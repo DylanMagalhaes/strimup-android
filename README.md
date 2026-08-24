@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/badge/Jetpack%20Compose-BOM%202026.05-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" />
   <img src="https://img.shields.io/badge/Architecture-Clean%20Architecture-informational" alt="Clean Architecture" />
   <img src="https://img.shields.io/badge/Pattern-MVVM%20%2F%20MVI-blueviolet" alt="MVVM/MVI" />
+  <img src="https://img.shields.io/badge/Database-Room%203-4285F4?logo=sqlite&logoColor=white" alt="Room 3" />
   <img src="https://img.shields.io/badge/Async-Coroutines%20%7C%20Flow-orange" alt="Coroutines & Flow" />
   <img src="https://img.shields.io/badge/DI-Hilt-2C9C4A" alt="Hilt" />
   <img src="https://img.shields.io/badge/Min%20SDK-27-brightgreen" alt="Min SDK 27" />
