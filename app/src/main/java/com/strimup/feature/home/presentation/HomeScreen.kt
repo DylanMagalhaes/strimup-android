@@ -45,7 +45,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                is UiEvent.ShowSnackBar -> {
+                is HomeUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(event.text)
                 }
             }
@@ -58,39 +58,39 @@ fun HomeScreen(
         onStreamerClick = onStreamerClick,
         onStreamerFavoriteClick = { /* TODO */ },
         onSocialClick = { socialUrl ->
-            if (socialUrl != null) {
-                uriHandler.openUri(socialUrl)
+            if (!socialUrl.isNullOrBlank()) {
+                try {
+                    uriHandler.openUri(socialUrl)
+                } catch (_: Exception) {
+                }
             }
         },
-        onTabClick = { viewModel.onTabClick(it) },
+        onTabClick = viewModel::onTabClick,
     )
 }
 
 @Composable
 private fun HomeContent(
-    state: UiState,
+    state: HomeUiState,
     onStreamerClick: (id: String) -> Unit,
     onStreamerFavoriteClick: (Streamer) -> Unit,
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     Surface(
         modifier = modifier,
-        color = MaterialTheme
-            .colorScheme.background,
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(top = 32.dp)) {
             HomeTabs(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 onButtonClick = onTabClick,
                 currentTab = state.currentTab,
             )
 
-            Crossfade(targetState = state.loading, label = "loading_crossfade") { loading ->
-                if (loading) {
+            Crossfade(targetState = state.isLoading, label = "loading_crossfade") { isLoading ->
+                if (isLoading) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
@@ -114,7 +114,7 @@ private fun HomeContent(
                                 isLive = streamer.isLive,
                                 liveTitle = streamer.liveTitle,
                                 onClick = { onStreamerClick(streamer.id) },
-                                onSocialClick = onSocialClick ,
+                                onSocialClick = onSocialClick,
                             )
                         }
                     }
@@ -130,7 +130,7 @@ private fun HomeScreenPreview() {
     StrimupTheme {
         HomeContent(
             modifier = Modifier.fillMaxSize(),
-            state = UiState(),
+            state = HomeUiState(),
             onStreamerClick = {},
             onStreamerFavoriteClick = {},
             onSocialClick = {},

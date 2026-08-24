@@ -19,9 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -40,11 +38,8 @@ import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.feature.auth.presentation.UiEvent
-import com.strimup.feature.auth.presentation.UiState
 
-@Composable
-fun LoginScreen(
+@Composable fun LoginScreen(
     onNavToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
@@ -52,17 +47,14 @@ fun LoginScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    var emailValue by remember { mutableStateOf("") }
-    var passwordValue by remember { mutableStateOf("") }
-
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
-                is UiEvent.ShowSnackBar -> {
+                is LoginUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(event.text)
                 }
 
-                UiEvent.ShowHomeUi -> {
+                LoginUiEvent.ShowHomeUi -> {
                     onNavToHome()
                 }
             }
@@ -71,25 +63,22 @@ fun LoginScreen(
 
     Scaffold(
         modifier = modifier,
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
-    ) { padding ->
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }) { padding ->
         LoginContent(
             modifier = Modifier.padding(padding),
             state = state,
-            emailValue = emailValue,
-            onEmailChange = { emailValue = it },
-            passwordValue = passwordValue,
-            onPasswordChange = { passwordValue = it },
+            emailValue = state.emailInput,
+            onEmailChange = { viewModel.onEmailChange(it) },
+            passwordValue = state.passwordInput,
+            onPasswordChange = { viewModel.onPasswordChange(it) },
             onForgetPasswordClick = { /* TODO */ },
-            onLoginClick = { viewModel.onLoginButtonClick(emailValue, passwordValue) },
-            onRegisterClick = { /* TODO */ }
-        )
+            onLoginClick = { viewModel.onLoginButtonClick() },
+            onRegisterClick = { /* TODO */ })
     }
 }
 
-@Composable
-fun LoginContent(
-    state: UiState,
+@Composable fun LoginContent(
+    state: LoginUiState,
     emailValue: String,
     onEmailChange: (String) -> Unit,
     passwordValue: String,
@@ -100,8 +89,7 @@ fun LoginContent(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.surface
+        modifier = modifier, color = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
@@ -148,8 +136,7 @@ fun LoginContent(
             )
 
             TextButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onForgetPasswordClick
+                modifier = Modifier.fillMaxWidth(), onClick = onForgetPasswordClick
             ) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
@@ -160,8 +147,7 @@ fun LoginContent(
 
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
-                // Correction de la condition logique ici 👇
-                label = if (state.loading) "Connexion en cours..." else "Se connecter",
+                label = if (state.isLoading) "Connexion en cours..." else "Se connecter",
                 onClick = onLoginClick,
             )
 
@@ -204,9 +190,7 @@ fun LoginContent(
     }
 }
 
-@Preview
-@Composable
-private fun LoginScreenPreview() {
+@Preview @Composable private fun LoginScreenPreview() {
     StrimupTheme {
         LoginContent(
             emailValue = "",
@@ -216,7 +200,7 @@ private fun LoginScreenPreview() {
             onForgetPasswordClick = {},
             onLoginClick = {},
             onRegisterClick = {},
-            state = UiState()
+            state = LoginUiState()
         )
     }
 }

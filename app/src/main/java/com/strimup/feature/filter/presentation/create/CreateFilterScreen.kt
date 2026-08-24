@@ -2,6 +2,7 @@ package com.strimup.feature.filter.presentation.create
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,6 +29,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +47,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
 import com.strimup.feature.filter.presentation.create.component.AgeRangePicker
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,24 +58,24 @@ fun CreateFilterScreen(
     viewModel: CreateFilterViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
+        viewModel.events.collectLatest { event ->
             when (event) {
-                is UiEvent.Success -> onNavUp()
+                is CreateFilterUiEvent.FilterCreated -> onNavUp()
+                is CreateFilterUiEvent.ShowSnackBar -> {
+                    snackbarHostState.showSnackbar(message = event.text)
+                }
             }
         }
     }
 
-    val availableOptions = state.availableOptions ?: FilterOptionsEntity(
-        averageViewers = emptyList(),
-        languages = emptyList(),
-        personalities = emptyList(),
-        streamFrequencies = emptyList()
-    )
+    val contentState = state as? CreateFilterUiState.Content
 
     Scaffold(
         modifier = modifier,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -89,18 +95,22 @@ fun CreateFilterScreen(
                     }
                 },
                 actions = {
-                    if (state.isSubmitting) {
+                    if (contentState?.isSubmitting == true) {
                         CircularProgressIndicator()
                     } else {
                         TextButton(
                             onClick = { viewModel.saveFilter() },
-                            enabled = !state.isSubmitting
+                            enabled = contentState?.isFormValid == true
                         ) {
                             Text(
                                 text = "Enregistrer",
                                 fontFamily = zalandoFontFamily,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = if (contentState?.isFormValid == true) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                }
                             )
                         }
                     }
@@ -108,99 +118,121 @@ fun CreateFilterScreen(
             )
         },
     ) { padding ->
-        CreateFilterContent(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-            state = state,
-            onEditFilterNameClicked = { viewModel.openEdit(ActiveEditType.FilterName) },
-            onEditPersonalitiesClicked = { viewModel.openEdit(ActiveEditType.Personalities) },
-            onEditStreamFrequencyClicked = { viewModel.openEdit(ActiveEditType.StreamFrequency) },
-            onEditAverageViewersClicked = { viewModel.openEdit(ActiveEditType.AverageViewers) },
-            onEditLanguagesClicked = { viewModel.openEdit(ActiveEditType.Languages) },
-            onEditPlatformsClicked = { viewModel.openEdit(ActiveEditType.Platforms) },
-            onEditTagClicked = onEditTagNav,
-            onRangeSelected = { range -> viewModel.onRangeSelected(range) }
-        )
-
-        when (state.activeEdit) {
-            ActiveEditType.FilterName -> {
-                EditTextBottomSheet(
-                    title = "Nom du filtre",
-                    currentText = state.filterName,
-                    onDone = { filterName ->
-                        viewModel.onFilterNameChange(filterName)
-                        viewModel.dismissEdit()
-                    },
-                    onDismiss = { viewModel.dismissEdit() },
-                    description = "Donne un nom clair à ton filtre"
-                )
+        when (val uiState = state) {
+            is CreateFilterUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
 
-            ActiveEditType.Personalities -> {
-                MultipleSelectBottomSheet(
-                    title = "Personnalités",
-                    options = availableOptions.personalities,
-                    selectedOptions = state.criteria.personalities,
-                    onOptionSelected = { personality ->
-                        viewModel.onPersonalitySelected(personality)
-                    },
-                    onDismiss = { viewModel.dismissEdit() }
+            is CreateFilterUiState.Content -> {
+                val availableOptions = uiState.availableOptions ?: FilterOptionsEntity(
+                    averageViewers = emptyList(),
+                    languages = emptyList(),
+                    personalities = emptyList(),
+                    streamFrequencies = emptyList()
                 )
-            }
 
-            ActiveEditType.StreamFrequency -> {
-                SingleSelectBottomSheet(
-                    title = "Fréquence de stream",
-                    options = availableOptions.streamFrequencies,
-                    selectedOption = state.criteria.streamFrequency,
-                    onOptionSelected = { newFrequency ->
-                        viewModel.onStreamFrequencySelected(newFrequency)
-                        viewModel.dismissEdit()
-                    },
-                    onDismiss = { viewModel.dismissEdit() }
+                CreateFilterContent(
+                    modifier = Modifier
+                        .padding(padding)
+                        .fillMaxSize(),
+                    state = uiState,
+                    onEditFilterNameClicked = { viewModel.openEdit(ActiveEditType.FilterName) },
+                    onEditPersonalitiesClicked = { viewModel.openEdit(ActiveEditType.Personalities) },
+                    onEditStreamFrequencyClicked = { viewModel.openEdit(ActiveEditType.StreamFrequency) },
+                    onEditAverageViewersClicked = { viewModel.openEdit(ActiveEditType.AverageViewers) },
+                    onEditLanguagesClicked = { viewModel.openEdit(ActiveEditType.Languages) },
+                    onEditPlatformsClicked = { viewModel.openEdit(ActiveEditType.Platforms) },
+                    onEditTagClicked = onEditTagNav,
+                    onRangeSelected = viewModel::onRangeSelected
                 )
-            }
 
-            ActiveEditType.AverageViewers -> {
-                SingleSelectBottomSheet(
-                    title = "Nombre de viewers moyen",
-                    options = availableOptions.averageViewers,
-                    selectedOption = state.criteria.averageViewers,
-                    onOptionSelected = { newAverage ->
-                        viewModel.onAverageViewersSelected(newAverage)
-                        viewModel.dismissEdit()
-                    },
-                    onDismiss = { viewModel.dismissEdit() }
-                )
-            }
+                when (uiState.activeEdit) {
+                    ActiveEditType.FilterName -> {
+                        EditTextBottomSheet(
+                            title = "Nom du filtre",
+                            currentText = uiState.filterName,
+                            onDone = { filterName ->
+                                viewModel.onFilterNameChange(filterName)
+                                viewModel.dismissEdit()
+                            },
+                            onDismiss = { viewModel.dismissEdit() },
+                            description = "Donne un nom clair à ton filtre"
+                        )
+                    }
 
-            ActiveEditType.Languages -> {
-                MultipleSelectBottomSheet(
-                    title = "Langues",
-                    options = availableOptions.languages,
-                    selectedOptions = state.criteria.languages,
-                    onOptionSelected = { language ->
-                        viewModel.onLanguagesSelected(language)
-                    },
-                    onDismiss = { viewModel.dismissEdit() }
-                )
-            }
+                    ActiveEditType.Personalities -> {
+                        MultipleSelectBottomSheet(
+                            title = "Personnalités",
+                            options = availableOptions.personalities,
+                            selectedOptions = uiState.criteria.personalities,
+                            onOptionSelected = { personality ->
+                                viewModel.onPersonalitySelected(personality)
+                            },
+                            onDismiss = { viewModel.dismissEdit() }
+                        )
+                    }
 
-            ActiveEditType.Platforms -> {
-                MultipleSelectBottomSheet(
-                    title = "Plateformes",
-                    options = availableOptions.platforms,
-                    selectedOptions = state.criteria.platforms,
-                    onOptionSelected = { platform ->
-                        viewModel.onPlatformSelected(platform)
-                    },
-                    onDismiss = { viewModel.dismissEdit() }
-                )
-            }
+                    ActiveEditType.StreamFrequency -> {
+                        SingleSelectBottomSheet(
+                            title = "Fréquence de stream",
+                            options = availableOptions.streamFrequencies,
+                            selectedOption = uiState.criteria.streamFrequency,
+                            onOptionSelected = { newFrequency ->
+                                viewModel.onStreamFrequencySelected(newFrequency)
+                                viewModel.dismissEdit()
+                            },
+                            onDismiss = { viewModel.dismissEdit() }
+                        )
+                    }
 
-            ActiveEditType.AgeRange,
-            null -> {
+                    ActiveEditType.AverageViewers -> {
+                        SingleSelectBottomSheet(
+                            title = "Nombre de viewers moyen",
+                            options = availableOptions.averageViewers,
+                            selectedOption = uiState.criteria.averageViewers,
+                            onOptionSelected = { newAverage ->
+                                viewModel.onAverageViewersSelected(newAverage)
+                                viewModel.dismissEdit()
+                            },
+                            onDismiss = { viewModel.dismissEdit() }
+                        )
+                    }
+
+                    ActiveEditType.Languages -> {
+                        MultipleSelectBottomSheet(
+                            title = "Langues",
+                            options = availableOptions.languages,
+                            selectedOptions = uiState.criteria.languages,
+                            onOptionSelected = { language ->
+                                viewModel.onLanguagesSelected(language)
+                            },
+                            onDismiss = { viewModel.dismissEdit() }
+                        )
+                    }
+
+                    ActiveEditType.Platforms -> {
+                        MultipleSelectBottomSheet(
+                            title = "Plateformes",
+                            options = availableOptions.platforms,
+                            selectedOptions = uiState.criteria.platforms,
+                            onOptionSelected = { platform ->
+                                viewModel.onPlatformSelected(platform)
+                            },
+                            onDismiss = { viewModel.dismissEdit() }
+                        )
+                    }
+
+                    ActiveEditType.AgeRange,
+                    null -> {
+                    }
+                }
             }
         }
     }
@@ -208,7 +240,7 @@ fun CreateFilterScreen(
 
 @Composable
 fun CreateFilterContent(
-    state: UiState,
+    state: CreateFilterUiState.Content,
     onEditFilterNameClicked: () -> Unit,
     onEditPersonalitiesClicked: () -> Unit,
     onEditStreamFrequencyClicked: () -> Unit,
@@ -298,10 +330,10 @@ fun CreateFilterContent(
 
 @Preview(showBackground = true)
 @Composable
-fun CreateFilterScreenPreview() {
+private fun CreateFilterScreenPreview() {
     StrimupTheme {
         CreateFilterContent(
-            state = UiState(
+            state = CreateFilterUiState.Content(
                 filterName = "Mon Filtre LoL",
                 criteria = FilterCriteria(
                     personalities = listOf("Chill", "Tryhard"),

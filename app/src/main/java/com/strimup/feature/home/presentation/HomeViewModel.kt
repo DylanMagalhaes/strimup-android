@@ -18,27 +18,29 @@ import kotlinx.coroutines.launch
 class HomeViewModel @Inject constructor(
     private val getStreamers: GetStreamersUsecase,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(UiState())
+
+    private val _state = MutableStateFlow(HomeUiState())
     val state = _state.asStateFlow()
 
-    private val _events = Channel<UiEvent>()
+    private val _events = Channel<HomeUiEvent>()
     val events = _events.receiveAsFlow()
 
     private var fetchStreamersJob: Job? = null
 
     init {
-        viewModelScope.launch {
-            fetchStreamers(_state.value.currentTab)
-        }
+        fetchStreamers(_state.value.currentTab)
     }
 
     fun onTabClick(filter: FilterEntity) {
+        if (_state.value.currentTab == filter && !_state.value.isLoading) return
+
         fetchStreamersJob?.cancel()
 
         _state.update {
             it.copy(
-                loading = true,
+                isLoading = true,
                 currentTab = filter,
+                errorMessage = null,
             )
         }
 
@@ -47,17 +49,26 @@ class HomeViewModel @Inject constructor(
 
     private fun fetchStreamers(filter: FilterEntity): Job {
         return viewModelScope.launch {
-            getStreamers(filter).onSuccess { streamers ->
-                _state.update {
-                    it.copy(
-                        streamers = streamers,
-                        loading = false,
-                    )
+            getStreamers(filter)
+                .onSuccess { streamers ->
+                    _state.update {
+                        it.copy(
+                            streamers = streamers,
+                            isLoading = false,
+                            errorMessage = null,
+                        )
+                    }
                 }
-            }.onFailure { exception ->
-                _events.send(UiEvent.ShowSnackBar(exception.message ?: ""))
-
-            }
+                .onFailure { exception ->
+                    val message = exception.localizedMessage ?: "Une erreur est survenue"
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = message,
+                        )
+                    }
+                    _events.send(HomeUiEvent.ShowSnackBar(message))
+                }
         }
     }
 }
