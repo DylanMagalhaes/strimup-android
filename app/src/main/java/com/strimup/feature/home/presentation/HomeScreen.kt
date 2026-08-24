@@ -30,6 +30,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.FilterEntity
+import com.strimup.feature.home.presentation.component.HomeBanner
 import com.strimup.feature.home.presentation.component.HomeTabs
 
 @Composable
@@ -83,6 +84,11 @@ private fun HomeContent(
         color = MaterialTheme.colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(top = 32.dp)) {
+
+            HomeBanner(
+                banners = state.bannerItems,
+                onBannerClick = { }
+            )
             HomeTabs(
                 modifier = Modifier.fillMaxWidth(),
                 onButtonClick = onTabClick,
