@@ -5,5 +5,5 @@ import retrofit2.http.GET
 
 interface BannerApiService {
     @GET("api/banners")
-    fun getBannerItems(): List<BannerItemsResponse>
+    suspend fun getBannerItems(): List<BannerItemsResponse>
 }

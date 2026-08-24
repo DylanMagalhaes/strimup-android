@@ -8,8 +8,10 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +52,10 @@ fun StrimupNavDisplay2(
         bottomBar = {
             if (!shouldHideBottomBar) {
                 NavigationBar {
+                    val itemColors = NavigationBarItemDefaults.colors(
+                        indicatorColor = MaterialTheme.colorScheme.primary,
+                    )
+
                     NavigationBarItem(
                         selected = currentDestination is Destination2.Home,
                         onClick = {
@@ -57,7 +63,8 @@ fun StrimupNavDisplay2(
                                 backStack.add(Destination2.Home.StreamerList)
                             }
                         },
-                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") }
+                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                        colors = itemColors
                     )
 
                     NavigationBarItem(
@@ -67,7 +74,8 @@ fun StrimupNavDisplay2(
                                 backStack.add(Destination2.Filter.List)
                             }
                         },
-                        icon = { Icon(Icons.Default.Tune, contentDescription = "Mes filtres") }
+                        icon = { Icon(Icons.Default.Tune, contentDescription = "Mes filtres") },
+                        colors = itemColors
                     )
 
                     NavigationBarItem(
@@ -77,7 +85,8 @@ fun StrimupNavDisplay2(
                                 backStack.add(Destination2.Search)
                             }
                         },
-                        icon = { Icon(Icons.Default.Search, contentDescription = "Rechercher") }
+                        icon = { Icon(Icons.Default.Search, contentDescription = "Rechercher") },
+                        colors = itemColors
                     )
 
                     NavigationBarItem(
@@ -96,7 +105,8 @@ fun StrimupNavDisplay2(
                                 Icons.Default.Person,
                                 contentDescription = if (isLoggedIn) "Profile" else "Connexion"
                             )
-                        }
+                        },
+                        colors = itemColors
                     )
                 }
             }

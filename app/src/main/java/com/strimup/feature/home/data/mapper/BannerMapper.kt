@@ -7,8 +7,11 @@ fun BannerItemsResponse.toDomain(): BannerItemEntity{
     return BannerItemEntity(
         title = this.title,
         description = this.description,
-        imageUrl = this.imageUrl,
+        imageUrl = this.imageUrl ?: "",
         linkUrl = this.linkUrl,
-        position = this.position
+        position = this.position,
+        avatarUrl = this.streamer?.avatarUrl,
+        type = this.type
+
     )
 }

@@ -2,6 +2,7 @@ package com.strimup.feature.home.presentation.component
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -28,8 +29,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +49,7 @@ fun HomeBanner(
     banners: List<BannerItemEntity>,
     modifier: Modifier = Modifier,
     autoScrollDelayMillis: Long = 4000L,
-    onBannerClick: (BannerItemEntity) -> Unit = {}
+    onBannerClick: (String) -> Unit = {}
 ) {
     if (banners.isEmpty()) return
 
@@ -80,7 +83,7 @@ fun HomeBanner(
             val banner = sortedBanners[page]
             BannerCard(
                 banner = banner,
-                onClick = { onBannerClick(banner) }
+                onClick = { onBannerClick(banner.linkUrl) }
             )
         }
 
@@ -138,40 +141,70 @@ private fun BannerCard(
                         Brush.verticalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                Color.Black.copy(alpha = 0.8f)
+                                Color.Black.copy(alpha = 0.85f)
                             ),
                             startY = 100f
                         )
                     )
             )
 
-            Column(
+            Row(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                if (banner.title.isNotBlank()) {
-                    Text(
-                        text = banner.title,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontFamily = zalandoFontFamily,
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold,
-                    )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 12.dp)
+                ) {
+                    if (banner.title.isNotBlank()) {
+                        Text(
+                            text = banner.title,
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontFamily = zalandoFontFamily,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    if (banner.description.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = banner.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontStyle = FontStyle.Italic,
+                            fontFamily = zalandoFontFamily,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
-                if (banner.description.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = banner.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.85f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                if (banner.type == "FEATURED_STREAMER" && !banner.avatarUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = banner.avatarUrl,
+                        contentDescription = "Avatar ${banner.title}",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .graphicsLayer { rotationZ = -6f }
+                            .shadow(elevation = 8.dp, shape = RoundedCornerShape(14.dp))
+                            .clip(RoundedCornerShape(14.dp))
+                            .border(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(14.dp)
+                            )
                     )
                 }
             }
         }
     }
 }
+

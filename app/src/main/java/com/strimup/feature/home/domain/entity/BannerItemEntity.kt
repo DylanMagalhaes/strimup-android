@@ -5,5 +5,7 @@ data class BannerItemEntity(
     val description:String,
     val imageUrl: String,
     val position: Int,
-    val linkUrl: String
+    val linkUrl: String,
+    val avatarUrl: String?,
+    val type: String,
 )

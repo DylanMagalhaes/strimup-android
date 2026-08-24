@@ -41,9 +41,9 @@ import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.tag.domain.entity.TagEntity
-import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -69,22 +69,26 @@ fun StreamerProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StreamerProfileScreen(
-    state: UiState,
+    state: ProfileUiState,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val titleText = when (state) {
+        is ProfileUiState.Success -> state.streamer.userName
+        else -> ""
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = state.streamer?.userName ?: "",
+                        text = titleText,
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
-
                 },
             )
         },
@@ -101,126 +105,143 @@ private fun StreamerProfileScreen(
 
 @Composable
 private fun StreamerProfileContent(
-    state: UiState,
+    state: ProfileUiState,
+    onEditProfileNav: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (state) {
+        is ProfileUiState.Loading -> {
+            Box(modifier = modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+
+        is ProfileUiState.Error -> {
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = state.errorMessage.ifBlank { "Impossible de charger les informations du streamer." })
+            }
+        }
+
+        is ProfileUiState.Success -> {
+            StreamerProfileSuccessContent(
+                streamer = state.streamer,
+                onEditProfileNav = onEditProfileNav,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+private fun StreamerProfileSuccessContent(
+    streamer: Streamer,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
-    if (state.loading) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-    } else if (state.streamer == null) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "Impossible de charger les informations du streamer.")
-        }
-    } else {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        StreamerHero(
+            modifier = Modifier.fillMaxWidth(),
+            isLive = streamer.isLive,
+            imageUrl = streamer.imageUrl ?: "",
+            pseudo = streamer.userName,
+            tags = streamer.tags?.map { it.name },
+            dailyStatus = streamer.dailyStatus ?: "",
+            followersCount = streamer.followersCount,
+        )
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface,
         ) {
-            StreamerHero(
-                modifier = Modifier.fillMaxWidth(),
-                isLive = state.streamer.isLive,
-                imageUrl = state.streamer.imageUrl ?: "",
-                pseudo = state.streamer.userName,
-                tags = state.streamer.tags?.map { it.name },
-                dailyStatus = state.streamer.dailyStatus ?: "",
-                followersCount = state.streamer.followersCount,
-            )
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface,
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth()
             ) {
-                Column(
+                OutlinedButton(
+                    onClick = onEditProfileNav,
                     modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
                 ) {
-                    OutlinedButton(
-                        onClick = onEditProfileNav,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                        shape = RoundedCornerShape(8.dp),
-                        border = BorderStroke(
-                            1.dp,
-                            MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                        ),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Text(
-                            text = "Modifier le profil",
-                            fontFamily = zalandoFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-                    }
-
-                    VerticalSpacer(24.dp)
-
-                    if (state.streamer.socials.isNotEmpty()) {
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            state.streamer.socials.forEach { social ->
-                                SocialIconButton(
-                                    iconRes = social.getIconRes(),
-                                    onClick = { /* TODO : Gérer le clic réseau social */ }
-                                )
-                            }
-                        }
-                        VerticalSpacer(24.dp)
-                    }
-
                     Text(
-                        text = "À propos",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleMedium,
+                        text = "Modifier le profil",
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
                     )
+                }
 
-                    VerticalSpacer(8.dp)
+                VerticalSpacer(24.dp)
 
-                    state.streamer.bio?.let {
-                        Text(
-                            text = it,
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = if (isExpanded) Int.MAX_VALUE else 3,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .animateContentSize()
-                                .clickable { isExpanded = !isExpanded }
-                        )
-                    }
-
-                    state.streamer.bio?.length?.let {
-                        if (it > 120) {
-                            Text(
-                                text = if (isExpanded) "Voir moins" else "Lire la suite",
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .padding(top = 4.dp)
-                                    .clickable { isExpanded = !isExpanded }
+                if (streamer.socials.isNotEmpty()) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        streamer.socials.forEach { social ->
+                            SocialIconButton(
+                                iconRes = social.getIconRes(),
+                                onClick = { /* TODO : Gérer le clic réseau social */ }
                             )
                         }
                     }
-
                     VerticalSpacer(24.dp)
                 }
+
+                Text(
+                    text = "À propos",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = zalandoFontFamily,
+                    fontWeight = FontWeight.Bold,
+                )
+
+                VerticalSpacer(8.dp)
+
+                streamer.bio?.let { bioText ->
+                    Text(
+                        text = bioText,
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .animateContentSize()
+                            .clickable { isExpanded = !isExpanded }
+                    )
+
+                    if (bioText.length > 120) {
+                        Text(
+                            text = if (isExpanded) "Voir moins" else "Lire la suite",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(top = 4.dp)
+                                .clickable { isExpanded = !isExpanded }
+                        )
+                    }
+                }
+
+                VerticalSpacer(24.dp)
             }
         }
     }
@@ -231,8 +252,7 @@ private fun StreamerProfileContent(
 private fun StreamerProfileScreenPreview() {
     StrimupTheme {
         StreamerProfileScreen(
-            state = UiState(
-                loading = false,
+            state = ProfileUiState.Success(
                 streamer = Streamer(
                     id = "1",
                     isLive = true,
