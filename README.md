@@ -18,6 +18,14 @@
 
 ---
 
+## Aperçu de l'application
+
+<p align="center">
+  <img src="docs/screenshots/home.webp" width="30%" alt="Écran d'accueil" />
+  <img src="docs/screenshots/filter.webp" width="30%" alt="Création de filtre" />
+  <img src="docs/screenshots/tags.webp" width="30%" alt="Sélection des tags" />
+</p>
+
 ## Sommaire
 
 - [À propos & Genèse du projet](#a-propos)

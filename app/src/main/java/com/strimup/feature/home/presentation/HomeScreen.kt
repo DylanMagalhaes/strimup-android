@@ -27,9 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.FilterEntity
+import com.strimup.feature.home.presentation.component.HomeBanner
 import com.strimup.feature.home.presentation.component.HomeTabs
 
 @Composable
@@ -66,6 +68,14 @@ fun HomeScreen(
             }
         },
         onTabClick = viewModel::onTabClick,
+        onBannerClick = { url ->
+            if (!url.isNullOrBlank()) {
+                try {
+                    uriHandler.openUri(url)
+                } catch (_: Exception) {
+                }
+            }
+        }
     )
 }
 
@@ -73,6 +83,7 @@ fun HomeScreen(
 private fun HomeContent(
     state: HomeUiState,
     onStreamerClick: (id: String) -> Unit,
+    onBannerClick: (String) -> Unit,
     onStreamerFavoriteClick: (Streamer) -> Unit,
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
@@ -83,6 +94,14 @@ private fun HomeContent(
         color = MaterialTheme.colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(top = 32.dp)) {
+
+            HomeBanner(
+                banners = state.bannerItems,
+                onBannerClick = onBannerClick
+            )
+
+            VerticalSpacer(24.dp)
+
             HomeTabs(
                 modifier = Modifier.fillMaxWidth(),
                 onButtonClick = onTabClick,
@@ -135,6 +154,7 @@ private fun HomeScreenPreview() {
             onStreamerFavoriteClick = {},
             onSocialClick = {},
             onTabClick = {},
+            onBannerClick = {}
         )
     }
 }
