@@ -1,7 +1,8 @@
 package com.strimup.feature.home.injection
 
-import com.strimup.feature.filter.data.FilterApiService
 import com.strimup.feature.home.data.BannerApiService
+import com.strimup.feature.home.data.DefaultBannerRepository
+import com.strimup.feature.home.domain.BannerRepository
 import com.strimup.feature.home.domain.usecase.GetStreamersUsecase
 import com.strimup.feature.home.domain.usecase.GetStreamersWithoutFavoriteUsecase
 import dagger.Binds
@@ -17,6 +18,10 @@ import retrofit2.Retrofit
 interface HomeModule {
     @Binds
     fun bindsStreamerUsecase(impl: GetStreamersWithoutFavoriteUsecase): GetStreamersUsecase
+
+    @Binds
+    @Singleton
+    fun bindBannerRepository(impl: DefaultBannerRepository): BannerRepository
 
     companion object {
         @Provides
