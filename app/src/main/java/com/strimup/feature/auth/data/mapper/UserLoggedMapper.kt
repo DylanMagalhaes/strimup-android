@@ -16,7 +16,7 @@ fun UserLoggedResponse.toEntity(): LoginResultEntity {
             userName = userLogged.userName,
             email = userLogged.email,
             role = UserRole.valueOf(userLogged.role.uppercase()),
-
+            avatarUrl = this.userLogged.avatarUrl
             )
     )
 }
@@ -27,6 +27,7 @@ fun UserEntity.toRoomEntity(): UserRoomEntity {
         userName = this.userName,
         email = this.email,
         role = this.role.name,
+        avatarUrl = this.avatarUrl
     )
 }
 
@@ -36,5 +37,6 @@ fun UserRoomEntity.toDomainEntity(): UserEntity {
         userName = this.userName,
         email = this.email,
         role = UserRole.valueOf(this.role),
+        avatarUrl = this.avatarUrl
     )
 }

@@ -11,6 +11,7 @@ fun UserMeResponse.UserMeData.toEntity(): UserEntity {
         userName = this.userName,
         email = this.email,
         role = UserRole.valueOf(this.role),
+        avatarUrl = this.imageUrl
     )
 }
 
@@ -20,7 +21,7 @@ fun UserEntity.toRoomEntity(): UserRoomEntity {
         userName = this.userName,
         email = this.email,
         role = this.role.name,
-
+        avatarUrl = this.avatarUrl
         )
 }
 
@@ -30,5 +31,6 @@ fun UserRoomEntity.toDomainEntity(): UserEntity {
         userName = this.userName,
         email = this.email,
         role = UserRole.valueOf(this.role),
+        avatarUrl = this.avatarUrl
     )
 }

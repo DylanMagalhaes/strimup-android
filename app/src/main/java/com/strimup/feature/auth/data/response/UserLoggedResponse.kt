@@ -31,5 +31,7 @@ data class UserLoggedResponse(
         val birthDate: String? = null,
         @SerialName("gender")
         val gender: String? = null,
+        @SerialName("avatar_url")
+        val avatarUrl: String? = null,
     )
 }

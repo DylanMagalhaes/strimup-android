@@ -16,8 +16,8 @@ class MainViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(Uistate())
-    val state: StateFlow<Uistate> = _state.asStateFlow()
+    private val _state = MutableStateFlow(UiState())
+    val state: StateFlow<UiState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {

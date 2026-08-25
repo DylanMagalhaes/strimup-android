@@ -11,4 +11,5 @@ data class UserRoomEntity(
     val email: String,
     val userName: String,
     val role: String,
+    val avatarUrl: String?
 )
