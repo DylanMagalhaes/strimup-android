@@ -20,6 +20,7 @@ import kotlinx.serialization.modules.polymorphic
 @Composable
 fun HomeNavigation(
     onStreamerClick: (String) -> Unit,
+    onStreamerBannerClick: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val homeBackStack = rememberNavBackStack(
@@ -46,6 +47,7 @@ fun HomeNavigation(
                 HomeScreen(
                     viewModel = homeViewModel,
                     onStreamerClick = onStreamerClick,
+                    onStreamerBannerClick = onStreamerBannerClick,
                     modifier = Modifier.fillMaxSize()
                 )
             }
