@@ -1,5 +1,6 @@
 package com.strimup.core.network.injection
 
+import com.strimup.BuildConfig
 import com.strimup.core.user.data.UserApiService
 import com.strimup.feature.auth.data.remote.AuthAuthenticator
 import com.strimup.feature.auth.data.remote.AuthInterceptor
@@ -28,7 +29,7 @@ object NetworkModule {
 
         return Retrofit
             .Builder()
-            .baseUrl("https://strimup-back-fd5v.onrender.com/")
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(jsonConfig.asConverterFactory("application/json".toMediaType()))
             .build()
