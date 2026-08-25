@@ -146,6 +146,7 @@ fun StrimupNavDisplay(
                 entry<Destination.Home> {
                     HomeScreen(
                         modifier = Modifier.fillMaxSize(),
+                        onStreamerBannerClick = {},
                         onStreamerClick = { id ->
                             backStack.add(Destination.StreamerDetail(streamerId = id))
                         },

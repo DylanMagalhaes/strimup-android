@@ -6,6 +6,8 @@ data class BannerItemEntity(
     val imageUrl: String,
     val position: Int,
     val linkUrl: String,
-    val avatarUrl: String?,
     val type: String,
+    val avatarUrl: String?,
+    val streamerId: String ?,
 )
+

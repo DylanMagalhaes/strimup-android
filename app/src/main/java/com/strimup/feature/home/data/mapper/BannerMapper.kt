@@ -10,8 +10,9 @@ fun BannerItemsResponse.toDomain(): BannerItemEntity{
         imageUrl = this.imageUrl ?: "",
         linkUrl = this.linkUrl,
         position = this.position,
+        type = this.type,
         avatarUrl = this.streamer?.avatarUrl,
-        type = this.type
+        streamerId = this.streamer?.id
 
     )
 }

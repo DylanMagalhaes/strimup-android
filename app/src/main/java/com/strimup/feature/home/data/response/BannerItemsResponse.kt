@@ -30,6 +30,9 @@ data class BannerItemsResponse(
     @Serializable
     data class Streamer(
 
+        @SerialName("id")
+        val id: String? = null,
+
         @SerialName("avatarUrl")
         val avatarUrl: String? = null,
 

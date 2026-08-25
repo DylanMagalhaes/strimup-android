@@ -49,7 +49,7 @@ fun HomeBanner(
     banners: List<BannerItemEntity>,
     modifier: Modifier = Modifier,
     autoScrollDelayMillis: Long = 4000L,
-    onBannerClick: (String) -> Unit = {}
+    onBannerClick: (BannerItemEntity) -> Unit = {}
 ) {
     if (banners.isEmpty()) return
 
@@ -83,7 +83,7 @@ fun HomeBanner(
             val banner = sortedBanners[page]
             BannerCard(
                 banner = banner,
-                onClick = { onBannerClick(banner.linkUrl) }
+                onClick = { onBannerClick(banner) }
             )
         }
 

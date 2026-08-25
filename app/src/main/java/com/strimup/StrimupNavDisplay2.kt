@@ -125,6 +125,9 @@ fun StrimupNavDisplay2(
                 entry<Destination2.Home.StreamerList> {
                     HomeNavigation(
                         modifier = Modifier.fillMaxSize(),
+                        onStreamerBannerClick = { streamerId ->
+                            backStack.add(Destination2.StreamerDetail(streamerId = streamerId ?: ""))
+                        },
                         onStreamerClick = { streamerId ->
                             backStack.add(Destination2.StreamerDetail(streamerId = streamerId))
                         }

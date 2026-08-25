@@ -30,6 +30,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.presentation.component.HomeBanner
 import com.strimup.feature.home.presentation.component.HomeTabs
@@ -37,6 +38,7 @@ import com.strimup.feature.home.presentation.component.HomeTabs
 @Composable
 fun HomeScreen(
     onStreamerClick: (id: String) -> Unit,
+    onStreamerBannerClick: (String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -68,13 +70,15 @@ fun HomeScreen(
             }
         },
         onTabClick = viewModel::onTabClick,
-        onBannerClick = { url ->
-            if (!url.isNullOrBlank()) {
-                try {
-                    uriHandler.openUri(url)
-                } catch (_: Exception) {
+        onBannerClick = { banner ->
+                if (!banner.linkUrl.isNullOrBlank()) {
+                    try {
+                        val url = if (banner.type == "FEATURED_STREAMER") onStreamerBannerClick(banner.streamerId)   else  uriHandler.openUri(banner.linkUrl)
+
+                    } catch (_: Exception) {
+                    }
                 }
-            }
+
         }
     )
 }
@@ -83,7 +87,7 @@ fun HomeScreen(
 private fun HomeContent(
     state: HomeUiState,
     onStreamerClick: (id: String) -> Unit,
-    onBannerClick: (String) -> Unit,
+    onBannerClick: (BannerItemEntity) -> Unit,
     onStreamerFavoriteClick: (Streamer) -> Unit,
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
