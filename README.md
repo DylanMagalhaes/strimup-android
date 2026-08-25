@@ -68,12 +68,12 @@ L'application suit les principes de la **Clean Architecture**, découpée en tro
 │                 Presentation                  │
 │   Composables · ViewModel · UiState · UiEvent │
 └───────────────────────▲───────────────────────┘
-                         │ expose (StateFlow / Channel)
+                        │ expose (StateFlow / Channel)
 ┌───────────────────────┴───────────────────────┐
 │                     Domain                    │
 │   UseCases · Entities · Repository (interface)│
 └───────────────────────▲───────────────────────┘
-                         │ implémente
+                        │ implémente
 ┌───────────────────────┴───────────────────────┐
 │                     Data                      │
 │ Repository (impl) · Retrofit API · Room · DTO │
