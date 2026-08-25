@@ -1,21 +1,21 @@
-# Fichiers de configuration locale & secrets (NE JAMAIS COMMITER)
+
 local.properties
 .env
 *.keystore
 *.jks
 
-# Fichiers de build Gradle
+
 .gradle/
 build/
 */build/
 app/build/
 
-# Fichiers de configuration IDE (Android Studio / IntelliJ)
+
 .idea/
 *.iml
 .DS_Store
 
-# Fichiers générés
+
 captures/
 .externalNativeBuild/
 .cxx/
