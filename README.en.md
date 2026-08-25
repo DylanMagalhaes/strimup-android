@@ -64,19 +64,19 @@ The application follows **Clean Architecture** principles, split into three inde
 
 ```
 ┌───────────────────────────────────────────────┐
-│                 Presentation                   │
-│   Composables · ViewModel · UiState · UiEvent  │
+│                 Presentation                  │
+│   Composables · ViewModel · UiState · UiEvent │
 └───────────────────────▲───────────────────────┘
-                         │ exposes (StateFlow / Channel)
+                        │ exposes (StateFlow / Channel)
 ┌───────────────────────┴───────────────────────┐
-│                     Domain                     │
-│     UseCases · Entities · Repository (interface)│
+│                     Domain                    │
+│   UseCases · Entities · Repository (interface)│
 └───────────────────────▲───────────────────────┘
-                         │ implements
+                        │ implements
 ┌───────────────────────┴───────────────────────┐
-│                      Data                      │
-│  Repository (impl) · Retrofit API · Room · DTO │
-└─────────────────────────────────────────────────┘
+│                     Data                      │
+│ Repository (impl) · Retrofit API · Room · DTO │
+└───────────────────────────────────────────────┘
 ```
 
 - **`data/`** — Repository implementations, Retrofit services, Room DAOs, DTOs, and mappers (DTO → domain entity).
