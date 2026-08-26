@@ -45,12 +45,10 @@ import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation
 import com.strimup.presentation.MainViewModel
 
-// Extension pour épaissir l'icône quand elle est sélectionnée
 fun Modifier.boldOnSelection(isSelected: Boolean, strokeWidthDp: Float = 0.8f): Modifier = this.then(
     if (isSelected) {
         this.drawWithContent {
             drawContent()
-            // Redessine l'icône légèrement dilatée pour simuler du bold
             drawContent()
         }
     } else Modifier
