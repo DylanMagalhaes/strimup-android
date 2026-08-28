@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerdetail.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -30,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.theme.StrimupTheme
@@ -129,6 +132,7 @@ private fun StreamerDetailContent(
                 modifier = modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 StreamerHero(
                     modifier = Modifier.fillMaxWidth(),
@@ -141,7 +145,7 @@ private fun StreamerDetailContent(
                 )
 
                 StreamerContent(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxSize(),
                     description = state.streamer.bio ?: "",
                     socials = state.streamer.socials,
                     onSocialClick = onSocialClick,

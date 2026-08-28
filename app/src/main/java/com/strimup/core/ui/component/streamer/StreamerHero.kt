@@ -157,7 +157,7 @@ fun StreamerHero(
                 if (!tags.isNullOrEmpty()) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(1.dp),
                         modifier = Modifier.padding(top = 2.dp)
                     ) {
                         tags.forEach { tag ->
@@ -178,7 +178,7 @@ private fun StreamerHeroPreview() {
             isLive = true,
             imageUrl = "https://media.gqmagazine.fr/photos/5e145005ac4b7e00082c6e5f/1:1/w_1125,h_1125,c_limit/thumbnail_squeezy-rap.jpg",
             pseudo = "Squeezie",
-            tags = listOf("Gaming", "Dev", "Cuisine"),
+            tags = listOf("Gaming", "Dev", "Cuisine", "mmorpg", "horreur"),
             followersCount = 10,
             dailyStatus = "En live toute la nuit sur le nouveau DLC !",
         )
