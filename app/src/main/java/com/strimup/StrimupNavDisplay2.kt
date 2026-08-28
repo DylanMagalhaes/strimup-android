@@ -37,6 +37,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination2
+import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
@@ -45,12 +46,10 @@ import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation
 import com.strimup.presentation.MainViewModel
 
-// Extension pour épaissir l'icône quand elle est sélectionnée
 fun Modifier.boldOnSelection(isSelected: Boolean, strokeWidthDp: Float = 0.8f): Modifier = this.then(
     if (isSelected) {
         this.drawWithContent {
             drawContent()
-            // Redessine l'icône légèrement dilatée pour simuler du bold
             drawContent()
         }
     } else Modifier
@@ -237,8 +236,21 @@ fun StrimupNavDisplay2(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = destination.streamerId,
+                        onVideoClick = { videoId, isVertical ->
+                            backStack.add(Destination2.YouTubePlayer(videoId, isVertical))
+                        },
                         onNavUp = { backStack.removeLastOrNull() },
                     )
+                }
+
+                entry<Destination2.YouTubePlayer>{ destination ->
+                    YouTubePlayerScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        videoId = destination.videoId,
+                        isVertical = destination.isVertical,
+                        onBack = { backStack.removeLastOrNull() }
+                    )
+
                 }
 
                 entry<Destination2.Login> {

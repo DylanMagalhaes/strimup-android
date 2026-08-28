@@ -14,7 +14,7 @@ data class Streamer(
     val dailyStatus: String? = null,
     val followersCount: Int? = null,
     val tags: List<TagEntity>? = null,
-    val videos: List<Video>? = null,
+    val videos: List<Video> = emptyList(),
     val averageViewers: String? = null,
     val languages: List<String>? = null,
     val personality: String? = null,
@@ -22,6 +22,7 @@ data class Streamer(
     val streamFrequency: String? = null,
 ) {
     data class Video(
+        val id: String,
         val title: String,
         val description: String,
         val url: String,

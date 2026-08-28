@@ -40,8 +40,9 @@ fun StreamerDto.toEntity(): Streamer {
         tags = profile?.tags?.map {
             TagEntity(id = it.id ?: 0, name = it.name ?: "", category = it.category ?: "")
         },
-        videos = profile?.videos?.map {
+        videos = profile?.videos.orEmpty().map {
             Streamer.Video(
+                id = it.id ?: "",
                 title = it.title ?: "",
                 description = it.description ?: "",
                 url = it.url ?: "",
@@ -78,7 +79,7 @@ fun RandomStreamersResponse.StreamerData.toEntity(isFavorite: Boolean): Streamer
         dailyStatus = profile?.dailyStatus,
         followersCount = null,
         tags = null,
-        videos = null,
+        videos = emptyList(),
         averageViewers = null,
         languages = null,
         personality = null,
@@ -109,7 +110,7 @@ fun InLiveStreamersResponse.StreamerData.toEntity(isFavorite: Boolean): Streamer
         dailyStatus = null,
         followersCount = null,
         tags = null,
-        videos = null,
+        videos = emptyList(),
         averageViewers = null,
         languages = null,
         personality = null,
@@ -131,7 +132,7 @@ fun StreamersResponse.toEntity(): Streamer {
         dailyStatus = null,
         followersCount = null,
         tags = null,
-        videos = null,
+        videos = emptyList(),
         averageViewers = null,
         languages = null,
         personality = null,
@@ -161,7 +162,7 @@ fun MatchedStreamerDto.toDomain(): Streamer {
         dailyStatus = null,
         followersCount = null,
         tags = null,
-        videos = null,
+        videos = emptyList(),
         averageViewers = null,
         languages = null,
         personality = null,

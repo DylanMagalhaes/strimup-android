@@ -264,7 +264,7 @@ private fun StreamerProfileScreenPreview() {
                         TagEntity(name = "Dev", category = "dolk", id = 34)
                     ),
                     dailyStatus = "Hello la compagnie !",
-                    videos = null,
+                    videos = emptyList(),
                     socials = listOf(
                         Social(
                             url = "",

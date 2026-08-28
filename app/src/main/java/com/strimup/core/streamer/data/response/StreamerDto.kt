@@ -71,7 +71,7 @@ data class StreamerDto(
         @SerialName("tags")
         val tags: List<Tag>? = emptyList(),
         @SerialName("videos")
-        val videos: List<Video>? = emptyList()
+        val videos: List<Video> = emptyList()
     )
 
     @Serializable

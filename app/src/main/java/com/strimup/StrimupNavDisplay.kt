@@ -22,6 +22,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.strimup.core.navigation.Destination
+import com.strimup.core.navigation.Destination2
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.filter.presentation.create.CreateFilterScreen
 import com.strimup.feature.filter.presentation.create.CreateFilterViewModel
@@ -167,6 +168,9 @@ fun StrimupNavDisplay(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = it.streamerId,
+                        onVideoClick = { videoId, isVertical ->
+                            backStack.add(Destination2.YouTubePlayer(videoId, isVertical))
+                        },
                         onNavUp = { backStack.removeLastOrNull() },
                     )
                 }

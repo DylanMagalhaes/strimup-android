@@ -5,8 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,13 +30,16 @@ import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 
 @Composable
 fun StreamerContent(
     description: String,
+    videos: List<Streamer.Video>,
     socials: List<Social>,
     onSocialClick: (String?) -> Unit,
+    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -98,6 +105,31 @@ fun StreamerContent(
 
             VerticalSpacer(24.dp)
 
+            if(videos.isNotEmpty()){
+                Text(
+                    text = "Mes vidéos",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = zalandoFontFamily,
+                    fontWeight = FontWeight.Bold,
+                )
+
+                VerticalSpacer(8.dp)
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy( 8. dp),
+
+                ) {
+                    items(videos) { video ->
+                        YouTubeThumbnail(
+                            videoUrl = video.url,
+                            videoName = video.title,
+                            onVideoClick = onVideoClick
+                        )
+                    }
+                }
+            }
+
         }
     }
 }
@@ -127,6 +159,8 @@ private fun StreamerContentPreview() {
             ),
             description = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting (Petit bonus si t'aimes t'enjailler en musique). Je partage également toutes mes activités (Création graphique, montage vidéo), session cinéma sur Discord, ainsi que montage Lego ou activités communautaires. Contact: moontsuki.pro@gmail.com",
             onSocialClick = {},
+            videos = emptyList(),
+            onVideoClick = { _, _ -> }
         )
     }
 }
