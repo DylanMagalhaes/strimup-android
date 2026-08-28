@@ -80,7 +80,10 @@ sealed interface Destination2 : NavKey {
     data class StreamerDetail(val streamerId: String) : Destination2
 
     @Serializable
-    data class YouTubePlayer(val videoId: String) : Destination
+    data class YouTubePlayer(
+        val videoId: String,
+        val isVertical: Boolean = false,
+    ) : Destination
 
     @Serializable
     data object Login : Destination2

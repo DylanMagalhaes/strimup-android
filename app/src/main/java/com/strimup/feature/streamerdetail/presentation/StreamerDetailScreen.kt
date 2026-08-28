@@ -39,7 +39,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 fun StreamerDetailScreen(
     streamerId: String,
     onNavUp: () -> Unit,
-    onVideoClick: (String) -> Unit,
+    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StreamerDetailViewModel = hiltViewModel(),
 ) {
@@ -72,7 +72,7 @@ private fun StreamerDetailScreen(
     state: StreamerDetailUiState,
     onNavUp: () -> Unit,
     onSocialClick: (String?) -> Unit,
-    onVideoClick: (String) -> Unit,
+    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -113,7 +113,7 @@ private fun StreamerDetailScreen(
 private fun StreamerDetailContent(
     state: StreamerDetailUiState,
     onSocialClick: (String?) -> Unit,
-    onVideoClick: (String) -> Unit,
+    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -165,7 +165,7 @@ private fun StreamerDetailScreenPreview() {
     StrimupTheme {
         StreamerDetailScreen(
             onNavUp = {},
-            onVideoClick = {},
+            onVideoClick = { _, _ -> },
             onSocialClick = {},
             state = StreamerDetailUiState.Success(
                 streamer = Streamer(

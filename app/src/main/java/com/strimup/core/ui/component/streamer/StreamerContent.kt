@@ -39,7 +39,7 @@ fun StreamerContent(
     videos: List<Streamer.Video>,
     socials: List<Social>,
     onSocialClick: (String?) -> Unit,
-    onVideoClick: (String) -> Unit,
+    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -124,9 +124,7 @@ fun StreamerContent(
                         YouTubeThumbnail(
                             videoUrl = video.url,
                             videoName = video.title,
-                            onVideoClick = { selectedId ->
-                                onVideoClick(selectedId)
-                            }
+                            onVideoClick = onVideoClick
                         )
                     }
                 }
@@ -162,7 +160,7 @@ private fun StreamerContentPreview() {
             description = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting (Petit bonus si t'aimes t'enjailler en musique). Je partage également toutes mes activités (Création graphique, montage vidéo), session cinéma sur Discord, ainsi que montage Lego ou activités communautaires. Contact: moontsuki.pro@gmail.com",
             onSocialClick = {},
             videos = emptyList(),
-            onVideoClick = {}
+            onVideoClick = { _, _ -> }
         )
     }
 }

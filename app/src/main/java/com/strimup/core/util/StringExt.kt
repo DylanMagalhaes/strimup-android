@@ -6,3 +6,7 @@ private val YOUTUBE_REGEX =
 fun String.extractYouTubeVideoId(): String? {
     return YOUTUBE_REGEX.find(this)?.groupValues?.get(1)
 }
+
+/** `true` si l'URL est celle d'un Short YouTube (vidéo verticale 9:16). */
+fun String.isYouTubeShortUrl(): Boolean =
+    contains("/shorts/", ignoreCase = true)

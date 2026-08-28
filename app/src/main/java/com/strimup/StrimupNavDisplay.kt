@@ -168,7 +168,9 @@ fun StrimupNavDisplay(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = it.streamerId,
-                        onVideoClick = { videoId -> backStack.add(Destination2.YouTubePlayer(videoId)) },
+                        onVideoClick = { videoId, isVertical ->
+                            backStack.add(Destination2.YouTubePlayer(videoId, isVertical))
+                        },
                         onNavUp = { backStack.removeLastOrNull() },
                     )
                 }

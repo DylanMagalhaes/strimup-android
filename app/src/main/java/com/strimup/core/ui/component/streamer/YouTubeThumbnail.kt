@@ -21,15 +21,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.strimup.core.util.extractYouTubeVideoId
+import com.strimup.core.util.isYouTubeShortUrl
 
 @Composable
 fun YouTubeThumbnail(
     videoUrl: String,
     videoName: String,
-    onVideoClick: (String) -> Unit,
+    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val videoId = videoUrl.extractYouTubeVideoId()
+    val isVertical = videoUrl.isYouTubeShortUrl()
     val thumbnailUrl = "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
 
     Box(
@@ -39,7 +41,7 @@ fun YouTubeThumbnail(
             .clip(RoundedCornerShape(16.dp))
             .background(Color.Black)
             .clickable {
-                videoId?.let { onVideoClick(it) }
+                videoId?.let { onVideoClick(it, isVertical) }
             },
         contentAlignment = Alignment.Center
     ) {

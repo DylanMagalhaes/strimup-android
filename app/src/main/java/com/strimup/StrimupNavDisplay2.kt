@@ -236,7 +236,9 @@ fun StrimupNavDisplay2(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = destination.streamerId,
-                        onVideoClick = { videoId -> backStack.add(Destination2.YouTubePlayer(videoId)) },
+                        onVideoClick = { videoId, isVertical ->
+                            backStack.add(Destination2.YouTubePlayer(videoId, isVertical))
+                        },
                         onNavUp = { backStack.removeLastOrNull() },
                     )
                 }
@@ -245,6 +247,7 @@ fun StrimupNavDisplay2(
                     YouTubePlayerScreen(
                         modifier = Modifier.fillMaxSize(),
                         videoId = destination.videoId,
+                        isVertical = destination.isVertical,
                         onBack = { backStack.removeLastOrNull() }
                     )
 
