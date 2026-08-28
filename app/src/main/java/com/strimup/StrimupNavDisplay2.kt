@@ -37,6 +37,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination2
+import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
@@ -235,8 +236,18 @@ fun StrimupNavDisplay2(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = destination.streamerId,
+                        onVideoClick = { videoId -> backStack.add(Destination2.YouTubePlayer(videoId)) },
                         onNavUp = { backStack.removeLastOrNull() },
                     )
+                }
+
+                entry<Destination2.YouTubePlayer>{ destination ->
+                    YouTubePlayerScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        videoId = destination.videoId,
+                        onBack = { backStack.removeLastOrNull() }
+                    )
+
                 }
 
                 entry<Destination2.Login> {

@@ -39,6 +39,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 fun StreamerDetailScreen(
     streamerId: String,
     onNavUp: () -> Unit,
+    onVideoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StreamerDetailViewModel = hiltViewModel(),
 ) {
@@ -61,6 +62,7 @@ fun StreamerDetailScreen(
                 }
             }
         },
+        onVideoClick = onVideoClick,
     )
 }
 
@@ -70,6 +72,7 @@ private fun StreamerDetailScreen(
     state: StreamerDetailUiState,
     onNavUp: () -> Unit,
     onSocialClick: (String?) -> Unit,
+    onVideoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -100,7 +103,8 @@ private fun StreamerDetailScreen(
                 .padding(padding)
                 .fillMaxSize(),
             state = state,
-            onSocialClick = onSocialClick
+            onSocialClick = onSocialClick,
+            onVideoClick = onVideoClick
         )
     }
 }
@@ -109,6 +113,7 @@ private fun StreamerDetailScreen(
 private fun StreamerDetailContent(
     state: StreamerDetailUiState,
     onSocialClick: (String?) -> Unit,
+    onVideoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -140,6 +145,8 @@ private fun StreamerDetailContent(
                     description = state.streamer.bio ?: "",
                     socials = state.streamer.socials,
                     onSocialClick = onSocialClick,
+                    videos = state.streamer.videos,
+                    onVideoClick = onVideoClick,
                 )
             }
         }
@@ -158,6 +165,7 @@ private fun StreamerDetailScreenPreview() {
     StrimupTheme {
         StreamerDetailScreen(
             onNavUp = {},
+            onVideoClick = {},
             onSocialClick = {},
             state = StreamerDetailUiState.Success(
                 streamer = Streamer(
@@ -171,7 +179,7 @@ private fun StreamerDetailScreenPreview() {
                         TagEntity(id = 2, name = "Dev", category = "dolk")
                     ),
                     dailyStatus = "Hello la compagnie !",
-                    videos = null,
+                    videos = emptyList(),
                     socials = listOf(
                         Social(
                             url = "",

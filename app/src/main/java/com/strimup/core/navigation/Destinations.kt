@@ -1,7 +1,6 @@
 package com.strimup.core.navigation
 
 import androidx.navigation3.runtime.NavKey
-import com.strimup.feature.filter.domain.entity.FilterCriteria
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -36,6 +35,7 @@ sealed interface Destination : NavKey {
 
     @Serializable
     data object StreamerEditTags : Destination
+
 }
 
 @Serializable
@@ -78,6 +78,9 @@ sealed interface Destination2 : NavKey {
 
     @Serializable
     data class StreamerDetail(val streamerId: String) : Destination2
+
+    @Serializable
+    data class YouTubePlayer(val videoId: String) : Destination
 
     @Serializable
     data object Login : Destination2
