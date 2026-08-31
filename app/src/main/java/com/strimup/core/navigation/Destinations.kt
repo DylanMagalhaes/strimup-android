@@ -65,6 +65,9 @@ sealed interface Destination2 : NavKey {
     data object Search : Destination2
 
     @Serializable
+    data object Favorite : Destination2
+
+    @Serializable
     sealed interface Profile : Destination2 {
         @Serializable
         data class View(val userId: String?) : Profile
