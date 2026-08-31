@@ -16,7 +16,7 @@ interface FavoriteApiService {
     )
 
     @DELETE("api/favorites/{id}")
-    suspend fun removeFavoriteStreamer(
+    suspend fun deleteFavoriteStreamer(
         @Path("id") id: String
     )
 }

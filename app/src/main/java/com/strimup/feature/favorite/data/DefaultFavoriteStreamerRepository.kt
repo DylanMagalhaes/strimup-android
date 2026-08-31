@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class DefaultFavoriteStreamerRepository @Inject constructor(
     private val service: FavoriteApiService
-): FavoriteStreamerRepository {
+) : FavoriteStreamerRepository {
     override suspend fun getFavoriteStreamers(): Result<List<Streamer>> {
         return runCatching {
             service.getFavoriteStreamers().map {
@@ -17,14 +17,14 @@ class DefaultFavoriteStreamerRepository @Inject constructor(
     }
 
     override suspend fun addFavoriteStreamer(id: String): Result<Unit> {
-         return runCatching {
-             service.addFavoriteStreamer(id)
-         }
+        return runCatching {
+            service.addFavoriteStreamer(id)
+        }
     }
 
-    override suspend fun removeFavoriteStreamer(id: String): Result<Unit> {
+    override suspend fun deleteFavoriteStreamer(id: String): Result<Unit> {
         return runCatching {
-            service.removeFavoriteStreamer(id)
+            service.deleteFavoriteStreamer(id)
         }
     }
 

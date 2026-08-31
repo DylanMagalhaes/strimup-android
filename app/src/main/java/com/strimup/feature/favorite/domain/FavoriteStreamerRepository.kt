@@ -7,5 +7,5 @@ interface FavoriteStreamerRepository {
 
     suspend fun addFavoriteStreamer(id: String): Result<Unit>
 
-    suspend fun removeFavoriteStreamer(id: String): Result<Unit>
+    suspend fun deleteFavoriteStreamer(id: String): Result<Unit>
 }

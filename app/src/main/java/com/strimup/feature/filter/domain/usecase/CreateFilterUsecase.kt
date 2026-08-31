@@ -14,4 +14,5 @@ class CreateFilterUsecase @Inject constructor(
     ): Result<FilterEntity> {
         return repository.createFilter(name, criteria)
     }
+
 }
