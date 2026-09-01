@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.room3.Room
 import com.strimup.core.database.StrimupDatabase
 import com.strimup.core.user.data.local.dao.UserDao
+import com.strimup.feature.favorite.data.local.dao.FavoriteDao
 import com.strimup.feature.filter.data.local.dao.FilterDao
 import dagger.Module
 import dagger.Provides
@@ -29,6 +30,12 @@ import javax.inject.Singleton
     @Singleton
     fun provideUserDao(database: StrimupDatabase): UserDao {
         return database.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteDao(database: StrimupDatabase): FavoriteDao{
+        return database.favoritesDao()
     }
 
     @Provides

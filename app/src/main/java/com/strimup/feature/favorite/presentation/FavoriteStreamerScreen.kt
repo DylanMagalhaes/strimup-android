@@ -95,7 +95,7 @@ private fun FavoriteStreamerScreenContent(
                 onValueChange = onSearchQueryChange,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp),
                 placeholder = { Text("Rechercher un streamer...") },
                 leadingIcon = {
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
