@@ -1,7 +1,7 @@
 package com.strimup.feature.favorite.data
 
-import com.strimup.core.streamer.data.mapper.toEntity
 import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.feature.favorite.data.mapper.toDomain
 import com.strimup.feature.favorite.domain.FavoriteStreamerRepository
 import javax.inject.Inject
 
@@ -11,7 +11,7 @@ class DefaultFavoriteStreamerRepository @Inject constructor(
     override suspend fun getFavoriteStreamers(): Result<List<Streamer>> {
         return runCatching {
             service.getFavoriteStreamers().map {
-                it.toEntity()
+                it.toDomain()
             }
         }
     }

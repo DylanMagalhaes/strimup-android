@@ -1,6 +1,7 @@
 package com.strimup.feature.favorite.data
 
-import com.strimup.core.streamer.data.response.StreamerDto
+
+import com.strimup.feature.favorite.data.response.FavoriteStreamerResponse
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -8,7 +9,7 @@ import retrofit2.http.Path
 
 interface FavoriteApiService {
     @GET("api/favorites")
-    suspend fun getFavoriteStreamers(): List<StreamerDto>
+    suspend fun getFavoriteStreamers(): List<FavoriteStreamerResponse>
 
     @POST("api/favorites/{id}")
     suspend fun addFavoriteStreamer(

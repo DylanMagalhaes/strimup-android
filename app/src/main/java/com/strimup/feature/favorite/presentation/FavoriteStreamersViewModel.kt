@@ -26,26 +26,29 @@ class FavoriteStreamersViewModel @Inject constructor(
         fetchFavoriteStreamers()
     }
 
-     fun fetchFavoriteStreamers() {
-        _state.update {
-            it.copy(
-                isLoading = true
-            )
-        }
-
+    fun fetchFavoriteStreamers() {
+        _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             getFavoriteStreamersUsecase()
                 .onSuccess { streamers ->
                     _state.update {
                         it.copy(
+                            isLoading = false,
                             favoriteStreamers = streamers
                         )
                     }
                 }
                 .onFailure { exception ->
-                    // TODO: create event for snackCase
+                    _state.update { it.copy(isLoading = false) }
                 }
         }
+    }
+
+    fun onSearchQueryChange(query: String){
+        _state.update {
+            it.copy(
+            searchQuery = query,
+        ) }
     }
 
 }

@@ -42,6 +42,7 @@ import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination2
 import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
@@ -276,7 +277,9 @@ fun StrimupNavDisplay2(
                 }
 
                 entry<Destination2.Favorite>{
-
+                    FavoriteStreamerScreen(
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
 
                 entry<Destination2.Login> {
