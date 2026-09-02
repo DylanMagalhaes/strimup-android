@@ -2,8 +2,8 @@ package com.strimup.feature.filter.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.feature.filter.domain.usecase.DeleteFilterUsecase
-import com.strimup.feature.filter.domain.usecase.GetFiltersUsecase
+import com.strimup.feature.filter.domain.usecase.DeleteFilterUseCase
+import com.strimup.feature.filter.domain.usecase.GetFiltersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FilterListViewModel @Inject constructor(
-    private val getFilters: GetFiltersUsecase,
-    private val deleteFilter: DeleteFilterUsecase,
+    private val getFilters: GetFiltersUseCase,
+    private val deleteFilter: DeleteFilterUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FilterListUiState())

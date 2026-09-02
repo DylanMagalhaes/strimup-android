@@ -3,13 +3,12 @@ package com.strimup.feature.filter.presentation.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.core.tag.domain.entity.TagEntity
-import com.strimup.core.tag.domain.usecase.GetTagsUsecase
-import com.strimup.feature.filter.domain.usecase.CreateFilterUsecase
-import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUsecase
+import com.strimup.core.tag.domain.usecase.GetTagsUseCase
+import com.strimup.feature.filter.domain.usecase.CreateFilterUseCase
+import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,9 +19,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CreateFilterViewModel @Inject constructor(
-    private val createFilter: CreateFilterUsecase,
-    private val getFilterOptionsUsecase: GetFilterOptionsUsecase,
-    private val getTags: GetTagsUsecase
+    private val createFilter: CreateFilterUseCase,
+    private val getFilterOptions: GetFilterOptionsUseCase,
+    private val getTags: GetTagsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<CreateFilterUiState>(CreateFilterUiState.Loading)
@@ -41,7 +40,7 @@ class CreateFilterViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = CreateFilterUiState.Loading
 
-            val optionsDeferred = async { getFilterOptionsUsecase() }
+            val optionsDeferred = async { getFilterOptions() }
             val tagsDeferred = async { getTags() }
 
             val optionsResult = optionsDeferred.await()

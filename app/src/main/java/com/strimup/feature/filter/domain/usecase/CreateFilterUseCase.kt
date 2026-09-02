@@ -5,7 +5,7 @@ import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 import javax.inject.Inject
 
-class CreateFilterUsecase @Inject constructor(
+class CreateFilterUseCase @Inject constructor(
     private val repository: FilterRepository
 ) {
     suspend operator fun invoke(

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
-import com.strimup.feature.streamerdetail.domain.usecase.GetStreamerUsecase
+import com.strimup.feature.streamerdetail.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class StreamerDetailViewModel @Inject constructor(
-    private val getStreamer: GetStreamerUsecase,
+    private val getStreamer: GetStreamerUseCase,
     private val addStreamerToFavorites: AddStreamerToFavoritesUseCase,
-    private val removeStreamerFromFavorites: DeleteStreamerFromFavoritesUseCase
+    private val deleteStreamerFromFavorites: DeleteStreamerFromFavoritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<StreamerDetailUiState>(StreamerDetailUiState.Loading)
@@ -61,7 +61,7 @@ class StreamerDetailViewModel @Inject constructor(
 
             viewModelScope.launch {
                 val result = if (previousFavoriteState) {
-                    removeStreamerFromFavorites(currentStreamer.id)
+                    deleteStreamerFromFavorites(currentStreamer.id)
                 } else {
                     addStreamerToFavorites(currentStreamer.id)
                 }

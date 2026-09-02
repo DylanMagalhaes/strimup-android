@@ -4,9 +4,9 @@ import com.strimup.feature.auth.domain.AuthRepository
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import javax.inject.Inject
 
-class DefaultLoginUsecase @Inject constructor(
+class DefaultLoginUseCase @Inject constructor(
     private val repository: AuthRepository
-) : LoginUsecase {
+) : LoginUseCase {
     override suspend fun invoke(email: String, password: String): Result<LoginResultEntity> {
         return repository.login(email, password)
     }

@@ -4,7 +4,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import javax.inject.Inject
 
-class DefaultUpdateProfileUsecase @Inject constructor(
+class DefaultUpdateProfileUseCase @Inject constructor(
     private val repository: StreamerRepository
 ) {
     suspend operator fun invoke(profile: Streamer): Result<Streamer> {

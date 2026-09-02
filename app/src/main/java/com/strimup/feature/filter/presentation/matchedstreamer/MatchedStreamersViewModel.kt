@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.feature.filter.domain.entity.FilterCriteria
-import com.strimup.feature.filter.domain.usecase.GetFilterByIdUsecase
+import com.strimup.feature.filter.domain.usecase.GetFilterByIdUseCase
 import com.strimup.feature.filter.domain.usecase.GetStreamersByFilterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class MatchedStreamerListViewModel @Inject constructor(
     private val getMatchedStreamers: GetStreamersByFilterUseCase,
-    private val getFilterByIdUsecase: GetFilterByIdUsecase
+    private val getFilterById: GetFilterByIdUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<MatchedStreamersUiState>(MatchedStreamersUiState.Loading)
@@ -39,7 +39,7 @@ class MatchedStreamerListViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = MatchedStreamersUiState.Loading
 
-            getFilterByIdUsecase(filterId)
+            getFilterById(filterId)
                 .onSuccess { filter ->
                     cachedCriteria = filter.criteria
                     filterName = filter.name

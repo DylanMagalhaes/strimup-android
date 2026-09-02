@@ -5,9 +5,9 @@ import com.strimup.core.streamer.domain.repository.StreamerRepository
 import com.strimup.feature.home.domain.entity.FilterEntity
 import javax.inject.Inject
 
-class GetStreamersWithoutFavoriteUsecase @Inject constructor(
+class GetStreamersWithoutFavoriteUseCase @Inject constructor(
     private val repository: StreamerRepository,
-) : GetStreamersUsecase {
+) : GetStreamersUseCase {
     override suspend fun invoke(filter: FilterEntity): Result<List<Streamer>> {
         return when (filter) {
             FilterEntity.Discovery -> repository.getRandomStreamers(emptyList())

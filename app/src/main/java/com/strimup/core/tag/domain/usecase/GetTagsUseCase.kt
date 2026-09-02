@@ -4,7 +4,7 @@ import com.strimup.core.tag.data.repository.DefaultTagRepository
 import com.strimup.core.tag.domain.entity.TagEntity
 import javax.inject.Inject
 
-class GetTagsUsecase @Inject constructor(
+class GetTagsUseCase @Inject constructor(
     private val repository: DefaultTagRepository
 ) {
     suspend operator fun invoke(): Result<List<TagEntity>> {
