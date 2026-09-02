@@ -2,9 +2,9 @@ package com.strimup.feature.favorite.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.feature.favorite.domain.usecase.AddFavoriteStreamerUsecase
-import com.strimup.feature.favorite.domain.usecase.DeleteFavoriteStreamerUsecase
-import com.strimup.feature.favorite.domain.usecase.GetFavoriteStreamersUsecase
+import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
+import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
+import com.strimup.core.favorite.domain.usecase.GetFavoriteStreamersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FavoriteStreamersViewModel @Inject constructor(
-    private val getFavoriteStreamersUsecase: GetFavoriteStreamersUsecase,
-    private val addFavoriteStreamerUsecase: AddFavoriteStreamerUsecase,
-    private val deleteFavoriteStreamerUsecase: DeleteFavoriteStreamerUsecase
+    private val getFavoriteStreamersUseCase: GetFavoriteStreamersUseCase,
+    private val addStreamerToFavoritesUseCase: AddStreamerToFavoritesUseCase,
+    private val deleteStreamerFromFavoritesUseCase: DeleteStreamerFromFavoritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FavoriteStreamersUiState())
@@ -29,7 +29,7 @@ class FavoriteStreamersViewModel @Inject constructor(
     fun fetchFavoriteStreamers() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            getFavoriteStreamersUsecase()
+            getFavoriteStreamersUseCase()
                 .onSuccess { streamers ->
                     _state.update {
                         it.copy(

@@ -1,7 +1,7 @@
-package com.strimup.feature.favorite.data
+package com.strimup.core.favorite.data
 
 
-import com.strimup.feature.favorite.data.response.FavoriteStreamerResponse
+import com.strimup.core.favorite.data.response.FavoriteStreamerResponse
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST

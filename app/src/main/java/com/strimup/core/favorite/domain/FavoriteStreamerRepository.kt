@@ -1,4 +1,4 @@
-package com.strimup.feature.favorite.domain
+package com.strimup.core.favorite.domain
 
 import com.strimup.core.streamer.domain.entity.Streamer
 

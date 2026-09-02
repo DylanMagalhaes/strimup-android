@@ -1,8 +1,8 @@
-package com.strimup.feature.favorite.data.mapper
+package com.strimup.core.favorite.data.mapper
 
 import com.strimup.core.streamer.domain.entity.Streamer
-import com.strimup.feature.favorite.data.local.model.FavoriteRoomEntity
-import com.strimup.feature.favorite.data.response.FavoriteStreamerResponse
+import com.strimup.core.favorite.data.local.model.FavoriteRoomEntity
+import com.strimup.core.favorite.data.response.FavoriteStreamerResponse
 
 fun FavoriteStreamerResponse.toDomain(): Streamer {
     return Streamer(

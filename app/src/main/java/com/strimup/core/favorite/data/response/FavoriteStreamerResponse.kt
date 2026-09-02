@@ -1,4 +1,4 @@
-package com.strimup.feature.favorite.data.response
+package com.strimup.core.favorite.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

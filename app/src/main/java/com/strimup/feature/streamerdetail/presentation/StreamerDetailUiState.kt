@@ -6,6 +6,7 @@ sealed interface StreamerDetailUiState {
 
     data class Success(
         val streamer: Streamer,
+        val isFavorite: Boolean
     ) : StreamerDetailUiState
 
     data class Error(

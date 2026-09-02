@@ -41,11 +41,6 @@ class DefaultStreamerRepository @Inject constructor(
         }
     }
 
-    override suspend fun getFavoriteStreamerIds(): List<String> {
-        return service.getFavoriteStreamers()
-            .map { requireNotNull(it.streamerId) }
-    }
-
     override suspend fun searchStreamers(userName: String): Result<List<Streamer>> {
         return runCatching {
             service.searchStreamers(userName).map { it.toEntity() }

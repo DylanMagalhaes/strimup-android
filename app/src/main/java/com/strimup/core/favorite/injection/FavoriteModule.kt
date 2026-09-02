@@ -1,8 +1,8 @@
-package com.strimup.feature.favorite.injection
+package com.strimup.core.favorite.injection
 
-import com.strimup.feature.favorite.data.DefaultFavoriteStreamerRepository
-import com.strimup.feature.favorite.data.FavoriteApiService
-import com.strimup.feature.favorite.domain.FavoriteStreamerRepository
+import com.strimup.core.favorite.data.DefaultFavoriteStreamerRepository
+import com.strimup.core.favorite.data.FavoriteApiService
+import com.strimup.core.favorite.domain.FavoriteStreamerRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

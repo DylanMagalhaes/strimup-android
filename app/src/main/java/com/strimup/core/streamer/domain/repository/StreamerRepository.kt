@@ -10,7 +10,7 @@ interface StreamerRepository {
 
     suspend fun getLiveStreamers(favoriteStreamerIds: List<String>): Result<List<Streamer>>
 
-    suspend fun getFavoriteStreamerIds(): List<String>
+//    suspend fun getFavoriteStreamerIds(): List<String>
 
     suspend fun searchStreamers(userName: String): Result<List<Streamer>>
 

@@ -14,8 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,12 +42,15 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 
 @Composable
 fun StreamerHero(
+    isProfile: Boolean,
     isLive: Boolean,
     imageUrl: String,
     pseudo: String,
     tags: List<String>?,
     dailyStatus: String,
     followersCount: Int?,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -107,7 +114,7 @@ fun StreamerHero(
                         horizontalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Favorite,
+                            imageVector = Icons.Default.Bookmark,
                             contentDescription = null,
                             modifier = Modifier.size(12.dp),
                             tint = MaterialTheme.colorScheme.primary
@@ -126,23 +133,43 @@ fun StreamerHero(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Text(
-                    text = buildAnnotatedString {
-                        append(pseudo)
-                        withStyle(
-                            style = MaterialTheme.typography.titleLarge.toSpanStyle().copy(
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(pseudo)
+                            withStyle(
+                                style = MaterialTheme.typography.titleLarge.toSpanStyle().copy(
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                append(".")
+                            }
+                        },
+                        modifier = Modifier.weight(1f, fill = false),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontFamily = zalandoFontFamily,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    if(!isProfile){
+                        IconButton(
+                            onClick = onFavoriteClick,
+                            modifier = Modifier.size(32.dp)
                         ) {
-                            append(".")
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
+                                contentDescription = if (isFavorite) "Retirer des favoris" else "Ajouter aux favoris",
+                                tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
-                    },
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontFamily = zalandoFontFamily,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                )
+                    }
+                }
 
                 if (dailyStatus.isNotEmpty()) {
                     Text(
@@ -181,6 +208,9 @@ private fun StreamerHeroPreview() {
             tags = listOf("Gaming", "Dev", "Cuisine", "mmorpg", "horreur"),
             followersCount = 10,
             dailyStatus = "En live toute la nuit sur le nouveau DLC !",
+            isFavorite = false,
+            onFavoriteClick = {},
+            isProfile = false
         )
     }
 }

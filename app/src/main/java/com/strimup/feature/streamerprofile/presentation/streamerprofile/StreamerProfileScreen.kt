@@ -155,6 +155,9 @@ private fun StreamerProfileSuccessContent(
             tags = streamer.tags?.map { it.name },
             dailyStatus = streamer.dailyStatus ?: "",
             followersCount = streamer.followersCount,
+            isFavorite = false,
+            onFavoriteClick = {},
+            isProfile = true
         )
 
         Surface(

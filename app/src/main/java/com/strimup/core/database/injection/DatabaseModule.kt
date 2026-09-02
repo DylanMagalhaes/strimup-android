@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.room3.Room
 import com.strimup.core.database.StrimupDatabase
 import com.strimup.core.user.data.local.dao.UserDao
-import com.strimup.feature.favorite.data.local.dao.FavoriteDao
+import com.strimup.core.favorite.data.local.dao.FavoriteDao
 import com.strimup.feature.filter.data.local.dao.FilterDao
 import dagger.Module
 import dagger.Provides
