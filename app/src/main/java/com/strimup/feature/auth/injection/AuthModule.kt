@@ -1,9 +1,5 @@
 package com.strimup.feature.auth.injection
 
-import com.strimup.core.user.data.DefaultUserRepository
-import com.strimup.core.user.domain.UserRepository
-import com.strimup.core.user.domain.usecase.DefaultGetUserFlowUseCase
-import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.domain.AuthRepository
@@ -13,9 +9,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import jakarta.inject.Singleton
+import javax.inject.Singleton
 import retrofit2.Retrofit
 
 @Module
@@ -30,18 +25,13 @@ object AuthNetworkModule {
 }
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 interface AuthDomainModule {
 
     @Binds
+    @Singleton
     fun bindsAuthRepository(impl: DefaultAuthRepository): AuthRepository
 
     @Binds
-    fun bindsUserRepository(impl: DefaultUserRepository): UserRepository
-
-    @Binds
     fun bindsLoginUseCase(impl: DefaultLoginUseCase): LoginUseCase
-
-    @Binds
-    fun bindsGetAuthStateUseCase(impl: DefaultGetUserFlowUseCase): GetUserFlowUseCase
 }
