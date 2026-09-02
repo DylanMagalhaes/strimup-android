@@ -11,7 +11,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.strimup.core.navigation.Destination2
+import com.strimup.core.navigation.Destination
 import com.strimup.feature.search.presentation.SearchScreen
 import com.strimup.feature.search.presentation.SearchViewModel
 import kotlinx.serialization.modules.SerializersModule
@@ -26,11 +26,11 @@ fun SearchNavigation(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
-                    subclass(Destination2.Search::class, Destination2.Search.serializer())
+                    subclass(Destination.Search::class, Destination.Search.serializer())
                 }
             }
         },
-        Destination2.Search
+        Destination.Search
     )
 
     NavDisplay(
@@ -41,7 +41,7 @@ fun SearchNavigation(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Destination2.Search> {
+            entry<Destination.Search> {
                 val searchViewModel: SearchViewModel = hiltViewModel()
                 SearchScreen(
                     viewModel = searchViewModel,

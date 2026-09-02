@@ -11,7 +11,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.strimup.core.navigation.Destination2
+import com.strimup.core.navigation.Destination
 import com.strimup.feature.filter.presentation.create.CreateFilterScreen
 import com.strimup.feature.filter.presentation.create.CreateFilterViewModel
 import com.strimup.feature.filter.presentation.create.SelectFilterTagsScreen
@@ -29,23 +29,23 @@ fun FilterNavigation(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
-                    subclass(Destination2.Filter.List::class, Destination2.Filter.List.serializer())
+                    subclass(Destination.Filter.List::class, Destination.Filter.List.serializer())
                     subclass(
-                        Destination2.Filter.Create::class,
-                        Destination2.Filter.Create.serializer()
+                        Destination.Filter.Create::class,
+                        Destination.Filter.Create.serializer()
                     )
                     subclass(
-                        Destination2.Filter.SelectTags::class,
-                        Destination2.Filter.SelectTags.serializer()
+                        Destination.Filter.SelectTags::class,
+                        Destination.Filter.SelectTags.serializer()
                     )
                     subclass(
-                        Destination2.Filter.Result::class,
-                        Destination2.Filter.Result.serializer()
+                        Destination.Filter.Result::class,
+                        Destination.Filter.Result.serializer()
                     )
                 }
             }
         },
-        Destination2.Filter.List
+        Destination.Filter.List
     )
 
     val createFilterViewModel: CreateFilterViewModel = hiltViewModel()
@@ -58,19 +58,19 @@ fun FilterNavigation(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Destination2.Filter.List> {
+            entry<Destination.Filter.List> {
                 FilterListScreen(
                     modifier = Modifier.fillMaxSize(),
                     onCreateFilterClick = {
-                        filterBackStack.add(Destination2.Filter.Create)
+                        filterBackStack.add(Destination.Filter.Create)
                     },
                     onFilterClick = { filterId ->
-                        filterBackStack.add(Destination2.Filter.Result(filterId))
+                        filterBackStack.add(Destination.Filter.Result(filterId))
                     }
                 )
             }
 
-            entry<Destination2.Filter.Result> { destination ->
+            entry<Destination.Filter.Result> { destination ->
                 MatchedStreamersScreen(
                     onNavUp = { filterBackStack.removeLastOrNull() },
                     onStreamerClick = onStreamerClick,
@@ -78,18 +78,18 @@ fun FilterNavigation(
                 )
             }
 
-            entry<Destination2.Filter.Create> {
+            entry<Destination.Filter.Create> {
                 CreateFilterScreen(
                     viewModel = createFilterViewModel,
                     modifier = Modifier.fillMaxSize(),
                     onNavUp = { filterBackStack.removeLastOrNull() },
                     onEditTagNav = {
-                        filterBackStack.add(Destination2.Filter.SelectTags)
+                        filterBackStack.add(Destination.Filter.SelectTags)
                     }
                 )
             }
 
-            entry<Destination2.Filter.SelectTags> {
+            entry<Destination.Filter.SelectTags> {
                 SelectFilterTagsScreen(
                     viewModel = createFilterViewModel,
                     modifier = Modifier.fillMaxSize(),

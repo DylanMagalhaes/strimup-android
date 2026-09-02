@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             StrimupTheme {
-                StrimupNavDisplay2(modifier = Modifier.fillMaxSize())
+                StrimupNavDisplay(modifier = Modifier.fillMaxSize())
             }
         }
     }
