@@ -4,10 +4,10 @@ import com.strimup.core.favorite.domain.FavoriteStreamerRepository
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import javax.inject.Inject
 
-class DefaultGetStreamerUsecase @Inject constructor(
+class DefaultGetStreamerUseCase @Inject constructor(
     private val streamerRepository: StreamerRepository,
     private val favoriteRepository: FavoriteStreamerRepository
-) : GetStreamerUsecase {
+) : GetStreamerUseCase {
 
     override suspend operator fun invoke(id: String): Result<StreamerDetailResult> {
         val streamerResult = streamerRepository.getStreamerById(id)

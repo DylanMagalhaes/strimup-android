@@ -2,7 +2,7 @@ package com.strimup.feature.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.feature.search.domain.usecase.DefaultGetStreamerUsecase
+import com.strimup.feature.search.domain.usecase.DefaultGetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val getStreamers: DefaultGetStreamerUsecase,
+    private val getStreamers: DefaultGetStreamerUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<SearchUiState>(SearchUiState.Content())

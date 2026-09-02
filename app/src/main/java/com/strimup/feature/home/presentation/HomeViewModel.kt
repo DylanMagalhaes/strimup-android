@@ -1,11 +1,10 @@
 package com.strimup.feature.home.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.feature.home.domain.usecase.GetBannerItemsUsecase
-import com.strimup.feature.home.domain.usecase.GetStreamersUsecase
+import com.strimup.feature.home.domain.usecase.GetBannerItemsUseCase
+import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -18,8 +17,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getStreamers: GetStreamersUsecase,
-    private val getBannerItemsUsecase: GetBannerItemsUsecase
+    private val getStreamers: GetStreamersUseCase,
+    private val getBannerItems: GetBannerItemsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -50,7 +49,7 @@ class HomeViewModel @Inject constructor(
         }
 
         return viewModelScope.launch {
-            getBannerItemsUsecase()
+            getBannerItems()
                 .onSuccess { bannerItems ->
                     _state.update {
                         it.copy(

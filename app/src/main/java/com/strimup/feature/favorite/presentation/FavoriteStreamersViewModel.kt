@@ -14,9 +14,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FavoriteStreamersViewModel @Inject constructor(
-    private val getFavoriteStreamersUseCase: GetFavoriteStreamersUseCase,
-    private val addStreamerToFavoritesUseCase: AddStreamerToFavoritesUseCase,
-    private val deleteStreamerFromFavoritesUseCase: DeleteStreamerFromFavoritesUseCase
+    private val getFavoriteStreamers: GetFavoriteStreamersUseCase,
+    private val addStreamerToFavorites: AddStreamerToFavoritesUseCase,
+    private val deleteStreamerFromFavorites: DeleteStreamerFromFavoritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FavoriteStreamersUiState())
@@ -29,7 +29,7 @@ class FavoriteStreamersViewModel @Inject constructor(
     fun fetchFavoriteStreamers() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            getFavoriteStreamersUseCase()
+            getFavoriteStreamers()
                 .onSuccess { streamers ->
                     _state.update {
                         it.copy(

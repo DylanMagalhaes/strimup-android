@@ -7,6 +7,6 @@ data class StreamerDetailResult(
     val isFavorite: Boolean
 )
 
-fun interface GetStreamerUsecase {
+fun interface GetStreamerUseCase {
     suspend operator fun invoke(id: String): Result<StreamerDetailResult>
 }

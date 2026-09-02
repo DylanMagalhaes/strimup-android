@@ -4,9 +4,9 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import javax.inject.Inject
 
-class DefaultGetStreamerUsecase @Inject constructor(
+class DefaultGetStreamerUseCase @Inject constructor(
     private val repository: StreamerRepository
-) : GetStreamerUsecase {
+) : GetStreamerUseCase {
     override suspend fun invoke(id: String): Result<Streamer> {
         return repository.getStreamerById(id)
     }

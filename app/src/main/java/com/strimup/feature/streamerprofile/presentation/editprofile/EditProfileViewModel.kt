@@ -5,13 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
-import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
-import com.strimup.core.tag.domain.usecase.GetTagsUsecase
-import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUsecase
-import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUsecase
+import com.strimup.core.tag.domain.usecase.GetTagsUseCase
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUseCase
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
-import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
+import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +21,12 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val getStreamer: GetStreamerUsecase,
-    private val updateProfile: DefaultUpdateProfileUsecase,
-    private val updateAvatar: DefaultUpdateAvatarUsecase,
+    private val getStreamer: GetStreamerUseCase,
+    private val updateProfile: DefaultUpdateProfileUseCase,
+    private val updateAvatar: DefaultUpdateAvatarUseCase,
     private val getUser: GetUserFlowUseCase,
     private val getOptions: GetStreamerOptionsUseCase,
-    private val getTags: GetTagsUsecase,
+    private val getTags: GetTagsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EditProfileUiState())

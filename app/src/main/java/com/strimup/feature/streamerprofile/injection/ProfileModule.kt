@@ -1,7 +1,7 @@
 package com.strimup.feature.streamerprofile.injection
 
-import com.strimup.feature.streamerprofile.domain.usecase.DefaultGetStreamerUsecase
-import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUsecase
+import com.strimup.feature.streamerprofile.domain.usecase.DefaultGetStreamerUseCase
+import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -12,5 +12,5 @@ import dagger.hilt.android.components.ViewModelComponent
 interface ProfileModule {
 
     @Binds
-    fun bindsStreamerUsecase(impl: DefaultGetStreamerUsecase): GetStreamerUsecase
+    fun bindsStreamerUseCase(impl: DefaultGetStreamerUseCase): GetStreamerUseCase
 }
