@@ -54,6 +54,14 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions {
+        unitTests {
+            // Les méthodes du SDK Android renvoient une valeur par défaut
+            // au lieu de lever "Method ... not mocked" dans les tests JVM.
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 room3 {
@@ -94,13 +102,23 @@ dependencies {
 
     implementation(libs.youtube.player.core)
 
+    implementation(libs.kotlinx.coroutines.android)
 
-
+    // ----- Tests unitaires (JVM, src/test) -----
     testImplementation(libs.junit)
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+
+    // ----- Tests instrumentés (device/émulateur, src/androidTest) -----
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.room3.testing)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

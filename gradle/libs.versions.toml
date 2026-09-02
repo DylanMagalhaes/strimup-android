@@ -22,6 +22,12 @@ room3 = "3.0.0"
 roomCommonJvm = "2.8.4"
 youtubePlayer = "12.1.0"
 
+# Testing
+coroutines = "1.10.2"
+truth = "1.4.4"
+turbine = "1.2.0"
+androidxTestCore = "1.6.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +67,14 @@ okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-
 androidx-room3-runtime = { group = "androidx.room3", name = "room3-runtime", version.ref = "room3" }
 androidx-room3-compiler = { group = "androidx.room3", name = "room3-compiler", version.ref = "room3" }
 youtube-player-core = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "core", version.ref = "youtubePlayer" }
+
+# Testing
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidxTestCore" }
+androidx-room3-testing = { group = "androidx.room3", name = "room3-testing", version.ref = "room3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
