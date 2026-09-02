@@ -1,19 +1,17 @@
 *.iml
-.gradle
+.gradle/
 /local.properties
-/.idea
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+*.apk
+*.aab
 
-# Roadmap de travail perso — non versionnée
-/docs/ROADMAP.md
+keystore.properties
+*.jks
+*.keystore
+.env
+
+/.idea
