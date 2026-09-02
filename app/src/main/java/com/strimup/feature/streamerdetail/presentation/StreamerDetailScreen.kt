@@ -32,7 +32,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
-import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.theme.StrimupTheme
@@ -66,6 +65,7 @@ fun StreamerDetailScreen(
             }
         },
         onVideoClick = onVideoClick,
+        onFavoriteClick = { viewModel.onFavoriteClick() },
     )
 }
 
@@ -76,6 +76,7 @@ private fun StreamerDetailScreen(
     onNavUp: () -> Unit,
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -107,7 +108,8 @@ private fun StreamerDetailScreen(
                 .fillMaxSize(),
             state = state,
             onSocialClick = onSocialClick,
-            onVideoClick = onVideoClick
+            onVideoClick = onVideoClick,
+            onFavoriteClick = onFavoriteClick
         )
     }
 }
@@ -117,6 +119,7 @@ private fun StreamerDetailContent(
     state: StreamerDetailUiState,
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -142,6 +145,10 @@ private fun StreamerDetailContent(
                     tags = state.streamer.tags?.map { it.name },
                     dailyStatus = state.streamer.dailyStatus ?: "",
                     followersCount = state.streamer.followersCount,
+                    onFavoriteClick = onFavoriteClick,
+                    isFavorite = state.isFavorite,
+                    isProfile = false
+
                 )
 
                 StreamerContent(
@@ -169,6 +176,7 @@ private fun StreamerDetailScreenPreview() {
     StrimupTheme {
         StreamerDetailScreen(
             onNavUp = {},
+            onFavoriteClick = {},
             onVideoClick = { _, _ -> },
             onSocialClick = {},
             state = StreamerDetailUiState.Success(
@@ -195,7 +203,8 @@ private fun StreamerDetailScreenPreview() {
                         )
                     ),
                     followersCount = 10
-                )
+                ),
+                isFavorite = true
             )
         )
     }

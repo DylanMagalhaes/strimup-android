@@ -28,8 +28,8 @@ interface StreamerApiService {
     @GET("api/streamer/live")
     suspend fun getInliveStreamers(): InLiveStreamersResponse
 
-    @GET("api/favorites")
-    suspend fun getFavoriteStreamers(): List<FavoriteStreamerResponse>
+//    @GET("api/favorites")
+//    suspend fun getFavoriteStreamers(): List<FavoriteStreamerResponse>
 
     @GET("api/streamer/search")
     suspend fun searchStreamers(

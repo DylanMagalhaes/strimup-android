@@ -1,4 +1,4 @@
-package com.strimup.core.streamer.di
+package com.strimup.core.streamer.injection
 
 import com.strimup.core.streamer.data.StreamerApiService
 import com.strimup.core.streamer.data.repository.DefaultStreamerRepository

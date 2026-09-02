@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
@@ -39,7 +42,9 @@ import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination2
 import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
+import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
 import com.strimup.feature.search.presentation.navigation.SearchNavigation
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
@@ -78,6 +83,7 @@ fun StrimupNavDisplay2(
                     val isHomeSelected = currentDestination is Destination2.Home
                     val isFilterSelected = currentDestination is Destination2.Filter
                     val isSearchSelected = currentDestination is Destination2.Search
+                    val isFavoriteSelected = currentDestination is Destination2.Favorite
                     val isProfileSelected = if (isLoggedIn) currentDestination is Destination2.Profile else currentDestination is Destination2.Login
 
                     val itemColors = NavigationBarItemDefaults.colors(
@@ -130,6 +136,23 @@ fun StrimupNavDisplay2(
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Rechercher",
+                                modifier = Modifier.boldOnSelection(isSearchSelected)
+                            )
+                        },
+                        colors = itemColors
+                    )
+
+                    NavigationBarItem(
+                        selected = isFavoriteSelected,
+                        onClick = {
+                            if (!isFavoriteSelected) {
+                                backStack.add(Destination2.Favorite)
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = if (isFavoriteSelected) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                contentDescription = "Mes streamers favoris",
                                 modifier = Modifier.boldOnSelection(isSearchSelected)
                             )
                         },
@@ -251,6 +274,12 @@ fun StrimupNavDisplay2(
                         onBack = { backStack.removeLastOrNull() }
                     )
 
+                }
+
+                entry<Destination2.Favorite>{
+                    FavoriteStreamerScreen(
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
 
                 entry<Destination2.Login> {

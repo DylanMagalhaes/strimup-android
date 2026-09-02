@@ -14,3 +14,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Roadmap de travail perso — non versionnée
+/docs/ROADMAP.md
