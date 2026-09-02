@@ -11,7 +11,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.strimup.core.navigation.Destination2
+import com.strimup.core.navigation.Destination
 import com.strimup.feature.home.presentation.HomeScreen
 import com.strimup.feature.home.presentation.HomeViewModel
 import kotlinx.serialization.modules.SerializersModule
@@ -27,11 +27,11 @@ fun HomeNavigation(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
-                    subclass(Destination2.Home.StreamerList::class, Destination2.Home.StreamerList.serializer())
+                    subclass(Destination.Home.StreamerList::class, Destination.Home.StreamerList.serializer())
                 }
             }
         },
-        Destination2.Home.StreamerList
+        Destination.Home.StreamerList
     )
 
     NavDisplay(
@@ -42,7 +42,7 @@ fun HomeNavigation(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Destination2.Home.StreamerList> {
+            entry<Destination.Home.StreamerList> {
                 val homeViewModel: HomeViewModel = hiltViewModel()
                 HomeScreen(
                     viewModel = homeViewModel,

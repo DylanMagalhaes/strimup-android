@@ -11,7 +11,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.strimup.core.navigation.Destination2
+import com.strimup.core.navigation.Destination
 import com.strimup.feature.streamerprofile.presentation.editprofile.EditProfileScreen
 import com.strimup.feature.streamerprofile.presentation.editprofile.EditProfileViewModel
 import com.strimup.feature.streamerprofile.presentation.editprofile.SelectProfileTagsScreen
@@ -24,15 +24,15 @@ fun ProfileNavigation(
     userId: String?,
     modifier: Modifier = Modifier
 ) {
-    val initialDestination = Destination2.Profile.View(userId = userId)
+    val initialDestination = Destination.Profile.View(userId = userId)
 
     val profileBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration {
             serializersModule = SerializersModule {
                 polymorphic(NavKey::class) {
-                    subclass(Destination2.Profile.View::class, Destination2.Profile.View.serializer())
-                    subclass(Destination2.Profile.Edit::class, Destination2.Profile.Edit.serializer())
-                    subclass(Destination2.Profile.EditTags::class, Destination2.Profile.EditTags.serializer())
+                    subclass(Destination.Profile.View::class, Destination.Profile.View.serializer())
+                    subclass(Destination.Profile.Edit::class, Destination.Profile.Edit.serializer())
+                    subclass(Destination.Profile.EditTags::class, Destination.Profile.EditTags.serializer())
                 }
             }
         },
@@ -49,27 +49,27 @@ fun ProfileNavigation(
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Destination2.Profile.View> {
+            entry<Destination.Profile.View> {
                 StreamerProfileScreen(
                     modifier = Modifier.fillMaxSize(),
                     onEditProfileNav = {
-                        profileBackStack.add(Destination2.Profile.Edit)
+                        profileBackStack.add(Destination.Profile.Edit)
                     },
                 )
             }
 
-            entry<Destination2.Profile.Edit> {
+            entry<Destination.Profile.Edit> {
                 EditProfileScreen(
                     viewModel = editProfileViewModel,
                     modifier = Modifier.fillMaxSize(),
                     onNavUp = { profileBackStack.removeLastOrNull() },
                     onEditTagsNav = {
-                        profileBackStack.add(Destination2.Profile.EditTags)
+                        profileBackStack.add(Destination.Profile.EditTags)
                     }
                 )
             }
 
-            entry<Destination2.Profile.EditTags> {
+            entry<Destination.Profile.EditTags> {
                 SelectProfileTagsScreen(
                     viewModel = editProfileViewModel,
                     modifier = Modifier.fillMaxSize(),
