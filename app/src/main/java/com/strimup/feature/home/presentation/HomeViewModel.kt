@@ -35,11 +35,6 @@ class HomeViewModel @Inject constructor(
         fetchStreamersJob = fetchStreamers(_state.value.currentTab)
     }
 
-    fun retryBanner() {
-        fetchBannerJob?.cancel()
-        fetchBannerJob = loadBanner()
-    }
-
     private fun loadBanner(): Job {
         _state.update {
             it.copy(
