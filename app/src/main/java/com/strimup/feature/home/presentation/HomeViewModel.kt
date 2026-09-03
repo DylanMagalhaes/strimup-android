@@ -4,13 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.domain.usecase.GetBannerItemsUseCase
+import com.strimup.feature.home.domain.usecase.GetBannerUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,11 +19,11 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getStreamers: GetStreamersUseCase,
-    private val getBannerItems: GetBannerItemsUseCase
+    private val getBannerItems: GetBannerUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(HomeUiState())
-    val state = _state.asStateFlow()
+    val state: StateFlow<HomeUiState>
+        field = MutableStateFlow(HomeUiState())
 
     private val _events = Channel<HomeUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -32,11 +33,11 @@ class HomeViewModel @Inject constructor(
 
     init {
         fetchBannerJob = loadBanner()
-        fetchStreamersJob = fetchStreamers(_state.value.currentTab)
+        fetchStreamersJob = fetchStreamers(state.value.currentTab)
     }
 
     private fun loadBanner(): Job {
-        _state.update {
+        state.update {
             it.copy(
                 isBannerLoading = true,
                 errorMessage = null
@@ -46,7 +47,7 @@ class HomeViewModel @Inject constructor(
         return viewModelScope.launch {
             getBannerItems()
                 .onSuccess { bannerItems ->
-                    _state.update {
+                    state.update {
                         it.copy(
                             isBannerLoading = false,
                             bannerItems = bannerItems
@@ -55,7 +56,7 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     val message = exception.localizedMessage ?: "Une erreur est survenue"
-                    _state.update {
+                    state.update {
                         it.copy(
                             isBannerLoading = false,
                             errorMessage = message,
@@ -66,11 +67,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onTabClick(filter: FilterEntity) {
-        if (_state.value.currentTab == filter && !_state.value.isLoading) return
+        if (state.value.currentTab == filter && !state.value.isLoading) return
 
         fetchStreamersJob?.cancel()
 
-        _state.update {
+        state.update {
             it.copy(
                 isLoading = true,
                 currentTab = filter,
@@ -85,7 +86,7 @@ class HomeViewModel @Inject constructor(
         return viewModelScope.launch {
             getStreamers(filter)
                 .onSuccess { streamers ->
-                    _state.update {
+                    state.update {
                         it.copy(
                             streamers = streamers,
                             isLoading = false,
@@ -95,7 +96,7 @@ class HomeViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     val message = exception.localizedMessage ?: "Une erreur est survenue"
-                    _state.update {
+                    state.update {
                         it.copy(
                             isLoading = false,
                             errorMessage = message,

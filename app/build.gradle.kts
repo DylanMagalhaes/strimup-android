@@ -64,6 +64,14 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        // Enable the Kotlin 2.3 experimental "explicit backing fields" feature
+        // (val foo: PublicType field = InternalType()).
+        freeCompilerArgs.add("-Xexplicit-backing-fields")
+    }
+}
+
 room3 {
     schemaDirectory("$projectDir/schemas")
 }
@@ -109,6 +117,7 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(libs.androidx.arch.core.testing)
 
     // ----- Tests instrumentés (device/émulateur, src/androidTest) -----
     androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -6,6 +6,8 @@ import javax.inject.Inject
 
 class GetBannerItemsUseCase @Inject constructor(
     val repository: BannerRepository
-) {
-    suspend operator fun invoke(): Result<List<BannerItemEntity>> = repository.getBannerItems()
+): GetBannerUseCase {
+    override suspend fun invoke(): Result<List<BannerItemEntity>> {
+        return repository.getBannerItems()
+    }
 }
