@@ -16,7 +16,6 @@ import javax.inject.Inject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okio.IOException
 
 class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService,
@@ -27,8 +26,7 @@ class DefaultStreamerRepository @Inject constructor(
         return runCatching {
             service.getRandomStreamers()
                 .items
-                ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-                ?: throw IOException("error fetching random streamers")
+                .map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
         }
     }
 
@@ -36,14 +34,13 @@ class DefaultStreamerRepository @Inject constructor(
         return runCatching {
             service.getInliveStreamers()
                 .items
-                ?.map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-                ?: throw IOException("error fetching live streamers")
+                .map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
         }
     }
 
     override suspend fun searchStreamers(userName: String): Result<List<Streamer>> {
         return runCatching {
-            service.searchStreamers(userName).map { it.toEntity() }
+            service.searchStreamers(userName).items.map { it.toEntity() }
         }
     }
 

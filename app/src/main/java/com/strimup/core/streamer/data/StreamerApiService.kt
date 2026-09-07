@@ -2,13 +2,10 @@ package com.strimup.core.streamer.data
 
 import com.strimup.core.streamer.data.request.StreamerMatchRequest
 import com.strimup.core.streamer.data.request.UpdateProfileRequest
-import com.strimup.core.streamer.data.response.FavoriteStreamerResponse
 import com.strimup.core.streamer.data.response.FilterOptionsResponse
-import com.strimup.core.streamer.data.response.InLiveStreamersResponse
-import com.strimup.core.streamer.data.response.RandomStreamersResponse
 import com.strimup.core.streamer.data.response.StreamerDto
+import com.strimup.core.streamer.data.response.StreamerListResponse
 import com.strimup.core.streamer.data.response.StreamerMatchResponse
-import com.strimup.core.streamer.data.response.StreamersResponse
 import com.strimup.core.streamer.data.response.UpdateAvatarResponse
 import com.strimup.core.streamer.data.response.UpdateProfileResponse
 import okhttp3.MultipartBody
@@ -23,10 +20,10 @@ import retrofit2.http.Query
 
 interface StreamerApiService {
     @GET("api/streamer/random")
-    suspend fun getRandomStreamers(): RandomStreamersResponse
+    suspend fun getRandomStreamers(): StreamerListResponse
 
     @GET("api/streamer/live")
-    suspend fun getInliveStreamers(): InLiveStreamersResponse
+    suspend fun getInliveStreamers(): StreamerListResponse
 
 //    @GET("api/favorites")
 //    suspend fun getFavoriteStreamers(): List<FavoriteStreamerResponse>
@@ -34,7 +31,7 @@ interface StreamerApiService {
     @GET("api/streamer/search")
     suspend fun searchStreamers(
         @Query("q") query: String
-    ): List<StreamersResponse>
+    ): StreamerListResponse
 
     @GET("api/streamer/{id}")
     suspend fun getStreamerById(
