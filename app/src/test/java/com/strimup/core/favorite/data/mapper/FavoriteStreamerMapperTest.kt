@@ -5,7 +5,7 @@ import org.junit.Test
 class FavoriteStreamerMapperTest {
 
     @Test
-    fun `ah siace`() {
+    fun `todo`() {
         // GIVEN
 
         // WHEN
