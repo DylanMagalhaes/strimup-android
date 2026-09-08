@@ -158,7 +158,7 @@ fun Streamer.toFavoriteRoom(): FavoriteRoomEntity{
     return FavoriteRoomEntity(
         id= this.id,
         userName= this.userName,
-        avatarUrl =  this.imageUrl
+        imageUrl =  this.imageUrl
     )
 }
 

@@ -77,7 +77,7 @@ class UserMeMapperTest {
         assertThat(result.userName).isEqualTo("Inox")
         assertThat(result.email).isEqualTo("test@strimup.com")
         assertThat(result.role).isEqualTo("STREAMER")
-        assertThat(result.avatarUrl).isEqualTo("https://example.com/avatar.png")
+        assertThat(result.imageUrl).isEqualTo("https://example.com/avatar.png")
     }
 
     // UserRoomEntity.toDomainEntity()
@@ -90,7 +90,7 @@ class UserMeMapperTest {
             userName = "Inox",
             email = "test@strimup.com",
             role = "STREAMER",
-            avatarUrl = "https://example.com/avatar.png"
+            imageUrl = "https://example.com/avatar.png"
         )
 
         // WHEN
@@ -112,7 +112,7 @@ class UserMeMapperTest {
             userName = "Inox",
             email = "test@strimup.com",
             role = "UNKNOWN_ROLE",
-            avatarUrl = null
+            imageUrl = null
         )
 
         // WHEN

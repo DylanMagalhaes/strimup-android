@@ -18,7 +18,7 @@ fun FavoriteStreamerResponse.toRoomEntity(): FavoriteRoomEntity {
     return FavoriteRoomEntity(
         id = this.id,
         userName = this.pseudo,
-        avatarUrl = this.avatarUrl
+        imageUrl = this.avatarUrl
     )
 }
 
@@ -26,6 +26,6 @@ fun FavoriteRoomEntity.toDomain(): Streamer {
     return Streamer(
         id = this.id,
         userName = this.userName,
-        imageUrl = this.avatarUrl
+        imageUrl = this.imageUrl
     )
 }

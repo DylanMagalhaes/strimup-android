@@ -128,7 +128,7 @@ class UserLoggedMapperTest {
         assertThat(roomEntity.userName).isEqualTo("Inox")
         assertThat(roomEntity.email).isEqualTo("inox@test.com")
         assertThat(roomEntity.role).isEqualTo("STREAMER")
-        assertThat(roomEntity.avatarUrl).isEqualTo("https://example.com/avatar.png")
+        assertThat(roomEntity.imageUrl).isEqualTo("https://example.com/avatar.png")
     }
 
     // UserRoomEntity.toDomainEntity()
@@ -141,7 +141,7 @@ class UserLoggedMapperTest {
             userName = "Inox",
             email = "inox@test.com",
             role = "STREAMER",
-            avatarUrl = "https://example.com/avatar.png"
+            imageUrl = "https://example.com/avatar.png"
         )
 
         // WHEN
@@ -163,7 +163,7 @@ class UserLoggedMapperTest {
             userName = "Inox",
             email = "inox@test.com",
             role = "UNKNOWN_ROLE",
-            avatarUrl = null
+            imageUrl = null
         )
 
         // WHEN

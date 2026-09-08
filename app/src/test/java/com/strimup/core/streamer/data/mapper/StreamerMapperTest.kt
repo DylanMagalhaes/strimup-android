@@ -297,7 +297,7 @@ class StreamerMapperTest {
         // THEN
         assertThat(favoriteRoom.id).isEqualTo("1")
         assertThat(favoriteRoom.userName).isEqualTo("Inox")
-        assertThat(favoriteRoom.avatarUrl).isEqualTo("https://example.com/avatar.png")
+        assertThat(favoriteRoom.imageUrl).isEqualTo("https://example.com/avatar.png")
     }
 
     // --- FilterOptionsResponse.toEntity() ---

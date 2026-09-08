@@ -4,10 +4,11 @@ import com.strimup.core.favorite.domain.FavoriteStreamerRepository
 import com.strimup.core.streamer.domain.entity.Streamer
 import javax.inject.Inject
 
-class GetFavoriteStreamersUseCase @Inject constructor(
+class DefaultGetFavoriteStreamersUseCase @Inject constructor(
     private val repository: FavoriteStreamerRepository
-) {
-    suspend operator fun invoke(): Result<List<Streamer>> {
+): GetFavoriteStreamerUseCase {
+    override suspend fun invoke(): Result<List<Streamer>> {
         return repository.getFavoriteStreamers()
     }
+
 }

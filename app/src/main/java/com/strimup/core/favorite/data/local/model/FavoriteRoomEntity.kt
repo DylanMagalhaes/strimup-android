@@ -8,5 +8,5 @@ data class FavoriteRoomEntity(
     @PrimaryKey
     val id: String,
     val userName: String,
-    val avatarUrl: String?
+    val imageUrl: String?
 )
