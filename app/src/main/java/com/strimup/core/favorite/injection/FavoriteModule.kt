@@ -7,7 +7,7 @@ import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DefaultAddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DefaultDeleteStreamerFromFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DefaultGetFavoriteStreamersUseCase
-import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoriteUseCase
+import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.GetFavoriteStreamerUseCase
 import dagger.Binds
 import dagger.Module
@@ -32,7 +32,7 @@ interface FavoriteModule {
     fun bindAddStreamerToFavoritesUseCase(impl: DefaultAddStreamerToFavoritesUseCase): AddStreamerToFavoritesUseCase
 
     @Binds
-    fun bindDeleteStreamerFromFavoritesUseCase(impl: DefaultDeleteStreamerFromFavoritesUseCase): DeleteStreamerFromFavoriteUseCase
+    fun bindDeleteStreamerFromFavoritesUseCase(impl: DefaultDeleteStreamerFromFavoritesUseCase): DeleteStreamerFromFavoritesUseCase
 
 
     companion object {

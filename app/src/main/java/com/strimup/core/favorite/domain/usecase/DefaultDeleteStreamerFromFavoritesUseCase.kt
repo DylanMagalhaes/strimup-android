@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 class DefaultDeleteStreamerFromFavoritesUseCase @Inject constructor(
     private val repository: FavoriteStreamerRepository
-) : DeleteStreamerFromFavoriteUseCase {
+) : DeleteStreamerFromFavoritesUseCase {
     override suspend fun invoke(id: String): Result<Unit> {
         return repository.deleteFavoriteStreamer(id)
     }
