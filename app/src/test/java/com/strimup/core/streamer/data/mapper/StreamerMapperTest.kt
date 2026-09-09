@@ -2,9 +2,8 @@ package com.strimup.core.streamer.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import com.strimup.core.streamer.data.response.FilterOptionsResponse
-import com.strimup.core.streamer.data.response.MatchedStreamerDto
 import com.strimup.core.streamer.data.response.StreamerDto
-import com.strimup.core.streamer.data.response.StreamerMatchResponse
+import com.strimup.core.streamer.data.response.StreamerListResponse
 import com.strimup.core.streamer.data.response.UpdateAvatarResponse
 import com.strimup.core.streamer.data.response.UpdateProfileResponse
 import com.strimup.core.streamer.domain.entity.Social
@@ -113,57 +112,24 @@ class StreamerMapperTest {
         assertThat(result).isNull()
     }
 
-    // MatchedStreamerDto.toDomain()
+    // StreamerListResponse.toDomain()
 
     @Test
-    fun `MatchedStreamerDto toDomain should map streamer and construct socials list from non-null URLs`() {
+    fun `StreamerListResponse toDomain should map total count and list of streamers`() {
         // GIVEN
-        val dto = MatchedStreamerDto(
-            id = "1",
-            username = "Inox",
-            imageUrl = "https://example.com/avatar.png",
-            isLive = true,
-            liveTitle = "Live chill",
-            twitchUrl = "https://twitch.tv/inox",
-            youtubeUrl = null,
-            instagramUrl = "https://instagram.com/inox",
-            tiktokUrl = null,
-            kickUrl = null
-        )
-
-        // WHEN
-        val domain = dto.toDomain()
-
-        // THEN
-        assertThat(domain.id).isEqualTo("1")
-        assertThat(domain.userName).isEqualTo("Inox")
-        assertThat(domain.isLive).isTrue()
-        assertThat(domain.socials).hasSize(2)
-        assertThat(domain.socials.map { it.type }).containsExactly(
-            Social.Type.Twitch,
-            Social.Type.Instagram
-        )
-    }
-
-    // StreamerMatchResponse.toDomain()
-
-    @Test
-    fun `StreamerMatchResponse toDomain should map total count and list of matched streamers`() {
-        // GIVEN
-        val response = StreamerMatchResponse(
+        val response = StreamerListResponse(
             total = 1,
-            matchedStreamers = listOf(
-                MatchedStreamerDto(
+            items = listOf(
+                StreamerDto(
                     id = "1",
                     username = "Inox",
-                    imageUrl = "https://example.com/avatar.png",
-                    isLive = false,
-                    liveTitle = null,
-                    twitchUrl = "https://twitch.tv/inox",
-                    youtubeUrl = null,
-                    instagramUrl = null,
-                    tiktokUrl = null,
-                    kickUrl = null
+                    avatarUrl = "https://example.com/avatar.png",
+                    isLive = true,
+                    liveTitle = "Live chill",
+                    platforms = listOf(
+                        StreamerDto.Social(url = "https://twitch.tv/inox", type = "twitch"),
+                        StreamerDto.Social(url = "https://instagram.com/inox", type = "instagram"),
+                    )
                 )
             )
         )
@@ -175,6 +141,11 @@ class StreamerMapperTest {
         assertThat(domain.total).isEqualTo(1)
         assertThat(domain.streamers).hasSize(1)
         assertThat(domain.streamers.first().userName).isEqualTo("Inox")
+        assertThat(domain.streamers.first().isLive).isTrue()
+        assertThat(domain.streamers.first().socials.map { it.type }).containsExactly(
+            Social.Type.Twitch,
+            Social.Type.Instagram
+        )
     }
 
     // UpdateProfileResponse.Streamer.toEntity()
