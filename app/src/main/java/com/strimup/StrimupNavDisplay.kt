@@ -98,8 +98,10 @@ fun StrimupNavDisplay(
                     NavigationBarItem(
                         selected = isFilterSelected,
                         onClick = {
-                            if (!isFilterSelected) {
+                            if (!isFilterSelected && isLoggedIn) {
                                 backStack.add(Destination.Filter.List)
+                            } else {
+                                backStack.add(Destination.Login)
                             }
                         },
                         icon = {
@@ -130,8 +132,10 @@ fun StrimupNavDisplay(
                     NavigationBarItem(
                         selected = isFavoriteSelected,
                         onClick = {
-                            if (!isFavoriteSelected) {
+                            if (!isFavoriteSelected && isLoggedIn) {
                                 backStack.add(Destination.Favorite)
+                            } else {
+                                backStack.add(Destination.Login)
                             }
                         },
                         icon = {
