@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.tag.SelectTagsContent
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 
 @Composable
@@ -21,7 +22,10 @@ fun SelectProfileTagsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = screenTopWindowInsets,
+    ) { innerPadding ->
         SelectTagsContent(
             title = "Vos tags de stream",
             description = "Choisissez jusqu'à 4 tags pour aider les viewers à découvrir votre contenu.",

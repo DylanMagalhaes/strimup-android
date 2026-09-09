@@ -46,6 +46,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -72,6 +73,7 @@ private fun FavoriteStreamerScreenContent(
 ) {
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = screenTopWindowInsets,
         topBar = {
             TopAppBar(
                 title = {
