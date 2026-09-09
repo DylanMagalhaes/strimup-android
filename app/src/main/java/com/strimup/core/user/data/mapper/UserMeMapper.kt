@@ -21,7 +21,7 @@ fun UserEntity.toRoomEntity(): UserRoomEntity {
         userName = this.userName,
         email = this.email,
         role = this.role.name,
-        avatarUrl = this.avatarUrl
+        imageUrl = this.avatarUrl
         )
 }
 
@@ -31,6 +31,6 @@ fun UserRoomEntity.toDomainEntity(): UserEntity {
         userName = this.userName,
         email = this.email,
         role = UserRole.valueOf(this.role),
-        avatarUrl = this.avatarUrl
+        avatarUrl = this.imageUrl
     )
 }

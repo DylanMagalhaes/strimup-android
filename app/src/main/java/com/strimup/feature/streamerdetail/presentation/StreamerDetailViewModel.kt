@@ -2,8 +2,8 @@ package com.strimup.feature.streamerdetail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
+import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.feature.streamerdetail.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
