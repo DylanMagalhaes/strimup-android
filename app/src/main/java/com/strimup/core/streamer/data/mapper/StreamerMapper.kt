@@ -3,9 +3,8 @@ package com.strimup.core.streamer.data.mapper
 import com.strimup.core.favorite.data.local.model.FavoriteRoomEntity
 import com.strimup.core.streamer.data.request.UpdateProfileRequest
 import com.strimup.core.streamer.data.response.FilterOptionsResponse
-import com.strimup.core.streamer.data.response.MatchedStreamerDto
 import com.strimup.core.streamer.data.response.StreamerDto
-import com.strimup.core.streamer.data.response.StreamerMatchResponse
+import com.strimup.core.streamer.data.response.StreamerListResponse
 import com.strimup.core.streamer.data.response.UpdateAvatarResponse
 import com.strimup.core.streamer.data.response.UpdateProfileResponse
 import com.strimup.core.streamer.domain.entity.Social
@@ -62,40 +61,10 @@ private fun String.toSocialType(): Social.Type? =
     }
 
 
-fun MatchedStreamerDto.toDomain(): Streamer {
-    val socialsList = listOfNotNull(
-        twitchUrl?.let { Social(url = it, type = Social.Type.Twitch) },
-        youtubeUrl?.let { Social(url = it, type = Social.Type.Youtube) },
-        instagramUrl?.let { Social(url = it, type = Social.Type.Instagram) },
-        tiktokUrl?.let { Social(url = it, type = Social.Type.Tiktok) },
-        kickUrl?.let { Social(url = it, type = Social.Type.Kick) },
-    )
-
-    return Streamer(
-        id = id,
-        userName = username,
-        imageUrl = imageUrl,
-        socials = socialsList,
-        isLive = isLive,
-        liveTitle = liveTitle,
-        isFavorite = false,
-        bio = null,
-        dailyStatus = null,
-        followersCount = null,
-        tags = null,
-        videos = emptyList(),
-        averageViewers = null,
-        languages = null,
-        personality = null,
-        personalitySecondary = null,
-        streamFrequency = null,
-    )
-}
-
-fun StreamerMatchResponse.toDomain(): StreamerMatchResult {
+fun StreamerListResponse.toDomain(): StreamerMatchResult {
     return StreamerMatchResult(
         total = total,
-        streamers = matchedStreamers.map { it.toDomain() }
+        streamers = items.map { it.toEntity() }
     )
 }
 

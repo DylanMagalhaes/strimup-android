@@ -5,7 +5,6 @@ import com.strimup.core.streamer.data.request.UpdateProfileRequest
 import com.strimup.core.streamer.data.response.FilterOptionsResponse
 import com.strimup.core.streamer.data.response.StreamerDto
 import com.strimup.core.streamer.data.response.StreamerListResponse
-import com.strimup.core.streamer.data.response.StreamerMatchResponse
 import com.strimup.core.streamer.data.response.UpdateAvatarResponse
 import com.strimup.core.streamer.data.response.UpdateProfileResponse
 import okhttp3.MultipartBody
@@ -53,5 +52,5 @@ interface StreamerApiService {
     suspend fun getStreamerOptions(): FilterOptionsResponse
 
     @POST("api/streamer/match")
-    suspend fun getFilteredStreamers(@Body request: StreamerMatchRequest): StreamerMatchResponse
+    suspend fun getFilteredStreamers(@Body request: StreamerMatchRequest): StreamerListResponse
 }
