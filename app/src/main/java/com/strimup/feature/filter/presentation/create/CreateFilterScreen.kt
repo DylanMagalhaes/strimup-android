@@ -42,6 +42,7 @@ import com.strimup.core.ui.component.editrow.ProfileEditRow
 import com.strimup.core.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.SingleSelectBottomSheet
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.filter.domain.entity.FilterCriteria
@@ -75,6 +76,7 @@ fun CreateFilterScreen(
 
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = screenTopWindowInsets,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(

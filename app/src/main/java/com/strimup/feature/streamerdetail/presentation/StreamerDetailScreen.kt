@@ -34,6 +34,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -81,6 +82,7 @@ private fun StreamerDetailScreen(
 ) {
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = screenTopWindowInsets,
         topBar = {
             TopAppBar(
                 title = {

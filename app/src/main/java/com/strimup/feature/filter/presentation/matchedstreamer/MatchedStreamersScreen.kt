@@ -47,6 +47,7 @@ import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.core.ui.component.streamer.StreamerCard
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -98,6 +99,7 @@ fun MatchedStreamersScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        contentWindowInsets = screenTopWindowInsets,
         topBar = {
             TopAppBar(
                 title = {

@@ -42,6 +42,7 @@ import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.editrow.ProfileEditRow
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.feature.streamerprofile.presentation.editprofile.component.EditProfileImageSection
 import com.strimup.core.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
@@ -78,6 +79,7 @@ fun EditProfileScreen(
     } else {
         Scaffold(
             modifier = modifier,
+            contentWindowInsets = screenTopWindowInsets,
             topBar = {
                 TopAppBar(
                     title = {

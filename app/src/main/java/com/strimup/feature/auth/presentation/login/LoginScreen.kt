@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
 import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -63,6 +64,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = screenTopWindowInsets,
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }) { padding ->
         LoginContent(
             modifier = Modifier.padding(padding),
