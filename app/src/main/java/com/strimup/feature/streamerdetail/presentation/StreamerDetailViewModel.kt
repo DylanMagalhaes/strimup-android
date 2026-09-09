@@ -2,8 +2,9 @@ package com.strimup.feature.streamerdetail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
+import com.strimup.core.favorite.domain.usecase.DefaultDeleteStreamerFromFavoritesUseCase
+import com.strimup.core.favorite.domain.usecase.DefaultAddStreamerToFavoritesUseCase
 import com.strimup.feature.streamerdetail.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 class StreamerDetailViewModel @Inject constructor(
     private val getStreamer: GetStreamerUseCase,
     private val addStreamerToFavorites: AddStreamerToFavoritesUseCase,
-    private val deleteStreamerFromFavorites: DeleteStreamerFromFavoritesUseCase
+    private val deleteStreamerFromFavorites: DefaultDeleteStreamerFromFavoritesUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<StreamerDetailUiState>(StreamerDetailUiState.Loading)

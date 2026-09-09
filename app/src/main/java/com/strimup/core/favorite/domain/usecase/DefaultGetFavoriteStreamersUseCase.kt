@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 class DefaultGetFavoriteStreamersUseCase @Inject constructor(
     private val repository: FavoriteStreamerRepository
-): GetFavoriteStreamerUseCase {
+) : GetFavoriteStreamerUseCase {
     override suspend fun invoke(): Result<List<Streamer>> {
         return repository.getFavoriteStreamers()
     }
