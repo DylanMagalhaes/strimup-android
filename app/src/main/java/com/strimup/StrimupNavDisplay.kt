@@ -41,6 +41,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination
+import com.strimup.core.navigation.navigateAsTab
 import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
@@ -88,9 +89,7 @@ fun StrimupNavDisplay(
                     NavigationBarItem(
                         selected = isHomeSelected,
                         onClick = {
-                            if (!isHomeSelected) {
-                                backStack.add(Destination.Home.StreamerList)
-                            }
+                            backStack.navigateAsTab(Destination.Home.StreamerList)
                         },
                         icon = {
                             Icon(
@@ -104,10 +103,10 @@ fun StrimupNavDisplay(
                     NavigationBarItem(
                         selected = isFilterSelected,
                         onClick = {
-                            if (!isFilterSelected && isLoggedIn) {
-                                backStack.add(Destination.Filter.List)
+                            if (isLoggedIn) {
+                                backStack.navigateAsTab(Destination.Filter.List)
                             } else {
-                                backStack.add(Destination.Login)
+                                backStack.navigateAsTab(Destination.Login)
                             }
                         },
                         icon = {
@@ -122,9 +121,7 @@ fun StrimupNavDisplay(
                     NavigationBarItem(
                         selected = isSearchSelected,
                         onClick = {
-                            if (!isSearchSelected) {
-                                backStack.add(Destination.Search)
-                            }
+                            backStack.navigateAsTab(Destination.Search)
                         },
                         icon = {
                             Icon(
@@ -138,10 +135,10 @@ fun StrimupNavDisplay(
                     NavigationBarItem(
                         selected = isFavoriteSelected,
                         onClick = {
-                            if (!isFavoriteSelected && isLoggedIn) {
-                                backStack.add(Destination.Favorite)
+                            if (isLoggedIn) {
+                                backStack.navigateAsTab(Destination.Favorite)
                             } else {
-                                backStack.add(Destination.Login)
+                                backStack.navigateAsTab(Destination.Login)
                             }
                         },
                         icon = {
@@ -157,14 +154,11 @@ fun StrimupNavDisplay(
                         selected = isProfileSelected,
                         onClick = {
                             if (isLoggedIn) {
-                                val currentProfileUserId = (currentDestination as? Destination.Profile.View)?.userId
-                                if (currentDestination !is Destination.Profile || currentProfileUserId != userId) {
-                                    userId?.let { id ->
-                                        backStack.add(Destination.Profile.View(userId = id))
-                                    }
+                                userId?.let { id ->
+                                    backStack.navigateAsTab(Destination.Profile.View(userId = id))
                                 }
-                            } else if (currentDestination !is Destination.Login) {
-                                backStack.add(Destination.Login)
+                            } else {
+                                backStack.navigateAsTab(Destination.Login)
                             }
                         },
                         icon = {
