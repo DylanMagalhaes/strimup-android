@@ -4,6 +4,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 
 data class FavoriteStreamersUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val favoriteStreamers: List<Streamer> = emptyList(),
     val searchQuery: String = ""
 ) {

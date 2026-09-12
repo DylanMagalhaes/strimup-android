@@ -1,41 +1,37 @@
 package com.strimup.core.favorite.data
 
-import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.favorite.data.local.dao.FavoriteDao
 import com.strimup.core.favorite.data.mapper.toDomain
 import com.strimup.core.favorite.data.mapper.toRoomEntity
 import com.strimup.core.favorite.domain.FavoriteStreamerRepository
 import com.strimup.core.streamer.data.mapper.toFavoriteRoom
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class DefaultFavoriteStreamerRepository @Inject constructor(
     private val service: FavoriteApiService,
     private val streamerRepository: StreamerRepository,
     private val favoriteDao: FavoriteDao
 ) : FavoriteStreamerRepository {
-    override suspend fun getFavoriteStreamers(): Result<List<Streamer>> {
+    override fun observeFavorites(): Flow<List<Streamer>> {
+
+        return favoriteDao.observeFavorites()
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
+
+    }
+
+    override suspend fun refreshFavoriteStreamers(): Result<Unit> {
         return runCatching {
             val remoteFavorites = service.getFavoriteStreamers()
-
-            val favoriteStreamers = remoteFavorites.map {
-                it.toDomain()
-            }
 
             remoteFavorites.forEach { favorite ->
                 favoriteDao.insertFavoriteStreamer(favorite.toRoomEntity())
             }
-
-            favoriteStreamers
-        }.recoverCatching { exception ->
-            val localFavorite = favoriteDao.getAllFavoritesOnce()
-
-            if (localFavorite.isNotEmpty()) {
-                localFavorite.map {
-                    it.toDomain()
-                }
-            } else
-                throw exception
         }
     }
 

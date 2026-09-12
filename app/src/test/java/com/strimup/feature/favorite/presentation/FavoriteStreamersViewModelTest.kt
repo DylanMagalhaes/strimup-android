@@ -1,7 +1,7 @@
 package com.strimup.feature.favorite.presentation
 
 import com.google.common.truth.Truth.assertThat
-import com.strimup.core.favorite.domain.usecase.GetFavoriteStreamerUseCase
+import com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,7 +26,7 @@ class FavoriteStreamersViewModelTest {
 
         // WHEN
         val viewModel = FavoriteStreamersViewModel(
-            getFavoriteStreamers = GetFavoriteStreamerUseCase { Result.success(fakeStreamers) }
+            refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase { Result.success(fakeStreamers) }
 
         )
 
@@ -42,7 +42,7 @@ class FavoriteStreamersViewModelTest {
     fun `fetchFavoriteStreamers when use case fails should set isLoading to false`() = runTest {
         // GIVEN
         val viewModel = FavoriteStreamersViewModel(
-            getFavoriteStreamers = GetFavoriteStreamerUseCase { Result.failure(Exception("Erreur réseau")) },
+            refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase { Result.failure(Exception("Erreur réseau")) },
         )
 
         // WHEN
@@ -58,7 +58,7 @@ class FavoriteStreamersViewModelTest {
     fun `onSearchQueryChange should update state searchQuery`() = runTest {
         // GIVEN
         val viewModel = FavoriteStreamersViewModel(
-            getFavoriteStreamers = GetFavoriteStreamerUseCase { Result.success(emptyList()) },
+            refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase { Result.success(emptyList()) },
         )
         advanceUntilIdle()
 
