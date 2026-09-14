@@ -1,5 +1,6 @@
 package com.strimup.core.tag.data.repository
 
+import com.strimup.core.network.toDomainResult
 import com.strimup.core.tag.data.remote.TagApiService
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.repository.TagRepository
@@ -14,6 +15,6 @@ class DefaultTagRepository @Inject constructor(
             service.getTags().map {
                 it.toEntity()
             }
-        }
+        }.toDomainResult()
     }
 }

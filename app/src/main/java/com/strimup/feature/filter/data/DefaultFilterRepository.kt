@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.data
 
+import com.strimup.core.network.toDomainResult
 import com.strimup.feature.filter.data.local.dao.FilterDao
 import com.strimup.feature.filter.data.mapper.toDomain
 import com.strimup.feature.filter.data.mapper.toDomainEntity
@@ -33,14 +34,14 @@ class DefaultFilterRepository @Inject constructor(
             } else {
                 throw throwable
             }
-        }
+        }.toDomainResult()
     }
 
     override suspend fun deleteFilterById(id: String): Result<Unit> {
         return runCatching {
             service.deleteFilterById(id)
             filterDao.deleteFilter(id)
-        }
+        }.toDomainResult()
     }
 
     override suspend fun createFilter(
@@ -57,13 +58,13 @@ class DefaultFilterRepository @Inject constructor(
             filterDao.insertFilter(newFilter.toRoomEntity())
 
             newFilter
-        }
+        }.toDomainResult()
     }
 
     override suspend fun getFilterById(id: String): Result<FilterEntity> {
         return runCatching {
             filterDao.getFilterById(id)?.toDomainEntity()
                 ?: throw NoSuchElementException("Filtre introuvable")
-        }
+        }.toDomainResult()
     }
 }
