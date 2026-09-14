@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.user.domain.entity.UserEntity
@@ -198,6 +199,53 @@ class StreamerProfileViewModelTest {
         assertThat(callCount).isEqualTo(2)
         val state = viewModel.state.value as ProfileUiState.Success
         assertThat(state.streamer).isEqualTo(updatedStreamer)
+    }
+
+    @Test
+    fun `refresh when it fails should keep the previously displayed profile and emit ShowSnackBar`() = runTest {
+        // GIVEN
+        val errorMessage = "Erreur réseau"
+        var callCount = 0
+        val viewModel = buildViewModel(
+            getStreamer = getStreamerUseCase {
+                callCount++
+                if (callCount == 1) Result.success(fakeStreamer) else Result.failure(Exception(errorMessage))
+            },
+        )
+        advanceUntilIdle()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.refresh()
+            advanceUntilIdle()
+
+            val event = awaitItem() as ProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo(errorMessage)
+        }
+        val state = viewModel.state.value as ProfileUiState.Success
+        assertThat(state.streamer).isEqualTo(fakeStreamer)
+    }
+
+    @Test
+    fun `refresh when it fails without a message should emit the default error message`() = runTest {
+        // GIVEN
+        var callCount = 0
+        val viewModel = buildViewModel(
+            getStreamer = getStreamerUseCase {
+                callCount++
+                if (callCount == 1) Result.success(fakeStreamer) else Result.failure(Exception())
+            },
+        )
+        advanceUntilIdle()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.refresh()
+            advanceUntilIdle()
+
+            val event = awaitItem() as ProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo("Erreur de chargement du profil")
+        }
     }
 
     @Test
