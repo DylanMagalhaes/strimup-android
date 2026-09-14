@@ -5,12 +5,13 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
 import com.strimup.core.favorite.data.local.model.FavoriteRoomEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteDao {
 
     @Query("SELECT * FROM favorite")
-    suspend fun getAllFavoritesOnce(): List<FavoriteRoomEntity>
+    fun observeFavorites(): Flow<List<FavoriteRoomEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFavoriteStreamer(favorite: FavoriteRoomEntity)

@@ -181,7 +181,11 @@ fun StrimupNavDisplay(
                                             } else Modifier
                                         )
                                         .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .4f))
+                                        .background(
+                                            MaterialTheme.colorScheme.onBackground.copy(
+                                                alpha = .4f
+                                            )
+                                        )
                                 )
                             } else {
                                 Icon(
@@ -254,7 +258,7 @@ fun StrimupNavDisplay(
                     )
                 }
 
-                entry<Destination.YouTubePlayer>{ destination ->
+                entry<Destination.YouTubePlayer> { destination ->
                     YouTubePlayerScreen(
                         modifier = Modifier.fillMaxSize(),
                         videoId = destination.videoId,
@@ -264,8 +268,12 @@ fun StrimupNavDisplay(
 
                 }
 
-                entry<Destination.Favorite>{
+                entry<Destination.Favorite> {
                     FavoriteStreamerScreen(
+                        onStreamerClick = { streamerId ->
+                            backStack.add(Destination.StreamerDetail(streamerId = streamerId))
+
+                        },
                         modifier = Modifier.fillMaxSize()
                     )
                 }

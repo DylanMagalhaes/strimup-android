@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,12 +55,14 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 @Composable
 fun FavoriteStreamerScreen(
     viewModel: FavoriteStreamersViewModel = hiltViewModel(),
+    onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     FavoriteStreamerScreenContent(
         state = state,
         onSearchQueryChange = {it -> viewModel.onSearchQueryChange(it)},
+        onStreamerClick = onStreamerClick,
         modifier = modifier
     )
     
@@ -69,6 +73,7 @@ fun FavoriteStreamerScreen(
 private fun FavoriteStreamerScreenContent(
     state: FavoriteStreamersUiState,
     onSearchQueryChange: (String) -> Unit,
+    onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -142,71 +147,82 @@ private fun FavoriteStreamerScreenContent(
                             items = state.filteredStreamers,
                             key = { it.id }
                         ) { streamer ->
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.fillMaxWidth()
+                            Surface(
+                                color = Color.Transparent,
+                                tonalElevation = 0.dp,
+                                shadowElevation = 0.dp,
+                                onClick = { onStreamerClick(streamer.id) }
                             ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    AsyncImage(
-                                        modifier = Modifier
-                                            .size(170.dp)
-                                            .clip(RoundedCornerShape(24.dp))
-                                            .background(
-                                                MaterialTheme.colorScheme.onBackground.copy(alpha = .4f)
-                                            )
-                                            .then(
-                                                if (streamer.isLive) {
-                                                    Modifier.border(
-                                                        width = 2.dp,
-                                                        color = MaterialTheme.colorScheme.tertiary,
-                                                        shape = RoundedCornerShape(24.dp)
-                                                    )
-                                                } else {
-                                                    Modifier
-                                                }
-                                            ),
-                                        model = streamer.imageUrl,
-                                        contentScale = ContentScale.Crop,
-                                        contentDescription = null,
-                                    )
-                                    if (streamer.isLive) {
-                                        Badge(
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        AsyncImage(
                                             modifier = Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .offset(y = 6.dp),
-                                            containerColor = MaterialTheme.colorScheme.tertiary,
-                                            content = {
-                                                Text(
-                                                    text = "Live",
-                                                    color = MaterialTheme.colorScheme.onBackground,
-                                                    fontFamily = zalandoFontFamily,
-                                                    fontStyle = FontStyle.Italic,
-                                                    fontWeight = FontWeight.Bold,
+                                                .size(170.dp)
+                                                .clip(RoundedCornerShape(24.dp))
+                                                .background(
+                                                    MaterialTheme.colorScheme.onBackground.copy(
+                                                        alpha = .4f
+                                                    )
                                                 )
-                                            },
+                                                .then(
+                                                    if (streamer.isLive) {
+                                                        Modifier.border(
+                                                            width = 2.dp,
+                                                            color = MaterialTheme.colorScheme.tertiary,
+                                                            shape = RoundedCornerShape(24.dp)
+                                                        )
+                                                    } else {
+                                                        Modifier
+                                                    }
+                                                ),
+                                            model = streamer.imageUrl,
+                                            contentScale = ContentScale.Crop,
+                                            contentDescription = null,
+                                        )
+                                        if (streamer.isLive) {
+                                            Badge(
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomCenter)
+                                                    .offset(y = 6.dp),
+                                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                                content = {
+                                                    Text(
+                                                        text = "Live",
+                                                        color = MaterialTheme.colorScheme.onBackground,
+                                                        fontFamily = zalandoFontFamily,
+                                                        fontStyle = FontStyle.Italic,
+                                                        fontWeight = FontWeight.Bold,
+                                                    )
+                                                },
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Text(
+                                        text = streamer.userName,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 14.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+
+                                    if (streamer.isLive && !streamer.liveTitle.isNullOrBlank()) {
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = streamer.liveTitle,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.padding(horizontal = 4.dp)
                                         )
                                     }
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    text = streamer.userName,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 14.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-
-                                if (streamer.isLive && !streamer.liveTitle.isNullOrBlank()) {
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = streamer.liveTitle,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.padding(horizontal = 4.dp)
-                                    )
                                 }
                             }
                         }
@@ -287,7 +303,8 @@ fun FavoriteStreamerScreenPreview(modifier: Modifier = Modifier) {
                     )
                 ),
             ),
-            onSearchQueryChange = {}
+            onSearchQueryChange = {},
+            onStreamerClick = {}
         )
     }
 }

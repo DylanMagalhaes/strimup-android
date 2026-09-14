@@ -6,9 +6,11 @@ import com.strimup.core.favorite.domain.FavoriteStreamerRepository
 import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DefaultAddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DefaultDeleteStreamerFromFavoritesUseCase
-import com.strimup.core.favorite.domain.usecase.DefaultGetFavoriteStreamersUseCase
+import com.strimup.core.favorite.domain.usecase.DefaultObserveFavoritesStreamersUseCase
+import com.strimup.core.favorite.domain.usecase.DefaultRefreshFavoriteStreamersUseCase
 import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
-import com.strimup.core.favorite.domain.usecase.GetFavoriteStreamerUseCase
+import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase
+import com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -26,7 +28,10 @@ interface FavoriteModule {
     fun bindFavoriteStreamerRepository(impl: DefaultFavoriteStreamerRepository): FavoriteStreamerRepository
 
     @Binds
-    fun bindGetFavoriteStreamerUseCase(impl: DefaultGetFavoriteStreamersUseCase): GetFavoriteStreamerUseCase
+    fun bindRefreshFavoriteStreamerUseCase(impl: DefaultRefreshFavoriteStreamersUseCase): RefreshFavoriteStreamerUseCase
+
+    @Binds
+    fun bindObserveFavoriteStreamerUseCase(impl: DefaultObserveFavoritesStreamersUseCase): ObserveFavoritesStreamersUseCase
 
     @Binds
     fun bindAddStreamerToFavoritesUseCase(impl: DefaultAddStreamerToFavoritesUseCase): AddStreamerToFavoritesUseCase
