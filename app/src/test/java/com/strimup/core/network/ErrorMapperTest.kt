@@ -62,6 +62,12 @@ class ErrorMapperTest {
     }
 
     @Test
+    fun `a DomainException should unwrap to its own DomainError instead of remapping to Unknown`() {
+        val error = DomainException(DomainError.Network).toDomainError()
+        assertThat(error).isEqualTo(DomainError.Network)
+    }
+
+    @Test
     fun `toDomainResult on a success should return it unchanged`() {
         val result = Result.success("streamer")
 

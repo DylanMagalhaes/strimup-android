@@ -26,7 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -52,6 +54,7 @@ fun StreamerDetailScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
+    val resources = LocalResources.current
 
     LaunchedEffect(streamerId) {
         viewModel.loadStreamer(streamerId)
@@ -61,7 +64,7 @@ fun StreamerDetailScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is StreamerDetailUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }
@@ -183,7 +186,7 @@ private fun StreamerDetailContent(
 
         is StreamerDetailUiState.Error -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Impossible de charger les informations du streamer.")
+                Text(text = stringResource(state.messageRes))
             }
         }
     }

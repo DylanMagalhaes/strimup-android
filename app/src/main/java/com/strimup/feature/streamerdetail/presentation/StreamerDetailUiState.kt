@@ -1,6 +1,8 @@
 package com.strimup.feature.streamerdetail.presentation
 
+import androidx.annotation.StringRes
 import com.strimup.core.streamer.domain.entity.Streamer
+
 sealed interface StreamerDetailUiState {
     data object Loading : StreamerDetailUiState
 
@@ -10,6 +12,6 @@ sealed interface StreamerDetailUiState {
     ) : StreamerDetailUiState
 
     data class Error(
-        val message: String,
+        @StringRes val messageRes: Int,
     ) : StreamerDetailUiState
 }

@@ -10,6 +10,7 @@ import java.net.SocketTimeoutException
 private const val HTTP_UNAUTHORIZED = 401
 
 fun Throwable.toDomainError(): DomainError = when (this) {
+    is DomainException -> error
     is SocketTimeoutException -> DomainError.Timeout
     is HttpException -> if (code() == HTTP_UNAUTHORIZED) {
         DomainError.Unauthorized

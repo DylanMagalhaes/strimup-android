@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
+import com.strimup.core.network.toDomainError
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.streamerdetail.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -40,7 +42,7 @@ class StreamerDetailViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     _state.value = StreamerDetailUiState.Error(
-                        message = exception.localizedMessage ?: "Impossible de charger le streamer"
+                        messageRes = exception.toDomainError().toMessageRes()
                     )
                 }
         }
@@ -72,13 +74,13 @@ class StreamerDetailViewModel @Inject constructor(
                 }
 
                 result.onFailure { exception ->
-                    val message = exception.localizedMessage ?: "Impossible de mettre à jour vos favoris"
+                    val messageRes = exception.toDomainError().toMessageRes()
                     _state.value = currentState.copy(
                         streamer = currentStreamer,
                         isFavorite = previousFavoriteState
                     )
 
-                    _event.send(StreamerDetailUiEvent.ShowSnackBar(message))
+                    _event.send(StreamerDetailUiEvent.ShowSnackBar(messageRes))
                 }
             }
         }
