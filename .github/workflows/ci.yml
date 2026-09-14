@@ -40,8 +40,8 @@ jobs:
       - name: Unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
-      # TODO: ajouter une étape `./gradlew detekt` une fois le plugin detekt
-      # configuré (+ baseline) dans le projet.
+      - name: Detekt
+        run: ./gradlew detekt --stacktrace
 
       - name: Upload lint report
         if: always()
@@ -65,4 +65,12 @@ jobs:
         with:
           name: unit-test-results
           path: app/build/test-results/testDebugUnitTest/
+          if-no-files-found: ignore
+
+      - name: Upload detekt report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-report
+          path: app/build/reports/detekt/
           if-no-files-found: ignore
