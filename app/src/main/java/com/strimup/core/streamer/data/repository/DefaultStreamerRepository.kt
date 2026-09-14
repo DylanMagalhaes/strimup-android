@@ -2,6 +2,7 @@ package com.strimup.core.streamer.data.repository
 
 import android.content.Context
 import android.net.Uri
+import com.strimup.core.network.toDomainResult
 import com.strimup.core.streamer.data.StreamerApiService
 import com.strimup.core.streamer.data.mapper.toDomain
 import com.strimup.core.streamer.data.mapper.toEntity
@@ -12,10 +13,10 @@ import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import javax.inject.Inject
 
 class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService,
@@ -27,7 +28,7 @@ class DefaultStreamerRepository @Inject constructor(
             service.getRandomStreamers()
                 .items
                 .map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-        }
+        }.toDomainResult()
     }
 
     override suspend fun getLiveStreamers(favoriteStreamerIds: List<String>): Result<List<Streamer>> {
@@ -35,26 +36,26 @@ class DefaultStreamerRepository @Inject constructor(
             service.getInliveStreamers()
                 .items
                 .map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
-        }
+        }.toDomainResult()
     }
 
     override suspend fun searchStreamers(userName: String): Result<List<Streamer>> {
         return runCatching {
             service.searchStreamers(userName).items.map { it.toEntity() }
-        }
+        }.toDomainResult()
     }
 
     override suspend fun getStreamerById(id: String): Result<Streamer> {
         return runCatching {
             service.getStreamerById(id).toEntity()
-        }
+        }.toDomainResult()
     }
 
     override suspend fun updateProfile(streamer: Streamer): Result<Streamer> {
         return runCatching {
             val request = streamer.toUpdateProfileRequest()
             service.updateProfile(request).streamer.toEntity()
-        }
+        }.toDomainResult()
     }
 
     override suspend fun updateAvatar(uri: String): Result<String> {
@@ -74,18 +75,18 @@ class DefaultStreamerRepository @Inject constructor(
             )
 
             service.updateAvatar(bodyPart).toDomain()
-        }
+        }.toDomainResult()
     }
 
     override suspend fun getStreamerOptions(): Result<StreamerOptions> {
         return runCatching {
             service.getStreamerOptions().toEntity()
-        }
+        }.toDomainResult()
     }
 
     override suspend fun getStreamersByFilter(request: StreamerMatchRequest): Result<StreamerMatchResult> {
         return runCatching {
             service.getFilteredStreamers(request).toDomain()
-        }
+        }.toDomainResult()
     }
 }
