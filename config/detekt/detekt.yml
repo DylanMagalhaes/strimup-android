@@ -1,2 +1,16 @@
 formatting:
   active: true
+
+naming:
+  FunctionNaming:
+    # Les fonctions @Composable sont nommées en PascalCase par convention
+    # (ex: HomeContent), pas en camelCase comme les fonctions normales.
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  # Un composable déclare naturellement beaucoup de callbacks et de lignes
+  # de mise en page sans que ce soit un signe de complexité excessive.
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+  LongMethod:
+    ignoreAnnotated: ['Composable']

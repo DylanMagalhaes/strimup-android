@@ -20,6 +20,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -56,13 +58,25 @@ fun StreamerProfileScreen(
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.refresh()
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ProfileUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
+        }
+    }
+
     StreamerProfileScreen(
         state = state,
+        snackBarHostState = snackBarHostState,
         onEditProfileNav = onEditProfileNav,
         modifier = modifier
     )
@@ -72,6 +86,7 @@ fun StreamerProfileScreen(
 @Composable
 private fun StreamerProfileScreen(
     state: ProfileUiState,
+    snackBarHostState: SnackbarHostState,
     onEditProfileNav: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -83,6 +98,7 @@ private fun StreamerProfileScreen(
     Scaffold(
         modifier = modifier,
         contentWindowInsets = screenTopWindowInsets,
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -259,6 +275,7 @@ private fun StreamerProfileSuccessContent(
 private fun StreamerProfileScreenPreview() {
     StrimupTheme {
         StreamerProfileScreen(
+            snackBarHostState = remember { SnackbarHostState() },
             state = ProfileUiState.Success(
                 streamer = Streamer(
                     id = "1",

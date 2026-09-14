@@ -16,11 +16,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
@@ -47,15 +50,27 @@ fun StreamerDetailScreen(
     viewModel: StreamerDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(streamerId) {
         viewModel.loadStreamer(streamerId)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.event.collect { event ->
+            when (event) {
+                is StreamerDetailUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
+        }
+    }
+
     StreamerDetailScreen(
         modifier = modifier,
         state = state,
+        snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
         onSocialClick = { socialUrl ->
             if (!socialUrl.isNullOrBlank()) {
@@ -74,6 +89,7 @@ fun StreamerDetailScreen(
 @Composable
 private fun StreamerDetailScreen(
     state: StreamerDetailUiState,
+    snackBarHostState: SnackbarHostState,
     onNavUp: () -> Unit,
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
@@ -83,6 +99,7 @@ private fun StreamerDetailScreen(
     Scaffold(
         modifier = modifier,
         contentWindowInsets = screenTopWindowInsets,
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -181,6 +198,7 @@ private fun StreamerDetailScreenPreview() {
             onFavoriteClick = {},
             onVideoClick = { _, _ -> },
             onSocialClick = {},
+            snackBarHostState = remember { SnackbarHostState() },
             state = StreamerDetailUiState.Success(
                 streamer = Streamer(
                     id = "1",

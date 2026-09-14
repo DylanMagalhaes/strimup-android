@@ -1,5 +1,6 @@
 package com.strimup.feature.favorite.presentation
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase
 import com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase
@@ -78,20 +79,40 @@ class FavoriteStreamersViewModelTest {
     @Test
     fun `init when refresh fails should set isRefreshing to false without clearing favoriteStreamers`() = runTest {
         // GIVEN
+        val errorMessage = "Erreur réseau"
         val viewModel = buildViewModel(
             refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase {
-                Result.failure(Exception("Erreur réseau"))
+                Result.failure(Exception(errorMessage))
             },
             observeFavoritesStreamers = observeUseCase(flowOf(fakeStreamers)),
         )
 
-        // WHEN
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            advanceUntilIdle()
 
-        // THEN
+            val event = awaitItem() as FavoriteStreamersUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo(errorMessage)
+        }
         val state = viewModel.state.value
         assertThat(state.isRefreshing).isFalse()
         assertThat(state.favoriteStreamers).isEqualTo(fakeStreamers)
+    }
+
+    @Test
+    fun `init when refresh fails without a message should emit the default error message`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase { Result.failure(Exception()) },
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            advanceUntilIdle()
+
+            val event = awaitItem() as FavoriteStreamersUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo("Impossible d'actualiser vos favoris")
+        }
     }
 
     @Test

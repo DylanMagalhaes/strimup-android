@@ -27,11 +27,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,19 +63,33 @@ fun FavoriteStreamerScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is FavoriteStreamersUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
+        }
+    }
+
     FavoriteStreamerScreenContent(
         state = state,
+        snackBarHostState = snackBarHostState,
         onSearchQueryChange = {it -> viewModel.onSearchQueryChange(it)},
         onStreamerClick = onStreamerClick,
         modifier = modifier
     )
-    
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FavoriteStreamerScreenContent(
     state: FavoriteStreamersUiState,
+    snackBarHostState: SnackbarHostState,
     onSearchQueryChange: (String) -> Unit,
     onStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -79,6 +97,7 @@ private fun FavoriteStreamerScreenContent(
     Scaffold(
         modifier = modifier,
         contentWindowInsets = screenTopWindowInsets,
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -269,6 +288,7 @@ private fun EmptyFavoriteState(
 fun FavoriteStreamerScreenPreview(modifier: Modifier = Modifier) {
     StrimupTheme {
         FavoriteStreamerScreenContent(
+            snackBarHostState = remember { SnackbarHostState() },
             state = FavoriteStreamersUiState(
                 isLoading = false,
                 searchQuery = "",

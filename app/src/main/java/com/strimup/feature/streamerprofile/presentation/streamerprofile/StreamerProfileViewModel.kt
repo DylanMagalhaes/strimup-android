@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class StreamerProfileViewModel @Inject constructor(
@@ -18,6 +20,9 @@ class StreamerProfileViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val state = _state.asStateFlow()
+
+    private val _events = Channel<ProfileUiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
     private var currentUserId: String? = null
 
@@ -36,7 +41,7 @@ class StreamerProfileViewModel @Inject constructor(
         }
     }
 
-    private fun loadStreamer(id: String) {
+    private fun loadStreamer(id: String, previousState: ProfileUiState? = null) {
         viewModelScope.launch {
             currentUserId = id
             getStreamer(id)
@@ -44,17 +49,22 @@ class StreamerProfileViewModel @Inject constructor(
                     _state.value = ProfileUiState.Success(streamer = streamer)
                 }
                 .onFailure { throwable ->
-                    _state.value = ProfileUiState.Error(
-                        errorMessage = throwable.message ?: "Erreur de chargement du profil"
-                    )
+                    val message = throwable.message ?: "Erreur de chargement du profil"
+                    if (previousState is ProfileUiState.Success) {
+                        _state.value = previousState
+                        _events.send(ProfileUiEvent.ShowSnackBar(message))
+                    } else {
+                        _state.value = ProfileUiState.Error(errorMessage = message)
+                    }
                 }
         }
     }
 
     fun refresh() {
         currentUserId?.let { id ->
+            val previousState = _state.value
             _state.value = ProfileUiState.Loading
-            loadStreamer(id)
+            loadStreamer(id, previousState = previousState)
         }
     }
 }
