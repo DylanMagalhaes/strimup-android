@@ -1,5 +1,6 @@
 [versions]
 agp = "9.2.1"
+detekt = "1.23.8"
 coreKtx = "1.18.0"
 coil = "3.4.0"
 junit = "4.13.2"
@@ -30,6 +31,7 @@ androidxTestCore = "1.6.1"
 
 
 [libraries]
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -85,3 +87,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room3 = { id = "androidx.room3", version.ref = "room3" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
