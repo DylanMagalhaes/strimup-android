@@ -26,12 +26,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,14 +63,26 @@ fun MatchedStreamersScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(filterId) {
         viewModel.initData(filterId)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is MatchedStreamersUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
+        }
+    }
+
     MatchedStreamersScreen(
         state = state,
+        snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
         onStreamerClick = onStreamerClick,
         onSocialClick = { socialUrl ->
@@ -85,6 +100,7 @@ fun MatchedStreamersScreen(
 @Composable
 fun MatchedStreamersScreen(
     state: MatchedStreamersUiState,
+    snackBarHostState: SnackbarHostState,
     onNavUp: () -> Unit,
     onStreamerClick: (String) -> Unit,
     onSocialClick: (String?) -> Unit,
@@ -100,6 +116,7 @@ fun MatchedStreamersScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         contentWindowInsets = screenTopWindowInsets,
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -372,6 +389,7 @@ private fun MatchedStreamersScreenPreview() {
             onStreamerClick = {},
             onSocialClick = {},
             onLoadNextPage = {},
+            snackBarHostState = remember { SnackbarHostState() },
             state = MatchedStreamersUiState.Success(
                 filterName = "Mon Filtre",
                 isLiveOnly = true,

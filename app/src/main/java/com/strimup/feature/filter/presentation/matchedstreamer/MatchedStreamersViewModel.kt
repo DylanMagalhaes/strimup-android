@@ -7,11 +7,13 @@ import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.usecase.GetFilterByIdUseCase
 import com.strimup.feature.filter.domain.usecase.GetStreamersByFilterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class MatchedStreamerListViewModel @Inject constructor(
@@ -21,6 +23,9 @@ class MatchedStreamerListViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<MatchedStreamersUiState>(MatchedStreamersUiState.Loading)
     val state = _state.asStateFlow()
+
+    private val _events = Channel<MatchedStreamersUiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
     private var filterId: String = ""
     private var filterName: String? = null
@@ -100,60 +105,66 @@ class MatchedStreamerListViewModel @Inject constructor(
         }
 
         getMatchedStreamers(page = pageNumber, filter = criteria)
-            .onSuccess { response ->
-                val newStreamers = response.streamers.orEmpty()
+            .onSuccess { response -> applyFetchedPage(pageNumber, response) }
+            .onFailure { throwable -> handleFetchFailure(pageNumber, throwable) }
+    }
 
-                if (newStreamers.isEmpty()) {
-                    isEndReached = true
-                }
+    private fun applyFetchedPage(pageNumber: Int, response: StreamerMatchResult) {
+        val newStreamers = response.streamers.orEmpty()
 
-                _state.update { currentState ->
-                    val previousSuccessState = currentState as? MatchedStreamersUiState.Success
+        if (newStreamers.isEmpty()) {
+            isEndReached = true
+        }
 
-                    val currentOriginalStreamers = previousSuccessState?.originalMatchedResult?.streamers.orEmpty()
-                    val updatedOriginalStreamers = if (pageNumber == 1) newStreamers else currentOriginalStreamers + newStreamers
+        _state.update { currentState ->
+            val previousSuccessState = currentState as? MatchedStreamersUiState.Success
 
-                    val isLiveOnly = previousSuccessState?.isLiveOnly ?: false
+            val currentOriginalStreamers = previousSuccessState?.originalMatchedResult?.streamers.orEmpty()
+            val updatedOriginalStreamers = if (pageNumber == 1) newStreamers else currentOriginalStreamers + newStreamers
 
-                    val displayedStreamers = if (isLiveOnly) {
-                        updatedOriginalStreamers.filter { it.isLive }
-                    } else {
-                        updatedOriginalStreamers
-                    }
+            val isLiveOnly = previousSuccessState?.isLiveOnly ?: false
 
-                    val newOriginalResult = StreamerMatchResult(
-                        streamers = updatedOriginalStreamers,
-                        total = response.total
-                    )
+            val displayedStreamers = if (isLiveOnly) {
+                updatedOriginalStreamers.filter { it.isLive }
+            } else {
+                updatedOriginalStreamers
+            }
 
-                    MatchedStreamersUiState.Success(
-                        filterName = filterName,
-                        matchedResult = StreamerMatchResult(
-                            streamers = displayedStreamers,
-                            total = response.total
-                        ),
-                        originalMatchedResult = newOriginalResult,
-                        isLiveOnly = isLiveOnly,
-                        isLoadingNextPage = false
-                    )
+            val newOriginalResult = StreamerMatchResult(
+                streamers = updatedOriginalStreamers,
+                total = response.total
+            )
+
+            MatchedStreamersUiState.Success(
+                filterName = filterName,
+                matchedResult = StreamerMatchResult(
+                    streamers = displayedStreamers,
+                    total = response.total
+                ),
+                originalMatchedResult = newOriginalResult,
+                isLiveOnly = isLiveOnly,
+                isLoadingNextPage = false
+            )
+        }
+    }
+
+    private suspend fun handleFetchFailure(pageNumber: Int, throwable: Throwable) {
+        if (pageNumber == 1) {
+            _state.update {
+                MatchedStreamersUiState.Error(
+                    errorMessage = throwable.message ?: "Une erreur est survenue"
+                )
+            }
+        } else {
+            _state.update { currentState ->
+                if (currentState is MatchedStreamersUiState.Success) {
+                    currentState.copy(isLoadingNextPage = false)
+                } else {
+                    currentState
                 }
             }
-            .onFailure { throwable ->
-                _state.update { currentState ->
-                    if (pageNumber == 1) {
-                        MatchedStreamersUiState.Error(
-                            errorMessage = throwable.message ?: "Une erreur est survenue"
-                        )
-                    } else if (currentState is MatchedStreamersUiState.Success) {
-                        // TODO: la page suivante échoue silencieusement ici : on ne fait que
-                        //  repasser isLoadingNextPage à false, aucun message d'erreur n'est
-                        //  affiché à l'utilisateur (pas de canal d'événements type
-                        //  ShowSnackBar dans ce VM). À revoir si on ajoute un tel mécanisme.
-                        currentState.copy(isLoadingNextPage = false)
-                    } else {
-                        currentState
-                    }
-                }
-            }
+            val message = throwable.message ?: "Impossible de charger la suite des résultats"
+            _events.send(MatchedStreamersUiEvent.ShowSnackBar(message))
+        }
     }
 }

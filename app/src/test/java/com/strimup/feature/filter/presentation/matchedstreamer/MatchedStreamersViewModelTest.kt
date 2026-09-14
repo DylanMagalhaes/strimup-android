@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.presentation.matchedstreamer
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
@@ -268,31 +269,57 @@ class MatchedStreamersViewModelTest {
     }
 
     @Test
-    fun `loadNextPage when a later page fails should reset isLoadingNextPage and keep the existing streamers`() = runTest {
+    fun `loadNextPage when a later page fails should reset isLoadingNextPage, keep the existing streamers and emit ShowSnackBar`() = runTest {
         // GIVEN
-        // TODO: cette branche ne remonte aucun message d'erreur à l'utilisateur (voir le TODO
-        //  dans MatchedStreamerListViewModel.fetchStreamersPage) — ce test documente le
-        //  comportement actuel (silencieux), à mettre à jour si un canal d'événements est ajouté.
+        val errorMessage = "Erreur réseau"
         val viewModel = buildViewModel(
             getMatchedStreamers = GetStreamersByFilterUseCase { page, _ ->
                 if (page == 1) {
                     Result.success(StreamerMatchResult(page1Streamers, 2))
                 } else {
-                    Result.failure(Exception("Erreur réseau"))
+                    Result.failure(Exception(errorMessage))
                 }
             },
         )
         viewModel.initData("f1")
         advanceUntilIdle()
 
-        // WHEN
-        viewModel.loadNextPage()
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.loadNextPage()
+            advanceUntilIdle()
 
-        // THEN
+            val event = awaitItem() as MatchedStreamersUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo(errorMessage)
+        }
         val state = viewModel.state.value as MatchedStreamersUiState.Success
         assertThat(state.isLoadingNextPage).isFalse()
         assertThat(state.matchedResult.streamers).isEqualTo(page1Streamers)
+    }
+
+    @Test
+    fun `loadNextPage when a later page fails without a message should emit the default error message`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            getMatchedStreamers = GetStreamersByFilterUseCase { page, _ ->
+                if (page == 1) {
+                    Result.success(StreamerMatchResult(page1Streamers, 2))
+                } else {
+                    Result.failure(Exception())
+                }
+            },
+        )
+        viewModel.initData("f1")
+        advanceUntilIdle()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.loadNextPage()
+            advanceUntilIdle()
+
+            val event = awaitItem() as MatchedStreamersUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo("Impossible de charger la suite des résultats")
+        }
     }
 
     // endregion
