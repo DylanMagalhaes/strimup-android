@@ -9,6 +9,7 @@
 > The 100% native Kotlin/Compose port of the [strimup.com](https://www.strimup.com) web platform.
 
 <p align="left">
+  <a href="https://github.com/DylanMagalhaes/strimup-android/actions/workflows/ci.yml"><img src="https://github.com/DylanMagalhaes/strimup-android/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" /></a>
   <img src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin" />
   <img src="https://img.shields.io/badge/Jetpack%20Compose-BOM%202026.05-4285F4?logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" />
   <img src="https://img.shields.io/badge/Architecture-Clean%20Architecture-informational" alt="Clean Architecture" />
