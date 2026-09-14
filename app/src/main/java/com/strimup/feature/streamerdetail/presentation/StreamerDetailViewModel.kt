@@ -6,11 +6,13 @@ import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.feature.streamerdetail.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class StreamerDetailViewModel @Inject constructor(
@@ -21,6 +23,9 @@ class StreamerDetailViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<StreamerDetailUiState>(StreamerDetailUiState.Loading)
     val state: StateFlow<StreamerDetailUiState> = _state.asStateFlow()
+
+    private val _event = Channel<StreamerDetailUiEvent>(Channel.BUFFERED)
+    val event = _event.receiveAsFlow()
 
     fun loadStreamer(id: String) {
         viewModelScope.launch {
@@ -66,11 +71,14 @@ class StreamerDetailViewModel @Inject constructor(
                     addStreamerToFavorites(currentStreamer.id)
                 }
 
-                result.onFailure {
+                result.onFailure { exception ->
+                    val message = exception.localizedMessage ?: "Impossible de mettre à jour vos favoris"
                     _state.value = currentState.copy(
                         streamer = currentStreamer,
                         isFavorite = previousFavoriteState
                     )
+
+                    _event.send(StreamerDetailUiEvent.ShowSnackBar(message))
                 }
             }
         }
