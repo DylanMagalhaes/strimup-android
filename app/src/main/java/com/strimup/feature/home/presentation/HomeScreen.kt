@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -31,9 +33,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerCard
+import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.FilterEntity
@@ -64,8 +66,8 @@ fun HomeScreen(
     HomeContent(
         modifier = modifier.fillMaxSize(),
         state = state,
+        snackBarHostState = snackBarHostState,
         onStreamerClick = onStreamerClick,
-        onStreamerFavoriteClick = { /* TODO */ },
         onSocialClick = { socialUrl ->
             if (!socialUrl.isNullOrBlank()) {
                 try {
@@ -76,14 +78,16 @@ fun HomeScreen(
         },
         onTabClick = viewModel::onTabClick,
         onBannerClick = { banner ->
-                if (!banner.linkUrl.isNullOrBlank()) {
-                    try {
-                        val url = if (banner.type == "FEATURED_STREAMER") onStreamerBannerClick(banner.streamerId)   else  uriHandler.openUri(banner.linkUrl)
-
-                    } catch (_: Exception) {
+            if (!banner.linkUrl.isNullOrBlank()) {
+                try {
+                    if (banner.type == "FEATURED_STREAMER") {
+                        onStreamerBannerClick(banner.streamerId)
+                    } else {
+                        uriHandler.openUri(banner.linkUrl)
                     }
+                } catch (_: Exception) {
                 }
-
+            }
         }
     )
 }
@@ -91,69 +95,77 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState,
+    snackBarHostState: SnackbarHostState,
     onStreamerClick: (id: String) -> Unit,
     onBannerClick: (BannerItemEntity) -> Unit,
-    onStreamerFavoriteClick: (Streamer) -> Unit,
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    Scaffold(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.background,
-    ) {
-        Column(
-            modifier = Modifier
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
-                .padding(top = 32.dp)
+        contentWindowInsets = screenTopWindowInsets,
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+    ) { padding ->
+        Surface(
+            modifier = Modifier.padding(padding),
+            color = MaterialTheme.colorScheme.background,
         ) {
+            Column(
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
+                    .padding(top = 32.dp)
+            ) {
 
-            HomeBanner(
-                banners = state.bannerItems,
-                onBannerClick = onBannerClick
-            )
+                HomeBanner(
+                    banners = state.bannerItems,
+                    onBannerClick = onBannerClick
+                )
 
-            VerticalSpacer(24.dp)
+                VerticalSpacer(24.dp)
 
-            HomeTabs(
-                modifier = Modifier.fillMaxWidth(),
-                onButtonClick = onTabClick,
-                currentTab = state.currentTab,
-            )
+                HomeTabs(
+                    modifier = Modifier.fillMaxWidth(),
+                    onButtonClick = onTabClick,
+                    currentTab = state.currentTab,
+                )
 
-            Crossfade(targetState = state.isLoading, label = "loading_crossfade") { isLoading ->
-                if (isLoading) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        items(
-                            items = state.streamers,
-                            key = { streamer -> streamer.id }
-                        ) { streamer ->
-                            StreamerCard(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .defaultMinSize(minHeight = 112.dp),
-                                pseudo = streamer.userName,
-                                socials = streamer.socials,
-                                imageUrl = streamer.imageUrl,
-                                isLive = streamer.isLive,
-                                liveTitle = streamer.liveTitle,
-                                onClick = { onStreamerClick(streamer.id) },
-                                onSocialClick = onSocialClick,
-                            )
+                Crossfade(targetState = state.isLoading, label = "loading_crossfade") { isLoading ->
+                    if (isLoading) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            items(
+                                items = state.streamers,
+                                key = { streamer -> streamer.id }
+                            ) { streamer ->
+                                StreamerCard(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .defaultMinSize(minHeight = 112.dp),
+                                    pseudo = streamer.userName,
+                                    socials = streamer.socials,
+                                    imageUrl = streamer.imageUrl,
+                                    isLive = streamer.isLive,
+                                    liveTitle = streamer.liveTitle,
+                                    onClick = { onStreamerClick(streamer.id) },
+                                    onSocialClick = onSocialClick,
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
     }
+
 }
 
 @Composable
@@ -163,8 +175,8 @@ private fun HomeScreenPreview() {
         HomeContent(
             modifier = Modifier.fillMaxSize(),
             state = HomeUiState(),
+            snackBarHostState = remember { SnackbarHostState() },
             onStreamerClick = {},
-            onStreamerFavoriteClick = {},
             onSocialClick = {},
             onTabClick = {},
             onBannerClick = {}
