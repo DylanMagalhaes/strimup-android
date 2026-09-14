@@ -1,0 +1,223 @@
+package com.strimup.feature.streamerprofile.presentation.streamerprofile
+
+import com.google.common.truth.Truth.assertThat
+import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.user.domain.entity.UserEntity
+import com.strimup.core.user.domain.entity.UserRole
+import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
+import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
+import com.strimup.util.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
+import org.junit.Rule
+import org.junit.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class StreamerProfileViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private val fakeUser = UserEntity(
+        id = "1",
+        userName = "inox",
+        email = "inox@mail.com",
+        role = UserRole.STREAMER,
+        avatarUrl = "",
+    )
+
+    private val fakeStreamer = Streamer(
+        id = "1",
+        userName = "inox",
+        imageUrl = "",
+    )
+
+    private fun getStreamerUseCase(fn: suspend (String) -> Result<Streamer>) =
+        object : GetStreamerUseCase {
+            override suspend fun invoke(id: String): Result<Streamer> = fn(id)
+        }
+
+    private fun buildViewModel(
+        getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
+        getStreamer: GetStreamerUseCase = getStreamerUseCase { Result.success(fakeStreamer) },
+    ) = StreamerProfileViewModel(
+        getUser = getUser,
+        getStreamer = getStreamer,
+    )
+
+    // region init
+
+    @Test
+    fun `state should default to Loading before the user flow emits`() = runTest {
+        // GIVEN / WHEN
+        val viewModel = buildViewModel(getUser = GetUserFlowUseCase { MutableSharedFlow() })
+
+        // THEN
+        assertThat(viewModel.state.value).isEqualTo(ProfileUiState.Loading)
+    }
+
+    @Test
+    fun `init when user is logged in should load and expose the streamer profile`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+
+        // WHEN
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as ProfileUiState.Success
+        assertThat(state.streamer).isEqualTo(fakeStreamer)
+    }
+
+    @Test
+    fun `init when user flow emits null should expose Error state`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(getUser = GetUserFlowUseCase { flowOf(null) })
+
+        // WHEN
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as ProfileUiState.Error
+        assertThat(state.errorMessage).isEqualTo("Utilisateur non connecté")
+    }
+
+    @Test
+    fun `init when user id is blank should expose Error state`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            getUser = GetUserFlowUseCase { flowOf(fakeUser.copy(id = "  ")) },
+        )
+
+        // WHEN
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as ProfileUiState.Error
+        assertThat(state.errorMessage).isEqualTo("Utilisateur non connecté")
+    }
+
+    @Test
+    fun `init when getStreamer fails should expose Error state with exception message`() = runTest {
+        // GIVEN
+        val errorMessage = "Streamer introuvable"
+        val viewModel = buildViewModel(
+            getStreamer = getStreamerUseCase { Result.failure(Exception(errorMessage)) },
+        )
+
+        // WHEN
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as ProfileUiState.Error
+        assertThat(state.errorMessage).isEqualTo(errorMessage)
+    }
+
+    @Test
+    fun `init when getStreamer fails without a message should expose the default error message`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            getStreamer = getStreamerUseCase { Result.failure(Exception()) },
+        )
+
+        // WHEN
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as ProfileUiState.Error
+        assertThat(state.errorMessage).isEqualTo("Erreur de chargement du profil")
+    }
+
+    @Test
+    fun `when the user flow emits a different user the profile should reload for the new id`() = runTest {
+        // GIVEN
+        val userFlow = MutableSharedFlow<UserEntity?>()
+        val requestedIds = mutableListOf<String>()
+        val otherStreamer = Streamer(id = "2", userName = "gotaga", imageUrl = "")
+        val viewModel = buildViewModel(
+            getUser = GetUserFlowUseCase { userFlow },
+            getStreamer = getStreamerUseCase { id ->
+                requestedIds += id
+                if (id == "1") Result.success(fakeStreamer) else Result.success(otherStreamer)
+            },
+        )
+        runCurrent()
+
+        // WHEN
+        userFlow.emit(fakeUser)
+        advanceUntilIdle()
+        userFlow.emit(fakeUser.copy(id = "2"))
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(requestedIds).containsExactly("1", "2").inOrder()
+        val state = viewModel.state.value as ProfileUiState.Success
+        assertThat(state.streamer).isEqualTo(otherStreamer)
+    }
+
+    // endregion
+
+    // region refresh
+
+    @Test
+    fun `refresh should immediately reset state to Loading before the new profile arrives`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+        advanceUntilIdle()
+        assertThat(viewModel.state.value).isInstanceOf(ProfileUiState.Success::class.java)
+
+        // WHEN
+        viewModel.refresh()
+
+        // THEN
+        assertThat(viewModel.state.value).isEqualTo(ProfileUiState.Loading)
+    }
+
+    @Test
+    fun `refresh should reload the streamer for the current user and expose the latest data`() = runTest {
+        // GIVEN
+        var callCount = 0
+        val updatedStreamer = fakeStreamer.copy(bio = "Nouvelle bio")
+        val viewModel = buildViewModel(
+            getStreamer = getStreamerUseCase {
+                callCount++
+                Result.success(if (callCount == 1) fakeStreamer else updatedStreamer)
+            },
+        )
+        advanceUntilIdle()
+
+        // WHEN
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(callCount).isEqualTo(2)
+        val state = viewModel.state.value as ProfileUiState.Success
+        assertThat(state.streamer).isEqualTo(updatedStreamer)
+    }
+
+    @Test
+    fun `refresh when no user has ever been loaded should do nothing`() = runTest {
+        // GIVEN
+        var callCount = 0
+        val viewModel = buildViewModel(
+            getUser = GetUserFlowUseCase { flowOf(null) },
+            getStreamer = getStreamerUseCase { callCount++; Result.success(fakeStreamer) },
+        )
+        advanceUntilIdle()
+        val errorState = viewModel.state.value
+
+        // WHEN
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(callCount).isEqualTo(0)
+        assertThat(viewModel.state.value).isEqualTo(errorState)
+    }
+
+}
