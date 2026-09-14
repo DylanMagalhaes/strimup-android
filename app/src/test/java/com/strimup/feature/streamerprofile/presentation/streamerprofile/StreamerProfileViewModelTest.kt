@@ -2,6 +2,9 @@ package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
@@ -84,7 +87,7 @@ class StreamerProfileViewModelTest {
 
         // THEN
         val state = viewModel.state.value as ProfileUiState.Error
-        assertThat(state.errorMessage).isEqualTo("Utilisateur non connecté")
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_not_logged_in)
     }
 
     @Test
@@ -99,15 +102,14 @@ class StreamerProfileViewModelTest {
 
         // THEN
         val state = viewModel.state.value as ProfileUiState.Error
-        assertThat(state.errorMessage).isEqualTo("Utilisateur non connecté")
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_not_logged_in)
     }
 
     @Test
-    fun `init when getStreamer fails should expose Error state with exception message`() = runTest {
+    fun `init when getStreamer fails should expose Error state with the mapped DomainError message`() = runTest {
         // GIVEN
-        val errorMessage = "Streamer introuvable"
         val viewModel = buildViewModel(
-            getStreamer = getStreamerUseCase { Result.failure(Exception(errorMessage)) },
+            getStreamer = getStreamerUseCase { Result.failure(Exception("peu importe")) },
         )
 
         // WHEN
@@ -115,14 +117,14 @@ class StreamerProfileViewModelTest {
 
         // THEN
         val state = viewModel.state.value as ProfileUiState.Error
-        assertThat(state.errorMessage).isEqualTo(errorMessage)
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_unknown)
     }
 
     @Test
-    fun `init when getStreamer fails without a message should expose the default error message`() = runTest {
+    fun `init when getStreamer fails with a DomainException should keep its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getStreamer = getStreamerUseCase { Result.failure(Exception()) },
+            getStreamer = getStreamerUseCase { Result.failure(DomainException(DomainError.Network)) },
         )
 
         // WHEN
@@ -130,7 +132,7 @@ class StreamerProfileViewModelTest {
 
         // THEN
         val state = viewModel.state.value as ProfileUiState.Error
-        assertThat(state.errorMessage).isEqualTo("Erreur de chargement du profil")
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_network)
     }
 
     @Test
@@ -204,12 +206,11 @@ class StreamerProfileViewModelTest {
     @Test
     fun `refresh when it fails should keep the previously displayed profile and emit ShowSnackBar`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur réseau"
         var callCount = 0
         val viewModel = buildViewModel(
             getStreamer = getStreamerUseCase {
                 callCount++
-                if (callCount == 1) Result.success(fakeStreamer) else Result.failure(Exception(errorMessage))
+                if (callCount == 1) Result.success(fakeStreamer) else Result.failure(Exception("peu importe"))
             },
         )
         advanceUntilIdle()
@@ -220,20 +221,24 @@ class StreamerProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as ProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         val state = viewModel.state.value as ProfileUiState.Success
         assertThat(state.streamer).isEqualTo(fakeStreamer)
     }
 
     @Test
-    fun `refresh when it fails without a message should emit the default error message`() = runTest {
+    fun `refresh when it fails with a DomainException should emit its own category`() = runTest {
         // GIVEN
         var callCount = 0
         val viewModel = buildViewModel(
             getStreamer = getStreamerUseCase {
                 callCount++
-                if (callCount == 1) Result.success(fakeStreamer) else Result.failure(Exception())
+                if (callCount == 1) {
+                    Result.success(fakeStreamer)
+                } else {
+                    Result.failure(DomainException(DomainError.Network))
+                }
             },
         )
         advanceUntilIdle()
@@ -244,7 +249,7 @@ class StreamerProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as ProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Erreur de chargement du profil")
+            assertThat(event.textRes).isEqualTo(R.string.error_network)
         }
     }
 

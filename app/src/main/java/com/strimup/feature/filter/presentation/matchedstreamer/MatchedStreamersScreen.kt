@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.presentation.matchedstreamer
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +39,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,6 +68,7 @@ fun MatchedStreamersScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
+    val resources = LocalResources.current
 
     LaunchedEffect(filterId) {
         viewModel.initData(filterId)
@@ -74,7 +78,7 @@ fun MatchedStreamersScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is MatchedStreamersUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }
@@ -150,7 +154,7 @@ fun MatchedStreamersScreen(
 
                 is MatchedStreamersUiState.Error -> {
                     ErrorMatchedStreamers(
-                        errorMessage = state.errorMessage,
+                        errorMessageRes = state.errorMessageRes,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -342,7 +346,7 @@ private fun EmptyMatchedStreamers(modifier: Modifier = Modifier) {
 
 @Composable
 private fun ErrorMatchedStreamers(
-    errorMessage: String,
+    @StringRes errorMessageRes: Int,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -370,7 +374,7 @@ private fun ErrorMatchedStreamers(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = errorMessage,
+                text = stringResource(errorMessageRes),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

@@ -33,12 +33,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
@@ -61,6 +64,7 @@ fun EditProfileScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
 
     LaunchedEffect(state.isSaveSuccess) {
         if (state.isSaveSuccess) {
@@ -72,7 +76,7 @@ fun EditProfileScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is EditProfileUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }
@@ -82,10 +86,10 @@ fun EditProfileScreen(
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
-    } else if (state.errorMessage != null && state.originalProfile == null) {
+    } else if (state.errorMessageRes != null && state.originalProfile == null) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = state.errorMessage ?: "Une erreur est survenue",
+                text = stringResource(state.errorMessageRes ?: R.string.error_unknown),
                 color = MaterialTheme.colorScheme.error,
                 fontFamily = zalandoFontFamily
             )
