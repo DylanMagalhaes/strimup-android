@@ -173,42 +173,74 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `init when getOptions fails should silently fall back to empty options with no error shown`() = runTest {
-        // TODO: voir le TODO dans EditProfileViewModel.loadOptions() — aucun retour utilisateur
-        //  en cas d'échec. Pire : loadStreamer() retombe ensuite sur un StreamerOptions vide
-        //  (fetchedOptions ?: StreamerOptions(...)), donc l'écran a l'air d'avoir chargé des
-        //  options valides alors qu'elles sont vides. Ce test documente ce comportement actuel.
+    fun `init when getOptions fails should emit ShowSnackBar and fall back to empty options`() = runTest {
         // GIVEN
+        val errorMessage = "Erreur serveur"
         val viewModel = buildViewModel(
-            repository = FakeStreamerRepository(optionsResult = Result.failure(Exception("Erreur serveur"))),
+            repository = FakeStreamerRepository(optionsResult = Result.failure(Exception(errorMessage))),
         )
 
-        // WHEN
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            advanceUntilIdle()
 
-        // THEN
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo(errorMessage)
+        }
         assertThat(viewModel.state.value.availableOptions).isEqualTo(
             StreamerOptions(emptyList(), emptyList(), emptyList(), emptyList())
         )
-        assertThat(viewModel.state.value.errorMessage).isNull()
     }
 
     @Test
-    fun `init when getTags fails should silently leave availableTags and availableCategories empty`() = runTest {
-        // TODO: voir le TODO dans EditProfileViewModel.loadTags() — aucun retour utilisateur
-        //  en cas d'échec, ce test documente le comportement actuel (silencieux).
+    fun `init when getOptions fails without a message should emit the default error message`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getTags = GetTagsUseCase { Result.failure(Exception("Erreur serveur")) },
+            repository = FakeStreamerRepository(optionsResult = Result.failure(Exception())),
         )
 
-        // WHEN
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            advanceUntilIdle()
 
-        // THEN
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo("Impossible de charger les options")
+        }
+    }
+
+    @Test
+    fun `init when getTags fails should emit ShowSnackBar and leave availableTags and availableCategories empty`() = runTest {
+        // GIVEN
+        val errorMessage = "Erreur serveur"
+        val viewModel = buildViewModel(
+            getTags = GetTagsUseCase { Result.failure(Exception(errorMessage)) },
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            advanceUntilIdle()
+
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo(errorMessage)
+        }
         assertThat(viewModel.state.value.availableTags).isEmpty()
         assertThat(viewModel.state.value.availableCategories).isEmpty()
-        assertThat(viewModel.state.value.errorMessage).isNull()
+    }
+
+    @Test
+    fun `init when getTags fails without a message should emit the default error message`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            getTags = GetTagsUseCase { Result.failure(Exception()) },
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            advanceUntilIdle()
+
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo("Impossible de charger les tags")
+        }
     }
 
     // endregion
