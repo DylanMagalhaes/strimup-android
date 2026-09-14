@@ -51,6 +51,11 @@ class EditProfileViewModel @Inject constructor(
 
     private fun loadOptions() {
         viewModelScope.launch {
+            // TODO: pas de .onFailure ici : si getOptions() échoue, aucun retour utilisateur
+            //  (pas d'errorMessage, pas de snackbar) — et pire, loadStreamer() retombe ensuite
+            //  sur un StreamerOptions vide (fetchedOptions ?: StreamerOptions(...)), donc l'écran
+            //  a l'air d'avoir chargé des options valides alors qu'elles sont vides.
+            //  À corriger si un écran d'édition sans options doit être signalé.
             getOptions()
                 .onSuccess { options ->
                     fetchedOptions = options
@@ -63,6 +68,8 @@ class EditProfileViewModel @Inject constructor(
 
     private fun loadTags() {
         viewModelScope.launch {
+            // TODO: pas de .onFailure ici : si getTags() échoue, availableTags/availableCategories
+            //  restent vides et l'utilisateur n'a aucun retour. Même remarque que loadOptions().
             getTags()
                 .onSuccess { tags ->
                     fetchedTags = tags
