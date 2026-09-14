@@ -2,22 +2,24 @@ package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
+import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
@@ -31,6 +33,9 @@ class EditProfileViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(EditProfileUiState())
     val state: StateFlow<EditProfileUiState> = _state.asStateFlow()
+
+    private val _events = Channel<EditProfileUiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
     private var fetchedOptions: StreamerOptions? = null
     private var fetchedTags: List<TagEntity> = emptyList()
@@ -283,13 +288,10 @@ class EditProfileViewModel @Inject constructor(
                 val avatarResult = updateAvatar(selectedImage)
 
                 if (avatarResult.isFailure) {
-                    _state.update { state ->
-                        state.copy(
-                            isSaving = false,
-                            errorMessage = avatarResult.exceptionOrNull()?.localizedMessage
-                                ?: "Erreur lors de l'envoi de la photo de profil"
-                        )
-                    }
+                    _state.update { state -> state.copy(isSaving = false) }
+                    val message = avatarResult.exceptionOrNull()?.localizedMessage
+                        ?: "Erreur lors de l'envoi de la photo de profil"
+                    _events.send(EditProfileUiEvent.ShowSnackBar(message))
                     return@launch
                 }
 
@@ -323,12 +325,9 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    _state.update { state ->
-                        state.copy(
-                            isSaving = false,
-                            errorMessage = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
-                        )
-                    }
+                    _state.update { state -> state.copy(isSaving = false) }
+                    val message = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
+                    _events.send(EditProfileUiEvent.ShowSnackBar(message))
                 }
         }
     }

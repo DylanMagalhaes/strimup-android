@@ -21,6 +21,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,6 +30,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -36,17 +39,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.core.ui.theme.StrimupTheme
-import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.editrow.ProfileEditRow
-import com.strimup.core.ui.inset.screenTopWindowInsets
-import com.strimup.feature.streamerprofile.presentation.editprofile.component.EditProfileImageSection
 import com.strimup.core.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.SingleSelectBottomSheet
+import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.feature.streamerprofile.presentation.editprofile.component.EditProfileImageSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,10 +60,21 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.isSaveSuccess) {
         if (state.isSaveSuccess) {
             onNavUp()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is EditProfileUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(event.text)
+                }
+            }
         }
     }
 
@@ -80,6 +94,7 @@ fun EditProfileScreen(
         Scaffold(
             modifier = modifier,
             contentWindowInsets = screenTopWindowInsets,
+            snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
             topBar = {
                 TopAppBar(
                     title = {

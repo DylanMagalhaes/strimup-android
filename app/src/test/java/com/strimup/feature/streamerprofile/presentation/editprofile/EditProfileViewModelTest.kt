@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerprofile.presentation.editprofile
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.strimup.core.streamer.data.request.StreamerMatchRequest
 import com.strimup.core.streamer.domain.entity.Social
@@ -493,7 +494,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `saveProfile when the avatar upload fails should set errorMessage and never call updateProfile`() = runTest {
+    fun `saveProfile when the avatar upload fails should emit ShowSnackBar and never call updateProfile`() = runTest {
         // GIVEN
         val errorMessage = "Fichier trop volumineux"
         val repository = FakeStreamerRepository(
@@ -503,32 +504,36 @@ class EditProfileViewModelTest {
         advanceUntilIdle()
         viewModel.onImageSelected("content://media/42")
 
-        // WHEN
-        viewModel.saveProfile()
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.saveProfile()
+            advanceUntilIdle()
 
-        // THEN
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo(errorMessage)
+        }
         assertThat(repository.updateProfileCallCount).isEqualTo(0)
         val state = viewModel.state.value
         assertThat(state.isSaving).isFalse()
         assertThat(state.isSaveSuccess).isFalse()
-        assertThat(state.errorMessage).isEqualTo(errorMessage)
     }
 
     @Test
-    fun `saveProfile when the avatar upload fails without a message should use the default error message`() = runTest {
+    fun `saveProfile when the avatar upload fails without a message should emit the default error message`() = runTest {
         // GIVEN
         val repository = FakeStreamerRepository(avatarResult = Result.failure(Exception()))
         val viewModel = buildViewModel(repository = repository)
         advanceUntilIdle()
         viewModel.onImageSelected("file://tmp/photo.jpg")
 
-        // WHEN
-        viewModel.saveProfile()
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.saveProfile()
+            advanceUntilIdle()
 
-        // THEN
-        assertThat(viewModel.state.value.errorMessage).isEqualTo("Erreur lors de l'envoi de la photo de profil")
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo("Erreur lors de l'envoi de la photo de profil")
+        }
     }
 
     @Test
@@ -555,7 +560,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `saveProfile when updateProfile fails should set errorMessage without isSaveSuccess`() = runTest {
+    fun `saveProfile when updateProfile fails should emit ShowSnackBar without isSaveSuccess`() = runTest {
         // GIVEN
         val errorMessage = "Conflit serveur"
         val repository = FakeStreamerRepository(
@@ -564,19 +569,21 @@ class EditProfileViewModelTest {
         val viewModel = buildViewModel(repository = repository)
         advanceUntilIdle()
 
-        // WHEN
-        viewModel.saveProfile()
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.saveProfile()
+            advanceUntilIdle()
 
-        // THEN
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo(errorMessage)
+        }
         val state = viewModel.state.value
         assertThat(state.isSaving).isFalse()
         assertThat(state.isSaveSuccess).isFalse()
-        assertThat(state.errorMessage).isEqualTo(errorMessage)
     }
 
     @Test
-    fun `saveProfile when updateProfile fails without a message should use the default error message`() = runTest {
+    fun `saveProfile when updateProfile fails without a message should emit the default error message`() = runTest {
         // GIVEN
         val repository = FakeStreamerRepository(
             updateProfileResult = { Result.failure(Exception()) },
@@ -584,12 +591,14 @@ class EditProfileViewModelTest {
         val viewModel = buildViewModel(repository = repository)
         advanceUntilIdle()
 
-        // WHEN
-        viewModel.saveProfile()
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.saveProfile()
+            advanceUntilIdle()
 
-        // THEN
-        assertThat(viewModel.state.value.errorMessage).isEqualTo("Impossible de sauvegarder les modifications")
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.text).isEqualTo("Impossible de sauvegarder les modifications")
+        }
     }
 
     @Test
