@@ -145,6 +145,10 @@ class MatchedStreamerListViewModel @Inject constructor(
                             errorMessage = throwable.message ?: "Une erreur est survenue"
                         )
                     } else if (currentState is MatchedStreamersUiState.Success) {
+                        // TODO: la page suivante échoue silencieusement ici : on ne fait que
+                        //  repasser isLoadingNextPage à false, aucun message d'erreur n'est
+                        //  affiché à l'utilisateur (pas de canal d'événements type
+                        //  ShowSnackBar dans ce VM). À revoir si on ajoute un tel mécanisme.
                         currentState.copy(isLoadingNextPage = false)
                     } else {
                         currentState
