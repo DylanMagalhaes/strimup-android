@@ -1,6 +1,7 @@
 package com.strimup.core.network
 
 import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
@@ -18,4 +19,13 @@ fun Throwable.toDomainError(): DomainError = when (this) {
     is SerializationException -> DomainError.Serialization
     is IOException -> DomainError.Network
     else -> DomainError.Unknown
+}
+
+fun <T> Result<T>.toDomainResult(): Result<T> {
+    val exception = exceptionOrNull()
+    return when {
+        exception == null -> this
+        exception is DomainException -> this
+        else -> Result.failure(DomainException(exception.toDomainError()))
+    }
 }
