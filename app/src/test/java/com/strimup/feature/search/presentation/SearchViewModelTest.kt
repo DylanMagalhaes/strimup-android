@@ -1,6 +1,9 @@
 package com.strimup.feature.search.presentation
 
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.feature.search.domain.usecase.GetStreamersUseCase
 import com.strimup.util.MainDispatcherRule
@@ -71,12 +74,11 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `on search input change, should emit Error when search fails`() = runTest {
+    fun `on search input change, should emit Error with the mapped DomainError message when search fails`() = runTest {
         // GIVEN
         val query = "erreur"
-        val errorMessage = "Erreur réseau"
         val viewModel = SearchViewModel(
-            getStreamers = GetStreamersUseCase { Result.failure(Exception(errorMessage)) }
+            getStreamers = GetStreamersUseCase { Result.failure(Exception("peu importe")) }
         )
 
         // WHEN
@@ -89,7 +91,24 @@ class SearchViewModelTest {
 
         val errorState = stateValue as SearchUiState.Error
         assertThat(errorState.searchQuery).isEqualTo(query)
-        assertThat(errorState.message).isEqualTo(errorMessage)
+        assertThat(errorState.messageRes).isEqualTo(R.string.error_unknown)
+    }
+
+    @Test
+    fun `on search input change, should emit Error keeping the DomainException own category`() = runTest {
+        // GIVEN
+        val query = "erreur"
+        val viewModel = SearchViewModel(
+            getStreamers = GetStreamersUseCase { Result.failure(DomainException(DomainError.Network)) }
+        )
+
+        // WHEN
+        viewModel.onSearchInputChange(query)
+        advanceUntilIdle()
+
+        // THEN
+        val errorState = viewModel.state.value as SearchUiState.Error
+        assertThat(errorState.messageRes).isEqualTo(R.string.error_network)
     }
 
     @Test

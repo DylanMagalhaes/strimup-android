@@ -2,6 +2,9 @@ package com.strimup.feature.filter.presentation.list
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUseCase
@@ -77,11 +80,10 @@ class FilterListViewModelTest {
     }
 
     @Test
-    fun `init when getFilters fails should set isLoading false and emit ShowSnackBar with exception message`() = runTest {
+    fun `init when getFilters fails should set isLoading false and emit ShowSnackBar with the mapped DomainError message`() = runTest {
         // GIVEN
-        val errorMessage = "Impossible de joindre le serveur"
         val viewModel = buildViewModel(
-            getFilters = GetFiltersUseCase { Result.failure(Exception(errorMessage)) },
+            getFilters = GetFiltersUseCase { Result.failure(Exception("peu importe")) },
         )
 
         // WHEN & THEN
@@ -90,17 +92,17 @@ class FilterListViewModelTest {
 
             val event = awaitItem()
             assertThat(event).isInstanceOf(FilterListUiEvent.ShowSnackBar::class.java)
-            assertThat((event as FilterListUiEvent.ShowSnackBar).text).isEqualTo(errorMessage)
+            assertThat((event as FilterListUiEvent.ShowSnackBar).textRes).isEqualTo(R.string.error_unknown)
         }
         assertThat(viewModel.state.value.isLoading).isFalse()
         assertThat(viewModel.state.value.filters).isEmpty()
     }
 
     @Test
-    fun `init when getFilters fails without a message should emit the default error message`() = runTest {
+    fun `init when getFilters fails with a DomainException should keep its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getFilters = GetFiltersUseCase { Result.failure(Exception()) },
+            getFilters = GetFiltersUseCase { Result.failure(DomainException(DomainError.Network)) },
         )
 
         // WHEN & THEN
@@ -108,7 +110,7 @@ class FilterListViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as FilterListUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Erreur lors de la récupération des filtres")
+            assertThat(event.textRes).isEqualTo(R.string.error_network)
         }
     }
 
@@ -163,17 +165,16 @@ class FilterListViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as FilterListUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("votre filtre a bien été supprimé")
+            assertThat(event.textRes).isEqualTo(R.string.filter_deleted_success)
         }
         assertThat(viewModel.state.value.filters).containsExactly(fakeFilters[1])
     }
 
     @Test
-    fun `onDeleteButtonClick when delete fails should rollback the filters and emit ShowSnackBar with exception message`() = runTest {
+    fun `onDeleteButtonClick when delete fails should rollback the filters and emit ShowSnackBar with the mapped DomainError message`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur serveur"
         val viewModel = buildViewModel(
-            deleteFilter = DeleteFilterUseCase { Result.failure(Exception(errorMessage)) },
+            deleteFilter = DeleteFilterUseCase { Result.failure(Exception("peu importe")) },
         )
         advanceUntilIdle()
 
@@ -183,16 +184,16 @@ class FilterListViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as FilterListUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         assertThat(viewModel.state.value.filters).isEqualTo(fakeFilters)
     }
 
     @Test
-    fun `onDeleteButtonClick when delete fails without a message should emit the default error message`() = runTest {
+    fun `onDeleteButtonClick when delete fails with a DomainException should keep its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            deleteFilter = DeleteFilterUseCase { Result.failure(Exception()) },
+            deleteFilter = DeleteFilterUseCase { Result.failure(DomainException(DomainError.Server(500))) },
         )
         advanceUntilIdle()
 
@@ -202,7 +203,7 @@ class FilterListViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as FilterListUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Impossible de supprimer le filtre")
+            assertThat(event.textRes).isEqualTo(R.string.error_server)
         }
     }
 

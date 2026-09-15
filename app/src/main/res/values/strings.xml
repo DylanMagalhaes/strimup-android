@@ -9,4 +9,7 @@
     <string name="error_serialization">Une erreur inattendue est survenue.</string>
     <string name="error_unknown">Une erreur est survenue.</string>
     <string name="error_not_logged_in">Utilisateur non connecté.</string>
+
+    <!-- Filters -->
+    <string name="filter_deleted_success">Votre filtre a bien été supprimé.</string>
 </resources>
