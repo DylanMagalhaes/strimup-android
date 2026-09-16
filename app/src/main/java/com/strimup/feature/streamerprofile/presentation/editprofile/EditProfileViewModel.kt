@@ -42,6 +42,7 @@ class EditProfileViewModel @Inject constructor(
 
     private var fetchedOptions: StreamerOptions? = null
     private var fetchedTags: List<TagEntity> = emptyList()
+    private var currentUserId: String? = null
 
     init {
         viewModelScope.launch {
@@ -51,10 +52,15 @@ class EditProfileViewModel @Inject constructor(
             getUser().collect { user ->
                 val id = user?.id
                 if (!id.isNullOrBlank()) {
+                    currentUserId = id
                     loadStreamer(id)
                 }
             }
         }
+    }
+
+    fun retry() {
+        currentUserId?.let { loadStreamer(it) }
     }
 
     private fun loadOptions() {

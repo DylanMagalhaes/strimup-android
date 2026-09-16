@@ -46,6 +46,7 @@ import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerHero
@@ -81,6 +82,7 @@ fun StreamerProfileScreen(
         state = state,
         snackBarHostState = snackBarHostState,
         onEditProfileNav = onEditProfileNav,
+        onRetryClick = viewModel::refresh,
         modifier = modifier
     )
 }
@@ -91,6 +93,7 @@ private fun StreamerProfileScreen(
     state: ProfileUiState,
     snackBarHostState: SnackbarHostState,
     onEditProfileNav: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val titleText = when (state) {
@@ -120,6 +123,7 @@ private fun StreamerProfileScreen(
                 .padding(padding)
                 .fillMaxSize(),
             onEditProfileNav = onEditProfileNav,
+            onRetryClick = onRetryClick,
             state = state,
         )
     }
@@ -129,6 +133,7 @@ private fun StreamerProfileScreen(
 private fun StreamerProfileContent(
     state: ProfileUiState,
     onEditProfileNav: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -139,8 +144,17 @@ private fun StreamerProfileContent(
         }
 
         is ProfileUiState.Error -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(text = stringResource(state.errorMessageRes))
+                VerticalSpacer(8.dp)
+                PrimaryButton(
+                    label = "Réessayer",
+                    onClick = onRetryClick,
+                )
             }
         }
 
@@ -310,7 +324,8 @@ private fun StreamerProfileScreenPreview() {
                     streamFrequency = "",
                 )
             ),
-            onEditProfileNav = {}
+            onEditProfileNav = {},
+            onRetryClick = {}
         )
     }
 }

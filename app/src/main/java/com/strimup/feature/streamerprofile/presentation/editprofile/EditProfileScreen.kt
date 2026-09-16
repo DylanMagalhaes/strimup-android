@@ -45,6 +45,7 @@ import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.editrow.ProfileEditRow
 import com.strimup.core.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
@@ -87,11 +88,20 @@ fun EditProfileScreen(
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     } else if (state.errorMessageRes != null && state.originalProfile == null) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(
                 text = stringResource(state.errorMessageRes ?: R.string.error_unknown),
                 color = MaterialTheme.colorScheme.error,
                 fontFamily = zalandoFontFamily
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            PrimaryButton(
+                label = "Réessayer",
+                onClick = viewModel::retry,
             )
         }
     } else {

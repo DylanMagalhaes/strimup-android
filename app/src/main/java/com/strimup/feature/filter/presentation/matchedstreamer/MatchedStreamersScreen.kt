@@ -52,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
+import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
@@ -96,6 +97,7 @@ fun MatchedStreamersScreen(
         },
         onLoadNextPage = viewModel::loadNextPage,
         onLiveCheckedChange = viewModel::onLiveSwitch,
+        onRetryClick = viewModel::retry,
         modifier = modifier
     )
 }
@@ -110,6 +112,7 @@ fun MatchedStreamersScreen(
     onSocialClick: (String?) -> Unit,
     onLoadNextPage: () -> Unit,
     onLiveCheckedChange: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val topBarTitle = when (state) {
@@ -155,6 +158,7 @@ fun MatchedStreamersScreen(
                 is MatchedStreamersUiState.Error -> {
                     ErrorMatchedStreamers(
                         errorMessageRes = state.errorMessageRes,
+                        onRetryClick = onRetryClick,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -347,6 +351,7 @@ private fun EmptyMatchedStreamers(modifier: Modifier = Modifier) {
 @Composable
 private fun ErrorMatchedStreamers(
     @StringRes errorMessageRes: Int,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -379,6 +384,11 @@ private fun ErrorMatchedStreamers(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            PrimaryButton(
+                label = "Réessayer",
+                onClick = onRetryClick,
+            )
         }
     }
 }
@@ -393,6 +403,7 @@ private fun MatchedStreamersScreenPreview() {
             onStreamerClick = {},
             onSocialClick = {},
             onLoadNextPage = {},
+            onRetryClick = {},
             snackBarHostState = remember { SnackbarHostState() },
             state = MatchedStreamersUiState.Success(
                 filterName = "Mon Filtre",

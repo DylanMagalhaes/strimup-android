@@ -42,6 +42,10 @@ class MatchedStreamerListViewModel @Inject constructor(
         }
     }
 
+    fun retry() {
+        loadInitialData()
+    }
+
     private fun loadInitialData() {
         viewModelScope.launch {
             _state.value = MatchedStreamersUiState.Loading
