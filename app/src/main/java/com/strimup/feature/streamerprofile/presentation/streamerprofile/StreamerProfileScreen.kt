@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,8 +45,8 @@ import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.tag.domain.entity.TagEntity
-import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.button.SocialIconButton
+import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -144,18 +143,11 @@ private fun StreamerProfileContent(
         }
 
         is ProfileUiState.Error -> {
-            Column(
+            ErrorState(
+                messageRes = state.errorMessageRes,
+                onRetryClick = onRetryClick,
                 modifier = modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = stringResource(state.errorMessageRes))
-                VerticalSpacer(8.dp)
-                PrimaryButton(
-                    label = "Réessayer",
-                    onClick = onRetryClick,
-                )
-            }
+            )
         }
 
         is ProfileUiState.Success -> {

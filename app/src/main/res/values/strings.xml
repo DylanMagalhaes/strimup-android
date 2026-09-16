@@ -10,7 +10,11 @@
     <string name="error_unknown">Une erreur est survenue.</string>
     <string name="error_not_logged_in">Utilisateur non connecté.</string>
     <string name="error_open_link">Impossible d\'ouvrir ce lien.</string>
+    <string name="error_generic_title">Une erreur est survenue</string>
 
     <!-- Filters -->
     <string name="filter_deleted_success">Votre filtre a bien été supprimé.</string>
+
+    <!-- Actions -->
+    <string name="action_retry">Réessayer</string>
 </resources>

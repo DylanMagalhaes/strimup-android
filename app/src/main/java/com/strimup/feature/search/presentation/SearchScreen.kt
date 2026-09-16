@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.strimup.core.streamer.domain.entity.Streamer
-import com.strimup.core.ui.component.button.PrimaryButton
+import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -128,23 +127,11 @@ private fun SearchContent(
             }
         }
         is SearchUiState.Error -> {
-            Column(
+            ErrorState(
+                messageRes = state.messageRes,
+                onRetryClick = onRetryClick,
                 modifier = modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = stringResource(state.messageRes),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
-                PrimaryButton(
-                    label = "Réessayer",
-                    onClick = onRetryClick,
-                )
-            }
+            )
         }
         is SearchUiState.Content -> {
             LazyColumn(

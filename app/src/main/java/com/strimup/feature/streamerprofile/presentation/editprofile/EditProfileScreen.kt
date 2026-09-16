@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,11 +44,11 @@ import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
-import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.editrow.ProfileEditRow
 import com.strimup.core.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.SingleSelectBottomSheet
+import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -88,22 +87,11 @@ fun EditProfileScreen(
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     } else if (state.errorMessageRes != null && state.originalProfile == null) {
-        Column(
+        ErrorState(
+            messageRes = state.errorMessageRes ?: R.string.error_unknown,
+            onRetryClick = viewModel::retry,
             modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(state.errorMessageRes ?: R.string.error_unknown),
-                color = MaterialTheme.colorScheme.error,
-                fontFamily = zalandoFontFamily
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            PrimaryButton(
-                label = "Réessayer",
-                onClick = viewModel::retry,
-            )
-        }
+        )
     } else {
         Scaffold(
             modifier = modifier,
