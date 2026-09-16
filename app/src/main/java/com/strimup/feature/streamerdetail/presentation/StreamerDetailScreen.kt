@@ -1,6 +1,7 @@
 package com.strimup.feature.streamerdetail.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +33,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,6 +41,8 @@ import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.button.PrimaryButton
+import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -92,6 +96,7 @@ fun StreamerDetailScreen(
         },
         onVideoClick = onVideoClick,
         onFavoriteClick = { viewModel.onFavoriteClick() },
+        onRetryClick = { viewModel.loadStreamer(streamerId) }
     )
 }
 
@@ -104,6 +109,7 @@ private fun StreamerDetailScreen(
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -138,7 +144,8 @@ private fun StreamerDetailScreen(
             state = state,
             onSocialClick = onSocialClick,
             onVideoClick = onVideoClick,
-            onFavoriteClick = onFavoriteClick
+            onFavoriteClick = onFavoriteClick,
+            onRetryClick = onRetryClick,
         )
     }
 }
@@ -149,6 +156,7 @@ private fun StreamerDetailContent(
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -192,8 +200,17 @@ private fun StreamerDetailContent(
         }
 
         is StreamerDetailUiState.Error -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(text = stringResource(state.messageRes))
+                VerticalSpacer(8.dp)
+                PrimaryButton(
+                    label = "Réessayer",
+                    onClick = onRetryClick,
+                )
             }
         }
     }
@@ -235,7 +252,8 @@ private fun StreamerDetailScreenPreview() {
                     followersCount = 10
                 ),
                 isFavorite = true
-            )
+            ),
+            onRetryClick = {}
         )
     }
 }
