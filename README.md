@@ -104,7 +104,7 @@ Le projet est découpé en modules fonctionnels au sein d'un module `app` unique
           val isLoadingNextPage: Boolean = false,
       ) : MatchedStreamersUiState
 
-      data class Error(val errorMessage: String) : MatchedStreamersUiState
+      data class Error(@StringRes val errorMessageRes: Int) : MatchedStreamersUiState
   }
   ```
 
@@ -112,13 +112,48 @@ Le projet est découpé en modules fonctionnels au sein d'un module `app` unique
 
   ```kotlin
   sealed interface FilterListUiEvent {
-      data class ShowSnackBar(val text: String) : FilterListUiEvent
+      data class ShowSnackBar(@StringRes val textRes: Int) : FilterListUiEvent
   }
   ```
 
 ### Injection de dépendances — Hilt
 
 Chaque `feature` et chaque module `core` expose son propre **module Hilt** (`@Module @InstallIn(SingletonComponent::class)`), liant les interfaces de `domain` à leurs implémentations `data` (`FilterModule`, `HomeModule`, `AuthModule`, `StreamerCoreModule`, `TagModule`…). Les `ViewModel` sont injectés via `@HiltViewModel`, garantissant un couplage faible et une testabilité maximale (mock des dépendances par interface).
+
+### Gestion d'erreurs typée
+
+Aucune exception ne remonte brute jusqu'à l'utilisateur (`exception.localizedMessage`) : la couche `data` la convertit en un type métier fermé, et seule la couche `presentation` sait le traduire en texte localisé.
+
+```kotlin
+// core/common — pur Kotlin, aucune dépendance Android
+sealed class DomainError {
+    data object Network : DomainError()
+    data object Timeout : DomainError()
+    data object Unauthorized : DomainError()
+    data class Server(val code: Int) : DomainError()
+    data object Serialization : DomainError()
+    data object Unknown : DomainError()
+}
+
+// core/network — Throwable → DomainError, appliqué au bord de chaque repository
+fun Throwable.toDomainError(): DomainError = when (this) {
+    is SocketTimeoutException -> DomainError.Timeout
+    is HttpException -> if (code() == 401) DomainError.Unauthorized else DomainError.Server(code())
+    is SerializationException -> DomainError.Serialization
+    is IOException -> DomainError.Network
+    else -> DomainError.Unknown
+}
+
+// core/ui — seule couche qui connaît les ressources Android
+@StringRes fun DomainError.toMessageRes(): Int = when (this) {
+    DomainError.Network -> R.string.error_network
+    DomainError.Timeout -> R.string.error_timeout
+    // ...
+}
+```
+
+- Les `UiState.Error` et `UiEvent.ShowSnackBar` transportent un `@StringRes Int`, jamais une `String` brute — messages localisés et cohérents partout dans l'app.
+- Un composant Compose partagé **`ErrorState`** (icône, titre, message, action *Réessayer*) est réutilisé sur tous les écrans en échec, évitant la duplication d'UI d'erreur et garantissant une expérience homogène.
 
 ---
 <a id="stack-technique"></a>
@@ -169,9 +204,11 @@ Fils de découverte (favoris / sans favoris), recherche de streamers, navigation
 - **Immuabilité du state** : les `UiState` sont des `data class` / `sealed interface` immuables ; toute mise à jour passe par `copy()`, jamais de mutation directe — garantissant la prévisibilité du flux de données (UDF).
 - **`Result<T>` de bout en bout** : les `UseCase` et `Repository` retournent des `Result<T>` Kotlin plutôt que de lever des exceptions non contrôlées, forçant une gestion explicite du succès/échec (`onSuccess` / `onFailure`) jusque dans le ViewModel.
 - **Repositories orientés interface** : chaque feature expose une interface de `Repository` dans `domain/`, implémentée dans `data/` — permettant le mock complet en tests unitaires sans dépendance à Retrofit/Room.
-- **Composants Compose découplés & réutilisables** : extraction systématique en petits composants (`FilterBadge`, `FilterItemCard`, `FavoriteIconButton`, `EditProfileImageSection`…) avec **`@Preview`** pour une itération visuelle rapide, indépendante du run sur device/émulateur.
+- **Composants Compose découplés & réutilisables** : extraction systématique en petits composants (`FilterBadge`, `FilterItemCard`, `FavoriteIconButton`, `EditProfileImageSection`, `ErrorState`…) avec **`@Preview`** pour une itération visuelle rapide, indépendante du run sur device/émulateur.
 - **UI responsive** : layouts construits avec les primitives Compose (`Column`, `Row`, `LazyColumn`, `BoxWithConstraints`) sans dimensions codées en dur, pour s'adapter aux différentes tailles d'écran.
 - **Séparation stricte des couches** : aucune dépendance Android (`Context`, vues) dans `domain/`.
+- **+200 tests unitaires** (UseCases, mappers, ViewModels) avec JUnit, Truth et Turbine (test des `Flow`/`Channel` d'événements UI).
+- **Analyse statique en continu** : `detekt` (config personnalisée + baseline) et Android Lint exécutés à chaque push/PR via **GitHub Actions**, aux côtés du build et de la suite de tests.
 
 ---
 <a id="structure"></a>
@@ -232,11 +269,13 @@ Le projet utilise un **Version Catalog** (`gradle/libs.versions.toml`) : aucune 
 <a id="roadmap"></a>
 ## Roadmap
 
-- [ ] Externalisation des chaînes de caractères en dur vers `strings.xml`
-- [ ] Couverture de tests unitaires (UseCases & ViewModels) et tests d'instrumentation Compose
+- [x] Gestion d'erreurs typée (`DomainError`) & messages localisés (externalisation des messages d'erreur vers `strings.xml`)
+- [x] Couverture de tests unitaires (UseCases, mappers & ViewModels)
+- [x] CI/CD (build, lint, tests, analyse statique automatisés via GitHub Actions)
+- [ ] Externalisation complète des chaînes de caractères restantes vers `strings.xml`
+- [ ] Tests d'instrumentation Compose
 - [ ] Mode hors-ligne enrichi (cache Room étendu à l'ensemble des entités)
 - [ ] Modularisation Gradle multi-module (`:core:*`, `:feature:*`)
-- [ ] CI/CD (build, lint, tests automatisés)
 
 ---
 <a id="auteur"></a>
