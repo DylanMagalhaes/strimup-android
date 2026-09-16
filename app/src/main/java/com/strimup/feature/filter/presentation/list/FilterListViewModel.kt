@@ -6,7 +6,8 @@ import com.strimup.R
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUseCase
-import com.strimup.feature.filter.domain.usecase.GetFiltersUseCase
+import com.strimup.feature.filter.domain.usecase.ObserveFiltersUseCase
+import com.strimup.feature.filter.domain.usecase.RefreshFiltersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FilterListViewModel @Inject constructor(
-    private val getFilters: GetFiltersUseCase,
+    private val observeFilters: ObserveFiltersUseCase,
+    private val refreshFilters: RefreshFiltersUseCase,
     private val deleteFilter: DeleteFilterUseCase,
 ) : ViewModel() {
 
@@ -29,22 +31,21 @@ class FilterListViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     init {
-        loadFilters()
+        observeFiltersState()
+        refresh()
     }
 
-    fun loadFilters() {
+    private fun observeFiltersState() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+            observeFilters().collect { filters ->
+                _state.update { it.copy(filters = filters, isLoading = false) }
+            }
+        }
+    }
 
-            getFilters()
-                .onSuccess { filters ->
-                    _state.update {
-                        it.copy(
-                            filters = filters,
-                            isLoading = false,
-                        )
-                    }
-                }
+    private fun refresh() {
+        viewModelScope.launch {
+            refreshFilters()
                 .onFailure { exception ->
                     _state.update { it.copy(isLoading = false) }
                     val messageRes = exception.toDomainError().toMessageRes()

@@ -8,9 +8,12 @@ import com.strimup.core.common.DomainException
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUseCase
-import com.strimup.feature.filter.domain.usecase.GetFiltersUseCase
+import com.strimup.feature.filter.domain.usecase.ObserveFiltersUseCase
+import com.strimup.feature.filter.domain.usecase.RefreshFiltersUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -27,30 +30,40 @@ class FilterListViewModelTest {
         FilterEntity(id = "2", name = "Tryhard", criteria = FilterCriteria(), userId = "u1"),
     )
 
+    private fun observeUseCase(flow: Flow<List<FilterEntity>>) =
+        object : ObserveFiltersUseCase {
+            override fun invoke(): Flow<List<FilterEntity>> = flow
+        }
+
     private fun buildViewModel(
-        getFilters: GetFiltersUseCase = GetFiltersUseCase { Result.success(fakeFilters) },
+        observeFilters: ObserveFiltersUseCase = observeUseCase(MutableStateFlow(fakeFilters)),
+        refreshFilters: RefreshFiltersUseCase = RefreshFiltersUseCase { Result.success(Unit) },
         deleteFilter: DeleteFilterUseCase = DeleteFilterUseCase { Result.success(Unit) },
     ) = FilterListViewModel(
-        getFilters = getFilters,
+        observeFilters = observeFilters,
+        refreshFilters = refreshFilters,
         deleteFilter = deleteFilter,
     )
 
-
     @Test
-    fun `state should default to isLoading true before any filters are loaded`() = runTest {
-        // GIVEN / WHEN
-        val viewModel = buildViewModel()
+    fun `state should default to isLoading true before the observed filters are collected`() = runTest {
+        // GIVEN
+        val observedFilters = MutableStateFlow(fakeFilters)
+
+        // WHEN
+        val viewModel = buildViewModel(
+            observeFilters = observeUseCase(observedFilters),
+        )
 
         // THEN
         assertThat(viewModel.state.value.isLoading).isTrue()
-        assertThat(viewModel.state.value.filters).isEmpty()
     }
 
     @Test
-    fun `init should load filters and update state with the list on success`() = runTest {
+    fun `init should collect the observed filters and update state with the list`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getFilters = GetFiltersUseCase { Result.success(fakeFilters) },
+            observeFilters = observeUseCase(MutableStateFlow(fakeFilters)),
         )
 
         // WHEN
@@ -64,10 +77,10 @@ class FilterListViewModelTest {
     }
 
     @Test
-    fun `init when getFilters returns an empty list should set isEmpty to true`() = runTest {
+    fun `init when the observed filters are empty should set isEmpty to true`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getFilters = GetFiltersUseCase { Result.success(emptyList()) },
+            observeFilters = observeUseCase(MutableStateFlow(emptyList())),
         )
 
         // WHEN
@@ -80,13 +93,31 @@ class FilterListViewModelTest {
     }
 
     @Test
-    fun `init when getFilters fails should set isLoading false and emit ShowSnackBar with the mapped DomainError message`() = runTest {
+    fun `init should collect every update emitted by the observed filters flow`() = runTest {
         // GIVEN
+        val observedFilters = MutableStateFlow(fakeFilters)
         val viewModel = buildViewModel(
-            getFilters = GetFiltersUseCase { Result.failure(Exception("peu importe")) },
+            observeFilters = observeUseCase(observedFilters),
+        )
+        advanceUntilIdle()
+        assertThat(viewModel.state.value.filters).isEqualTo(fakeFilters)
+
+        // WHEN
+        observedFilters.value = listOf(fakeFilters[0])
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(viewModel.state.value.filters).isEqualTo(listOf(fakeFilters[0]))
+    }
+
+    @Test
+    fun `init when refresh fails should set isLoading false and emit ShowSnackBar with the mapped DomainError message`() = runTest {
+        // GIVEN & WHEN
+        val viewModel = buildViewModel(
+            refreshFilters = RefreshFiltersUseCase { Result.failure(Exception("peu importe")) },
         )
 
-        // WHEN & THEN
+        // THEN
         viewModel.events.test {
             advanceUntilIdle()
 
@@ -95,17 +126,16 @@ class FilterListViewModelTest {
             assertThat((event as FilterListUiEvent.ShowSnackBar).textRes).isEqualTo(R.string.error_unknown)
         }
         assertThat(viewModel.state.value.isLoading).isFalse()
-        assertThat(viewModel.state.value.filters).isEmpty()
     }
 
     @Test
-    fun `init when getFilters fails with a DomainException should keep its own category`() = runTest {
-        // GIVEN
+    fun `init when refresh fails with a DomainException should keep its own category`() = runTest {
+        // GIVEN & WHEN
         val viewModel = buildViewModel(
-            getFilters = GetFiltersUseCase { Result.failure(DomainException(DomainError.Network)) },
+            refreshFilters = RefreshFiltersUseCase { Result.failure(DomainException(DomainError.Network)) },
         )
 
-        // WHEN & THEN
+        // THEN
         viewModel.events.test {
             advanceUntilIdle()
 
@@ -115,25 +145,21 @@ class FilterListViewModelTest {
     }
 
     @Test
-    fun `loadFilters called again should reload and replace the current filters`() = runTest {
+    fun `init should call refreshFilters exactly once`() = runTest {
         // GIVEN
         var callCount = 0
-        val viewModel = buildViewModel(
-            getFilters = GetFiltersUseCase {
+
+        // WHEN
+        buildViewModel(
+            refreshFilters = RefreshFiltersUseCase {
                 callCount++
-                if (callCount == 1) Result.success(fakeFilters) else Result.success(listOf(fakeFilters[0]))
+                Result.success(Unit)
             },
         )
         advanceUntilIdle()
-        assertThat(viewModel.state.value.filters).isEqualTo(fakeFilters)
-
-        // WHEN
-        viewModel.loadFilters()
-        advanceUntilIdle()
 
         // THEN
-        assertThat(callCount).isEqualTo(2)
-        assertThat(viewModel.state.value.filters).isEqualTo(listOf(fakeFilters[0]))
+        assertThat(callCount).isEqualTo(1)
     }
 
     @Test
@@ -206,5 +232,4 @@ class FilterListViewModelTest {
             assertThat(event.textRes).isEqualTo(R.string.error_server)
         }
     }
-
 }

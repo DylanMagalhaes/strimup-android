@@ -10,20 +10,22 @@ import com.strimup.feature.filter.domain.usecase.DefaultCreateFilterUseCase
 import com.strimup.feature.filter.domain.usecase.DefaultDeleteFilterUseCase
 import com.strimup.feature.filter.domain.usecase.DefaultGetFilterByIdUseCase
 import com.strimup.feature.filter.domain.usecase.DefaultGetFilterOptionsUseCase
-import com.strimup.feature.filter.domain.usecase.DefaultGetFiltersUseCase
 import com.strimup.feature.filter.domain.usecase.DefaultGetStreamersByFilterUseCase
+import com.strimup.feature.filter.domain.usecase.DefaultObserveFiltersUseCase
+import com.strimup.feature.filter.domain.usecase.DefaultRefreshFiltersUseCase
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUseCase
 import com.strimup.feature.filter.domain.usecase.GetFilterByIdUseCase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUseCase
-import com.strimup.feature.filter.domain.usecase.GetFiltersUseCase
 import com.strimup.feature.filter.domain.usecase.GetStreamersByFilterUseCase
+import com.strimup.feature.filter.domain.usecase.ObserveFiltersUseCase
+import com.strimup.feature.filter.domain.usecase.RefreshFiltersUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 import retrofit2.Retrofit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -50,7 +52,10 @@ interface FilterModule {
     fun bindGetFilterOptionsUseCase(impl: DefaultGetFilterOptionsUseCase): GetFilterOptionsUseCase
 
     @Binds
-    fun bindGetFiltersUseCase(impl: DefaultGetFiltersUseCase): GetFiltersUseCase
+    fun bindObserveFiltersUseCase(impl: DefaultObserveFiltersUseCase): ObserveFiltersUseCase
+
+    @Binds
+    fun bindRefreshFiltersUseCase(impl: DefaultRefreshFiltersUseCase): RefreshFiltersUseCase
 
     @Binds
     fun bindGetStreamersByFilterUseCase(impl: DefaultGetStreamersByFilterUseCase): GetStreamersByFilterUseCase
