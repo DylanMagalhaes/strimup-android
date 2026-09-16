@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase
 import com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase
+import com.strimup.core.network.toDomainError
+import com.strimup.core.ui.error.toMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,8 +60,8 @@ class FavoriteStreamersViewModel @Inject constructor(
 
             refreshFavoriteStreamers()
                 .onFailure { exception ->
-                    val message = exception.localizedMessage ?: "Impossible d'actualiser vos favoris"
-                    _events.send(FavoriteStreamersUiEvent.ShowSnackBar(message))
+                    val messageRes = exception.toDomainError().toMessageRes()
+                    _events.send(FavoriteStreamersUiEvent.ShowSnackBar(messageRes))
                 }
 
             _state.update {

@@ -1,5 +1,6 @@
 package com.strimup.feature.search.presentation
 
+import androidx.annotation.StringRes
 import com.strimup.core.streamer.domain.entity.Streamer
 
 sealed interface SearchUiState {
@@ -20,6 +21,6 @@ sealed interface SearchUiState {
 
     data class Error(
         override val searchQuery: String,
-        val message: String,
+        @StringRes val messageRes: Int,
     ) : SearchUiState
 }

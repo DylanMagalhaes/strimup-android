@@ -37,6 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -91,7 +92,8 @@ private fun SearchScreen(
             SearchContent(
                 modifier = Modifier.weight(1f),
                 state = state,
-                onStreamerClick = onStreamerClick
+                onStreamerClick = onStreamerClick,
+                onRetryClick = { onSearchInputChange(state.searchQuery) }
             )
         }
     }
@@ -101,6 +103,7 @@ private fun SearchScreen(
 private fun SearchContent(
     state: SearchUiState,
     onStreamerClick: (String) -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -124,18 +127,11 @@ private fun SearchContent(
             }
         }
         is SearchUiState.Error -> {
-            Box(
+            ErrorState(
+                messageRes = state.messageRes,
+                onRetryClick = onRetryClick,
                 modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = state.message,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+            )
         }
         is SearchUiState.Content -> {
             LazyColumn(

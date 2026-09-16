@@ -2,6 +2,9 @@ package com.strimup.feature.filter.presentation.matchedstreamer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.feature.filter.domain.entity.FilterCriteria
@@ -101,11 +104,10 @@ class MatchedStreamersViewModelTest {
     }
 
     @Test
-    fun `initData when getFilterById fails should expose Error state with exception message`() = runTest {
+    fun `initData when getFilterById fails should expose Error state with the mapped DomainError message`() = runTest {
         // GIVEN
-        val errorMessage = "Filtre introuvable"
         val viewModel = buildViewModel(
-            getFilterById = GetFilterByIdUseCase { Result.failure(Exception(errorMessage)) },
+            getFilterById = GetFilterByIdUseCase { Result.failure(Exception("peu importe")) },
         )
 
         // WHEN
@@ -114,14 +116,14 @@ class MatchedStreamersViewModelTest {
 
         // THEN
         val state = viewModel.state.value as MatchedStreamersUiState.Error
-        assertThat(state.errorMessage).isEqualTo(errorMessage)
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_unknown)
     }
 
     @Test
-    fun `initData when getFilterById fails without a message should expose the default error message`() = runTest {
+    fun `initData when getFilterById fails with a DomainException should keep its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getFilterById = GetFilterByIdUseCase { Result.failure(Exception()) },
+            getFilterById = GetFilterByIdUseCase { Result.failure(DomainException(DomainError.Network)) },
         )
 
         // WHEN
@@ -130,15 +132,14 @@ class MatchedStreamersViewModelTest {
 
         // THEN
         val state = viewModel.state.value as MatchedStreamersUiState.Error
-        assertThat(state.errorMessage).isEqualTo("Erreur de chargement du filtre")
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_network)
     }
 
     @Test
-    fun `initData when the first page fetch fails should expose Error state with exception message`() = runTest {
+    fun `initData when the first page fetch fails should expose Error state with the mapped DomainError message`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur serveur"
         val viewModel = buildViewModel(
-            getMatchedStreamers = GetStreamersByFilterUseCase { _, _ -> Result.failure(Exception(errorMessage)) },
+            getMatchedStreamers = GetStreamersByFilterUseCase { _, _ -> Result.failure(Exception("peu importe")) },
         )
 
         // WHEN
@@ -147,14 +148,16 @@ class MatchedStreamersViewModelTest {
 
         // THEN
         val state = viewModel.state.value as MatchedStreamersUiState.Error
-        assertThat(state.errorMessage).isEqualTo(errorMessage)
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_unknown)
     }
 
     @Test
-    fun `initData when the first page fetch fails without a message should expose the default error message`() = runTest {
+    fun `initData when the first page fetch fails with a DomainException should keep its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getMatchedStreamers = GetStreamersByFilterUseCase { _, _ -> Result.failure(Exception()) },
+            getMatchedStreamers = GetStreamersByFilterUseCase { _, _ ->
+                Result.failure(DomainException(DomainError.Timeout))
+            },
         )
 
         // WHEN
@@ -163,7 +166,7 @@ class MatchedStreamersViewModelTest {
 
         // THEN
         val state = viewModel.state.value as MatchedStreamersUiState.Error
-        assertThat(state.errorMessage).isEqualTo("Une erreur est survenue")
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_timeout)
     }
 
     // endregion
@@ -271,13 +274,12 @@ class MatchedStreamersViewModelTest {
     @Test
     fun `loadNextPage when a later page fails should reset isLoadingNextPage, keep the existing streamers and emit ShowSnackBar`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur réseau"
         val viewModel = buildViewModel(
             getMatchedStreamers = GetStreamersByFilterUseCase { page, _ ->
                 if (page == 1) {
                     Result.success(StreamerMatchResult(page1Streamers, 2))
                 } else {
-                    Result.failure(Exception(errorMessage))
+                    Result.failure(Exception("peu importe"))
                 }
             },
         )
@@ -290,7 +292,7 @@ class MatchedStreamersViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as MatchedStreamersUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         val state = viewModel.state.value as MatchedStreamersUiState.Success
         assertThat(state.isLoadingNextPage).isFalse()
@@ -298,14 +300,14 @@ class MatchedStreamersViewModelTest {
     }
 
     @Test
-    fun `loadNextPage when a later page fails without a message should emit the default error message`() = runTest {
+    fun `loadNextPage when a later page fails with a DomainException should emit its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
             getMatchedStreamers = GetStreamersByFilterUseCase { page, _ ->
                 if (page == 1) {
                     Result.success(StreamerMatchResult(page1Streamers, 2))
                 } else {
-                    Result.failure(Exception())
+                    Result.failure(DomainException(DomainError.Unauthorized))
                 }
             },
         )
@@ -318,7 +320,7 @@ class MatchedStreamersViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as MatchedStreamersUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Impossible de charger la suite des résultats")
+            assertThat(event.textRes).isEqualTo(R.string.error_unauthorized)
         }
     }
 

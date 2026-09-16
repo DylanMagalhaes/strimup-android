@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +46,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.button.SocialIconButton
+import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -59,6 +61,7 @@ fun StreamerProfileScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
         viewModel.refresh()
@@ -68,7 +71,7 @@ fun StreamerProfileScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is ProfileUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }
@@ -78,6 +81,7 @@ fun StreamerProfileScreen(
         state = state,
         snackBarHostState = snackBarHostState,
         onEditProfileNav = onEditProfileNav,
+        onRetryClick = viewModel::refresh,
         modifier = modifier
     )
 }
@@ -88,6 +92,7 @@ private fun StreamerProfileScreen(
     state: ProfileUiState,
     snackBarHostState: SnackbarHostState,
     onEditProfileNav: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val titleText = when (state) {
@@ -117,6 +122,7 @@ private fun StreamerProfileScreen(
                 .padding(padding)
                 .fillMaxSize(),
             onEditProfileNav = onEditProfileNav,
+            onRetryClick = onRetryClick,
             state = state,
         )
     }
@@ -126,6 +132,7 @@ private fun StreamerProfileScreen(
 private fun StreamerProfileContent(
     state: ProfileUiState,
     onEditProfileNav: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -136,9 +143,11 @@ private fun StreamerProfileContent(
         }
 
         is ProfileUiState.Error -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = state.errorMessage.ifBlank { "Impossible de charger les informations du streamer." })
-            }
+            ErrorState(
+                messageRes = state.errorMessageRes,
+                onRetryClick = onRetryClick,
+                modifier = modifier.fillMaxSize(),
+            )
         }
 
         is ProfileUiState.Success -> {
@@ -307,7 +316,8 @@ private fun StreamerProfileScreenPreview() {
                     streamFrequency = "",
                 )
             ),
-            onEditProfileNav = {}
+            onEditProfileNav = {},
+            onRetryClick = {}
         )
     }
 }

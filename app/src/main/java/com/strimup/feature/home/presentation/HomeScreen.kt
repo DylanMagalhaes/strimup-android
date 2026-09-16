@@ -26,13 +26,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -41,6 +44,7 @@ import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.presentation.component.HomeBanner
 import com.strimup.feature.home.presentation.component.HomeTabs
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -52,12 +56,14 @@ fun HomeScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
+    val resources = LocalResources.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is HomeUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }
@@ -73,6 +79,9 @@ fun HomeScreen(
                 try {
                     uriHandler.openUri(socialUrl)
                 } catch (_: Exception) {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
+                    }
                 }
             }
         },
@@ -86,6 +95,9 @@ fun HomeScreen(
                         uriHandler.openUri(banner.linkUrl)
                     }
                 } catch (_: Exception) {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
+                    }
                 }
             }
         }

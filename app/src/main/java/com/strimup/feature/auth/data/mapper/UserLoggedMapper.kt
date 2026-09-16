@@ -15,7 +15,7 @@ fun UserLoggedResponse.toEntity(): LoginResultEntity {
             id = userLogged.id,
             userName = userLogged.userName,
             email = userLogged.email,
-            role = UserRole.valueOf(userLogged.role.uppercase()),
+            role = UserRole.fromApi(userLogged.role),
             avatarUrl = this.userLogged.avatarUrl
             )
     )
@@ -36,7 +36,7 @@ fun UserRoomEntity.toDomainEntity(): UserEntity {
         id = this.id,
         userName = this.userName,
         email = this.email,
-        role = UserRole.valueOf(this.role),
+        role = UserRole.fromApi(this.role),
         avatarUrl = this.imageUrl
     )
 }

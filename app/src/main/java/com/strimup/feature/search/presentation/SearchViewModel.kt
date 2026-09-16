@@ -2,15 +2,17 @@ package com.strimup.feature.search.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.core.network.toDomainError
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.search.domain.usecase.DefaultGetStreamersUseCase
 import com.strimup.feature.search.domain.usecase.GetStreamersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -49,7 +51,7 @@ class SearchViewModel @Inject constructor(
                 .onFailure { exception ->
                     _state.value = SearchUiState.Error(
                         searchQuery = query,
-                        message = exception.localizedMessage ?: "Une erreur est survenue",
+                        messageRes = exception.toDomainError().toMessageRes(),
                     )
                 }
         }

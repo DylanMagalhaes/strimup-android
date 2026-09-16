@@ -2,6 +2,9 @@ package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.data.request.StreamerMatchRequest
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
@@ -139,7 +142,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `init when getStreamer fails should set the fixed error message and isLoading false`() = runTest {
+    fun `init when getStreamer fails should expose the mapped DomainError message and isLoading false`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
             getStreamer = getStreamerUseCase { Result.failure(Exception("Peu importe")) },
@@ -151,8 +154,22 @@ class EditProfileViewModelTest {
         // THEN
         val state = viewModel.state.value
         assertThat(state.isLoading).isFalse()
-        assertThat(state.errorMessage).isEqualTo("Erreur pendant la récupération du profil")
+        assertThat(state.errorMessageRes).isEqualTo(R.string.error_unknown)
         assertThat(state.originalProfile).isNull()
+    }
+
+    @Test
+    fun `init when getStreamer fails with a DomainException should keep its own category`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            getStreamer = getStreamerUseCase { Result.failure(DomainException(DomainError.Network)) },
+        )
+
+        // WHEN
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(viewModel.state.value.errorMessageRes).isEqualTo(R.string.error_network)
     }
 
     @Test
@@ -175,9 +192,8 @@ class EditProfileViewModelTest {
     @Test
     fun `init when getOptions fails should emit ShowSnackBar and fall back to empty options`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur serveur"
         val viewModel = buildViewModel(
-            repository = FakeStreamerRepository(optionsResult = Result.failure(Exception(errorMessage))),
+            repository = FakeStreamerRepository(optionsResult = Result.failure(Exception("peu importe"))),
         )
 
         // WHEN & THEN
@@ -185,7 +201,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         assertThat(viewModel.state.value.availableOptions).isEqualTo(
             StreamerOptions(emptyList(), emptyList(), emptyList(), emptyList())
@@ -193,10 +209,12 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `init when getOptions fails without a message should emit the default error message`() = runTest {
+    fun `init when getOptions fails with a DomainException should emit its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            repository = FakeStreamerRepository(optionsResult = Result.failure(Exception())),
+            repository = FakeStreamerRepository(
+                optionsResult = Result.failure(DomainException(DomainError.Timeout)),
+            ),
         )
 
         // WHEN & THEN
@@ -204,16 +222,15 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Impossible de charger les options")
+            assertThat(event.textRes).isEqualTo(R.string.error_timeout)
         }
     }
 
     @Test
     fun `init when getTags fails should emit ShowSnackBar and leave availableTags and availableCategories empty`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur serveur"
         val viewModel = buildViewModel(
-            getTags = GetTagsUseCase { Result.failure(Exception(errorMessage)) },
+            getTags = GetTagsUseCase { Result.failure(Exception("peu importe")) },
         )
 
         // WHEN & THEN
@@ -221,17 +238,17 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         assertThat(viewModel.state.value.availableTags).isEmpty()
         assertThat(viewModel.state.value.availableCategories).isEmpty()
     }
 
     @Test
-    fun `init when getTags fails without a message should emit the default error message`() = runTest {
+    fun `init when getTags fails with a DomainException should emit its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            getTags = GetTagsUseCase { Result.failure(Exception()) },
+            getTags = GetTagsUseCase { Result.failure(DomainException(DomainError.Server(500))) },
         )
 
         // WHEN & THEN
@@ -239,7 +256,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Impossible de charger les tags")
+            assertThat(event.textRes).isEqualTo(R.string.error_server)
         }
     }
 
@@ -528,9 +545,8 @@ class EditProfileViewModelTest {
     @Test
     fun `saveProfile when the avatar upload fails should emit ShowSnackBar and never call updateProfile`() = runTest {
         // GIVEN
-        val errorMessage = "Fichier trop volumineux"
         val repository = FakeStreamerRepository(
-            avatarResult = Result.failure(Exception(errorMessage)),
+            avatarResult = Result.failure(Exception("peu importe")),
         )
         val viewModel = buildViewModel(repository = repository)
         advanceUntilIdle()
@@ -542,7 +558,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         assertThat(repository.updateProfileCallCount).isEqualTo(0)
         val state = viewModel.state.value
@@ -551,9 +567,11 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `saveProfile when the avatar upload fails without a message should emit the default error message`() = runTest {
+    fun `saveProfile when the avatar upload fails with a DomainException should emit its own category`() = runTest {
         // GIVEN
-        val repository = FakeStreamerRepository(avatarResult = Result.failure(Exception()))
+        val repository = FakeStreamerRepository(
+            avatarResult = Result.failure(DomainException(DomainError.Network)),
+        )
         val viewModel = buildViewModel(repository = repository)
         advanceUntilIdle()
         viewModel.onImageSelected("file://tmp/photo.jpg")
@@ -564,7 +582,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Erreur lors de l'envoi de la photo de profil")
+            assertThat(event.textRes).isEqualTo(R.string.error_network)
         }
     }
 
@@ -594,9 +612,8 @@ class EditProfileViewModelTest {
     @Test
     fun `saveProfile when updateProfile fails should emit ShowSnackBar without isSaveSuccess`() = runTest {
         // GIVEN
-        val errorMessage = "Conflit serveur"
         val repository = FakeStreamerRepository(
-            updateProfileResult = { Result.failure(Exception(errorMessage)) },
+            updateProfileResult = { Result.failure(Exception("peu importe")) },
         )
         val viewModel = buildViewModel(repository = repository)
         advanceUntilIdle()
@@ -607,7 +624,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         val state = viewModel.state.value
         assertThat(state.isSaving).isFalse()
@@ -615,10 +632,10 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `saveProfile when updateProfile fails without a message should emit the default error message`() = runTest {
+    fun `saveProfile when updateProfile fails with a DomainException should emit its own category`() = runTest {
         // GIVEN
         val repository = FakeStreamerRepository(
-            updateProfileResult = { Result.failure(Exception()) },
+            updateProfileResult = { Result.failure(DomainException(DomainError.Unauthorized)) },
         )
         val viewModel = buildViewModel(repository = repository)
         advanceUntilIdle()
@@ -629,7 +646,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Impossible de sauvegarder les modifications")
+            assertThat(event.textRes).isEqualTo(R.string.error_unauthorized)
         }
     }
 

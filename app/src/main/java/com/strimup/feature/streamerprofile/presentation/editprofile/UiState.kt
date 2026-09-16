@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerprofile.presentation.editprofile
 
+import androidx.annotation.StringRes
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerOptions
@@ -10,7 +11,7 @@ data class EditProfileUiState(
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isSaveSuccess: Boolean = false,
-    val errorMessage: String? = null,
+    @StringRes val errorMessageRes: Int? = null,
 
     val originalProfile: Streamer? = null,
     val availableOptions: StreamerOptions? = null,

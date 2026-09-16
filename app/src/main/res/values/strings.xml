@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">strimup</string>
+
+    <!-- Errors -->
+    <string name="error_network">Vérifie ta connexion internet.</string>
+    <string name="error_timeout">La requête a pris trop de temps. Réessaie.</string>
+    <string name="error_unauthorized">Ta session a expiré. Reconnecte-toi.</string>
+    <string name="error_server">Le serveur rencontre un problème. Réessaie plus tard.</string>
+    <string name="error_serialization">Une erreur inattendue est survenue.</string>
+    <string name="error_unknown">Une erreur est survenue.</string>
+    <string name="error_not_logged_in">Utilisateur non connecté.</string>
+    <string name="error_open_link">Impossible d\'ouvrir ce lien.</string>
+    <string name="error_generic_title">Une erreur est survenue</string>
+
+    <!-- Filters -->
+    <string name="filter_deleted_success">Votre filtre a bien été supprimé.</string>
+
+    <!-- Actions -->
+    <string name="action_retry">Réessayer</string>
 </resources>

@@ -2,6 +2,9 @@ package com.strimup.feature.favorite.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase
 import com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase
 import com.strimup.core.streamer.domain.entity.Streamer
@@ -79,10 +82,9 @@ class FavoriteStreamersViewModelTest {
     @Test
     fun `init when refresh fails should set isRefreshing to false without clearing favoriteStreamers`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur réseau"
         val viewModel = buildViewModel(
             refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase {
-                Result.failure(Exception(errorMessage))
+                Result.failure(Exception("peu importe"))
             },
             observeFavoritesStreamers = observeUseCase(flowOf(fakeStreamers)),
         )
@@ -92,7 +94,7 @@ class FavoriteStreamersViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as FavoriteStreamersUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo(errorMessage)
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         val state = viewModel.state.value
         assertThat(state.isRefreshing).isFalse()
@@ -100,10 +102,12 @@ class FavoriteStreamersViewModelTest {
     }
 
     @Test
-    fun `init when refresh fails without a message should emit the default error message`() = runTest {
+    fun `init when refresh fails with a DomainException should emit its own category`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
-            refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase { Result.failure(Exception()) },
+            refreshFavoriteStreamers = RefreshFavoriteStreamerUseCase {
+                Result.failure(DomainException(DomainError.Network))
+            },
         )
 
         // WHEN & THEN
@@ -111,7 +115,7 @@ class FavoriteStreamersViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as FavoriteStreamersUiEvent.ShowSnackBar
-            assertThat(event.text).isEqualTo("Impossible d'actualiser vos favoris")
+            assertThat(event.textRes).isEqualTo(R.string.error_network)
         }
     }
 

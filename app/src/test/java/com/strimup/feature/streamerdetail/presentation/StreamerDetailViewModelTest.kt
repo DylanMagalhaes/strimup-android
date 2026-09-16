@@ -1,6 +1,10 @@
 package com.strimup.feature.streamerdetail.presentation
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.core.streamer.domain.entity.Streamer
@@ -53,11 +57,10 @@ class StreamerDetailViewModelTest {
     }
 
     @Test
-    fun `loadStreamer when use case fails should emit Error state with exception message`() = runTest {
+    fun `loadStreamer when use case fails should emit Error state with the mapped DomainError message`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur de chargement"
         val viewModel = StreamerDetailViewModel(
-            getStreamer = GetStreamerUseCase { Result.failure(Exception(errorMessage)) },
+            getStreamer = GetStreamerUseCase { Result.failure(Exception("peu importe")) },
             addStreamerToFavorites = AddStreamerToFavoritesUseCase { Result.success(Unit) },
             deleteStreamerFromFavorites = DeleteStreamerFromFavoritesUseCase { Result.success(Unit) }
         )
@@ -67,7 +70,25 @@ class StreamerDetailViewModelTest {
         advanceUntilIdle()
 
         // THEN
-        val expectedState = StreamerDetailUiState.Error(message = errorMessage)
+        val expectedState = StreamerDetailUiState.Error(messageRes = R.string.error_unknown)
+        assertThat(viewModel.state.value).isEqualTo(expectedState)
+    }
+
+    @Test
+    fun `loadStreamer when use case fails with a DomainException should keep its own category`() = runTest {
+        // GIVEN
+        val viewModel = StreamerDetailViewModel(
+            getStreamer = GetStreamerUseCase { Result.failure(DomainException(DomainError.Network)) },
+            addStreamerToFavorites = AddStreamerToFavoritesUseCase { Result.success(Unit) },
+            deleteStreamerFromFavorites = DeleteStreamerFromFavoritesUseCase { Result.success(Unit) }
+        )
+
+        // WHEN
+        viewModel.loadStreamer("12")
+        advanceUntilIdle()
+
+        // THEN
+        val expectedState = StreamerDetailUiState.Error(messageRes = R.string.error_network)
         assertThat(viewModel.state.value).isEqualTo(expectedState)
     }
 
@@ -132,24 +153,29 @@ class StreamerDetailViewModelTest {
     }
 
     @Test
-    fun `onFavoriteClick when addition fails should rollback state to previous values`() = runTest {
+    fun `onFavoriteClick when addition fails should rollback state and emit ShowSnackBar`() = runTest {
         // GIVEN
         val streamerResult = StreamerDetailResult(streamer = fakeStreamer, isFavorite = false)
 
         val viewModel = StreamerDetailViewModel(
             getStreamer = GetStreamerUseCase { Result.success(streamerResult) },
-            addStreamerToFavorites = AddStreamerToFavoritesUseCase { Result.failure(Exception("Erreur serveur")) },
+            addStreamerToFavorites = AddStreamerToFavoritesUseCase {
+                Result.failure(DomainException(DomainError.Network))
+            },
             deleteStreamerFromFavorites = DeleteStreamerFromFavoritesUseCase { Result.success(Unit) }
         )
 
         viewModel.loadStreamer("12")
         advanceUntilIdle()
 
-        // WHEN
-        viewModel.onFavoriteClick()
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.event.test {
+            viewModel.onFavoriteClick()
+            advanceUntilIdle()
 
-        // THEN
+            val event = awaitItem() as StreamerDetailUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.error_network)
+        }
         val state = viewModel.state.value as StreamerDetailUiState.Success
         assertThat(state.isFavorite).isFalse()
         assertThat(state.streamer.followersCount).isEqualTo(10)

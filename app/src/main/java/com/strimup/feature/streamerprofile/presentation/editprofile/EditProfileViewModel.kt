@@ -2,10 +2,13 @@ package com.strimup.feature.streamerprofile.presentation.editprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
+import com.strimup.core.network.toDomainError
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUseCase
@@ -39,6 +42,7 @@ class EditProfileViewModel @Inject constructor(
 
     private var fetchedOptions: StreamerOptions? = null
     private var fetchedTags: List<TagEntity> = emptyList()
+    private var currentUserId: String? = null
 
     init {
         viewModelScope.launch {
@@ -48,10 +52,15 @@ class EditProfileViewModel @Inject constructor(
             getUser().collect { user ->
                 val id = user?.id
                 if (!id.isNullOrBlank()) {
+                    currentUserId = id
                     loadStreamer(id)
                 }
             }
         }
+    }
+
+    fun retry() {
+        currentUserId?.let { loadStreamer(it) }
     }
 
     private fun loadOptions() {
@@ -64,8 +73,8 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    val message = exception.localizedMessage ?: "Impossible de charger les options"
-                    _events.send(EditProfileUiEvent.ShowSnackBar(message))
+                    val messageRes = exception.toDomainError().toMessageRes()
+                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
                 }
         }
     }
@@ -83,15 +92,15 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    val message = exception.localizedMessage ?: "Impossible de charger les tags"
-                    _events.send(EditProfileUiEvent.ShowSnackBar(message))
+                    val messageRes = exception.toDomainError().toMessageRes()
+                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
                 }
         }
     }
 
     private fun loadStreamer(id: String) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            _state.update { it.copy(isLoading = true, errorMessageRes = null) }
 
             getStreamer(id)
                 .onSuccess { streamer ->
@@ -119,11 +128,11 @@ class EditProfileViewModel @Inject constructor(
                         )
                     }
                 }
-                .onFailure {
+                .onFailure { exception ->
                     _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            errorMessage = "Erreur pendant la récupération du profil"
+                            errorMessageRes = exception.toDomainError().toMessageRes()
                         )
                     }
                 }
@@ -279,7 +288,7 @@ class EditProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             _state.update { state ->
-                state.copy(isSaving = true, isSaveSuccess = false, errorMessage = null)
+                state.copy(isSaving = true, isSaveSuccess = false, errorMessageRes = null)
             }
 
             var finalImageUrl = originalProfile.imageUrl
@@ -290,9 +299,9 @@ class EditProfileViewModel @Inject constructor(
 
                 if (avatarResult.isFailure) {
                     _state.update { state -> state.copy(isSaving = false) }
-                    val message = avatarResult.exceptionOrNull()?.localizedMessage
-                        ?: "Erreur lors de l'envoi de la photo de profil"
-                    _events.send(EditProfileUiEvent.ShowSnackBar(message))
+                    val messageRes = avatarResult.exceptionOrNull()?.toDomainError()?.toMessageRes()
+                        ?: R.string.error_unknown
+                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
                     return@launch
                 }
 
@@ -327,8 +336,8 @@ class EditProfileViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     _state.update { state -> state.copy(isSaving = false) }
-                    val message = exception.localizedMessage ?: "Impossible de sauvegarder les modifications"
-                    _events.send(EditProfileUiEvent.ShowSnackBar(message))
+                    val messageRes = exception.toDomainError().toMessageRes()
+                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
                 }
         }
     }

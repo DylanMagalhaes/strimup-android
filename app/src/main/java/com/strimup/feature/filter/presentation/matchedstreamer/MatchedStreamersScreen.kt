@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,9 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
+import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
@@ -65,6 +65,7 @@ fun MatchedStreamersScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
+    val resources = LocalResources.current
 
     LaunchedEffect(filterId) {
         viewModel.initData(filterId)
@@ -74,7 +75,7 @@ fun MatchedStreamersScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is MatchedStreamersUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }
@@ -92,6 +93,7 @@ fun MatchedStreamersScreen(
         },
         onLoadNextPage = viewModel::loadNextPage,
         onLiveCheckedChange = viewModel::onLiveSwitch,
+        onRetryClick = viewModel::retry,
         modifier = modifier
     )
 }
@@ -106,6 +108,7 @@ fun MatchedStreamersScreen(
     onSocialClick: (String?) -> Unit,
     onLoadNextPage: () -> Unit,
     onLiveCheckedChange: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val topBarTitle = when (state) {
@@ -149,8 +152,9 @@ fun MatchedStreamersScreen(
                 }
 
                 is MatchedStreamersUiState.Error -> {
-                    ErrorMatchedStreamers(
-                        errorMessage = state.errorMessage,
+                    ErrorState(
+                        messageRes = state.errorMessageRes,
+                        onRetryClick = onRetryClick,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -341,45 +345,6 @@ private fun EmptyMatchedStreamers(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ErrorMatchedStreamers(
-    errorMessage: String,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(24.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.ErrorOutline,
-                contentDescription = null,
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.error
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "Une erreur est survenue",
-                fontFamily = zalandoFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = errorMessage,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-@Composable
 @Preview
 private fun MatchedStreamersScreenPreview() {
     StrimupTheme {
@@ -389,6 +354,7 @@ private fun MatchedStreamersScreenPreview() {
             onStreamerClick = {},
             onSocialClick = {},
             onLoadNextPage = {},
+            onRetryClick = {},
             snackBarHostState = remember { SnackbarHostState() },
             state = MatchedStreamersUiState.Success(
                 filterName = "Mon Filtre",

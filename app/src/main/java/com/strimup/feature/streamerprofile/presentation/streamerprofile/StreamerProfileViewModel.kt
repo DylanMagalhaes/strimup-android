@@ -2,6 +2,9 @@ package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
+import com.strimup.core.network.toDomainError
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +37,7 @@ class StreamerProfileViewModel @Inject constructor(
                     loadStreamer(id)
                 } else {
                     _state.value = ProfileUiState.Error(
-                        errorMessage = "Utilisateur non connecté"
+                        errorMessageRes = R.string.error_not_logged_in
                     )
                 }
             }
@@ -49,12 +52,12 @@ class StreamerProfileViewModel @Inject constructor(
                     _state.value = ProfileUiState.Success(streamer = streamer)
                 }
                 .onFailure { throwable ->
-                    val message = throwable.message ?: "Erreur de chargement du profil"
+                    val messageRes = throwable.toDomainError().toMessageRes()
                     if (previousState is ProfileUiState.Success) {
                         _state.value = previousState
-                        _events.send(ProfileUiEvent.ShowSnackBar(message))
+                        _events.send(ProfileUiEvent.ShowSnackBar(messageRes))
                     } else {
-                        _state.value = ProfileUiState.Error(errorMessage = message)
+                        _state.value = ProfileUiState.Error(errorMessageRes = messageRes)
                     }
                 }
         }

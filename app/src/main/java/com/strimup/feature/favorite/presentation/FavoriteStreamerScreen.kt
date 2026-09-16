@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -64,12 +65,13 @@ fun FavoriteStreamerScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is FavoriteStreamersUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }

@@ -2,7 +2,9 @@ package com.strimup.feature.filter.presentation.matchedstreamer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.core.network.toDomainError
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.usecase.GetFilterByIdUseCase
 import com.strimup.feature.filter.domain.usecase.GetStreamersByFilterUseCase
@@ -40,6 +42,10 @@ class MatchedStreamerListViewModel @Inject constructor(
         }
     }
 
+    fun retry() {
+        loadInitialData()
+    }
+
     private fun loadInitialData() {
         viewModelScope.launch {
             _state.value = MatchedStreamersUiState.Loading
@@ -52,7 +58,7 @@ class MatchedStreamerListViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     _state.value = MatchedStreamersUiState.Error(
-                        errorMessage = throwable.message ?: "Erreur de chargement du filtre"
+                        errorMessageRes = throwable.toDomainError().toMessageRes()
                     )
                 }
         }
@@ -152,7 +158,7 @@ class MatchedStreamerListViewModel @Inject constructor(
         if (pageNumber == 1) {
             _state.update {
                 MatchedStreamersUiState.Error(
-                    errorMessage = throwable.message ?: "Une erreur est survenue"
+                    errorMessageRes = throwable.toDomainError().toMessageRes()
                 )
             }
         } else {
@@ -163,8 +169,8 @@ class MatchedStreamerListViewModel @Inject constructor(
                     currentState
                 }
             }
-            val message = throwable.message ?: "Impossible de charger la suite des résultats"
-            _events.send(MatchedStreamersUiEvent.ShowSnackBar(message))
+            val messageRes = throwable.toDomainError().toMessageRes()
+            _events.send(MatchedStreamersUiEvent.ShowSnackBar(messageRes))
         }
     }
 }

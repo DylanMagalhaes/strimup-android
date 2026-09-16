@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerprofile.presentation.streamerprofile
 
+import androidx.annotation.StringRes
 import com.strimup.core.streamer.domain.entity.Streamer
 
 sealed interface ProfileUiState {
@@ -10,6 +11,6 @@ sealed interface ProfileUiState {
     ) : ProfileUiState
 
     data class Error(
-        val errorMessage: String
+        @StringRes val errorMessageRes: Int
     ) : ProfileUiState
 }

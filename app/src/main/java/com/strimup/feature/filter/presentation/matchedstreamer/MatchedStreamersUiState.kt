@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.presentation.matchedstreamer
 
+import androidx.annotation.StringRes
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 
 sealed interface MatchedStreamersUiState {
@@ -14,6 +15,6 @@ sealed interface MatchedStreamersUiState {
     ) : MatchedStreamersUiState
 
     data class Error(
-        val errorMessage: String
+        @StringRes val errorMessageRes: Int
     ) : MatchedStreamersUiState
 }

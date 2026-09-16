@@ -2,16 +2,19 @@ package com.strimup.feature.filter.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
+import com.strimup.core.network.toDomainError
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.filter.domain.usecase.DeleteFilterUseCase
 import com.strimup.feature.filter.domain.usecase.GetFiltersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class FilterListViewModel @Inject constructor(
@@ -44,8 +47,8 @@ class FilterListViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     _state.update { it.copy(isLoading = false) }
-                    val message = exception.localizedMessage ?: "Erreur lors de la récupération des filtres"
-                    _events.send(FilterListUiEvent.ShowSnackBar(message))
+                    val messageRes = exception.toDomainError().toMessageRes()
+                    _events.send(FilterListUiEvent.ShowSnackBar(messageRes))
                 }
         }
     }
@@ -62,15 +65,15 @@ class FilterListViewModel @Inject constructor(
 
             deleteFilter(id)
                 .onSuccess {
-                    _events.send(FilterListUiEvent.ShowSnackBar("votre filtre a bien été supprimé"))
+                    _events.send(FilterListUiEvent.ShowSnackBar(R.string.filter_deleted_success))
 
                 }
                 .onFailure { error ->
                 _state.update { currentState ->
                     currentState.copy(filters = previousFilters)
                 }
-                val message = error.localizedMessage ?: "Impossible de supprimer le filtre"
-                _events.send(FilterListUiEvent.ShowSnackBar(message))
+                val messageRes = error.toDomainError().toMessageRes()
+                _events.send(FilterListUiEvent.ShowSnackBar(messageRes))
             }
         }
     }

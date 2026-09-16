@@ -2,6 +2,8 @@ package com.strimup.feature.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.core.network.toDomainError
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.domain.usecase.GetBannerUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
@@ -39,7 +41,7 @@ class HomeViewModel @Inject constructor(
         state.update {
             it.copy(
                 isBannerLoading = true,
-                errorMessage = null
+                errorMessageRes = null
             )
         }
 
@@ -54,11 +56,11 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    val message = exception.localizedMessage ?: "Une erreur est survenue"
+                    val messageRes = exception.toDomainError().toMessageRes()
                     state.update {
                         it.copy(
                             isBannerLoading = false,
-                            errorMessage = message,
+                            errorMessageRes = messageRes,
                         )
                     }
                 }
@@ -74,7 +76,7 @@ class HomeViewModel @Inject constructor(
             it.copy(
                 isLoading = true,
                 currentTab = filter,
-                errorMessage = null,
+                errorMessageRes = null,
             )
         }
 
@@ -89,19 +91,19 @@ class HomeViewModel @Inject constructor(
                         it.copy(
                             streamers = streamers,
                             isLoading = false,
-                            errorMessage = null,
+                            errorMessageRes = null,
                         )
                     }
                 }
                 .onFailure { exception ->
-                    val message = exception.localizedMessage ?: "Une erreur est survenue"
+                    val messageRes = exception.toDomainError().toMessageRes()
                     state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = message,
+                            errorMessageRes = messageRes,
                         )
                     }
-                    _events.send(HomeUiEvent.ShowSnackBar(message))
+                    _events.send(HomeUiEvent.ShowSnackBar(messageRes))
                 }
         }
     }

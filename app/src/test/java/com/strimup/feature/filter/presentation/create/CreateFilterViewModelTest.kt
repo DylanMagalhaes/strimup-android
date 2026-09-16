@@ -2,6 +2,9 @@ package com.strimup.feature.filter.presentation.create
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
 import com.strimup.feature.filter.domain.entity.FilterCriteria
@@ -71,11 +74,10 @@ class CreateFilterViewModelTest {
     }
 
     @Test
-    fun `init when options fail should emit ShowSnackBar with error message`() = runTest {
+    fun `init when options fail should emit ShowSnackBar with the mapped DomainError message`() = runTest {
         // GIVEN
-        val errorMessage = "Impossible de joindre le serveur"
         val viewModel = buildViewModel(
-            getFilterOptions = GetFilterOptionsUseCase { Result.failure(Exception(errorMessage)) },
+            getFilterOptions = GetFilterOptionsUseCase { Result.failure(Exception("peu importe")) },
         )
 
         // WHEN & THEN
@@ -84,16 +86,31 @@ class CreateFilterViewModelTest {
 
             val event = awaitItem()
             assertThat(event).isInstanceOf(CreateFilterUiEvent.ShowSnackBar::class.java)
-            assertThat((event as CreateFilterUiEvent.ShowSnackBar).text).isEqualTo(errorMessage)
+            assertThat((event as CreateFilterUiEvent.ShowSnackBar).textRes).isEqualTo(R.string.error_unknown)
         }
     }
 
     @Test
-    fun `init when tags fail should emit ShowSnackBar with error message`() = runTest {
+    fun `init when options fail with a DomainException should keep its own category`() = runTest {
         // GIVEN
-        val errorMessage = "Erreur de chargement des tags"
         val viewModel = buildViewModel(
-            getTags = GetTagsUseCase { Result.failure(Exception(errorMessage)) },
+            getFilterOptions = GetFilterOptionsUseCase { Result.failure(DomainException(DomainError.Network)) },
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            advanceUntilIdle()
+
+            val event = awaitItem() as CreateFilterUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.error_network)
+        }
+    }
+
+    @Test
+    fun `init when tags fail should emit ShowSnackBar with the mapped DomainError message`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            getTags = GetTagsUseCase { Result.failure(Exception("peu importe")) },
         )
 
         // WHEN & THEN
@@ -102,7 +119,7 @@ class CreateFilterViewModelTest {
 
             val event = awaitItem()
             assertThat(event).isInstanceOf(CreateFilterUiEvent.ShowSnackBar::class.java)
-            assertThat((event as CreateFilterUiEvent.ShowSnackBar).text).isEqualTo(errorMessage)
+            assertThat((event as CreateFilterUiEvent.ShowSnackBar).textRes).isEqualTo(R.string.error_unknown)
         }
     }
 
@@ -158,9 +175,8 @@ class CreateFilterViewModelTest {
     @Test
     fun `saveFilter when createFilter fails should emit ShowSnackBar and reset isSubmitting`() = runTest {
         // GIVEN
-        val errorMessage = "Le filtre existe déjà"
         val viewModel = buildViewModel(
-            createFilter = CreateFilterUseCase { _, _ -> Result.failure(Exception(errorMessage)) },
+            createFilter = CreateFilterUseCase { _, _ -> Result.failure(Exception("peu importe")) },
         )
         advanceUntilIdle()
         viewModel.onFilterNameChange("Mon filtre")
@@ -172,11 +188,30 @@ class CreateFilterViewModelTest {
 
             val event = awaitItem()
             assertThat(event).isInstanceOf(CreateFilterUiEvent.ShowSnackBar::class.java)
-            assertThat((event as CreateFilterUiEvent.ShowSnackBar).text).isEqualTo(errorMessage)
+            assertThat((event as CreateFilterUiEvent.ShowSnackBar).textRes).isEqualTo(R.string.error_unknown)
         }
 
         val state = viewModel.state.value as CreateFilterUiState.Content
         assertThat(state.isSubmitting).isFalse()
+    }
+
+    @Test
+    fun `saveFilter when createFilter fails with a DomainException should keep its own category`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            createFilter = CreateFilterUseCase { _, _ -> Result.failure(DomainException(DomainError.Unauthorized)) },
+        )
+        advanceUntilIdle()
+        viewModel.onFilterNameChange("Mon filtre")
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.saveFilter()
+            advanceUntilIdle()
+
+            val event = awaitItem() as CreateFilterUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.error_unauthorized)
+        }
     }
 
     @Test

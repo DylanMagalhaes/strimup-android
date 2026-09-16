@@ -2,12 +2,13 @@ package com.strimup.feature.filter.presentation.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.core.network.toDomainError
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
+import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.filter.domain.usecase.CreateFilterUseCase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class CreateFilterViewModel @Inject constructor(
@@ -53,7 +55,7 @@ class CreateFilterViewModel @Inject constructor(
                     contentState = contentState.copy(availableOptions = options)
                 }
                 .onFailure { error ->
-                    _events.send(CreateFilterUiEvent.ShowSnackBar(error.localizedMessage ?: "Impossible de charger les options"))
+                    _events.send(CreateFilterUiEvent.ShowSnackBar(error.toDomainError().toMessageRes()))
                 }
 
             tagsResult
@@ -69,7 +71,7 @@ class CreateFilterViewModel @Inject constructor(
                     )
                 }
                 .onFailure { error ->
-                    _events.send(CreateFilterUiEvent.ShowSnackBar(error.localizedMessage ?: "Impossible de charger les tags"))
+                    _events.send(CreateFilterUiEvent.ShowSnackBar(error.toDomainError().toMessageRes()))
                 }
 
             _state.value = contentState
@@ -101,8 +103,8 @@ class CreateFilterViewModel @Inject constructor(
                 }
                 .onFailure { error ->
                     updateContentState { it.copy(isSubmitting = false) }
-                    val message = error.localizedMessage ?: "Erreur lors de la création du filtre"
-                    _events.send(CreateFilterUiEvent.ShowSnackBar(message))
+                    val messageRes = error.toDomainError().toMessageRes()
+                    _events.send(CreateFilterUiEvent.ShowSnackBar(messageRes))
                 }
         }
     }

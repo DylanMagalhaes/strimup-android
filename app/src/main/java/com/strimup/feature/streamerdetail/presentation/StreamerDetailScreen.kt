@@ -24,22 +24,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
+import kotlinx.coroutines.launch
 
 @Composable
 fun StreamerDetailScreen(
@@ -52,6 +57,8 @@ fun StreamerDetailScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val uriHandler = LocalUriHandler.current
+    val resources = LocalResources.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(streamerId) {
         viewModel.loadStreamer(streamerId)
@@ -61,7 +68,7 @@ fun StreamerDetailScreen(
         viewModel.event.collect { event ->
             when (event) {
                 is StreamerDetailUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
             }
         }
@@ -77,11 +84,15 @@ fun StreamerDetailScreen(
                 try {
                     uriHandler.openUri(socialUrl)
                 } catch (_: Exception) {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
+                    }
                 }
             }
         },
         onVideoClick = onVideoClick,
         onFavoriteClick = { viewModel.onFavoriteClick() },
+        onRetryClick = { viewModel.loadStreamer(streamerId) }
     )
 }
 
@@ -94,6 +105,7 @@ private fun StreamerDetailScreen(
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -128,7 +140,8 @@ private fun StreamerDetailScreen(
             state = state,
             onSocialClick = onSocialClick,
             onVideoClick = onVideoClick,
-            onFavoriteClick = onFavoriteClick
+            onFavoriteClick = onFavoriteClick,
+            onRetryClick = onRetryClick,
         )
     }
 }
@@ -139,6 +152,7 @@ private fun StreamerDetailContent(
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -182,9 +196,11 @@ private fun StreamerDetailContent(
         }
 
         is StreamerDetailUiState.Error -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Impossible de charger les informations du streamer.")
-            }
+            ErrorState(
+                messageRes = state.messageRes,
+                onRetryClick = onRetryClick,
+                modifier = Modifier.fillMaxSize(),
+            )
         }
     }
 }
@@ -225,7 +241,8 @@ private fun StreamerDetailScreenPreview() {
                     followersCount = 10
                 ),
                 isFavorite = true
-            )
+            ),
+            onRetryClick = {}
         )
     }
 }

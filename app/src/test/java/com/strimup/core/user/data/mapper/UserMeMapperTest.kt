@@ -36,8 +36,8 @@ class UserMeMapperTest {
         assertThat(result.avatarUrl).isEqualTo("https://example.com/avatar.png")
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `toEntity should throw IllegalArgumentException when role is invalid`() {
+    @Test
+    fun `toEntity should fallback to VIEWER when role is invalid`() {
         // GIVEN
         val userMeData = UserMeResponse.UserMeData(
             id = "1",
@@ -51,9 +51,10 @@ class UserMeMapperTest {
         )
 
         // WHEN
-        userMeData.toEntity()
+        val result = userMeData.toEntity()
 
-        // THEN -> Exception
+        // THEN
+        assertThat(result.role).isEqualTo(UserRole.VIEWER)
     }
 
     // UserEntity.toRoomEntity()
@@ -104,8 +105,8 @@ class UserMeMapperTest {
         assertThat(result.avatarUrl).isEqualTo("https://example.com/avatar.png")
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `toDomainEntity should throw IllegalArgumentException when stored role is invalid`() {
+    @Test
+    fun `toDomainEntity should fallback to VIEWER when stored role is invalid`() {
         // GIVEN
         val roomEntity = UserRoomEntity(
             id = "1",
@@ -116,8 +117,9 @@ class UserMeMapperTest {
         )
 
         // WHEN
-        roomEntity.toDomainEntity()
+        val result = roomEntity.toDomainEntity()
 
-        // THEN -> Exception
+        // THEN
+        assertThat(result.role).isEqualTo(UserRole.VIEWER)
     }
 }

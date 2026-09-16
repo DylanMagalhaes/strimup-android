@@ -10,7 +10,7 @@ fun UserMeResponse.UserMeData.toEntity(): UserEntity {
         id = this.id,
         userName = this.userName,
         email = this.email,
-        role = UserRole.valueOf(this.role),
+        role = UserRole.fromApi(this.role),
         avatarUrl = this.imageUrl
     )
 }
@@ -30,7 +30,7 @@ fun UserRoomEntity.toDomainEntity(): UserEntity {
         id = this.id,
         userName = this.userName,
         email = this.email,
-        role = UserRole.valueOf(this.role),
+        role = UserRole.fromApi(this.role),
         avatarUrl = this.imageUrl
     )
 }
