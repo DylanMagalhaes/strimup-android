@@ -1,6 +1,5 @@
 package com.strimup.feature.filter.data.local.dao
 
-
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
@@ -14,10 +13,7 @@ interface FilterDao {
     suspend fun getFilterById(id: String): FilterRoomEntity?
 
     @Query("SELECT * FROM filters")
-    fun getAllFilters(): Flow<List<FilterRoomEntity>>
-
-    @Query("SELECT * FROM filters")
-    suspend fun getAllFiltersOnce(): List<FilterRoomEntity>
+    fun observeFilters(): Flow<List<FilterRoomEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFilter(filter: FilterRoomEntity)

@@ -10,6 +10,8 @@ import com.strimup.feature.filter.data.request.CreateFilterRequest
 import com.strimup.feature.filter.domain.FilterRepository
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DefaultFilterRepository @Inject constructor(
@@ -17,22 +19,19 @@ class DefaultFilterRepository @Inject constructor(
     private val filterDao: FilterDao
 ) : FilterRepository {
 
-    override suspend fun getFilters(): Result<List<FilterEntity>> {
+    override fun observeFilters(): Flow<List<FilterEntity>> {
+        return filterDao.observeFilters()
+            .map { entities ->
+                entities.map { it.toDomainEntity() }
+            }
+    }
+
+    override suspend fun refreshFilters(): Result<Unit> {
         return runCatching {
             val remoteFilters = service.getFilters().map { it.toDomain() }
 
             remoteFilters.forEach { filter ->
                 filterDao.insertFilter(filter.toRoomEntity())
-            }
-
-            remoteFilters
-        }.recoverCatching { throwable ->
-            val localEntities = filterDao.getAllFiltersOnce()
-
-            if (localEntities.isNotEmpty()) {
-                localEntities.map { it.toDomainEntity() }
-            } else {
-                throw throwable
             }
         }.toDomainResult()
     }

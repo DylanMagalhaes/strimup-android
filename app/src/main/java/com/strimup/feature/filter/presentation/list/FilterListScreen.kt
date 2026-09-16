@@ -71,10 +71,6 @@ fun FilterListScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadFilters()
-    }
-
     FiltersListContent(
         state = state,
         snackbarHostState = snackbarHostState,

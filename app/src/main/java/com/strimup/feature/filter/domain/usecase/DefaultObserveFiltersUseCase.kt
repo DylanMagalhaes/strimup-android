@@ -2,12 +2,13 @@ package com.strimup.feature.filter.domain.usecase
 
 import com.strimup.feature.filter.domain.FilterRepository
 import com.strimup.feature.filter.domain.entity.FilterEntity
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class DefaultGetFiltersUseCase @Inject constructor(
+class DefaultObserveFiltersUseCase @Inject constructor(
     private val repository: FilterRepository
-) : GetFiltersUseCase {
-    override suspend fun invoke(): Result<List<FilterEntity>> {
-        return repository.getFilters()
+) : ObserveFiltersUseCase {
+    override fun invoke(): Flow<List<FilterEntity>> {
+        return repository.observeFilters()
     }
 }
