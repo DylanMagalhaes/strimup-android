@@ -1,5 +1,6 @@
 package com.strimup.feature.auth.data
 
+
 import com.strimup.core.favorite.data.local.dao.FavoriteDao
 import com.strimup.core.network.toDomainResult
 import com.strimup.core.user.data.local.dao.UserDao
@@ -35,7 +36,7 @@ class DefaultAuthRepository @Inject constructor(
             userDao.insertUser(loginResult.user.toRoomEntity())
 
             loginResult
-        }
+        }.toDomainResult()
     }
 
     override suspend fun register(credentials: RegisterCredentials): Result<LoginResultEntity> {

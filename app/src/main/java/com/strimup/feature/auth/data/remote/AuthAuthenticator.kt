@@ -2,15 +2,16 @@ package com.strimup.feature.auth.data.remote
 
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
-import javax.inject.Inject
-import javax.inject.Provider
-import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
+import javax.inject.Inject
+import javax.inject.Provider
+import javax.inject.Singleton
 
 @Singleton
 class AuthAuthenticator @Inject constructor(
@@ -63,6 +64,8 @@ class AuthAuthenticator @Inject constructor(
                         preferences.clear()
                         null
                     }
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     preferences.clear()
                     null
