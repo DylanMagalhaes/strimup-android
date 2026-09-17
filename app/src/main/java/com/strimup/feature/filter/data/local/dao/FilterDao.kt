@@ -21,4 +21,7 @@ interface FilterDao {
     @Query("DELETE FROM filters WHERE id = :id")
     suspend fun deleteFilter(id: String)
 
+    @Query("DELETE FROM filters")
+    suspend fun deleteAllFilters()
+
 }

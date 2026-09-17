@@ -19,4 +19,7 @@ interface FavoriteDao {
     @Query("DELETE FROM favorite WHERE id = :id")
     suspend fun deleteFavoriteStreamer(id: String)
 
+    @Query("DELETE FROM favorite")
+    suspend fun deleteAllFavorites()
+
 }

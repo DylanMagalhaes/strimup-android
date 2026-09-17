@@ -42,6 +42,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 
 @Composable fun LoginScreen(
     onNavToHome: () -> Unit,
+    onNavToRegister: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -75,7 +76,8 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             onPasswordChange = { viewModel.onPasswordChange(it) },
             onForgetPasswordClick = { /* TODO */ },
             onLoginClick = { viewModel.onLoginButtonClick() },
-            onRegisterClick = { /* TODO */ })
+            onNavToRegister = onNavToRegister
+        )
     }
 }
 
@@ -87,7 +89,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
     onPasswordChange: (String) -> Unit,
     onForgetPasswordClick: () -> Unit,
     onLoginClick: () -> Unit,
-    onRegisterClick: () -> Unit,
+    onNavToRegister: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -184,7 +186,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             )
 
             TextButton(
-                onClick = onRegisterClick,
+                onClick = onNavToRegister,
             ) {
                 Text(text = "S'inscrire maintenant")
             }
@@ -201,7 +203,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             onPasswordChange = {},
             onForgetPasswordClick = {},
             onLoginClick = {},
-            onRegisterClick = {},
+            onNavToRegister = {},
             state = LoginUiState()
         )
     }

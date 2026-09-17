@@ -17,4 +17,27 @@
 
     <!-- Actions -->
     <string name="action_retry">Réessayer</string>
+
+    <!-- Gender -->
+    <string name="gender_male">Homme</string>
+    <string name="gender_female">Femme</string>
+    <string name="gender_non_binary">Non-binaire</string>
+    <string name="gender_prefer_not_to_say">Je préfère ne pas préciser</string>
+
+    <!-- Role -->
+    <string name="role_viewer">Viewer</string>
+    <string name="role_streamer">Streamer / Créateur</string>
+    <string name="role_admin">Admin</string>
+
+    <!-- Password -->
+    <string name="password_error_min_length">Le mot de passe doit contenir au moins 12 caractères.</string>
+    <string name="password_error_uppercase">Le mot de passe doit contenir au moins une majuscule.</string>
+    <string name="password_error_lowercase">Le mot de passe doit contenir au moins une minuscule.</string>
+    <string name="password_error_digit">Le mot de passe doit contenir au moins un chiffre.</string>
+    <string name="password_error_special_character">Le mot de passe doit contenir un caractère spécial (@$!%*?&amp;./-_).</string>
+    <string name="password_checklist_min_length">12 car. min.</string>
+    <string name="password_checklist_uppercase">Majuscule</string>
+    <string name="password_checklist_lowercase">Minuscule</string>
+    <string name="password_checklist_digit">Chiffre</string>
+    <string name="password_checklist_special_character">Spécial (@$!%*?&amp;…)</string>
 </resources>
