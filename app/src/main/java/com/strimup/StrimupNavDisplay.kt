@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -43,7 +46,9 @@ import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination
 import com.strimup.core.navigation.navigateAsTab
 import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
+import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.auth.presentation.register.RegisterScreen
 import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
@@ -63,9 +68,10 @@ fun StrimupNavDisplay(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLoggedIn = state.user != null
     val userId = state.user?.id
+    val userRole = state.user?.role
 
     val shouldHideBottomBar = currentDestination is Destination.StreamerDetail ||
-            currentDestination is Destination.Login
+            currentDestination is Destination.Login || currentDestination is Destination.Register
 
     Scaffold(
         modifier = modifier,
@@ -73,130 +79,14 @@ fun StrimupNavDisplay(
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
         bottomBar = {
             if (!shouldHideBottomBar) {
-                NavigationBar {
-                    val isHomeSelected = currentDestination is Destination.Home
-                    val isFilterSelected = currentDestination is Destination.Filter
-                    val isSearchSelected = currentDestination is Destination.Search
-                    val isFavoriteSelected = currentDestination is Destination.Favorite
-                    val isProfileSelected = if (isLoggedIn) currentDestination is Destination.Profile else currentDestination is Destination.Login
-
-                    val itemColors = NavigationBarItemDefaults.colors(
-                        indicatorColor = Color.Transparent,
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    NavigationBarItem(
-                        selected = isHomeSelected,
-                        onClick = {
-                            backStack.navigateAsTab(Destination.Home.StreamerList)
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = if (isHomeSelected) Icons.Filled.Home else Icons.Outlined.Home,
-                                contentDescription = "Home"
-                            )
-                        },
-                        colors = itemColors
-                    )
-
-                    NavigationBarItem(
-                        selected = isFilterSelected,
-                        onClick = {
-                            if (isLoggedIn) {
-                                backStack.navigateAsTab(Destination.Filter.List)
-                            } else {
-                                backStack.navigateAsTab(Destination.Login)
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Tune,
-                                contentDescription = "Mes filtres",
-                            )
-                        },
-                        colors = itemColors
-                    )
-
-                    NavigationBarItem(
-                        selected = isSearchSelected,
-                        onClick = {
-                            backStack.navigateAsTab(Destination.Search)
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Rechercher",
-                            )
-                        },
-                        colors = itemColors
-                    )
-
-                    NavigationBarItem(
-                        selected = isFavoriteSelected,
-                        onClick = {
-                            if (isLoggedIn) {
-                                backStack.navigateAsTab(Destination.Favorite)
-                            } else {
-                                backStack.navigateAsTab(Destination.Login)
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = if (isFavoriteSelected) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                                contentDescription = "Mes streamers favoris",
-                            )
-                        },
-                        colors = itemColors
-                    )
-
-                    NavigationBarItem(
-                        selected = isProfileSelected,
-                        onClick = {
-                            if (isLoggedIn) {
-                                userId?.let { id ->
-                                    backStack.navigateAsTab(Destination.Profile.View(userId = id))
-                                }
-                            } else {
-                                backStack.navigateAsTab(Destination.Login)
-                            }
-                        },
-                        icon = {
-                            if (isLoggedIn) {
-                                AsyncImage(
-                                    model = state.user?.avatarUrl,
-                                    contentDescription = "Profile",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .then(
-                                            if (isProfileSelected) {
-                                                Modifier
-                                                    .border(
-                                                        width = 2.dp,
-                                                        color = MaterialTheme.colorScheme.primary,
-                                                        shape = CircleShape
-                                                    )
-                                                    .padding(2.dp)
-                                            } else Modifier
-                                        )
-                                        .clip(CircleShape)
-                                        .background(
-                                            MaterialTheme.colorScheme.onBackground.copy(
-                                                alpha = .4f
-                                            )
-                                        )
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = if (isProfileSelected) Icons.Filled.Person else Icons.Outlined.Person,
-                                    contentDescription = "Connexion"
-                                )
-                            }
-                        },
-                        colors = itemColors
-                    )
-                }
+                StrimupBottomBar(
+                    currentDestination = currentDestination,
+                    isLoggedIn = isLoggedIn,
+                    userId = userId,
+                    avatarUrl = state.user?.avatarUrl,
+                    userRole = userRole ?: UserRole.VIEWER,
+                    onNavigateAsTab = { destination -> backStack.navigateAsTab(destination) },
+                )
             }
         }
     ) { innerPadding ->
@@ -284,10 +174,176 @@ fun StrimupNavDisplay(
                         onNavToHome = {
                             backStack.clear()
                             backStack.add(Destination.Home.StreamerList)
-                        }
+                        },
+                        onNavToRegister = {
+                            backStack.clear()
+                            backStack.add(Destination.Register)
+                        },
+                    )
+                }
+
+                entry<Destination.Register> {
+                    RegisterScreen(
+                        onNavToHome = {
+                            backStack.clear()
+                            backStack.add(Destination.Home.StreamerList)
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                        onNavToLogin = { backStack.removeLastOrNull() }
                     )
                 }
             }
+        )
+    }
+}
+
+@Composable
+private fun StrimupBottomBar(
+    currentDestination: NavKey?,
+    isLoggedIn: Boolean,
+    userId: String?,
+    userRole: UserRole,
+    avatarUrl: String?,
+    onNavigateAsTab: (Destination) -> Unit,
+) {
+    val isHomeSelected = currentDestination is Destination.Home
+    val isFilterSelected = currentDestination is Destination.Filter
+    val isSearchSelected = currentDestination is Destination.Search
+    val isFavoriteSelected = currentDestination is Destination.Favorite
+    val isProfileSelected = if (isLoggedIn) {
+        currentDestination is Destination.Profile
+    } else {
+        currentDestination is Destination.Login
+    }
+
+    val itemColors = NavigationBarItemDefaults.colors(
+        indicatorColor = Color.Transparent,
+        selectedIconColor = MaterialTheme.colorScheme.primary,
+        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+
+    NavigationBar {
+        NavigationBarItem(
+            selected = isHomeSelected,
+            onClick = { onNavigateAsTab(Destination.Home.StreamerList) },
+            icon = {
+                Icon(
+                    imageVector = if (isHomeSelected) Icons.Filled.Home else Icons.Outlined.Home,
+                    contentDescription = "Home"
+                )
+            },
+            colors = itemColors
+        )
+
+        NavigationBarItem(
+            selected = isFilterSelected,
+            onClick = {
+                onNavigateAsTab(if (isLoggedIn) Destination.Filter.List else Destination.Login)
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Tune,
+                    contentDescription = "Mes filtres",
+                )
+            },
+            colors = itemColors
+        )
+
+        NavigationBarItem(
+            selected = isSearchSelected,
+            onClick = { onNavigateAsTab(Destination.Search) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Rechercher",
+                )
+            },
+            colors = itemColors
+        )
+
+        NavigationBarItem(
+            selected = isFavoriteSelected,
+            onClick = {
+                onNavigateAsTab(if (isLoggedIn) Destination.Favorite else Destination.Login)
+            },
+            icon = {
+                Icon(
+                    imageVector = if (isFavoriteSelected) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                    contentDescription = "Mes streamers favoris",
+                )
+            },
+            colors = itemColors
+        )
+
+            NavigationBarItem(
+                selected = isProfileSelected,
+                onClick = {
+                    val destination = if (isLoggedIn && userId != null)  {
+                        Destination.Profile.View(userId = userId)
+                    } else {
+                        Destination.Login
+                    }
+                    onNavigateAsTab(destination)
+                },
+                icon = {
+                    ProfileNavigationIcon(
+                        isLoggedIn = isLoggedIn,
+                        isSelected = isProfileSelected,
+                        avatarUrl = avatarUrl,
+                        userRol = userRole
+                    )
+                },
+                colors = itemColors
+            )
+
+    }
+}
+
+@Composable
+private fun ProfileNavigationIcon(
+    isLoggedIn: Boolean,
+    isSelected: Boolean,
+    userRol: UserRole,
+    avatarUrl: String?,
+) {
+    if (!isLoggedIn) {
+        Icon(
+            imageVector = if (isSelected) Icons.Filled.Person else Icons.Outlined.Person,
+            contentDescription = "Connexion"
+        )
+        return
+    }
+
+    if (userRol == UserRole.VIEWER) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Logout,
+            contentDescription = "Déconnexion"
+        )
+        return
+    }
+
+    if(userRol == UserRole.STREAMER){
+        AsyncImage(
+            model = avatarUrl,
+            contentDescription = "Profile",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(24.dp)
+                .then(
+                    if (isSelected) {
+                        Modifier
+                            .border(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape
+                            )
+                            .padding(2.dp)
+                    } else {
+                        Modifier
+                    }
+                )
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .4f))
         )
     }
 }

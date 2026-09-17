@@ -50,7 +50,6 @@
     <ID>FinalNewline:DefaultBannerRepository.kt$com.strimup.feature.home.data.DefaultBannerRepository.kt</ID>
     <ID>FinalNewline:DefaultDeleteStreamerFromFavoritesUseCase.kt$com.strimup.core.favorite.domain.usecase.DefaultDeleteStreamerFromFavoritesUseCase.kt</ID>
     <ID>FinalNewline:DefaultFavoriteStreamerRepository.kt$com.strimup.core.favorite.data.DefaultFavoriteStreamerRepository.kt</ID>
-    <ID>FinalNewline:DefaultFilterRepository.kt$com.strimup.feature.filter.data.DefaultFilterRepository.kt</ID>
     <ID>FinalNewline:DefaultGetStreamerUseCase.kt$com.strimup.feature.streamerdetail.domain.usecase.DefaultGetStreamerUseCase.kt</ID>
     <ID>FinalNewline:DefaultGetUserFlowUseCase.kt$com.strimup.core.user.domain.usecase.DefaultGetUserFlowUseCase.kt</ID>
     <ID>FinalNewline:DefaultLoginUseCase.kt$com.strimup.feature.auth.domain.usecase.DefaultLoginUseCase.kt</ID>
@@ -116,7 +115,6 @@
     <ID>FinalNewline:ProfileNavigation.kt$com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation.kt</ID>
     <ID>FinalNewline:ProfileUiState.kt$com.strimup.feature.streamerprofile.presentation.streamerprofile.ProfileUiState.kt</ID>
     <ID>FinalNewline:RefreshFavoriteStreamerUseCase.kt$com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase.kt</ID>
-    <ID>FinalNewline:RegisterScreen.kt$com.strimup.feature.auth.presentation.register.RegisterScreen.kt</ID>
     <ID>FinalNewline:SearchModule.kt$com.strimup.feature.search.injection.SearchModule.kt</ID>
     <ID>FinalNewline:SearchNavigation.kt$com.strimup.feature.search.presentation.navigation.SearchNavigation.kt</ID>
     <ID>FinalNewline:SearchScreen.kt$com.strimup.feature.search.presentation.SearchScreen.kt</ID>
@@ -165,7 +163,6 @@
     <ID>FunctionStartOfBodySpacing:StreamerMapper.kt$fun Streamer.toFavoriteRoom(): FavoriteRoomEntity</ID>
     <ID>ImportOrdering:AuthAuthenticator.kt$import com.strimup.feature.auth.data.AuthApiService import com.strimup.feature.auth.data.local.AuthPreferencesDataSource import javax.inject.Inject import javax.inject.Provider import javax.inject.Singleton import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.runBlocking import okhttp3.Authenticator import okhttp3.Request import okhttp3.Response import okhttp3.Route</ID>
     <ID>ImportOrdering:AuthInterceptor.kt$import com.strimup.feature.auth.data.local.AuthPreferencesDataSource import javax.inject.Inject import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.runBlocking import okhttp3.Interceptor import okhttp3.Response</ID>
-    <ID>ImportOrdering:AuthModule.kt$import com.strimup.feature.auth.data.AuthApiService import com.strimup.feature.auth.data.DefaultAuthRepository import com.strimup.feature.auth.domain.AuthRepository import com.strimup.feature.auth.domain.usecase.DefaultLoginUseCase import com.strimup.feature.auth.domain.usecase.LoginUseCase import dagger.Binds import dagger.Module import dagger.Provides import dagger.hilt.InstallIn import dagger.hilt.components.SingletonComponent import javax.inject.Singleton import retrofit2.Retrofit</ID>
     <ID>ImportOrdering:AuthPreferencesDataSource.kt$import androidx.datastore.core.DataStore import androidx.datastore.preferences.core.Preferences import androidx.datastore.preferences.core.edit import androidx.datastore.preferences.core.stringPreferencesKey import javax.inject.Inject import javax.inject.Singleton import kotlinx.coroutines.flow.Flow import kotlinx.coroutines.flow.first import kotlinx.coroutines.flow.map</ID>
     <ID>ImportOrdering:DatabaseModule.kt$import android.content.Context import androidx.room3.Room import com.strimup.core.database.StrimupDatabase import com.strimup.core.user.data.local.dao.UserDao import com.strimup.core.favorite.data.local.dao.FavoriteDao import com.strimup.feature.filter.data.local.dao.FilterDao import dagger.Module import dagger.Provides import dagger.hilt.InstallIn import dagger.hilt.android.qualifiers.ApplicationContext import dagger.hilt.components.SingletonComponent import javax.inject.Singleton</ID>
     <ID>ImportOrdering:DefaultGetStreamerUseCase.kt$import com.strimup.core.favorite.domain.FavoriteStreamerRepository import com.strimup.core.streamer.domain.repository.StreamerRepository import javax.inject.Inject import kotlinx.coroutines.flow.first</ID>
@@ -173,7 +170,6 @@
     <ID>ImportOrdering:DefaultObserveFavoritesStreamersUseCase.kt$import com.strimup.core.favorite.data.DefaultFavoriteStreamerRepository import com.strimup.core.streamer.domain.entity.Streamer import javax.inject.Inject import kotlinx.coroutines.flow.Flow</ID>
     <ID>ImportOrdering:FavoriteModule.kt$import com.strimup.core.favorite.data.DefaultFavoriteStreamerRepository import com.strimup.core.favorite.data.FavoriteApiService import com.strimup.core.favorite.domain.FavoriteStreamerRepository import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase import com.strimup.core.favorite.domain.usecase.DefaultAddStreamerToFavoritesUseCase import com.strimup.core.favorite.domain.usecase.DefaultDeleteStreamerFromFavoritesUseCase import com.strimup.core.favorite.domain.usecase.DefaultObserveFavoritesStreamersUseCase import com.strimup.core.favorite.domain.usecase.DefaultRefreshFavoriteStreamersUseCase import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase import com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase import dagger.Binds import dagger.Module import dagger.Provides import dagger.hilt.InstallIn import dagger.hilt.components.SingletonComponent import javax.inject.Singleton import retrofit2.Retrofit</ID>
     <ID>ImportOrdering:FavoriteStreamerMapper.kt$import com.strimup.core.streamer.domain.entity.Streamer import com.strimup.core.favorite.data.local.model.FavoriteRoomEntity import com.strimup.core.favorite.data.response.FavoriteStreamerResponse</ID>
-    <ID>ImportOrdering:FilterModule.kt$import com.strimup.feature.filter.data.DefaultFilterOptionsRepository import com.strimup.feature.filter.data.DefaultFilterRepository import com.strimup.feature.filter.data.FilterApiService import com.strimup.feature.filter.domain.FilterOptionRepository import com.strimup.feature.filter.domain.FilterRepository import com.strimup.feature.filter.domain.usecase.CreateFilterUseCase import com.strimup.feature.filter.domain.usecase.DefaultCreateFilterUseCase import com.strimup.feature.filter.domain.usecase.DefaultDeleteFilterUseCase import com.strimup.feature.filter.domain.usecase.DefaultGetFilterByIdUseCase import com.strimup.feature.filter.domain.usecase.DefaultGetFilterOptionsUseCase import com.strimup.feature.filter.domain.usecase.DefaultGetFiltersUseCase import com.strimup.feature.filter.domain.usecase.DefaultGetStreamersByFilterUseCase import com.strimup.feature.filter.domain.usecase.DeleteFilterUseCase import com.strimup.feature.filter.domain.usecase.GetFilterByIdUseCase import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUseCase import com.strimup.feature.filter.domain.usecase.GetFiltersUseCase import com.strimup.feature.filter.domain.usecase.GetStreamersByFilterUseCase import dagger.Binds import dagger.Module import dagger.Provides import dagger.hilt.InstallIn import dagger.hilt.components.SingletonComponent import javax.inject.Singleton import retrofit2.Retrofit</ID>
     <ID>ImportOrdering:HomeModule.kt$import com.strimup.feature.home.data.BannerApiService import com.strimup.feature.home.data.DefaultBannerRepository import com.strimup.feature.home.domain.BannerRepository import com.strimup.feature.home.domain.usecase.GetBannerItemsUseCase import com.strimup.feature.home.domain.usecase.GetBannerUseCase import com.strimup.feature.home.domain.usecase.GetStreamersUseCase import com.strimup.feature.home.domain.usecase.GetStreamersWithoutFavoriteUseCase import dagger.Binds import dagger.Module import dagger.Provides import dagger.hilt.InstallIn import dagger.hilt.components.SingletonComponent import javax.inject.Singleton import retrofit2.Retrofit</ID>
     <ID>ImportOrdering:HomeViewModelTest.kt$import com.strimup.core.streamer.domain.entity.Streamer import com.strimup.feature.home.domain.entity.BannerItemEntity import com.strimup.feature.home.domain.entity.FilterEntity import com.strimup.util.MainDispatcherRule import kotlin.random.Random import kotlin.random.nextUInt import kotlinx.coroutines.ExperimentalCoroutinesApi import kotlinx.coroutines.flow.first import kotlinx.coroutines.test.advanceUntilIdle import kotlinx.coroutines.test.runTest import org.junit.Assert import org.junit.Rule import org.junit.Test</ID>
     <ID>ImportOrdering:LoginViewModel.kt$import androidx.lifecycle.ViewModel import androidx.lifecycle.viewModelScope import com.strimup.feature.auth.domain.usecase.LoginUseCase import dagger.hilt.android.lifecycle.HiltViewModel import javax.inject.Inject import kotlinx.coroutines.channels.Channel import kotlinx.coroutines.flow.MutableStateFlow import kotlinx.coroutines.flow.asStateFlow import kotlinx.coroutines.flow.receiveAsFlow import kotlinx.coroutines.flow.update import kotlinx.coroutines.launch</ID>
@@ -302,7 +298,6 @@
     <ID>NewLineAtEndOfFile:DefaultBannerRepository.kt$com.strimup.feature.home.data.DefaultBannerRepository.kt</ID>
     <ID>NewLineAtEndOfFile:DefaultDeleteStreamerFromFavoritesUseCase.kt$com.strimup.core.favorite.domain.usecase.DefaultDeleteStreamerFromFavoritesUseCase.kt</ID>
     <ID>NewLineAtEndOfFile:DefaultFavoriteStreamerRepository.kt$com.strimup.core.favorite.data.DefaultFavoriteStreamerRepository.kt</ID>
-    <ID>NewLineAtEndOfFile:DefaultFilterRepository.kt$com.strimup.feature.filter.data.DefaultFilterRepository.kt</ID>
     <ID>NewLineAtEndOfFile:DefaultGetStreamerUseCase.kt$com.strimup.feature.streamerdetail.domain.usecase.DefaultGetStreamerUseCase.kt</ID>
     <ID>NewLineAtEndOfFile:DefaultGetUserFlowUseCase.kt$com.strimup.core.user.domain.usecase.DefaultGetUserFlowUseCase.kt</ID>
     <ID>NewLineAtEndOfFile:DefaultLoginUseCase.kt$com.strimup.feature.auth.domain.usecase.DefaultLoginUseCase.kt</ID>
@@ -368,7 +363,6 @@
     <ID>NewLineAtEndOfFile:ProfileNavigation.kt$com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation.kt</ID>
     <ID>NewLineAtEndOfFile:ProfileUiState.kt$com.strimup.feature.streamerprofile.presentation.streamerprofile.ProfileUiState.kt</ID>
     <ID>NewLineAtEndOfFile:RefreshFavoriteStreamerUseCase.kt$com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase.kt</ID>
-    <ID>NewLineAtEndOfFile:RegisterScreen.kt$com.strimup.feature.auth.presentation.register.RegisterScreen.kt</ID>
     <ID>NewLineAtEndOfFile:SearchModule.kt$com.strimup.feature.search.injection.SearchModule.kt</ID>
     <ID>NewLineAtEndOfFile:SearchNavigation.kt$com.strimup.feature.search.presentation.navigation.SearchNavigation.kt</ID>
     <ID>NewLineAtEndOfFile:SearchScreen.kt$com.strimup.feature.search.presentation.SearchScreen.kt</ID>
@@ -426,7 +420,6 @@
     <ID>NoBlankLineBeforeRbrace:FilterBadge.kt$ </ID>
     <ID>NoBlankLineBeforeRbrace:FilterDao.kt$FilterDao$ </ID>
     <ID>NoBlankLineBeforeRbrace:FilterListViewModel.kt$FilterListViewModel$ </ID>
-    <ID>NoBlankLineBeforeRbrace:FilterListViewModelTest.kt$FilterListViewModelTest$ </ID>
     <ID>NoBlankLineBeforeRbrace:GetUserFlowUseCase.kt$GetUserFlowUseCase$ </ID>
     <ID>NoBlankLineBeforeRbrace:HomeScreen.kt$ </ID>
     <ID>NoBlankLineBeforeRbrace:MainViewModel.kt$MainViewModel$ </ID>
@@ -441,8 +434,6 @@
     <ID>NoConsecutiveBlankLines:EditProfileViewModel.kt$EditProfileViewModel$ </ID>
     <ID>NoConsecutiveBlankLines:FavoriteApiService.kt$ </ID>
     <ID>NoConsecutiveBlankLines:FavoriteModule.kt$FavoriteModule$ </ID>
-    <ID>NoConsecutiveBlankLines:FilterDao.kt$ </ID>
-    <ID>NoConsecutiveBlankLines:FilterListViewModelTest.kt$FilterListViewModelTest$ </ID>
     <ID>NoConsecutiveBlankLines:FilterMapper.kt$ </ID>
     <ID>NoConsecutiveBlankLines:FilterOptionsMapper.kt$ </ID>
     <ID>NoConsecutiveBlankLines:HeroBanner.kt$ </ID>
@@ -467,7 +458,6 @@
     <ID>NoUnusedImports:ColorScheme.kt$com.strimup.core.ui.theme.ColorScheme.kt</ID>
     <ID>NoUnusedImports:DefaultRefreshFavoriteStreamersUseCase.kt$com.strimup.core.favorite.domain.usecase.DefaultRefreshFavoriteStreamersUseCase.kt</ID>
     <ID>NoUnusedImports:FilterMapperTest.kt$com.strimup.feature.filter.data.mapper.FilterMapperTest.kt</ID>
-    <ID>NoUnusedImports:FilterRepository.kt$com.strimup.feature.filter.domain.FilterRepository.kt</ID>
     <ID>NoUnusedImports:MultipleSelectBottomSheet.kt$com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet.kt</ID>
     <ID>NoUnusedImports:SearchViewModel.kt$com.strimup.feature.search.presentation.SearchViewModel.kt</ID>
     <ID>NoUnusedImports:SocialLoginSection.kt$com.strimup.feature.auth.presentation.component.SocialLoginSection.kt</ID>
@@ -516,7 +506,7 @@
     <ID>UnusedPrivateMember:LoginScreen.kt$@Preview @Composable private fun LoginScreenPreview()</ID>
     <ID>UnusedPrivateMember:MatchedStreamersScreen.kt$@Composable @Preview private fun MatchedStreamersScreenPreview()</ID>
     <ID>UnusedPrivateMember:PrimaryButton.kt$@Preview @Composable private fun PrimaryButtonPreview()</ID>
-    <ID>UnusedPrivateMember:RegisterScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Preview @Composable private fun RegisterScreenPreview()</ID>
+    <ID>UnusedPrivateMember:RegisterScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Preview @Composable private fun RegisterContentPreview()</ID>
     <ID>UnusedPrivateMember:SearchScreen.kt$@Composable @Preview private fun SearchScreenPreview()</ID>
     <ID>UnusedPrivateMember:SelectFilterTagsScreen.kt$@Preview(showBackground = true) @Composable private fun SelectFilterTagsScreenPreview()</ID>
     <ID>UnusedPrivateMember:SelectProfileTagsScreen.kt$@Preview(showBackground = true) @Composable private fun SelectProfileTagsScreenPreview()</ID>

@@ -1,13 +1,12 @@
 package com.strimup.feature.auth.data.request
 
-import com.strimup.core.user.domain.entity.UserRole
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegisterRequest(
     @SerialName("role")
-    val role: UserRole,
+    val role: String,
     @SerialName("pseudo")
     val userName: String,
     @SerialName("password")

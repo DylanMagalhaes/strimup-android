@@ -4,14 +4,16 @@ import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.domain.AuthRepository
 import com.strimup.feature.auth.domain.usecase.DefaultLoginUseCase
+import com.strimup.feature.auth.domain.usecase.DefaultRegisterUseCase
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
+import com.strimup.feature.auth.domain.usecase.RegisterUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 import retrofit2.Retrofit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -34,4 +36,7 @@ interface AuthDomainModule {
 
     @Binds
     fun bindsLoginUseCase(impl: DefaultLoginUseCase): LoginUseCase
+
+    @Binds
+    fun bindsRegisterUseCase(impl: DefaultRegisterUseCase): RegisterUseCase
 }
