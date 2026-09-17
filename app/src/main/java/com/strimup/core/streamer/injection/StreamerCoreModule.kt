@@ -1,6 +1,8 @@
 package com.strimup.core.streamer.injection
 
 import com.strimup.core.streamer.data.StreamerApiService
+import com.strimup.core.streamer.data.avatar.AvatarFileReader
+import com.strimup.core.streamer.data.avatar.ContentResolverAvatarFileReader
 import com.strimup.core.streamer.data.repository.DefaultStreamerRepository
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import dagger.Binds
@@ -18,6 +20,10 @@ interface StreamerCoreModule {
     @Binds
     @Singleton
     fun bindsStreamerRepository(impl: DefaultStreamerRepository): StreamerRepository
+
+    @Binds
+    @Singleton
+    fun bindsAvatarFileReader(impl: ContentResolverAvatarFileReader): AvatarFileReader
 
     companion object {
         @Provides

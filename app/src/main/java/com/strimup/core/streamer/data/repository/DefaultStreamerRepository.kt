@@ -1,9 +1,8 @@
 package com.strimup.core.streamer.data.repository
 
-import android.content.Context
-import android.net.Uri
 import com.strimup.core.network.toDomainResult
 import com.strimup.core.streamer.data.StreamerApiService
+import com.strimup.core.streamer.data.avatar.AvatarFileReader
 import com.strimup.core.streamer.data.mapper.toDomain
 import com.strimup.core.streamer.data.mapper.toEntity
 import com.strimup.core.streamer.data.mapper.toUpdateProfileRequest
@@ -12,7 +11,6 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.streamer.domain.repository.StreamerRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -20,7 +18,7 @@ import javax.inject.Inject
 
 class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService,
-    @ApplicationContext private val context: Context
+    private val avatarFileReader: AvatarFileReader
 ) : StreamerRepository {
 
     override suspend fun getRandomStreamers(favoriteStreamerIds: List<String>): Result<List<Streamer>> {
@@ -60,14 +58,9 @@ class DefaultStreamerRepository @Inject constructor(
 
     override suspend fun updateAvatar(uri: String): Result<String> {
         return runCatching {
-            val parsedUri = Uri.parse(uri)
-            val contentResolver = context.contentResolver
-            val mimeType = contentResolver.getType(parsedUri) ?: "image/jpeg"
+            val avatarFile = avatarFileReader.read(uri)
 
-            val bytes = contentResolver.openInputStream(parsedUri)?.use { it.readBytes() }
-                ?: throw IllegalArgumentException("Impossible de lire l'image")
-
-            val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+            val requestBody = avatarFile.bytes.toRequestBody(avatarFile.mimeType.toMediaTypeOrNull())
             val bodyPart = MultipartBody.Part.createFormData(
                 "avatar",
                 "profile_avatar.jpg",
