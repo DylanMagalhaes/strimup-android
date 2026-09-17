@@ -26,12 +26,17 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,6 +59,7 @@ import com.strimup.feature.home.presentation.navigation.HomeNavigation
 import com.strimup.feature.search.presentation.navigation.SearchNavigation
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation
+import com.strimup.presentation.MainUiEvent
 import com.strimup.presentation.MainViewModel
 
 @Composable
@@ -69,6 +75,24 @@ fun StrimupNavDisplay(
     val userId = state.user?.id
     val userRole = state.user?.role
 
+    val snackBarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                MainUiEvent.LoggedOut -> {
+                    backStack.clear()
+                    backStack.add(Destination.Login)
+                }
+
+                is MainUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
+                }
+            }
+        }
+    }
+
     val shouldHideBottomBar = currentDestination is Destination.StreamerDetail ||
             currentDestination is Destination.Login || currentDestination is Destination.Register
 
@@ -76,6 +100,7 @@ fun StrimupNavDisplay(
         modifier = modifier,
         contentWindowInsets = WindowInsets.safeDrawing
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         bottomBar = {
             if (!shouldHideBottomBar) {
                 StrimupBottomBar(
@@ -136,7 +161,7 @@ fun StrimupNavDisplay(
                         modifier = Modifier.fillMaxSize(),
                         onLogoutSuccess = {
                             backStack.clear()
-                            backStack.add(Destination.Home.StreamerList)
+                            backStack.add(Destination.Login)
                         },
                     )
                 }

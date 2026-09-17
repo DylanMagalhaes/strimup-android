@@ -1,5 +1,6 @@
 package com.strimup.feature.auth.data
 
+import com.strimup.core.favorite.data.local.dao.FavoriteDao
 import com.strimup.core.network.toDomainResult
 import com.strimup.core.user.data.local.dao.UserDao
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
@@ -10,12 +11,15 @@ import com.strimup.feature.auth.data.request.RegisterRequest
 import com.strimup.feature.auth.domain.AuthRepository
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import com.strimup.feature.auth.domain.entity.RegisterCredentials
+import com.strimup.feature.filter.data.local.dao.FilterDao
 import javax.inject.Inject
 
 class DefaultAuthRepository @Inject constructor(
     private val service: AuthApiService,
     private val preferences: AuthPreferencesDataSource,
     private val userDao: UserDao,
+    private val filterDao: FilterDao,
+    private val favoriteDao: FavoriteDao
 ) : AuthRepository {
     override suspend fun login(email: String, password: String): Result<LoginResultEntity> {
         return runCatching {
@@ -63,6 +67,8 @@ class DefaultAuthRepository @Inject constructor(
         return runCatching {
             preferences.clear()
             userDao.deleteAllUsers()
+
+
         }.toDomainResult()
     }
 }
