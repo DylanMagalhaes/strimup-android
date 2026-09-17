@@ -1,5 +1,6 @@
 package com.strimup.feature.streamerdetail.presentation
 
+import android.content.ActivityNotFoundException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,7 +84,7 @@ fun StreamerDetailScreen(
             if (!socialUrl.isNullOrBlank()) {
                 try {
                     uriHandler.openUri(socialUrl)
-                } catch (_: Exception) {
+                } catch (_: ActivityNotFoundException) {
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
                     }

@@ -3,9 +3,11 @@ package com.strimup.core.network
 import com.google.common.truth.Truth.assertThat
 import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.SerializationException
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
@@ -94,5 +96,15 @@ class ErrorMapperTest {
         val mapped = result.toDomainResult()
 
         assertThat(mapped.exceptionOrNull()).isSameInstanceAs(original)
+    }
+
+    @Test
+    fun `toDomainResult on a failure wrapping a CancellationException should rethrow it instead of wrapping it`() {
+        val cancellation = CancellationException("coroutine scope was cancelled")
+        val result = Result.failure<String>(cancellation)
+
+        assertThrows(CancellationException::class.java) {
+            result.toDomainResult()
+        }
     }
 }

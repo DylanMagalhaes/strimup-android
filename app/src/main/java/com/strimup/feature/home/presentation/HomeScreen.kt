@@ -1,5 +1,6 @@
 package com.strimup.feature.home.presentation
 
+import android.content.ActivityNotFoundException
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -78,7 +79,7 @@ fun HomeScreen(
             if (!socialUrl.isNullOrBlank()) {
                 try {
                     uriHandler.openUri(socialUrl)
-                } catch (_: Exception) {
+                } catch (_: ActivityNotFoundException) {
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
                     }
@@ -94,7 +95,7 @@ fun HomeScreen(
                     } else {
                         uriHandler.openUri(banner.linkUrl)
                     }
-                } catch (_: Exception) {
+                } catch (_: ActivityNotFoundException) {
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
                     }
