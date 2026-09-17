@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
+import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -35,7 +36,7 @@ class MainViewModelTest {
         val getUserUseCase = GetUserFlowUseCase { flowOf(fakeUser) }
 
         // WHEN
-        val viewModel = MainViewModel(getUser = getUserUseCase)
+        val viewModel = MainViewModel(getUser = getUserUseCase, logout = LogoutUseCase { Result.success(Unit) })
         advanceUntilIdle()
 
         // THEN
@@ -50,7 +51,7 @@ class MainViewModelTest {
         val getUserUseCase = GetUserFlowUseCase { flowOf(null) }
 
         // WHEN
-        val viewModel = MainViewModel(getUser = getUserUseCase)
+        val viewModel = MainViewModel(getUser = getUserUseCase, logout = LogoutUseCase { Result.success(Unit) })
         advanceUntilIdle()
 
         // THEN
@@ -65,7 +66,7 @@ class MainViewModelTest {
         val userFlow = MutableSharedFlow<UserEntity?>()
         val getUserUseCase = GetUserFlowUseCase { userFlow }
 
-        val viewModel = MainViewModel(getUser = getUserUseCase)
+        val viewModel = MainViewModel(getUser = getUserUseCase, logout = LogoutUseCase { Result.success(Unit) })
         // Laisse le `collect { }` du init s'abonner à userFlow avant toute émission :
         // sinon un MutableSharedFlow sans replay perd la valeur émise.
         runCurrent()
@@ -87,5 +88,25 @@ class MainViewModelTest {
             assertThat(finalState.loading).isFalse()
             assertThat(finalState.user).isEqualTo(updatedUser)
         }
+    }
+
+    @Test
+    fun `onLogoutClick should call the logout use case`() = runTest {
+        // GIVEN
+        var logoutCalled = false
+        val viewModel = MainViewModel(
+            getUser = GetUserFlowUseCase { flowOf(fakeUser) },
+            logout = LogoutUseCase {
+                logoutCalled = true
+                Result.success(Unit)
+            },
+        )
+
+        // WHEN
+        viewModel.onLogoutClick()
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(logoutCalled).isTrue()
     }
 }

@@ -58,4 +58,11 @@ class DefaultAuthRepository @Inject constructor(
             registerResult
         }.toDomainResult()
     }
+
+    override suspend fun logout(): Result<Unit> {
+        return runCatching {
+            preferences.clear()
+            userDao.deleteAllUsers()
+        }.toDomainResult()
+    }
 }

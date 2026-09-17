@@ -4,8 +4,10 @@ import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.domain.AuthRepository
 import com.strimup.feature.auth.domain.usecase.DefaultLoginUseCase
+import com.strimup.feature.auth.domain.usecase.DefaultLogoutUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultRegisterUseCase
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
+import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import com.strimup.feature.auth.domain.usecase.RegisterUseCase
 import dagger.Binds
 import dagger.Module
@@ -39,4 +41,7 @@ interface AuthDomainModule {
 
     @Binds
     fun bindsRegisterUseCase(impl: DefaultRegisterUseCase): RegisterUseCase
+
+    @Binds
+    fun bindsLogoutUseCase(impl: DefaultLogoutUseCase): LogoutUseCase
 }

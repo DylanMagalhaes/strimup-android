@@ -9,6 +9,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
+import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,9 +49,11 @@ class StreamerProfileViewModelTest {
     private fun buildViewModel(
         getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
         getStreamer: GetStreamerUseCase = getStreamerUseCase { Result.success(fakeStreamer) },
+        logout: LogoutUseCase = LogoutUseCase { Result.success(Unit) },
     ) = StreamerProfileViewModel(
         getUser = getUser,
         getStreamer = getStreamer,
+        logout = logout,
     )
 
     // region init
@@ -273,4 +276,43 @@ class StreamerProfileViewModelTest {
         assertThat(viewModel.state.value).isEqualTo(errorState)
     }
 
+    // endregion
+
+    // region logout
+
+    @Test
+    fun `onLogoutClick when logout succeeds should emit LoggedOut`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+        advanceUntilIdle()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onLogoutClick()
+            advanceUntilIdle()
+
+            val event = awaitItem()
+            assertThat(event).isEqualTo(ProfileUiEvent.LoggedOut)
+        }
+    }
+
+    @Test
+    fun `onLogoutClick when logout fails should emit ShowSnackBar with the mapped DomainError message`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            logout = LogoutUseCase { Result.failure(Exception("peu importe")) },
+        )
+        advanceUntilIdle()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onLogoutClick()
+            advanceUntilIdle()
+
+            val event = awaitItem() as ProfileUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
+        }
+    }
+
+    // endregion
 }

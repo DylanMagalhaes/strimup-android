@@ -14,9 +14,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -57,6 +63,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 fun StreamerProfileScreen(
     modifier: Modifier = Modifier,
     onEditProfileNav: () -> Unit,
+    onLogoutSuccess: () -> Unit,
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -73,6 +80,10 @@ fun StreamerProfileScreen(
                 is ProfileUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
+
+                ProfileUiEvent.LoggedOut -> {
+                    onLogoutSuccess()
+                }
             }
         }
     }
@@ -82,6 +93,7 @@ fun StreamerProfileScreen(
         snackBarHostState = snackBarHostState,
         onEditProfileNav = onEditProfileNav,
         onRetryClick = viewModel::refresh,
+        onLogoutClick = viewModel::onLogoutClick,
         modifier = modifier
     )
 }
@@ -93,6 +105,7 @@ private fun StreamerProfileScreen(
     snackBarHostState: SnackbarHostState,
     onEditProfileNav: () -> Unit,
     onRetryClick: () -> Unit,
+    onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val titleText = when (state) {
@@ -114,6 +127,9 @@ private fun StreamerProfileScreen(
                         fontSize = 18.sp
                     )
                 },
+                actions = {
+                    ProfileOverflowMenu(onLogoutClick = onLogoutClick)
+                },
             )
         },
     ) { padding ->
@@ -125,6 +141,36 @@ private fun StreamerProfileScreen(
             onRetryClick = onRetryClick,
             state = state,
         )
+    }
+}
+
+@Composable
+private fun ProfileOverflowMenu(
+    onLogoutClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        IconButton(onClick = { isExpanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "Plus d'options"
+            )
+        }
+
+        DropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Se déconnecter") },
+                onClick = {
+                    isExpanded = false
+                    onLogoutClick()
+                }
+            )
+        }
     }
 }
 
@@ -317,7 +363,8 @@ private fun StreamerProfileScreenPreview() {
                 )
             ),
             onEditProfileNav = {},
-            onRetryClick = {}
+            onRetryClick = {},
+            onLogoutClick = {}
         )
     }
 }

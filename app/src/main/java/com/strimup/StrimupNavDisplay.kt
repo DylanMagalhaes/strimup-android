@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
@@ -86,6 +85,7 @@ fun StrimupNavDisplay(
                     avatarUrl = state.user?.avatarUrl,
                     userRole = userRole ?: UserRole.VIEWER,
                     onNavigateAsTab = { destination -> backStack.navigateAsTab(destination) },
+                    onLogoutClick = viewModel::onLogoutClick,
                 )
             }
         }
@@ -134,6 +134,10 @@ fun StrimupNavDisplay(
                     ProfileNavigation(
                         userId = destination.userId,
                         modifier = Modifier.fillMaxSize(),
+                        onLogoutSuccess = {
+                            backStack.clear()
+                            backStack.add(Destination.Home.StreamerList)
+                        },
                     )
                 }
 
@@ -205,6 +209,7 @@ private fun StrimupBottomBar(
     userRole: UserRole,
     avatarUrl: String?,
     onNavigateAsTab: (Destination) -> Unit,
+    onLogoutClick: () -> Unit,
 ) {
     val isHomeSelected = currentDestination is Destination.Home
     val isFilterSelected = currentDestination is Destination.Filter
@@ -275,27 +280,25 @@ private fun StrimupBottomBar(
             colors = itemColors
         )
 
-            NavigationBarItem(
-                selected = isProfileSelected,
-                onClick = {
-                    val destination = if (isLoggedIn && userId != null)  {
-                        Destination.Profile.View(userId = userId)
-                    } else {
-                        Destination.Login
-                    }
-                    onNavigateAsTab(destination)
-                },
-                icon = {
-                    ProfileNavigationIcon(
-                        isLoggedIn = isLoggedIn,
-                        isSelected = isProfileSelected,
-                        avatarUrl = avatarUrl,
-                        userRol = userRole
-                    )
-                },
-                colors = itemColors
-            )
-
+        NavigationBarItem(
+            selected = isProfileSelected,
+            onClick = {
+                when {
+                    isLoggedIn && userRole == UserRole.VIEWER -> onLogoutClick()
+                    isLoggedIn && userId != null -> onNavigateAsTab(Destination.Profile.View(userId = userId))
+                    else -> onNavigateAsTab(Destination.Login)
+                }
+            },
+            icon = {
+                ProfileNavigationIcon(
+                    isLoggedIn = isLoggedIn,
+                    isSelected = isProfileSelected,
+                    avatarUrl = avatarUrl,
+                    userRole = userRole
+                )
+            },
+            colors = itemColors
+        )
     }
 }
 
@@ -303,7 +306,7 @@ private fun StrimupBottomBar(
 private fun ProfileNavigationIcon(
     isLoggedIn: Boolean,
     isSelected: Boolean,
-    userRol: UserRole,
+    userRole: UserRole,
     avatarUrl: String?,
 ) {
     if (!isLoggedIn) {
@@ -314,7 +317,7 @@ private fun ProfileNavigationIcon(
         return
     }
 
-    if (userRol == UserRole.VIEWER) {
+    if (userRole == UserRole.VIEWER) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Logout,
             contentDescription = "Déconnexion"
@@ -322,28 +325,26 @@ private fun ProfileNavigationIcon(
         return
     }
 
-    if(userRol == UserRole.STREAMER){
-        AsyncImage(
-            model = avatarUrl,
-            contentDescription = "Profile",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(24.dp)
-                .then(
-                    if (isSelected) {
-                        Modifier
-                            .border(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = CircleShape
-                            )
-                            .padding(2.dp)
-                    } else {
-                        Modifier
-                    }
-                )
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .4f))
-        )
-    }
+    AsyncImage(
+        model = avatarUrl,
+        contentDescription = "Profile",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(24.dp)
+            .then(
+                if (isSelected) {
+                    Modifier
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape
+                        )
+                        .padding(2.dp)
+                } else {
+                    Modifier
+                }
+            )
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = .4f))
+    )
 }

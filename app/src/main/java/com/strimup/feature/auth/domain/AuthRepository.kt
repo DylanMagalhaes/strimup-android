@@ -10,4 +10,6 @@ interface AuthRepository {
     ): Result<LoginResultEntity>
 
     suspend fun register(credentials: RegisterCredentials): Result<LoginResultEntity>
+
+    suspend fun logout(): Result<Unit>
 }
