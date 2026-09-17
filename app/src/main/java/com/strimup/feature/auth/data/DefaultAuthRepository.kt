@@ -67,8 +67,8 @@ class DefaultAuthRepository @Inject constructor(
         return runCatching {
             preferences.clear()
             userDao.deleteAllUsers()
-
-
+            filterDao.deleteAllFilters()
+            favoriteDao.deleteAllFavorites()
         }.toDomainResult()
     }
 }
