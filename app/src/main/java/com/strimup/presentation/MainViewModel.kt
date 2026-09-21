@@ -2,9 +2,12 @@ package com.strimup.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
+import com.strimup.feature.auth.domain.entity.OAuthCallback
+import com.strimup.feature.auth.domain.usecase.ApplyOAuthLoginUseCase
 import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -20,6 +23,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase,
     private val logout: LogoutUseCase,
+    private val applyOAuthLogin: ApplyOAuthLoginUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -55,4 +59,38 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun onOAuthCallback(callback: OAuthCallback?) {
+        when (callback) {
+            is OAuthCallback.LoggedIn -> applyOAuthSession(
+                token = callback.token,
+                refreshToken = callback.refreshToken,
+                successEvent = MainUiEvent.OAuthLoggedIn,
+            )
+
+            is OAuthCallback.Linked -> applyOAuthSession(
+                token = callback.token,
+                refreshToken = null,
+                successEvent = MainUiEvent.ShowSnackBar(R.string.oauth_link_success),
+            )
+
+            is OAuthCallback.Onboarding -> viewModelScope.launch {
+                _events.send(MainUiEvent.OAuthOnboardingRequired(callback.tmp))
+            }
+
+            null -> Unit
+        }
+    }
+
+    private fun applyOAuthSession(token: String, refreshToken: String?, successEvent: MainUiEvent) {
+        viewModelScope.launch {
+            applyOAuthLogin(token, refreshToken)
+                .onSuccess {
+                    _events.send(successEvent)
+                }
+                .onFailure { exception ->
+                    val messageRes = exception.toDomainError().toMessageRes()
+                    _events.send(MainUiEvent.ShowSnackBar(messageRes))
+                }
+        }
+    }
 }

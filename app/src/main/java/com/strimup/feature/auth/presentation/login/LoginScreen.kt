@@ -1,6 +1,9 @@
 package com.strimup.feature.auth.presentation.login
 
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,7 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -22,6 +29,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,8 +42,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.BuildConfig
 import com.strimup.R
 import com.strimup.core.ui.component.button.PrimaryButton
+import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
@@ -48,6 +59,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
@@ -76,7 +88,11 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             onPasswordChange = { viewModel.onPasswordChange(it) },
             onForgetPasswordClick = { /* TODO */ },
             onLoginClick = { viewModel.onLoginButtonClick() },
-            onNavToRegister = onNavToRegister
+            onNavToRegister = onNavToRegister,
+            onTwitchLoginClick = {
+                val url = "${BuildConfig.BASE_URL}api/auth/twitch/login?client=android"
+                CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
+            },
         )
     }
 }
@@ -90,6 +106,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
     onForgetPasswordClick: () -> Unit,
     onLoginClick: () -> Unit,
     onNavToRegister: () -> Unit,
+    onTwitchLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -158,7 +175,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 24.dp),
+                    .padding(top = 24.dp, bottom= 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -179,6 +196,31 @@ import com.strimup.core.ui.theme.zalandoFontFamily
                     color = MaterialTheme.colorScheme.outlineVariant,
                 )
             }
+
+
+            IconButton(
+                modifier = modifier
+                    .size(48.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = Color(0xFF9146FF),
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+                shape = RoundedCornerShape(12.dp),
+                onClick = onTwitchLoginClick,
+            ) {
+                Icon(
+                    modifier = Modifier.size(26.dp),
+                    painter = painterResource(R.drawable.ic_twitch),
+                    contentDescription = null,
+                )
+            }
+
+//            OutlinedButton(
+//                modifier = Modifier.fillMaxWidth(),
+//                onClick = onTwitchLoginClick,
+//            ) {
+//                Text(text = stringResource(R.string.oauth_twitch_continue))
+//            }
 
             Text(
                 text = "Pas encore de compte ?",
@@ -204,6 +246,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             onForgetPasswordClick = {},
             onLoginClick = {},
             onNavToRegister = {},
+            onTwitchLoginClick = {},
             state = LoginUiState()
         )
     }

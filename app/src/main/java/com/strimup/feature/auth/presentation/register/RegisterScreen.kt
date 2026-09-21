@@ -1,10 +1,8 @@
 package com.strimup.feature.auth.presentation.register
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -15,17 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +27,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,9 +57,9 @@ import com.strimup.core.ui.user.toLabelRes
 import com.strimup.core.user.domain.entity.Gender
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.PasswordCheck
+import com.strimup.feature.auth.presentation.component.AuthDateField
+import com.strimup.feature.auth.presentation.component.AuthDropdownField
 import com.strimup.feature.auth.presentation.toChecklistLabelRes
-import java.time.Instant
-import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -234,7 +225,7 @@ fun RegisterContent(
                     label = "email",
                 )
 
-                RegisterDateField(
+                AuthDateField(
                     dateTextValue = dateTextValue,
                     datePickerState = datePickerState,
                     isExpanded = isDateDropDownExpended,
@@ -242,7 +233,7 @@ fun RegisterContent(
                     onDateSelected = onDateTextValueChange,
                 )
 
-                RegisterDropdownField(
+                AuthDropdownField(
                     label = "Sexe",
                     selectedLabelRes = sexValue?.toLabelRes(),
                     isExpanded = isSexDropDownExpended,
@@ -253,7 +244,7 @@ fun RegisterContent(
                     contentDescription = "Sélectionner votre sexe",
                 )
 
-                RegisterDropdownField(
+                AuthDropdownField(
                     label = "Je suis un(e)",
                     selectedLabelRes = roleValue?.toLabelRes(),
                     isExpanded = isRoleDropDownExpended,
@@ -331,107 +322,6 @@ fun RegisterContent(
                         fontWeight = FontWeight.Bold,
                     )
                 }
-            }
-        }
-    }
-}
-
-/**
- * Formats a [DatePicker]-selected UTC epoch millis timestamp into an ISO-8601
- * date string ("yyyy-MM-dd"), matching the API's expected birth_date format.
- */
-private fun formatBirthDate(epochMillis: Long): String =
-    Instant.ofEpochMilli(epochMillis).atZone(ZoneOffset.UTC).toLocalDate().toString()
-
-@Composable
-private fun RegisterDateField(
-    dateTextValue: String,
-    datePickerState: DatePickerState,
-    isExpanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    onDateSelected: (String) -> Unit,
-) {
-    StrimupTextField(
-        value = dateTextValue,
-        onValueChange = {},
-        label = "Date de naissance",
-        trailingIcon = {
-            IconButton(onClick = { onExpandedChange(!isExpanded) }) {
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Sélectionner la date"
-                )
-            }
-        },
-    )
-
-    if (!isExpanded) return
-
-    DatePickerDialog(
-        onDismissRequest = { onExpandedChange(false) },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        onDateSelected(formatBirthDate(millis))
-                    }
-                    onExpandedChange(false)
-                }
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { onExpandedChange(false) }) {
-                Text("Annuler")
-            }
-        }
-    ) {
-        DatePicker(
-            state = datePickerState,
-            showModeToggle = false
-        )
-    }
-}
-
-@Composable
-private fun <T> RegisterDropdownField(
-    label: String,
-    @StringRes selectedLabelRes: Int?,
-    isExpanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    options: List<T>,
-    optionLabelRes: (T) -> Int,
-    onOptionSelected: (T) -> Unit,
-    contentDescription: String,
-) {
-    Box {
-        StrimupTextField(
-            value = selectedLabelRes?.let { stringResource(it) } ?: "",
-            onValueChange = {},
-            label = label,
-            trailingIcon = {
-                IconButton(onClick = { onExpandedChange(!isExpanded) }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = contentDescription
-                    )
-                }
-            },
-        )
-
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { onExpandedChange(false) }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(optionLabelRes(option))) },
-                    onClick = {
-                        onOptionSelected(option)
-                        onExpandedChange(false)
-                    }
-                )
             }
         }
     }

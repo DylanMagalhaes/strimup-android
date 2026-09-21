@@ -40,4 +40,11 @@
     <string name="password_checklist_lowercase">Minuscule</string>
     <string name="password_checklist_digit">Chiffre</string>
     <string name="password_checklist_special_character">Spécial (@$!%*?&amp;…)</string>
+
+    <!-- OAuth -->
+    <string name="oauth_twitch_continue">Continuer avec Twitch</string>
+    <string name="oauth_link_success">Compte Twitch lié !</string>
+    <string name="oauth_onboarding_title">Encore un peu d\'infos</string>
+    <string name="oauth_onboarding_submit">Continuer</string>
+    <string name="oauth_onboarding_submit_loading">Finalisation…</string>
 </resources>

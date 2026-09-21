@@ -129,6 +129,8 @@ dependencies {
 
     implementation(libs.youtube.player.core)
 
+    implementation(libs.androidx.browser)
+
     implementation(libs.kotlinx.coroutines.android)
 
     // ----- Tests unitaires (JVM, src/test) -----

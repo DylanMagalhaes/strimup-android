@@ -288,7 +288,7 @@ class EditProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             _state.update { state ->
-                state.copy(isSaving = true, isSaveSuccess = false, errorMessageRes = null)
+                state.copy(isSaving = true, errorMessageRes = null)
             }
 
             var finalImageUrl = originalProfile.imageUrl
@@ -328,11 +328,11 @@ class EditProfileViewModel @Inject constructor(
                     _state.update { state ->
                         state.copy(
                             isSaving = false,
-                            isSaveSuccess = true,
                             originalProfile = updatedStreamer,
                             imageUrl = updatedStreamer.imageUrl
                         )
                     }
+                    _events.send(EditProfileUiEvent.ProfileSaved)
                 }
                 .onFailure { exception ->
                     _state.update { state -> state.copy(isSaving = false) }

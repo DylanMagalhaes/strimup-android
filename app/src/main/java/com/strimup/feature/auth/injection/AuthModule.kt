@@ -3,6 +3,10 @@ package com.strimup.feature.auth.injection
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.domain.AuthRepository
+import com.strimup.feature.auth.domain.usecase.ApplyOAuthLoginUseCase
+import com.strimup.feature.auth.domain.usecase.CompleteOAuthUseCase
+import com.strimup.feature.auth.domain.usecase.DefaultApplyOAuthLoginUseCase
+import com.strimup.feature.auth.domain.usecase.DefaultCompleteOAuthUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultLoginUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultLogoutUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultRegisterUseCase
@@ -44,4 +48,10 @@ interface AuthDomainModule {
 
     @Binds
     fun bindsLogoutUseCase(impl: DefaultLogoutUseCase): LogoutUseCase
+
+    @Binds
+    fun bindsApplyOAuthLoginUseCase(impl: DefaultApplyOAuthLoginUseCase): ApplyOAuthLoginUseCase
+
+    @Binds
+    fun bindsCompleteOAuthUseCase(impl: DefaultCompleteOAuthUseCase): CompleteOAuthUseCase
 }

@@ -22,6 +22,7 @@ okhttp = "4.12.0"
 room3 = "3.0.0"
 roomCommonJvm = "2.8.4"
 youtubePlayer = "12.1.0"
+browser = "1.10.0"
 
 # Testing
 coroutines = "1.10.2"
@@ -70,6 +71,7 @@ okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-
 androidx-room3-runtime = { group = "androidx.room3", name = "room3-runtime", version.ref = "room3" }
 androidx-room3-compiler = { group = "androidx.room3", name = "room3-compiler", version.ref = "room3" }
 youtube-player-core = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "core", version.ref = "youtubePlayer" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 
 # Testing
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }

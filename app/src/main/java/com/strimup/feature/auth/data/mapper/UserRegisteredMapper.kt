@@ -5,17 +5,20 @@ import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.data.response.UserRegisteredResponse
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
 
+fun UserRegisteredResponse.UserRegistered.toUserEntity(): UserEntity {
+    return UserEntity(
+        id = id,
+        userName = userName,
+        email = email,
+        role = UserRole.fromApi(role),
+        avatarUrl = null
+    )
+}
+
 fun UserRegisteredResponse.toEntity(): LoginResultEntity {
-    val userRegistered = this.userRegistered
     return LoginResultEntity(
         message = "",
         token = this.token,
-        user = UserEntity(
-            id = userRegistered.id,
-            userName = userRegistered.userName,
-            email = userRegistered.email,
-            role = UserRole.fromApi(userRegistered.role),
-            avatarUrl = null
-        )
+        user = userRegistered.toUserEntity()
     )
 }

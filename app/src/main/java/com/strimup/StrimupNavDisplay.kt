@@ -52,6 +52,7 @@ import com.strimup.core.navigation.navigateAsTab
 import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.auth.presentation.oauthonboarding.OAuthOnboardingScreen
 import com.strimup.feature.auth.presentation.register.RegisterScreen
 import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
@@ -86,6 +87,15 @@ fun StrimupNavDisplay(
                     backStack.add(Destination.Login)
                 }
 
+                MainUiEvent.OAuthLoggedIn -> {
+                    backStack.clear()
+                    backStack.add(Destination.Home.StreamerList)
+                }
+
+                is MainUiEvent.OAuthOnboardingRequired -> {
+                    backStack.add(Destination.OAuthOnboarding(tmp = event.tmp))
+                }
+
                 is MainUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
@@ -94,7 +104,9 @@ fun StrimupNavDisplay(
     }
 
     val shouldHideBottomBar = currentDestination is Destination.StreamerDetail ||
-            currentDestination is Destination.Login || currentDestination is Destination.Register
+            currentDestination is Destination.Login ||
+            currentDestination is Destination.Register ||
+            currentDestination is Destination.OAuthOnboarding
 
     Scaffold(
         modifier = modifier,
@@ -219,6 +231,17 @@ fun StrimupNavDisplay(
                         },
                         modifier = Modifier.fillMaxSize(),
                         onNavToLogin = { backStack.removeLastOrNull() }
+                    )
+                }
+
+                entry<Destination.OAuthOnboarding> { destination ->
+                    OAuthOnboardingScreen(
+                        tmp = destination.tmp,
+                        modifier = Modifier.fillMaxSize(),
+                        onCompleted = {
+                            backStack.clear()
+                            backStack.add(Destination.Home.StreamerList)
+                        },
                     )
                 }
             }
