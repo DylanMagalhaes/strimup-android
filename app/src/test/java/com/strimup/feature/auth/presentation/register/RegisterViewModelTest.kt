@@ -10,6 +10,7 @@ import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import com.strimup.feature.auth.domain.usecase.RegisterUseCase
+import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -24,7 +25,8 @@ class RegisterViewModelTest {
 
     private fun buildViewModel(
         register: RegisterUseCase = RegisterUseCase { _ -> Result.success(fakeRegisterResult) },
-    ) = RegisterViewModel(register = register)
+        startTwitchLogin: StartTwitchLoginUseCase = StartTwitchLoginUseCase { Result.success("https://twitch") },
+    ) = RegisterViewModel(register = register, startTwitchLogin = startTwitchLogin)
 
     private fun fillValidForm(viewModel: RegisterViewModel) {
         viewModel.onPseudoChange("Inox")
@@ -155,6 +157,38 @@ class RegisterViewModelTest {
 
             val event = awaitItem() as RegisterUiEvent.ShowSnackBar
             assertThat(event.textRes).isEqualTo(R.string.error_server)
+        }
+    }
+
+    @Test
+    fun `onTwitchLoginClick when the URL is ready should emit OpenCustomTab with it`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            startTwitchLogin = { Result.success("https://api/auth/twitch/login?code_challenge=abc") }
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onTwitchLoginClick()
+
+            val event = awaitItem() as RegisterUiEvent.OpenCustomTab
+            assertThat(event.url).isEqualTo("https://api/auth/twitch/login?code_challenge=abc")
+        }
+    }
+
+    @Test
+    fun `onTwitchLoginClick when preparing the flow fails should emit the OAuth failure snackbar`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            startTwitchLogin = { Result.failure(Exception("keystore indisponible")) }
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onTwitchLoginClick()
+
+            val event = awaitItem() as RegisterUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.oauth_error_failed)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.strimup.feature.auth.presentation.register
 
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
@@ -60,6 +63,7 @@ import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.PasswordCheck
 import com.strimup.feature.auth.presentation.component.AuthDateField
 import com.strimup.feature.auth.presentation.component.AuthDropdownField
+import com.strimup.feature.auth.presentation.component.AuthOAuthSection
 import com.strimup.feature.auth.presentation.toChecklistLabelRes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +77,7 @@ fun RegisterScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    val context = LocalContext.current
     val datePickerState = rememberDatePickerState()
 
     LaunchedEffect(Unit) {
@@ -84,6 +89,10 @@ fun RegisterScreen(
 
                 RegisterUiEvent.ShowHomeUi -> {
                     onNavToHome()
+                }
+
+                is RegisterUiEvent.OpenCustomTab -> {
+                    CustomTabsIntent.Builder().build().launchUrl(context, event.url.toUri())
                 }
             }
         }
@@ -134,6 +143,7 @@ fun RegisterScreen(
             },
             onRegisterClick = viewModel::onRegisterButtonClick,
             onLoginClick = onNavToLogin,
+            onTwitchLoginClick = viewModel::onTwitchLoginClick,
         )
     }
 }
@@ -169,6 +179,7 @@ fun RegisterContent(
     onConfirmPasswordVisibleChange: (Boolean) -> Unit,
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
+    onTwitchLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -315,6 +326,8 @@ fun RegisterContent(
                     onClick = onRegisterClick,
                 )
 
+                AuthOAuthSection(onTwitchClick = onTwitchLoginClick)
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -408,6 +421,7 @@ private fun RegisterContentPreview() {
             onConfirmPasswordVisibleChange = {},
             onRegisterClick = {},
             onLoginClick = {},
+            onTwitchLoginClick = {},
         )
     }
 }

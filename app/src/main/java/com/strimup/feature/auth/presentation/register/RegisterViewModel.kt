@@ -2,12 +2,14 @@ package com.strimup.feature.auth.presentation.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.core.user.domain.entity.Gender
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.entity.RegisterCredentials
 import com.strimup.feature.auth.domain.usecase.RegisterUseCase
+import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val register: RegisterUseCase,
+    private val startTwitchLogin: StartTwitchLoginUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RegisterUiState())
@@ -103,6 +106,18 @@ class RegisterViewModel @Inject constructor(
                     _state.update { it.copy(isLoading = false) }
                     val messageRes = exception.toDomainError().toMessageRes()
                     _events.send(RegisterUiEvent.ShowSnackBar(messageRes))
+                }
+        }
+    }
+
+    fun onTwitchLoginClick() {
+        viewModelScope.launch {
+            startTwitchLogin()
+                .onSuccess { url ->
+                    _events.send(RegisterUiEvent.OpenCustomTab(url))
+                }
+                .onFailure {
+                    _events.send(RegisterUiEvent.ShowSnackBar(R.string.oauth_error_failed))
                 }
         }
     }

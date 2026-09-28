@@ -10,12 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -46,9 +41,9 @@ import com.strimup.R
 import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
-import com.strimup.core.ui.theme.PurpleTwitch
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.feature.auth.presentation.component.AuthOAuthSection
 
 @Composable fun LoginScreen(
     onNavToHome: () -> Unit,
@@ -177,53 +172,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
                 onClick = onLoginClick,
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-
-                Text(
-                    text = "Ou continuer avec",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                )
-            }
-
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = PurpleTwitch,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-                shape = RoundedCornerShape(12.dp),
-                onClick = onTwitchLoginClick,
-            ) {
-                Icon(
-                    modifier = Modifier.size(26.dp),
-                    painter = painterResource(R.drawable.ic_twitch),
-                    contentDescription = null,
-                )
-            }
-
-//            OutlinedButton(
-//                modifier = Modifier.fillMaxWidth(),
-//                onClick = onTwitchLoginClick,
-//            ) {
-//                Text(text = stringResource(R.string.oauth_twitch_continue))
-//            }
+            AuthOAuthSection(onTwitchClick = onTwitchLoginClick)
 
             Row(
                 modifier = Modifier.padding(top = 8.dp),
