@@ -2,13 +2,20 @@ package com.strimup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -21,22 +28,25 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -246,14 +256,8 @@ private fun StrimupBottomBar(
         currentDestination is Destination.Login
     }
 
-    val itemColors = NavigationBarItemDefaults.colors(
-        indicatorColor = Color.Transparent,
-        selectedIconColor = MaterialTheme.colorScheme.primary,
-        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-
-    NavigationBar {
-        NavigationBarItem(
+    CompactNavigationBar {
+        CompactNavigationBarItem(
             selected = isHomeSelected,
             onClick = { onNavigateAsTab(Destination.Home.StreamerList) },
             icon = {
@@ -261,11 +265,10 @@ private fun StrimupBottomBar(
                     imageVector = if (isHomeSelected) Icons.Filled.Home else Icons.Outlined.Home,
                     contentDescription = "Home"
                 )
-            },
-            colors = itemColors
+            }
         )
 
-        NavigationBarItem(
+        CompactNavigationBarItem(
             selected = isFilterSelected,
             onClick = {
                 onNavigateAsTab(if (isLoggedIn) Destination.Filter.List else Destination.Login)
@@ -275,11 +278,10 @@ private fun StrimupBottomBar(
                     imageVector = Icons.Default.Tune,
                     contentDescription = "Mes filtres",
                 )
-            },
-            colors = itemColors
+            }
         )
 
-        NavigationBarItem(
+        CompactNavigationBarItem(
             selected = isSearchSelected,
             onClick = { onNavigateAsTab(Destination.Search) },
             icon = {
@@ -287,11 +289,10 @@ private fun StrimupBottomBar(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Rechercher",
                 )
-            },
-            colors = itemColors
+            }
         )
 
-        NavigationBarItem(
+        CompactNavigationBarItem(
             selected = isFavoriteSelected,
             onClick = {
                 onNavigateAsTab(if (isLoggedIn) Destination.Favorite else Destination.Login)
@@ -301,11 +302,10 @@ private fun StrimupBottomBar(
                     imageVector = if (isFavoriteSelected) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                     contentDescription = "Mes streamers favoris",
                 )
-            },
-            colors = itemColors
+            }
         )
 
-        NavigationBarItem(
+        CompactNavigationBarItem(
             selected = isProfileSelected,
             onClick = {
                 when {
@@ -321,9 +321,60 @@ private fun StrimupBottomBar(
                     avatarUrl = avatarUrl,
                     userRole = userRole
                 )
-            },
-            colors = itemColors
+            }
         )
+    }
+}
+
+@Composable
+private fun CompactNavigationBar(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Surface(
+        modifier = modifier,
+        color = NavigationBarDefaults.containerColor,
+        tonalElevation = NavigationBarDefaults.Elevation,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .windowInsetsPadding(NavigationBarDefaults.windowInsets)
+                .selectableGroup(),
+            verticalAlignment = Alignment.CenterVertically,
+            content = content,
+        )
+    }
+}
+
+@Composable
+private fun RowScope.CompactNavigationBarItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
+) {
+    val contentColor = if (selected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                role = Role.Tab,
+                interactionSource = null,
+                indication = ripple(bounded = false),
+            )
+            .padding(vertical = 16.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
+            icon()
+        }
     }
 }
 
