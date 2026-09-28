@@ -22,7 +22,7 @@ import kotlinx.serialization.modules.polymorphic
 @Composable
 fun ProfileNavigation(
     userId: String?,
-    onLogoutSuccess: () -> Unit,
+    onAccountNav: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val initialDestination = Destination.Profile.View(userId = userId)
@@ -56,7 +56,7 @@ fun ProfileNavigation(
                     onEditProfileNav = {
                         profileBackStack.add(Destination.Profile.Edit)
                     },
-                    onLogoutSuccess = onLogoutSuccess,
+                    onAccountNav = onAccountNav,
                 )
             }
 

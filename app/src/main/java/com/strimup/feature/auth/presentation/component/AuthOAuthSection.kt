@@ -22,11 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.strimup.R
 import com.strimup.core.ui.theme.PurpleTwitch
 
-/**
- * "Ou continuer avec" divider followed by the OAuth providers buttons, shared by
- * the login and register screens. The backend decides on callback whether the
- * account already exists (login) or needs onboarding (register).
- */
 @Composable
 fun AuthOAuthSection(
     onTwitchClick: () -> Unit,

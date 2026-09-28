@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.R
 import com.strimup.core.network.toDomainError
-import com.strimup.core.ui.error.toMessageRes
+import com.strimup.core.ui.error.toUiText
 import com.strimup.core.user.domain.entity.Gender
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.entity.RegisterCredentials
@@ -32,35 +32,35 @@ class RegisterViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     fun onPseudoChange(pseudo: String) {
-        _state.update { it.copy(pseudoInput = pseudo) }
+        updateForm { it.copy(pseudoInput = pseudo) }
     }
 
     fun onEmailChange(email: String) {
-        _state.update { it.copy(emailInput = email) }
+        updateForm { it.copy(emailInput = email) }
     }
 
     fun onBirthDateChange(birthDate: String) {
-        _state.update { it.copy(birthDateInput = birthDate) }
+        updateForm { it.copy(birthDateInput = birthDate) }
     }
 
     fun onGenderChange(gender: Gender) {
-        _state.update { it.copy(genderInput = gender) }
+        updateForm { it.copy(genderInput = gender) }
     }
 
     fun onRoleChange(role: UserRole) {
-        _state.update { it.copy(roleInput = role) }
+        updateForm { it.copy(roleInput = role) }
     }
 
     fun onPasswordChange(password: String) {
-        _state.update { it.copy(passwordInput = password) }
+        updateForm { it.copy(passwordInput = password) }
     }
 
     fun onConfirmPasswordChange(confirmPassword: String) {
-        _state.update { it.copy(confirmPasswordInput = confirmPassword) }
+        updateForm { it.copy(confirmPasswordInput = confirmPassword) }
     }
 
     fun onTermsAcceptedChange(isAccepted: Boolean) {
-        _state.update { it.copy(isTermsAccepted = isAccepted) }
+        updateForm { it.copy(isTermsAccepted = isAccepted) }
     }
 
     fun onPasswordVisibleChange(field: RegisterPasswordField, isVisible: Boolean) {
@@ -87,18 +87,24 @@ class RegisterViewModel @Inject constructor(
         val gender = currentState.genderInput
         val role = currentState.roleInput
 
-        if (!currentState.isSubmitEnabled || gender == null || role == null) return
+        if (currentState.isLoading) return
+
+        if (!currentState.isFormValid || gender == null || role == null) {
+            _state.update { it.copy(hasTriedToSubmit = true) }
+            return
+        }
 
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
 
             val credentials = RegisterCredentials(
-                userName = currentState.pseudoInput,
-                email = currentState.emailInput,
+                userName = currentState.pseudoInput.trim(),
+                email = currentState.emailInput.trim(),
                 password = currentState.passwordInput,
                 birthDate = currentState.birthDateInput,
                 gender = gender,
                 role = role,
+                hasAcceptedTerms = currentState.isTermsAccepted,
             )
 
             register(credentials)
@@ -107,9 +113,9 @@ class RegisterViewModel @Inject constructor(
                     _events.send(RegisterUiEvent.ShowHomeUi)
                 }
                 .onFailure { exception ->
-                    _state.update { it.copy(isLoading = false) }
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    _events.send(RegisterUiEvent.ShowSnackBar(messageRes))
+                    _state.update {
+                        it.copy(isLoading = false, errorMessage = exception.toDomainError().toUiText())
+                    }
                 }
         }
     }
@@ -124,6 +130,10 @@ class RegisterViewModel @Inject constructor(
                     _events.send(RegisterUiEvent.ShowSnackBar(R.string.oauth_error_failed))
                 }
         }
+    }
+
+    private fun updateForm(transform: (RegisterUiState) -> RegisterUiState) {
+        _state.update { transform(it).copy(errorMessage = null) }
     }
 }
 

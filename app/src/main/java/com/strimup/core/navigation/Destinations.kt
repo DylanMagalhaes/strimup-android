@@ -61,4 +61,10 @@ sealed interface Destination : NavKey {
 
     @Serializable
     data class OAuthOnboarding(val tmp: String) : Destination
+
+    @Serializable
+    data object Account : Destination
+
+    @Serializable
+    data object DeleteAccount : Destination
 }

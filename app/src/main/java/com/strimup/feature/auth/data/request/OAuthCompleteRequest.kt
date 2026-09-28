@@ -15,4 +15,6 @@ data class OAuthCompleteRequest(
     val birthDate: String,
     @SerialName("gender")
     val gender: String,
+    @SerialName("accepted_terms")
+    val acceptedTerms: Boolean,
 )

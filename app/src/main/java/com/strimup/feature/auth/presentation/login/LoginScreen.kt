@@ -1,6 +1,5 @@
 package com.strimup.feature.auth.presentation.login
 
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,10 +33,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
+import com.strimup.core.ui.browser.openInCustomTab
 import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -67,7 +66,7 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
                 }
 
                 is LoginUiEvent.OpenCustomTab -> {
-                    CustomTabsIntent.Builder().build().launchUrl(context, event.url.toUri())
+                    context.openInCustomTab(event.url)
                 }
 
                 LoginUiEvent.ShowHomeUi -> {

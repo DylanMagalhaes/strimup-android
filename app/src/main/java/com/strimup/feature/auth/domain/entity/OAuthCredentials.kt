@@ -8,4 +8,5 @@ data class OAuthCredentials(
     val role: UserRole,
     val birthDate: String,
     val gender: Gender,
+    val hasAcceptedTerms: Boolean,
 )

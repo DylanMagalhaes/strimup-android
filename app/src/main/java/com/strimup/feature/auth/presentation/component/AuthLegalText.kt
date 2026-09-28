@@ -1,6 +1,5 @@
 package com.strimup.feature.auth.presentation.component
 
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,15 +13,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withLink
-import androidx.core.net.toUri
+import com.strimup.core.legal.LegalUrls
+import com.strimup.core.ui.browser.openInCustomTab
 
-private const val CGU_URL = "https://www.strimup.com/cgu"
-private const val PRIVACY_POLICY_URL = "https://www.strimup.com/politique-de-confidentialite"
-
-/**
- * "[prefix] les CGU et la politique de confidentialité." with both documents
- * opening in a Custom Tab, shared by every auth entry point creating an account.
- */
 @Composable
 fun AuthLegalText(
     prefix: String,
@@ -36,9 +29,9 @@ fun AuthLegalText(
             fontWeight = FontWeight.Bold,
         )
     )
-    val openInCustomTab = LinkInteractionListener { link ->
+    val openLink = LinkInteractionListener { link ->
         val url = (link as? LinkAnnotation.Url)?.url ?: return@LinkInteractionListener
-        CustomTabsIntent.Builder().build().launchUrl(context, url.toUri())
+        context.openInCustomTab(url)
     }
 
     Text(
@@ -48,11 +41,11 @@ fun AuthLegalText(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         text = buildAnnotatedString {
             append("$prefix les ")
-            withLink(LinkAnnotation.Url(CGU_URL, linkStyles, openInCustomTab)) {
+            withLink(LinkAnnotation.Url(LegalUrls.TERMS_OF_SERVICE, linkStyles, openLink)) {
                 append("CGU")
             }
             append(" et la ")
-            withLink(LinkAnnotation.Url(PRIVACY_POLICY_URL, linkStyles, openInCustomTab)) {
+            withLink(LinkAnnotation.Url(LegalUrls.PRIVACY_POLICY, linkStyles, openLink)) {
                 append("politique de confidentialité")
             }
             append(".")

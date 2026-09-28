@@ -36,23 +36,80 @@ class PasswordRequirementTest {
     }
 
     @Test
-    fun `passwordChecklist should return every requirement with its satisfaction status`() {
-        // GIVEN
+    fun `passwordChecklist should only list the requirements shown to the user`() {
         val checklist = passwordChecklist("Password123!")
 
-        // THEN
-        assertThat(checklist).hasSize(PasswordRequirement.entries.size)
-        assertThat(checklist.map { it.requirement }).isEqualTo(PasswordRequirement.entries)
+        assertThat(checklist.map { it.requirement }).containsExactly(
+            PasswordRequirement.MIN_LENGTH,
+            PasswordRequirement.UPPERCASE,
+            PasswordRequirement.LOWERCASE,
+            PasswordRequirement.DIGIT,
+            PasswordRequirement.SPECIAL_CHARACTER,
+        ).inOrder()
         assertThat(checklist.all { it.isSatisfied }).isTrue()
     }
 
     @Test
     fun `passwordChecklist should mark only the satisfied requirements as satisfied`() {
-        // GIVEN
         val checklist = passwordChecklist("password")
 
-        // THEN
         val satisfied = checklist.filter { it.isSatisfied }.map { it.requirement }
         assertThat(satisfied).containsExactly(PasswordRequirement.LOWERCASE)
+    }
+
+    @Test
+    fun `validatePassword should accept every allowed special character`() {
+        PASSWORD_SPECIAL_CHARACTERS.forEach { specialCharacter ->
+            assertThat(validatePassword("Motdepasse${specialCharacter}2026")).isNull()
+        }
+    }
+
+    @Test
+    fun `validatePassword should reject a special character outside the allowed list`() {
+        listOf('#', '+', '€', '(', ')', ' ', 'é').forEach { forbiddenCharacter ->
+            assertThat(validatePassword("Motdepasse!2026$forbiddenCharacter"))
+                .isEqualTo(PasswordRequirement.ALLOWED_CHARACTERS)
+        }
+    }
+
+    @Test
+    fun `validatePassword should reject a password longer than 128 characters`() {
+        val password = "Aa1!" + "a".repeat(125)
+
+        assertThat(validatePassword(password)).isEqualTo(PasswordRequirement.MAX_LENGTH)
+    }
+
+    @Test
+    fun `validatePassword should accept a password of exactly 128 characters`() {
+        val password = "Aa1!" + "a".repeat(124)
+
+        assertThat(validatePassword(password)).isNull()
+    }
+
+    @Test
+    fun `validatePassword should reject a password containing the pseudo whatever the case`() {
+        val identity = PasswordIdentity(pseudo = "Inox", email = "someone@test.com")
+
+        assertThat(validatePassword("MonINOX!2026", identity))
+            .isEqualTo(PasswordRequirement.NO_PERSONAL_INFORMATION)
+    }
+
+    @Test
+    fun `validatePassword should reject a password containing the e-mail local part`() {
+        val identity = PasswordIdentity(pseudo = "Inox", email = "dylan.m@test.com")
+
+        assertThat(validatePassword("Dylan.m!20262026", identity))
+            .isEqualTo(PasswordRequirement.NO_PERSONAL_INFORMATION)
+    }
+
+    @Test
+    fun `validatePassword should ignore an empty identity`() {
+        assertThat(validatePassword("Motdepasse!2026", PasswordIdentity())).isNull()
+    }
+
+    @Test
+    fun `firstForbiddenPasswordCharacter should return the first forbidden character`() {
+        assertThat(firstForbiddenPasswordCharacter("Mot#de+passe")).isEqualTo('#')
+        assertThat(firstForbiddenPasswordCharacter("Motdepasse!2026")).isNull()
     }
 }

@@ -3,10 +3,10 @@ package com.strimup.feature.auth.data
 import com.strimup.BuildConfig
 import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
-import com.strimup.core.favorite.data.local.dao.FavoriteDao
 import com.strimup.core.network.toDomainResult
 import com.strimup.core.user.data.local.dao.UserDao
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
+import com.strimup.feature.auth.data.local.LocalSessionDataSource
 import com.strimup.feature.auth.data.local.OAuthVerifierDataSource
 import com.strimup.feature.auth.data.mapper.toEntity
 import com.strimup.feature.auth.data.mapper.toRoomEntity
@@ -20,7 +20,6 @@ import com.strimup.feature.auth.domain.AuthRepository
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import com.strimup.feature.auth.domain.entity.OAuthCredentials
 import com.strimup.feature.auth.domain.entity.RegisterCredentials
-import com.strimup.feature.filter.data.local.dao.FilterDao
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -30,8 +29,7 @@ class DefaultAuthRepository @Inject constructor(
     private val preferences: AuthPreferencesDataSource,
     private val oauthVerifier: OAuthVerifierDataSource,
     private val userDao: UserDao,
-    private val filterDao: FilterDao,
-    private val favoriteDao: FavoriteDao,
+    private val localSession: LocalSessionDataSource,
 ) : AuthRepository {
     override suspend fun login(email: String, password: String): Result<LoginResultEntity> {
         return runCatching {
@@ -59,12 +57,13 @@ class DefaultAuthRepository @Inject constructor(
                 gender = credentials.gender.apiValue,
                 email = credentials.email,
                 birthDate = credentials.birthDate,
+                acceptedTerms = credentials.hasAcceptedTerms,
             )
             val response = service.register(request)
 
             preferences.saveTokens(
                 accessToken = response.token,
-                refreshToken = ""
+                refreshToken = response.refreshToken
             )
 
             val registerResult = response.toEntity()
@@ -78,10 +77,7 @@ class DefaultAuthRepository @Inject constructor(
     override suspend fun logout(): Result<Unit> {
         return runCatching {
             revokeRefreshToken()
-            preferences.clear()
-            userDao.deleteAllUsers()
-            filterDao.deleteAllFilters()
-            favoriteDao.deleteAllFavorites()
+            localSession.clear()
         }.toDomainResult()
     }
 
@@ -141,6 +137,7 @@ class DefaultAuthRepository @Inject constructor(
                 role = credentials.role.apiValue,
                 birthDate = credentials.birthDate,
                 gender = credentials.gender.apiValue,
+                acceptedTerms = credentials.hasAcceptedTerms,
             )
             val response = service.completeOAuth(request)
             oauthVerifier.clear()

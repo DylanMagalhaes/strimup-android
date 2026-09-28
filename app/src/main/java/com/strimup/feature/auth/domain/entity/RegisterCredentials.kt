@@ -10,4 +10,5 @@ data class RegisterCredentials(
     val birthDate: String,
     val gender: Gender,
     val role: UserRole,
+    val hasAcceptedTerms: Boolean,
 )

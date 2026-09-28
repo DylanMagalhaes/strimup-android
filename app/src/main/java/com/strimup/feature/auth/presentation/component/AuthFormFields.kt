@@ -43,12 +43,14 @@ fun AuthDateField(
     isExpanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onDateSelected: (String) -> Unit,
+    errorText: String? = null,
 ) {
     Box {
         StrimupTextField(
             value = dateTextValue,
             onValueChange = {},
             label = "Date de naissance",
+            errorText = errorText,
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.DateRange,
@@ -107,12 +109,14 @@ fun <T> AuthDropdownField(
     optionLabelRes: (T) -> Int,
     onOptionSelected: (T) -> Unit,
     contentDescription: String,
+    errorText: String? = null,
 ) {
     Box {
         StrimupTextField(
             value = selectedLabelRes?.let { stringResource(it) } ?: "",
             onValueChange = {},
             label = label,
+            errorText = errorText,
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,

@@ -17,4 +17,6 @@ data class RegisterRequest(
     val email: String,
     @SerialName("birth_date")
     val birthDate: String,
+    @SerialName("accepted_terms")
+    val acceptedTerms: Boolean,
 )

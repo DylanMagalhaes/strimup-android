@@ -11,7 +11,6 @@ import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
-import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +24,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase,
-    private val logout: LogoutUseCase,
     private val exchangeOAuthCode: ExchangeOAuthCodeUseCase,
 ) : ViewModel() {
 
@@ -46,19 +44,6 @@ class MainViewModel @Inject constructor(
                 }
             }
 
-        }
-    }
-
-    fun onLogoutClick() {
-        viewModelScope.launch {
-            logout()
-                .onSuccess {
-                    _events.send(MainUiEvent.LoggedOut)
-                }
-                .onFailure { exception ->
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    _events.send(MainUiEvent.ShowSnackBar(messageRes))
-                }
         }
     }
 

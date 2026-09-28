@@ -1,6 +1,5 @@
 package com.strimup.feature.auth.presentation.register
 
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,13 +50,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
+import com.strimup.core.ui.browser.openInCustomTab
 import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.text.asString
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.core.ui.user.toLabelRes
@@ -96,7 +96,7 @@ fun RegisterScreen(
                 }
 
                 is RegisterUiEvent.OpenCustomTab -> {
-                    CustomTabsIntent.Builder().build().launchUrl(context, event.url.toUri())
+                    context.openInCustomTab(event.url)
                 }
             }
         }
@@ -237,12 +237,14 @@ fun RegisterContent(
                     value = pseudoValue,
                     onValueChange = onPseudoChange,
                     label = "Pseudo",
+                    errorText = state.pseudoError?.asString(),
                 )
 
                 StrimupTextField(
                     value = emailValue,
                     onValueChange = onEmailChange,
                     label = "email",
+                    errorText = state.emailError?.asString(),
                 )
 
                 AuthDateField(
@@ -251,6 +253,7 @@ fun RegisterContent(
                     isExpanded = isDateDropDownExpended,
                     onExpandedChange = onDateDropDownExpendedChange,
                     onDateSelected = onDateTextValueChange,
+                    errorText = state.birthDateError?.asString(),
                 )
 
                 Row(
@@ -267,6 +270,7 @@ fun RegisterContent(
                             optionLabelRes = { it.toLabelRes() },
                             onOptionSelected = onSexValueChange,
                             contentDescription = "Sélectionner votre sexe",
+                            errorText = state.genderError?.asString(),
                         )
                     }
 
@@ -280,6 +284,7 @@ fun RegisterContent(
                             optionLabelRes = { it.toLabelRes() },
                             onOptionSelected = onRoleValueChange,
                             contentDescription = "Sélectionner votre profil",
+                            errorText = state.roleError?.asString(),
                         )
                     }
                 }
@@ -288,7 +293,8 @@ fun RegisterContent(
                     value = passwordValue,
                     onValueChange = onPasswordChange,
                     label = "Mot de passe",
-                    isPassword = isPasswordVisible,
+                    isPassword = !isPasswordVisible,
+                    errorText = state.passwordError?.asString(),
                     trailingIcon = {
                         IconButton(onClick = { onPasswordVisibleChange(!isPasswordVisible) }) {
                             Icon(
@@ -304,20 +310,12 @@ fun RegisterContent(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                state.passwordErrorRes?.let { errorRes ->
-                    Text(
-                        text = stringResource(errorRes),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                }
-
                 StrimupTextField(
                     value = confirmPasswordValue,
                     onValueChange = onConfirmPasswordChange,
                     label = "Confirmation",
-                    isPassword = isConfirmPasswordVisible,
+                    isPassword = !isConfirmPasswordVisible,
+                    errorText = state.confirmPasswordError?.asString(),
                     trailingIcon = {
                         IconButton(onClick = { onConfirmPasswordVisibleChange(!isConfirmPasswordVisible) }) {
                             Icon(
@@ -349,10 +347,32 @@ fun RegisterContent(
                     )
                 }
 
+                state.termsError?.let { error ->
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        text = error.asString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+
+                state.errorMessage?.let { message ->
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        text = message.asString(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+
                 PrimaryButton(
                     modifier = Modifier.fillMaxWidth(),
                     label = if (state.isLoading) "Inscription en cours..." else "S'inscrire",
-                    enabled = state.isSubmitEnabled,
+                    enabled = !state.isLoading,
                     onClick = onRegisterClick,
                 )
 

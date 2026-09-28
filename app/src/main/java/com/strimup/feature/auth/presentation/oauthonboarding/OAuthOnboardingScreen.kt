@@ -43,6 +43,7 @@ import com.strimup.core.user.domain.entity.Gender
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.presentation.component.AuthDateField
 import com.strimup.feature.auth.presentation.component.AuthDropdownField
+import com.strimup.feature.auth.presentation.component.AuthLegalText
 
 @Composable
 fun OAuthOnboardingScreen(
@@ -177,10 +178,18 @@ fun OAuthOnboardingContent(
                     contentDescription = "Sélectionner votre profil",
                 )
 
-                PrimaryButton(
+                AuthLegalText(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
+                    prefix = "En continuant, j'accepte",
+                    textAlign = TextAlign.Center,
+                )
+
+                PrimaryButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
                     label = if (state.isLoading) {
                         stringResource(R.string.oauth_onboarding_submit_loading)
                     } else {

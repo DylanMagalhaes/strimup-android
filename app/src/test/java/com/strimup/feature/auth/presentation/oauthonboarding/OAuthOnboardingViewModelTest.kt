@@ -117,6 +117,7 @@ class OAuthOnboardingViewModelTest {
                     role = UserRole.VIEWER,
                     birthDate = "1995-05-05",
                     gender = Gender.MALE,
+                    hasAcceptedTerms = true,
                 )
             )
         }

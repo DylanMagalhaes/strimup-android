@@ -10,6 +10,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -24,6 +25,9 @@ fun StrimupTextField(
     label: String,
     modifier: Modifier = Modifier,
     isPassword: Boolean = false,
+    enabled: Boolean = true,
+    capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
+    errorText: String? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val customTextFieldColors =
@@ -49,14 +53,17 @@ fun StrimupTextField(
             .padding(bottom = 16.dp),
         value = value,
         onValueChange = onValueChange,
+        enabled = enabled,
         label = { Text(label) },
+        isError = errorText != null,
+        supportingText = errorText?.let { text -> { Text(text) } },
         colors = customTextFieldColors,
         singleLine = true,
         trailingIcon = trailingIcon,
         keyboardOptions = if (isPassword) {
             KeyboardOptions(keyboardType = KeyboardType.Password)
         } else {
-            KeyboardOptions.Default
+            KeyboardOptions(capitalization = capitalization)
         },
         visualTransformation = if (isPassword) {
             PasswordVisualTransformation()

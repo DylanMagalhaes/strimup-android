@@ -65,6 +65,7 @@ class OAuthOnboardingViewModel @Inject constructor(
                 role = role,
                 birthDate = currentState.birthDateInput,
                 gender = gender,
+                hasAcceptedTerms = true,
             )
 
             completeOAuth(credentials)

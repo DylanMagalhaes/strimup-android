@@ -2,6 +2,8 @@ package com.strimup.feature.auth.injection
 
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
+import com.strimup.feature.auth.data.local.DefaultLocalSessionDataSource
+import com.strimup.feature.auth.data.local.LocalSessionDataSource
 import com.strimup.feature.auth.domain.AuthRepository
 import com.strimup.feature.auth.domain.usecase.CompleteOAuthUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultCompleteOAuthUseCase
@@ -41,6 +43,9 @@ interface AuthDomainModule {
     @Binds
     @Singleton
     fun bindsAuthRepository(impl: DefaultAuthRepository): AuthRepository
+
+    @Binds
+    fun bindsLocalSessionDataSource(impl: DefaultLocalSessionDataSource): LocalSessionDataSource
 
     @Binds
     fun bindsLoginUseCase(impl: DefaultLoginUseCase): LoginUseCase

@@ -12,7 +12,6 @@ import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
-import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -39,11 +38,9 @@ class MainViewModelTest {
 
     private fun buildViewModel(
         getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
-        logout: LogoutUseCase = LogoutUseCase { Result.success(Unit) },
         exchangeOAuthCode: ExchangeOAuthCodeUseCase = ExchangeOAuthCodeUseCase { Result.success(fakeLoginResult) },
     ) = MainViewModel(
         getUser = getUser,
-        logout = logout,
         exchangeOAuthCode = exchangeOAuthCode,
     )
 
@@ -110,57 +107,6 @@ class MainViewModelTest {
             val finalState = awaitItem()
             assertThat(finalState.loading).isFalse()
             assertThat(finalState.user).isEqualTo(updatedUser)
-        }
-    }
-
-    @Test
-    fun `onLogoutClick when logout succeeds should emit LoggedOut`() = runTest {
-        // GIVEN
-        val viewModel = buildViewModel(
-            logout = LogoutUseCase { Result.success(Unit) },
-        )
-
-        // WHEN & THEN
-        viewModel.events.test {
-            viewModel.onLogoutClick()
-            advanceUntilIdle()
-
-            val event = awaitItem()
-            assertThat(event).isEqualTo(MainUiEvent.LoggedOut)
-        }
-    }
-
-    @Test
-    fun `onLogoutClick when logout fails should emit ShowSnackBar with the mapped DomainError message`() = runTest {
-        // GIVEN
-        val viewModel = buildViewModel(
-            logout = LogoutUseCase { Result.failure(Exception("peu importe")) },
-        )
-
-        // WHEN & THEN
-        viewModel.events.test {
-            viewModel.onLogoutClick()
-            advanceUntilIdle()
-
-            val event = awaitItem() as MainUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
-        }
-    }
-
-    @Test
-    fun `onLogoutClick when logout fails with a DomainException should keep its own category`() = runTest {
-        // GIVEN
-        val viewModel = buildViewModel(
-            logout = LogoutUseCase { Result.failure(DomainException(DomainError.Network)) },
-        )
-
-        // WHEN & THEN
-        viewModel.events.test {
-            viewModel.onLogoutClick()
-            advanceUntilIdle()
-
-            val event = awaitItem() as MainUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_network)
         }
     }
 
