@@ -1,7 +1,11 @@
 package com.strimup.feature.auth.data
 
 import com.strimup.feature.auth.data.request.LoginRequest
+import com.strimup.feature.auth.data.request.LogoutRequest
+import com.strimup.feature.auth.data.request.OAuthCompleteRequest
+import com.strimup.feature.auth.data.request.OAuthExchangeRequest
 import com.strimup.feature.auth.data.request.RegisterRequest
+import com.strimup.feature.auth.data.response.OAuthCompleteResponse
 import com.strimup.feature.auth.data.response.UserLoggedResponse
 import com.strimup.feature.auth.data.response.UserRegisteredResponse
 import retrofit2.http.Body
@@ -19,4 +23,13 @@ interface AuthApiService {
 
     @POST("api/auth/register")
     suspend fun register(@Body request: RegisterRequest): UserRegisteredResponse
+
+    @POST("api/auth/oauth/complete")
+    suspend fun completeOAuth(@Body request: OAuthCompleteRequest): OAuthCompleteResponse
+
+    @POST("api/auth/oauth/exchange")
+    suspend fun exchangeOAuthCode(@Body request: OAuthExchangeRequest): UserLoggedResponse
+
+    @POST("api/auth/logout")
+    suspend fun logout(@Body request: LogoutRequest)
 }

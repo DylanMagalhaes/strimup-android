@@ -2,19 +2,22 @@ package com.strimup.feature.auth.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
+import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val login: LoginUseCase,
+    private val startTwitchLogin: StartTwitchLoginUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginUiState())
@@ -45,6 +48,18 @@ class LoginViewModel @Inject constructor(
                     _state.update { it.copy(isLoading = false) }
                     val errorMessage = exception.localizedMessage ?: "Une erreur est survenue"
                     _events.send(LoginUiEvent.ShowSnackBar(text = errorMessage))
+                }
+        }
+    }
+
+    fun onTwitchLoginClick() {
+        viewModelScope.launch {
+            startTwitchLogin()
+                .onSuccess { url ->
+                    _events.send(LoginUiEvent.OpenCustomTab(url))
+                }
+                .onFailure {
+                    _events.send(LoginUiEvent.ShowSnackBarRes(R.string.oauth_error_failed))
                 }
         }
     }

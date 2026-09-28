@@ -66,17 +66,14 @@ fun EditProfileScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
 
-    LaunchedEffect(state.isSaveSuccess) {
-        if (state.isSaveSuccess) {
-            onNavUp()
-        }
-    }
-
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is EditProfileUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(resources.getString(event.textRes))
+                }
+                is EditProfileUiEvent.ProfileSaved -> {
+                    onNavUp()
                 }
             }
         }

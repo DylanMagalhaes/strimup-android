@@ -561,9 +561,7 @@ class EditProfileViewModelTest {
             assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
         assertThat(repository.updateProfileCallCount).isEqualTo(0)
-        val state = viewModel.state.value
-        assertThat(state.isSaving).isFalse()
-        assertThat(state.isSaveSuccess).isFalse()
+        assertThat(viewModel.state.value.isSaving).isFalse()
     }
 
     @Test
@@ -587,7 +585,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `saveProfile when updateProfile succeeds should mark isSaveSuccess and refresh originalProfile`() = runTest {
+    fun `saveProfile when updateProfile succeeds should emit ProfileSaved and refresh originalProfile`() = runTest {
         // GIVEN
         val updatedStreamer = fakeStreamer.copy(bio = "Bio mise à jour")
         val repository = FakeStreamerRepository(
@@ -597,20 +595,21 @@ class EditProfileViewModelTest {
         advanceUntilIdle()
         viewModel.onBioChanged("Bio mise à jour")
 
-        // WHEN
-        viewModel.saveProfile()
-        advanceUntilIdle()
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.saveProfile()
+            advanceUntilIdle()
 
-        // THEN
+            assertThat(awaitItem()).isEqualTo(EditProfileUiEvent.ProfileSaved)
+        }
         val state = viewModel.state.value
         assertThat(state.isSaving).isFalse()
-        assertThat(state.isSaveSuccess).isTrue()
         assertThat(state.originalProfile).isEqualTo(updatedStreamer)
         assertThat(repository.lastUpdateProfileArg?.bio).isEqualTo("Bio mise à jour")
     }
 
     @Test
-    fun `saveProfile when updateProfile fails should emit ShowSnackBar without isSaveSuccess`() = runTest {
+    fun `saveProfile when updateProfile fails should emit ShowSnackBar and not ProfileSaved`() = runTest {
         // GIVEN
         val repository = FakeStreamerRepository(
             updateProfileResult = { Result.failure(Exception("peu importe")) },
@@ -626,9 +625,7 @@ class EditProfileViewModelTest {
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
             assertThat(event.textRes).isEqualTo(R.string.error_unknown)
         }
-        val state = viewModel.state.value
-        assertThat(state.isSaving).isFalse()
-        assertThat(state.isSaveSuccess).isFalse()
+        assertThat(viewModel.state.value.isSaving).isFalse()
     }
 
     @Test

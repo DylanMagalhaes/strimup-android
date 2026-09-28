@@ -16,7 +16,7 @@ fun Throwable.toDomainError(): DomainError = when (this) {
     is HttpException -> if (code() == HTTP_UNAUTHORIZED) {
         DomainError.Unauthorized
     } else {
-        DomainError.Server(code())
+        DomainError.Server(code(), apiErrorMessage())
     }
     is SerializationException -> DomainError.Serialization
     is IOException -> DomainError.Network

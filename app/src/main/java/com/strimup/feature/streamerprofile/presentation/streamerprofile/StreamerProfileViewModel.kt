@@ -6,7 +6,6 @@ import com.strimup.R
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
-import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +19,6 @@ import javax.inject.Inject
 class StreamerProfileViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase,
     private val getStreamer: GetStreamerUseCase,
-    private val logout: LogoutUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
@@ -70,19 +68,6 @@ class StreamerProfileViewModel @Inject constructor(
             val previousState = _state.value
             _state.value = ProfileUiState.Loading
             loadStreamer(id, previousState = previousState)
-        }
-    }
-
-    fun onLogoutClick() {
-        viewModelScope.launch {
-            logout()
-                .onSuccess {
-                    _events.send(ProfileUiEvent.LoggedOut)
-                }
-                .onFailure { exception ->
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    _events.send(ProfileUiEvent.ShowSnackBar(messageRes))
-                }
         }
     }
 }

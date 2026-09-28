@@ -18,15 +18,16 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -42,11 +43,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,7 +64,10 @@ import com.strimup.core.navigation.Destination
 import com.strimup.core.navigation.navigateAsTab
 import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
 import com.strimup.core.user.domain.entity.UserRole
+import com.strimup.feature.account.presentation.account.AccountScreen
+import com.strimup.feature.account.presentation.deletion.DeleteAccountScreen
 import com.strimup.feature.auth.presentation.login.LoginScreen
+import com.strimup.feature.auth.presentation.oauthonboarding.OAuthOnboardingScreen
 import com.strimup.feature.auth.presentation.register.RegisterScreen
 import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
@@ -71,6 +77,7 @@ import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation
 import com.strimup.presentation.MainUiEvent
 import com.strimup.presentation.MainViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun StrimupNavDisplay(
@@ -87,13 +94,18 @@ fun StrimupNavDisplay(
 
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                MainUiEvent.LoggedOut -> {
+                MainUiEvent.OAuthLoggedIn -> {
                     backStack.clear()
-                    backStack.add(Destination.Login)
+                    backStack.add(Destination.Home.StreamerList)
+                }
+
+                is MainUiEvent.OAuthOnboardingRequired -> {
+                    backStack.add(Destination.OAuthOnboarding(tmp = event.tmp))
                 }
 
                 is MainUiEvent.ShowSnackBar -> {
@@ -104,7 +116,10 @@ fun StrimupNavDisplay(
     }
 
     val shouldHideBottomBar = currentDestination is Destination.StreamerDetail ||
-            currentDestination is Destination.Login || currentDestination is Destination.Register
+            currentDestination is Destination.Login ||
+            currentDestination is Destination.Register ||
+            currentDestination is Destination.OAuthOnboarding ||
+            currentDestination is Destination.DeleteAccount
 
     Scaffold(
         modifier = modifier,
@@ -120,7 +135,6 @@ fun StrimupNavDisplay(
                     avatarUrl = state.user?.avatarUrl,
                     userRole = userRole ?: UserRole.VIEWER,
                     onNavigateAsTab = { destination -> backStack.navigateAsTab(destination) },
-                    onLogoutClick = viewModel::onLogoutClick,
                 )
             }
         }
@@ -169,10 +183,7 @@ fun StrimupNavDisplay(
                     ProfileNavigation(
                         userId = destination.userId,
                         modifier = Modifier.fillMaxSize(),
-                        onLogoutSuccess = {
-                            backStack.clear()
-                            backStack.add(Destination.Login)
-                        },
+                        onAccountNav = { backStack.add(Destination.Account) },
                     )
                 }
 
@@ -231,6 +242,51 @@ fun StrimupNavDisplay(
                         onNavToLogin = { backStack.removeLastOrNull() }
                     )
                 }
+
+                entry<Destination.Account> {
+                    val accountNavUp: (() -> Unit)? = when (userRole) {
+                        UserRole.VIEWER -> null
+                        else -> {
+                            { backStack.removeLastOrNull() }
+                        }
+                    }
+                    AccountScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onNavUp = accountNavUp,
+                        onDeleteAccountNav = { backStack.add(Destination.DeleteAccount) },
+                        onLoggedOut = {
+                            backStack.clear()
+                            backStack.add(Destination.Login)
+                        },
+                    )
+                }
+
+                entry<Destination.DeleteAccount> {
+                    DeleteAccountScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onNavUp = { backStack.removeLastOrNull() },
+                        onAccountDeleted = {
+                            backStack.clear()
+                            backStack.add(Destination.Home.StreamerList)
+                            coroutineScope.launch {
+                                snackBarHostState.showSnackbar(
+                                    resources.getString(R.string.account_deletion_success)
+                                )
+                            }
+                        },
+                    )
+                }
+
+                entry<Destination.OAuthOnboarding> { destination ->
+                    OAuthOnboardingScreen(
+                        tmp = destination.tmp,
+                        modifier = Modifier.fillMaxSize(),
+                        onCompleted = {
+                            backStack.clear()
+                            backStack.add(Destination.Home.StreamerList)
+                        },
+                    )
+                }
             }
         )
     }
@@ -244,14 +300,13 @@ private fun StrimupBottomBar(
     userRole: UserRole,
     avatarUrl: String?,
     onNavigateAsTab: (Destination) -> Unit,
-    onLogoutClick: () -> Unit,
 ) {
     val isHomeSelected = currentDestination is Destination.Home
     val isFilterSelected = currentDestination is Destination.Filter
     val isSearchSelected = currentDestination is Destination.Search
     val isFavoriteSelected = currentDestination is Destination.Favorite
     val isProfileSelected = if (isLoggedIn) {
-        currentDestination is Destination.Profile
+        currentDestination is Destination.Profile || currentDestination is Destination.Account
     } else {
         currentDestination is Destination.Login
     }
@@ -309,7 +364,7 @@ private fun StrimupBottomBar(
             selected = isProfileSelected,
             onClick = {
                 when {
-                    isLoggedIn && userRole == UserRole.VIEWER -> onLogoutClick()
+                    isLoggedIn && userRole == UserRole.VIEWER -> onNavigateAsTab(Destination.Account)
                     isLoggedIn && userId != null -> onNavigateAsTab(Destination.Profile.View(userId = userId))
                     else -> onNavigateAsTab(Destination.Login)
                 }
@@ -395,8 +450,8 @@ private fun ProfileNavigationIcon(
 
     if (userRole == UserRole.VIEWER) {
         Icon(
-            imageVector = Icons.AutoMirrored.Filled.Logout,
-            contentDescription = "Déconnexion"
+            imageVector = if (isSelected) Icons.Filled.Settings else Icons.Outlined.Settings,
+            contentDescription = stringResource(R.string.account_title)
         )
         return
     }
