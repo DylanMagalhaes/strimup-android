@@ -16,6 +16,7 @@ data class RegisterUiState(
     val roleInput: UserRole? = null,
     val passwordInput: String = "",
     val confirmPasswordInput: String = "",
+    val isTermsAccepted: Boolean = false,
     val isPasswordVisible: Boolean = false,
     val isConfirmPasswordVisible: Boolean = false,
     val isDateDropDownExpended: Boolean = false,
@@ -38,5 +39,6 @@ data class RegisterUiState(
             roleInput != null &&
             validatePassword(passwordInput) == null &&
             passwordInput == confirmPasswordInput &&
+            isTermsAccepted &&
             !isLoading
 }

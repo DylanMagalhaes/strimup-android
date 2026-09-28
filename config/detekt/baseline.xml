@@ -484,6 +484,7 @@
     <ID>TooGenericExceptionCaught:AuthAuthenticator.kt$AuthAuthenticator$e: Exception</ID>
     <ID>TooManyFunctions:CreateFilterViewModel.kt$CreateFilterViewModel : ViewModel</ID>
     <ID>TooManyFunctions:EditProfileViewModel.kt$EditProfileViewModel : ViewModel</ID>
+    <ID>TooManyFunctions:RegisterViewModel.kt$RegisterViewModel : ViewModel</ID>
     <ID>UnnecessaryParenthesesBeforeTrailingLambda:StreamerCard.kt$()</ID>
     <ID>UnusedParameter:EditRow.kt$modifier: Modifier = Modifier</ID>
     <ID>UnusedParameter:FavoriteStreamerScreen.kt$modifier: Modifier = Modifier</ID>

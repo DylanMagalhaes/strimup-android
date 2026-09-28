@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.strimup.R
 import com.strimup.core.ui.theme.PurpleTwitch
@@ -60,6 +61,11 @@ fun AuthOAuthSection(
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
         }
+
+        AuthLegalText(
+            prefix = "En continuant avec Twitch, j'accepte",
+            textAlign = TextAlign.Center,
+        )
 
         IconButton(
             modifier = Modifier.size(48.dp),

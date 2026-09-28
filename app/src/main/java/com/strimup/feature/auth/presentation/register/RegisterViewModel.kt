@@ -59,6 +59,10 @@ class RegisterViewModel @Inject constructor(
         _state.update { it.copy(confirmPasswordInput = confirmPassword) }
     }
 
+    fun onTermsAcceptedChange(isAccepted: Boolean) {
+        _state.update { it.copy(isTermsAccepted = isAccepted) }
+    }
+
     fun onPasswordVisibleChange(field: RegisterPasswordField, isVisible: Boolean) {
         _state.update {
             when (field) {

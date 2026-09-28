@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -63,6 +66,7 @@ import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.PasswordCheck
 import com.strimup.feature.auth.presentation.component.AuthDateField
 import com.strimup.feature.auth.presentation.component.AuthDropdownField
+import com.strimup.feature.auth.presentation.component.AuthLegalText
 import com.strimup.feature.auth.presentation.component.AuthOAuthSection
 import com.strimup.feature.auth.presentation.toChecklistLabelRes
 
@@ -141,6 +145,8 @@ fun RegisterScreen(
             onConfirmPasswordVisibleChange = {
                 viewModel.onPasswordVisibleChange(RegisterPasswordField.CONFIRM_PASSWORD, it)
             },
+            isTermsAccepted = state.isTermsAccepted,
+            onTermsAcceptedChange = viewModel::onTermsAcceptedChange,
             onRegisterClick = viewModel::onRegisterButtonClick,
             onLoginClick = onNavToLogin,
             onTwitchLoginClick = viewModel::onTwitchLoginClick,
@@ -177,6 +183,8 @@ fun RegisterContent(
     onPasswordVisibleChange: (Boolean) -> Unit,
     isConfirmPasswordVisible: Boolean,
     onConfirmPasswordVisibleChange: (Boolean) -> Unit,
+    isTermsAccepted: Boolean,
+    onTermsAcceptedChange: (Boolean) -> Unit,
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
     onTwitchLoginClick: () -> Unit,
@@ -320,9 +328,31 @@ fun RegisterContent(
                     }
                 )
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .toggleable(
+                            value = isTermsAccepted,
+                            role = Role.Checkbox,
+                            onValueChange = onTermsAcceptedChange,
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = isTermsAccepted,
+                        onCheckedChange = null,
+                    )
+                    AuthLegalText(
+                        modifier = Modifier.padding(start = 12.dp),
+                        prefix = "J'accepte",
+                    )
+                }
+
                 PrimaryButton(
                     modifier = Modifier.fillMaxWidth(),
                     label = if (state.isLoading) "Inscription en cours..." else "S'inscrire",
+                    enabled = state.isSubmitEnabled,
                     onClick = onRegisterClick,
                 )
 
@@ -419,6 +449,8 @@ private fun RegisterContentPreview() {
             isConfirmPasswordVisible = true,
             onPasswordVisibleChange = {},
             onConfirmPasswordVisibleChange = {},
+            isTermsAccepted = false,
+            onTermsAcceptedChange = {},
             onRegisterClick = {},
             onLoginClick = {},
             onTwitchLoginClick = {},

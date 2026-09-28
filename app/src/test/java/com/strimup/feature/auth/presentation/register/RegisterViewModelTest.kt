@@ -36,6 +36,7 @@ class RegisterViewModelTest {
         viewModel.onRoleChange(UserRole.VIEWER)
         viewModel.onPasswordChange("Password123!")
         viewModel.onConfirmPasswordChange("Password123!")
+        viewModel.onTermsAcceptedChange(true)
     }
 
     @Test
@@ -85,6 +86,39 @@ class RegisterViewModelTest {
 
         // THEN
         assertThat(viewModel.state.value.isSubmitEnabled).isFalse()
+    }
+
+    @Test
+    fun `isSubmitEnabled should be false when terms are not accepted`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+        fillValidForm(viewModel)
+
+        // WHEN
+        viewModel.onTermsAcceptedChange(false)
+
+        // THEN
+        assertThat(viewModel.state.value.isSubmitEnabled).isFalse()
+    }
+
+    @Test
+    fun `onRegisterButtonClick without accepted terms should not execute register`() = runTest {
+        // GIVEN
+        var useCaseCalled = false
+        val viewModel = buildViewModel(
+            register = RegisterUseCase { _ ->
+                useCaseCalled = true
+                Result.success(fakeRegisterResult)
+            }
+        )
+        fillValidForm(viewModel)
+        viewModel.onTermsAcceptedChange(false)
+
+        // WHEN
+        viewModel.onRegisterButtonClick()
+
+        // THEN
+        assertThat(useCaseCalled).isFalse()
     }
 
     @Test
