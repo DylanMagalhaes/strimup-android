@@ -11,6 +11,9 @@ data class OAuthCompleteResponse(
     @SerialName("token")
     val token: String,
 
+    @SerialName("refreshToken")
+    val refreshToken: String? = null,
+
     @SerialName("isNewUser")
     val isNewUser: Boolean? = null,
 

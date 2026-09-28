@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
         )
 
-        handleDeepLink(intent)
+        if (savedInstanceState == null) handleDeepLink(intent)
 
         setContent {
             StrimupTheme {

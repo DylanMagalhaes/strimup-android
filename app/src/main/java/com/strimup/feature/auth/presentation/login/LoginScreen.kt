@@ -1,6 +1,5 @@
 package com.strimup.feature.auth.presentation.login
 
-import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -40,9 +39,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.BuildConfig
 import com.strimup.R
 import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.button.SocialIconButton
@@ -68,6 +67,14 @@ import com.strimup.core.ui.theme.zalandoFontFamily
                     snackBarHostState.showSnackbar(event.text)
                 }
 
+                is LoginUiEvent.ShowSnackBarRes -> {
+                    snackBarHostState.showSnackbar(context.getString(event.textRes))
+                }
+
+                is LoginUiEvent.OpenCustomTab -> {
+                    CustomTabsIntent.Builder().build().launchUrl(context, event.url.toUri())
+                }
+
                 LoginUiEvent.ShowHomeUi -> {
                     onNavToHome()
                 }
@@ -89,10 +96,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             onForgetPasswordClick = { /* TODO */ },
             onLoginClick = { viewModel.onLoginButtonClick() },
             onNavToRegister = onNavToRegister,
-            onTwitchLoginClick = {
-                val url = "${BuildConfig.BASE_URL}api/auth/twitch/login?client=android"
-                CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(url))
-            },
+            onTwitchLoginClick = viewModel::onTwitchLoginClick,
         )
     }
 }

@@ -3,16 +3,18 @@ package com.strimup.feature.auth.injection
 import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.domain.AuthRepository
-import com.strimup.feature.auth.domain.usecase.ApplyOAuthLoginUseCase
 import com.strimup.feature.auth.domain.usecase.CompleteOAuthUseCase
-import com.strimup.feature.auth.domain.usecase.DefaultApplyOAuthLoginUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultCompleteOAuthUseCase
+import com.strimup.feature.auth.domain.usecase.DefaultExchangeOAuthCodeUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultLoginUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultLogoutUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultRegisterUseCase
+import com.strimup.feature.auth.domain.usecase.DefaultStartTwitchLoginUseCase
+import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
 import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import com.strimup.feature.auth.domain.usecase.RegisterUseCase
+import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -50,7 +52,10 @@ interface AuthDomainModule {
     fun bindsLogoutUseCase(impl: DefaultLogoutUseCase): LogoutUseCase
 
     @Binds
-    fun bindsApplyOAuthLoginUseCase(impl: DefaultApplyOAuthLoginUseCase): ApplyOAuthLoginUseCase
+    fun bindsStartTwitchLoginUseCase(impl: DefaultStartTwitchLoginUseCase): StartTwitchLoginUseCase
+
+    @Binds
+    fun bindsExchangeOAuthCodeUseCase(impl: DefaultExchangeOAuthCodeUseCase): ExchangeOAuthCodeUseCase
 
     @Binds
     fun bindsCompleteOAuthUseCase(impl: DefaultCompleteOAuthUseCase): CompleteOAuthUseCase

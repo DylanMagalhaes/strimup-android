@@ -17,7 +17,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.Strimup">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,13 +1,16 @@
 package com.strimup.presentation
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.R
+import com.strimup.core.common.DomainError
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.domain.entity.OAuthCallback
-import com.strimup.feature.auth.domain.usecase.ApplyOAuthLoginUseCase
+import com.strimup.feature.auth.domain.entity.OAuthFailureReason
+import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.auth.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -23,7 +26,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase,
     private val logout: LogoutUseCase,
-    private val applyOAuthLogin: ApplyOAuthLoginUseCase,
+    private val exchangeOAuthCode: ExchangeOAuthCodeUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -61,15 +64,13 @@ class MainViewModel @Inject constructor(
 
     fun onOAuthCallback(callback: OAuthCallback?) {
         when (callback) {
-            is OAuthCallback.LoggedIn -> applyOAuthSession(
-                token = callback.token,
-                refreshToken = callback.refreshToken,
+            is OAuthCallback.LoggedIn -> exchangeCode(
+                code = callback.code,
                 successEvent = MainUiEvent.OAuthLoggedIn,
             )
 
-            is OAuthCallback.Linked -> applyOAuthSession(
-                token = callback.token,
-                refreshToken = null,
+            is OAuthCallback.Linked -> exchangeCode(
+                code = callback.code,
                 successEvent = MainUiEvent.ShowSnackBar(R.string.oauth_link_success),
             )
 
@@ -77,20 +78,39 @@ class MainViewModel @Inject constructor(
                 _events.send(MainUiEvent.OAuthOnboardingRequired(callback.tmp))
             }
 
+            is OAuthCallback.Failed -> viewModelScope.launch {
+                _events.send(MainUiEvent.ShowSnackBar(callback.reason.toMessageRes()))
+            }
+
             null -> Unit
         }
     }
 
-    private fun applyOAuthSession(token: String, refreshToken: String?, successEvent: MainUiEvent) {
+    private fun exchangeCode(code: String, successEvent: MainUiEvent) {
         viewModelScope.launch {
-            applyOAuthLogin(token, refreshToken)
+            exchangeOAuthCode(code)
                 .onSuccess {
                     _events.send(successEvent)
                 }
                 .onFailure { exception ->
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    _events.send(MainUiEvent.ShowSnackBar(messageRes))
+                    _events.send(MainUiEvent.ShowSnackBar(exception.toOAuthMessageRes()))
                 }
         }
     }
+}
+
+@StringRes
+private fun Throwable.toOAuthMessageRes(): Int = when (val error = toDomainError()) {
+    is DomainError.Server -> if (error.code in 400..499) R.string.oauth_error_failed else error.toMessageRes()
+    DomainError.Unknown -> R.string.oauth_error_failed
+    else -> error.toMessageRes()
+}
+
+@StringRes
+private fun OAuthFailureReason.toMessageRes(): Int = when (this) {
+    OAuthFailureReason.ACCESS_DENIED -> R.string.oauth_error_access_denied
+    OAuthFailureReason.INVALID_STATE -> R.string.oauth_error_expired
+    OAuthFailureReason.INVALID_REQUEST,
+    OAuthFailureReason.SERVER_ERROR,
+    OAuthFailureReason.UNKNOWN -> R.string.oauth_error_failed
 }

@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 data class OAuthCompleteRequest(
     @SerialName("tmp")
     val tmp: String,
+    @SerialName("code_verifier")
+    val codeVerifier: String,
     @SerialName("role")
     val role: String,
     @SerialName("birth_date")

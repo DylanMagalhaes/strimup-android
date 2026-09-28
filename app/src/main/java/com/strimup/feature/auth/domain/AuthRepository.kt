@@ -14,11 +14,9 @@ interface AuthRepository {
 
     suspend fun logout(): Result<Unit>
 
-    /**
-     * Persists the token pair received from the Twitch OAuth deep link
-     * (`mode=login`/`mode=link`) and refreshes the cached user.
-     */
-    suspend fun applyOAuthLogin(token: String, refreshToken: String?): Result<Unit>
+    suspend fun createTwitchLoginUrl(): Result<String>
+
+    suspend fun exchangeOAuthCode(code: String): Result<LoginResultEntity>
 
     /** Completes a Twitch onboarding (`mode=onboarding`, `tmp` token). */
     suspend fun completeOAuth(credentials: OAuthCredentials): Result<LoginResultEntity>
