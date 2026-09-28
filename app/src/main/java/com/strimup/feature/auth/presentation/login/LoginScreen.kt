@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -53,6 +54,7 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
@@ -62,7 +64,7 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
                 }
 
                 is LoginUiEvent.ShowSnackBarRes -> {
-                    snackBarHostState.showSnackbar(context.getString(event.textRes))
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
 
                 is LoginUiEvent.OpenCustomTab -> {
