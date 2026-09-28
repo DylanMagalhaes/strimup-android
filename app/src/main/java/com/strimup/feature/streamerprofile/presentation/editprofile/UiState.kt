@@ -10,7 +10,6 @@ data class EditProfileUiState(
 
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
-    val isSaveSuccess: Boolean = false,
     @StringRes val errorMessageRes: Int? = null,
 
     val originalProfile: Streamer? = null,

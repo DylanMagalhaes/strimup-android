@@ -9,6 +9,9 @@ data class UserRegisteredResponse(
     @SerialName("token")
     val token: String,
 
+    @SerialName("refreshToken")
+    val refreshToken: String? = null,
+
     @SerialName("user")
     val userRegistered: UserRegistered
 ) {

@@ -34,10 +34,68 @@
     <string name="password_error_uppercase">Le mot de passe doit contenir au moins une majuscule.</string>
     <string name="password_error_lowercase">Le mot de passe doit contenir au moins une minuscule.</string>
     <string name="password_error_digit">Le mot de passe doit contenir au moins un chiffre.</string>
-    <string name="password_error_special_character">Le mot de passe doit contenir un caractère spécial (@$!%*?&amp;./-_).</string>
+    <string name="password_error_special_character" formatted="false">Le mot de passe doit contenir au moins un caractère spécial parmi @ $ ! % * ? &amp; . / - _</string>
+    <string name="password_error_mismatch">Les mots de passe ne correspondent pas.</string>
+    <string name="password_error_max_length">Le mot de passe doit contenir au plus 128 caractères.</string>
+    <string name="password_error_forbidden_character">Le caractère « %1$s » n\'est pas autorisé. Caractères spéciaux acceptés : @ $ ! %% * ? &amp; . / - _</string>
+    <string name="password_error_whitespace">Le mot de passe ne doit pas contenir d\'espace.</string>
+    <string name="password_error_personal_information">Le mot de passe ne doit contenir ni ton pseudo ni le début de ton e-mail.</string>
     <string name="password_checklist_min_length">12 car. min.</string>
     <string name="password_checklist_uppercase">Majuscule</string>
     <string name="password_checklist_lowercase">Minuscule</string>
     <string name="password_checklist_digit">Chiffre</string>
-    <string name="password_checklist_special_character">Spécial (@$!%*?&amp;…)</string>
+    <string name="password_checklist_special_character">Spécial (@$!%*?&amp;./-_)</string>
+    <string name="password_checklist_max_length">128 car. max.</string>
+    <string name="password_checklist_allowed_characters">Caractères autorisés</string>
+    <string name="password_checklist_personal_information">Sans pseudo ni e-mail</string>
+
+    <!-- Registration -->
+    <string name="email_error_required">L\'e-mail est obligatoire.</string>
+    <string name="gender_error_required">Choisis une option.</string>
+    <string name="role_error_required">Choisis ton profil.</string>
+    <string name="password_error_required">Le mot de passe est obligatoire.</string>
+    <string name="password_error_confirmation_required">Confirme ton mot de passe.</string>
+    <string name="terms_error_required">Tu dois accepter les CGU et la politique de confidentialité.</string>
+    <string name="pseudo_error_required">Le pseudo est obligatoire.</string>
+    <string name="pseudo_error_reserved">Ce pseudo est réservé. Choisis-en un autre.</string>
+    <string name="birth_date_error_required">La date de naissance est obligatoire.</string>
+    <string name="birth_date_error_invalid">Date de naissance invalide.</string>
+    <string name="birth_date_error_in_future">La date de naissance ne peut pas être dans le futur.</string>
+    <string name="birth_date_error_too_young">Tu dois avoir au moins %1$d ans pour créer ce type de compte.</string>
+
+    <!-- OAuth -->
+    <string name="oauth_twitch_continue">Continuer avec Twitch</string>
+    <string name="oauth_link_success">Compte Twitch lié !</string>
+    <string name="oauth_error_access_denied">Connexion Twitch annulée.</string>
+    <string name="oauth_error_expired">La connexion Twitch a expiré. Réessaie.</string>
+    <string name="oauth_error_failed">La connexion avec Twitch a échoué. Réessaie.</string>
+    <string name="oauth_onboarding_title">Encore un peu d\'infos</string>
+    <string name="oauth_onboarding_submit">Continuer</string>
+    <string name="oauth_onboarding_submit_loading">Finalisation…</string>
+
+    <!-- Account -->
+    <string name="account_title">Mon compte</string>
+    <string name="account_section_legal">Informations légales</string>
+    <string name="account_terms_of_service">Conditions générales d\'utilisation</string>
+    <string name="account_privacy_policy">Politique de confidentialité</string>
+    <string name="account_logout">Se déconnecter</string>
+    <string name="account_delete">Supprimer mon compte</string>
+    <string name="account_nav_back">Retour</string>
+
+    <!-- Account deletion -->
+    <string name="account_deletion_title">Supprimer mon compte</string>
+    <string name="account_deletion_warning_title">Cette action est définitive</string>
+    <string name="account_deletion_warning_body">Ton e-mail, ton pseudo, ton mot de passe, tes sessions, ta liaison Twitch, ton profil, tes favoris et tes filtres seront effacés. Ton compte ne pourra pas être récupéré.</string>
+    <string name="account_deletion_confirmation_instruction">Pour confirmer, tape %1$s ci-dessous.</string>
+    <string name="account_deletion_confirmation_label">Confirmation</string>
+    <string name="account_deletion_password_instruction">Saisis ton mot de passe pour confirmer qu\'il s\'agit bien de toi.</string>
+    <string name="account_deletion_password_label">Mot de passe</string>
+    <string name="account_deletion_password_show">Montrer le mot de passe</string>
+    <string name="account_deletion_password_hide">Cacher le mot de passe</string>
+    <string name="account_deletion_submit">Supprimer définitivement</string>
+    <string name="account_deletion_success">Ton compte a bien été supprimé.</string>
+    <string name="account_deletion_error_invalid_password">Mot de passe incorrect.</string>
+    <string name="account_deletion_error_not_allowed">Ce compte ne peut pas être supprimé depuis l\'application.</string>
+    <string name="account_deletion_error_pending_obligations">Ton compte ne peut pas être supprimé pour le moment.</string>
+    <string name="account_deletion_error_too_many_attempts">Trop d\'essais. Réessaie dans quelques minutes.</string>
 </resources>

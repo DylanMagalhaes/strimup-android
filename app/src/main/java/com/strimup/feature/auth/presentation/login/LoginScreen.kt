@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -22,6 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -34,11 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
+import com.strimup.core.ui.browser.openInCustomTab
 import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.feature.auth.presentation.component.AuthOAuthSection
 
 @Composable fun LoginScreen(
     onNavToHome: () -> Unit,
@@ -48,12 +53,22 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val resources = LocalResources.current
 
     LaunchedEffect(Unit) {
         viewModel.event.collect { event ->
             when (event) {
                 is LoginUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(event.text)
+                }
+
+                is LoginUiEvent.ShowSnackBarRes -> {
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
+                }
+
+                is LoginUiEvent.OpenCustomTab -> {
+                    context.openInCustomTab(event.url)
                 }
 
                 LoginUiEvent.ShowHomeUi -> {
@@ -76,7 +91,8 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             onPasswordChange = { viewModel.onPasswordChange(it) },
             onForgetPasswordClick = { /* TODO */ },
             onLoginClick = { viewModel.onLoginButtonClick() },
-            onNavToRegister = onNavToRegister
+            onNavToRegister = onNavToRegister,
+            onTwitchLoginClick = viewModel::onTwitchLoginClick,
         )
     }
 }
@@ -90,6 +106,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
     onForgetPasswordClick: () -> Unit,
     onLoginClick: () -> Unit,
     onNavToRegister: () -> Unit,
+    onTwitchLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -98,24 +115,25 @@ import com.strimup.core.ui.theme.zalandoFontFamily
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Image(
                 modifier = Modifier
-                    .padding(top = 40.dp, bottom = 16.dp)
-                    .size(112.dp),
+                    .padding(top = 16.dp)
+                    .size(72.dp),
                 painter = painterResource(R.drawable.ic_strimup),
                 contentDescription = "Strimup icon",
             )
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
+                    .padding(bottom = 16.dp),
                 textAlign = TextAlign.Center,
                 fontFamily = zalandoFontFamily,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 text = buildAnnotatedString {
@@ -155,40 +173,22 @@ import com.strimup.core.ui.theme.zalandoFontFamily
                 onClick = onLoginClick,
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
+            AuthOAuthSection(onTwitchClick = onTwitchLoginClick)
 
+            Row(
+                modifier = Modifier.padding(top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Text(
-                    text = "Ou continuer avec",
+                    text = "Pas encore de compte ?",
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                 )
 
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                )
-            }
-
-            Text(
-                text = "Pas encore de compte ?",
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-            )
-
-            TextButton(
-                onClick = onNavToRegister,
-            ) {
-                Text(text = "S'inscrire maintenant")
+                TextButton(
+                    onClick = onNavToRegister,
+                ) {
+                    Text(text = "S'inscrire")
+                }
             }
         }
     }
@@ -204,6 +204,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             onForgetPasswordClick = {},
             onLoginClick = {},
             onNavToRegister = {},
+            onTwitchLoginClick = {},
             state = LoginUiState()
         )
     }

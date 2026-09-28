@@ -15,11 +15,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
@@ -63,7 +63,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 fun StreamerProfileScreen(
     modifier: Modifier = Modifier,
     onEditProfileNav: () -> Unit,
-    onLogoutSuccess: () -> Unit,
+    onAccountNav: () -> Unit,
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -80,10 +80,6 @@ fun StreamerProfileScreen(
                 is ProfileUiEvent.ShowSnackBar -> {
                     snackBarHostState.showSnackbar(resources.getString(event.textRes))
                 }
-
-                ProfileUiEvent.LoggedOut -> {
-                    onLogoutSuccess()
-                }
             }
         }
     }
@@ -93,7 +89,7 @@ fun StreamerProfileScreen(
         snackBarHostState = snackBarHostState,
         onEditProfileNav = onEditProfileNav,
         onRetryClick = viewModel::refresh,
-        onLogoutClick = viewModel::onLogoutClick,
+        onAccountClick = onAccountNav,
         modifier = modifier
     )
 }
@@ -105,7 +101,7 @@ private fun StreamerProfileScreen(
     snackBarHostState: SnackbarHostState,
     onEditProfileNav: () -> Unit,
     onRetryClick: () -> Unit,
-    onLogoutClick: () -> Unit,
+    onAccountClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val titleText = when (state) {
@@ -128,7 +124,12 @@ private fun StreamerProfileScreen(
                     )
                 },
                 actions = {
-                    ProfileOverflowMenu(onLogoutClick = onLogoutClick)
+                    IconButton(onClick = onAccountClick) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = stringResource(R.string.account_title),
+                        )
+                    }
                 },
             )
         },
@@ -141,36 +142,6 @@ private fun StreamerProfileScreen(
             onRetryClick = onRetryClick,
             state = state,
         )
-    }
-}
-
-@Composable
-private fun ProfileOverflowMenu(
-    onLogoutClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    Box(modifier = modifier) {
-        IconButton(onClick = { isExpanded = true }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "Plus d'options"
-            )
-        }
-
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Se déconnecter") },
-                onClick = {
-                    isExpanded = false
-                    onLogoutClick()
-                }
-            )
-        }
     }
 }
 
@@ -364,7 +335,7 @@ private fun StreamerProfileScreenPreview() {
             ),
             onEditProfileNav = {},
             onRetryClick = {},
-            onLogoutClick = {}
+            onAccountClick = {}
         )
     }
 }

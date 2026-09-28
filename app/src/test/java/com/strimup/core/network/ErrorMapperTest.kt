@@ -107,4 +107,12 @@ class ErrorMapperTest {
             result.toDomainResult()
         }
     }
+
+    @Test
+    fun `HttpException should keep the backend message`() {
+        val body = """{ "message": "Pseudo déjà utilisé" }""".toResponseBody("application/json".toMediaTypeOrNull())
+        val error = HttpException(Response.error<Any>(400, body)).toDomainError()
+
+        assertThat(error).isEqualTo(DomainError.Server(400, "Pseudo déjà utilisé"))
+    }
 }

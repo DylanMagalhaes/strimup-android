@@ -2,10 +2,12 @@ package com.strimup.feature.auth.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
+import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -22,6 +24,7 @@ class LoginViewModelTest {
     fun `onEmailChange should update state emailInput`() = runTest {
         // GIVEN
         val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
             login = LoginUseCase { _, _ -> Result.success(fakeLoginResult) }
         )
 
@@ -36,6 +39,7 @@ class LoginViewModelTest {
     fun `onPasswordChange should update state passwordInput`() = runTest {
         // GIVEN
         val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
             login = LoginUseCase { _, _ -> Result.success(fakeLoginResult) }
         )
 
@@ -51,6 +55,7 @@ class LoginViewModelTest {
         // GIVEN
         var useCaseCalled = false
         val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
             login = LoginUseCase { _, _ ->
                 useCaseCalled = true
                 Result.success(fakeLoginResult)
@@ -73,6 +78,7 @@ class LoginViewModelTest {
         // GIVEN
         var useCaseCalled = false
         val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
             login = { _, _ ->
                 useCaseCalled = true
                 Result.success(fakeLoginResult)
@@ -94,6 +100,7 @@ class LoginViewModelTest {
     fun `onLoginButtonClick when login succeeds should update state and emit ShowHomeUi event`() = runTest {
         // GIVEN
         val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
             login = { _, _ -> Result.success(fakeLoginResult) }
         )
 
@@ -118,6 +125,7 @@ class LoginViewModelTest {
         // GIVEN
         val errorMessage = "Identifiants invalides"
         val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
             login = LoginUseCase { _, _ -> Result.failure(Exception(errorMessage)) }
         )
 
@@ -140,7 +148,43 @@ class LoginViewModelTest {
         }
     }
 
+    @Test
+    fun `onTwitchLoginClick when the URL is ready should emit OpenCustomTab with it`() = runTest {
+        // GIVEN
+        val viewModel = LoginViewModel(
+            login = { _, _ -> Result.success(fakeLoginResult) },
+            startTwitchLogin = { Result.success("https://api/auth/twitch/login?code_challenge=abc") },
+        )
+
+        // WHEN & THEN
+        viewModel.event.test {
+            viewModel.onTwitchLoginClick()
+
+            val event = awaitItem() as LoginUiEvent.OpenCustomTab
+            assertThat(event.url).isEqualTo("https://api/auth/twitch/login?code_challenge=abc")
+        }
+    }
+
+    @Test
+    fun `onTwitchLoginClick when preparing the flow fails should emit the OAuth failure snackbar`() = runTest {
+        // GIVEN
+        val viewModel = LoginViewModel(
+            login = { _, _ -> Result.success(fakeLoginResult) },
+            startTwitchLogin = { Result.failure(Exception("keystore indisponible")) },
+        )
+
+        // WHEN & THEN
+        viewModel.event.test {
+            viewModel.onTwitchLoginClick()
+
+            val event = awaitItem() as LoginUiEvent.ShowSnackBarRes
+            assertThat(event.textRes).isEqualTo(R.string.oauth_error_failed)
+        }
+    }
+
     private companion object {
+        val noopStartTwitchLogin = StartTwitchLoginUseCase { Result.success("https://twitch") }
+
         val fakeLoginResult = LoginResultEntity(
             message = "Success",
             token = "fake_jwt_token",

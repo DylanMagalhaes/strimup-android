@@ -8,7 +8,10 @@ import com.strimup.core.common.DomainException
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
-import com.strimup.feature.auth.domain.usecase.LogoutUseCase
+import com.strimup.feature.auth.domain.entity.LoginResultEntity
+import com.strimup.feature.auth.domain.entity.OAuthCallback
+import com.strimup.feature.auth.domain.entity.OAuthFailureReason
+import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,10 +30,24 @@ class MainViewModelTest {
 
     private val fakeUser = UserEntity(
         id = "1",
-        userName ="inox",
+        userName = "inox",
         email = "inox@mail.com",
         role = UserRole.STREAMER,
         avatarUrl = "",
+    )
+
+    private fun buildViewModel(
+        getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
+        exchangeOAuthCode: ExchangeOAuthCodeUseCase = ExchangeOAuthCodeUseCase { Result.success(fakeLoginResult) },
+    ) = MainViewModel(
+        getUser = getUser,
+        exchangeOAuthCode = exchangeOAuthCode,
+    )
+
+    private val fakeLoginResult = LoginResultEntity(
+        message = "Connexion réussie",
+        token = "t",
+        user = fakeUser,
     )
 
     @Test
@@ -39,7 +56,7 @@ class MainViewModelTest {
         val getUserUseCase = GetUserFlowUseCase { flowOf(fakeUser) }
 
         // WHEN
-        val viewModel = MainViewModel(getUser = getUserUseCase, logout = LogoutUseCase { Result.success(Unit) })
+        val viewModel = buildViewModel(getUser = getUserUseCase)
         advanceUntilIdle()
 
         // THEN
@@ -54,7 +71,7 @@ class MainViewModelTest {
         val getUserUseCase = GetUserFlowUseCase { flowOf(null) }
 
         // WHEN
-        val viewModel = MainViewModel(getUser = getUserUseCase, logout = LogoutUseCase { Result.success(Unit) })
+        val viewModel = buildViewModel(getUser = getUserUseCase)
         advanceUntilIdle()
 
         // THEN
@@ -69,7 +86,7 @@ class MainViewModelTest {
         val userFlow = MutableSharedFlow<UserEntity?>()
         val getUserUseCase = GetUserFlowUseCase { userFlow }
 
-        val viewModel = MainViewModel(getUser = getUserUseCase, logout = LogoutUseCase { Result.success(Unit) })
+        val viewModel = buildViewModel(getUser = getUserUseCase)
         // Laisse le `collect { }` du init s'abonner à userFlow avant toute émission :
         // sinon un MutableSharedFlow sans replay perd la valeur émise.
         runCurrent()
@@ -94,56 +111,176 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `onLogoutClick when logout succeeds should emit LoggedOut`() = runTest {
+    fun `onOAuthCallback with LoggedIn should exchange the code and emit OAuthLoggedIn`() = runTest {
         // GIVEN
-        val viewModel = MainViewModel(
-            getUser = GetUserFlowUseCase { flowOf(fakeUser) },
-            logout = LogoutUseCase { Result.success(Unit) },
+        var capturedCode: String? = null
+        val viewModel = buildViewModel(
+            exchangeOAuthCode = ExchangeOAuthCodeUseCase { code ->
+                capturedCode = code
+                Result.success(fakeLoginResult)
+            },
         )
 
         // WHEN & THEN
         viewModel.events.test {
-            viewModel.onLogoutClick()
+            viewModel.onOAuthCallback(OAuthCallback.LoggedIn(code = "one-time-code"))
             advanceUntilIdle()
 
             val event = awaitItem()
-            assertThat(event).isEqualTo(MainUiEvent.LoggedOut)
+            assertThat(event).isEqualTo(MainUiEvent.OAuthLoggedIn)
         }
+        assertThat(capturedCode).isEqualTo("one-time-code")
     }
 
     @Test
-    fun `onLogoutClick when logout fails should emit ShowSnackBar with the mapped DomainError message`() = runTest {
+    fun `onOAuthCallback with LoggedIn when the code is rejected should emit the OAuth failure snackbar`() = runTest {
         // GIVEN
-        val viewModel = MainViewModel(
-            getUser = GetUserFlowUseCase { flowOf(fakeUser) },
-            logout = LogoutUseCase { Result.failure(Exception("peu importe")) },
+        val viewModel = buildViewModel(
+            exchangeOAuthCode = ExchangeOAuthCodeUseCase { Result.failure(DomainException(DomainError.Server(400))) },
         )
 
         // WHEN & THEN
         viewModel.events.test {
-            viewModel.onLogoutClick()
+            viewModel.onOAuthCallback(OAuthCallback.LoggedIn(code = "expired"))
             advanceUntilIdle()
 
             val event = awaitItem() as MainUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
+            assertThat(event.textRes).isEqualTo(R.string.oauth_error_failed)
         }
     }
 
     @Test
-    fun `onLogoutClick when logout fails with a DomainException should keep its own category`() = runTest {
+    fun `onOAuthCallback with LoggedIn when the server is down should emit the server error snackbar`() = runTest {
         // GIVEN
-        val viewModel = MainViewModel(
-            getUser = GetUserFlowUseCase { flowOf(fakeUser) },
-            logout = LogoutUseCase { Result.failure(DomainException(DomainError.Network)) },
+        val viewModel = buildViewModel(
+            exchangeOAuthCode = ExchangeOAuthCodeUseCase { Result.failure(DomainException(DomainError.Server(503))) },
         )
 
         // WHEN & THEN
         viewModel.events.test {
-            viewModel.onLogoutClick()
+            viewModel.onOAuthCallback(OAuthCallback.LoggedIn(code = "c"))
+            advanceUntilIdle()
+
+            val event = awaitItem() as MainUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.error_server)
+        }
+    }
+
+    @Test
+    fun `onOAuthCallback with LoggedIn when offline should emit the network error snackbar`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            exchangeOAuthCode = ExchangeOAuthCodeUseCase { Result.failure(DomainException(DomainError.Network)) },
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onOAuthCallback(OAuthCallback.LoggedIn(code = "c"))
             advanceUntilIdle()
 
             val event = awaitItem() as MainUiEvent.ShowSnackBar
             assertThat(event.textRes).isEqualTo(R.string.error_network)
         }
+    }
+
+    @Test
+    fun `onOAuthCallback with Linked should exchange the code and emit a success snackbar`() = runTest {
+        // GIVEN
+        var capturedCode: String? = null
+        val viewModel = buildViewModel(
+            exchangeOAuthCode = ExchangeOAuthCodeUseCase { code ->
+                capturedCode = code
+                Result.success(fakeLoginResult)
+            },
+        )
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onOAuthCallback(OAuthCallback.Linked(code = "link-code"))
+            advanceUntilIdle()
+
+            val event = awaitItem() as MainUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.oauth_link_success)
+        }
+        assertThat(capturedCode).isEqualTo("link-code")
+    }
+
+    @Test
+    fun `onOAuthCallback with Failed access_denied should emit the cancelled snackbar`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onOAuthCallback(OAuthCallback.Failed(OAuthFailureReason.ACCESS_DENIED))
+            advanceUntilIdle()
+
+            val event = awaitItem() as MainUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.oauth_error_access_denied)
+        }
+    }
+
+    @Test
+    fun `onOAuthCallback with Failed invalid_state should emit the expired snackbar`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onOAuthCallback(OAuthCallback.Failed(OAuthFailureReason.INVALID_STATE))
+            advanceUntilIdle()
+
+            val event = awaitItem() as MainUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.oauth_error_expired)
+        }
+    }
+
+    @Test
+    fun `onOAuthCallback with Failed server_error should emit the generic OAuth failure snackbar`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onOAuthCallback(OAuthCallback.Failed(OAuthFailureReason.SERVER_ERROR))
+            advanceUntilIdle()
+
+            val event = awaitItem() as MainUiEvent.ShowSnackBar
+            assertThat(event.textRes).isEqualTo(R.string.oauth_error_failed)
+        }
+    }
+
+    @Test
+    fun `onOAuthCallback with Onboarding should emit OAuthOnboardingRequired with the tmp token`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+
+        // WHEN & THEN
+        viewModel.events.test {
+            viewModel.onOAuthCallback(OAuthCallback.Onboarding(tmp = "abc"))
+            advanceUntilIdle()
+
+            val event = awaitItem() as MainUiEvent.OAuthOnboardingRequired
+            assertThat(event.tmp).isEqualTo("abc")
+        }
+    }
+
+    @Test
+    fun `onOAuthCallback with null should not exchange anything`() = runTest {
+        // GIVEN
+        var exchangeCalled = false
+        val viewModel = buildViewModel(
+            exchangeOAuthCode = ExchangeOAuthCodeUseCase {
+                exchangeCalled = true
+                Result.success(fakeLoginResult)
+            },
+        )
+
+        // WHEN
+        viewModel.onOAuthCallback(null)
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(exchangeCalled).isFalse()
     }
 }

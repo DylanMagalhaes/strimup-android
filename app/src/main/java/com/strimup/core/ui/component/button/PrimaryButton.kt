@@ -13,10 +13,12 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 fun PrimaryButton(
     label: String,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Button(
         modifier = modifier,
+        enabled = enabled,
         onClick = onClick,
     ) {
         Text(
