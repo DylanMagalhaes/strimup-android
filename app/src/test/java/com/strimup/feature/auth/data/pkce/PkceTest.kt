@@ -34,7 +34,7 @@ class PkceTest {
         val challenge = Pkce.challengeOf(verifier)
 
         // THEN
-        assertThat(challenge).isEqualTo("E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuzHQ3dOK4Q")
+        assertThat(challenge).isEqualTo("E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM")
     }
 
     @Test

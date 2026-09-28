@@ -2,10 +2,10 @@ package com.strimup.feature.auth.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.strimup.R
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
-import com.strimup.R
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
 import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
 import com.strimup.util.MainDispatcherRule

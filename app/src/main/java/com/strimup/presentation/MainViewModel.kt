@@ -99,9 +99,13 @@ class MainViewModel @Inject constructor(
     }
 }
 
+private const val HTTP_CLIENT_ERROR_MIN = 400
+private const val HTTP_CLIENT_ERROR_MAX = 499
+private val CLIENT_ERROR_CODES = HTTP_CLIENT_ERROR_MIN..HTTP_CLIENT_ERROR_MAX
+
 @StringRes
 private fun Throwable.toOAuthMessageRes(): Int = when (val error = toDomainError()) {
-    is DomainError.Server -> if (error.code in 400..499) R.string.oauth_error_failed else error.toMessageRes()
+    is DomainError.Server -> if (error.code in CLIENT_ERROR_CODES) R.string.oauth_error_failed else error.toMessageRes()
     DomainError.Unknown -> R.string.oauth_error_failed
     else -> error.toMessageRes()
 }

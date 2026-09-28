@@ -21,9 +21,9 @@ import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import com.strimup.feature.auth.domain.entity.OAuthCredentials
 import com.strimup.feature.auth.domain.entity.RegisterCredentials
 import com.strimup.feature.filter.data.local.dao.FilterDao
+import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
-import retrofit2.HttpException
 
 class DefaultAuthRepository @Inject constructor(
     private val service: AuthApiService,

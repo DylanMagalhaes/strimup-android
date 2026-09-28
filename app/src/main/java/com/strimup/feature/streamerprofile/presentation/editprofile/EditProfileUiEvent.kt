@@ -4,5 +4,5 @@ import androidx.annotation.StringRes
 
 sealed interface EditProfileUiEvent {
     data class ShowSnackBar(@StringRes val textRes: Int) : EditProfileUiEvent
-    data object ProfileSaved: EditProfileUiEvent
+    data object ProfileSaved : EditProfileUiEvent
 }
