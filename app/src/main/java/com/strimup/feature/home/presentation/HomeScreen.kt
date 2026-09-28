@@ -2,21 +2,25 @@ package com.strimup.feature.home.presentation
 
 import android.content.ActivityNotFoundException
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
-import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
@@ -105,6 +108,7 @@ fun HomeScreen(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HomeContent(
     state: HomeUiState,
@@ -124,36 +128,51 @@ private fun HomeContent(
             modifier = Modifier.padding(padding),
             color = MaterialTheme.colorScheme.background,
         ) {
-            Column(
+            Box(
                 modifier = Modifier
+                    .fillMaxSize()
                     .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
                     .padding(top = 32.dp)
             ) {
-
-                HomeBanner(
-                    banners = state.bannerItems,
-                    onBannerClick = onBannerClick
-                )
-
-                VerticalSpacer(24.dp)
-
-                HomeTabs(
-                    modifier = Modifier.fillMaxWidth(),
-                    onButtonClick = onTabClick,
-                    currentTab = state.currentTab,
-                )
-
                 Crossfade(targetState = state.isLoading, label = "loading_crossfade") { isLoading ->
                     if (isLoading) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         }
                     } else {
+                        val lazyListState = rememberLazyListState()
+                        val snapFlingBehavior = rememberSnapFlingBehavior(lazyListState = lazyListState)
+
                         LazyColumn(
+                            state = lazyListState,
+                            flingBehavior = snapFlingBehavior,
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                            contentPadding = PaddingValues(bottom = 24.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
+                            item {
+                                HomeBanner(
+                                    banners = state.bannerItems,
+                                    onBannerClick = onBannerClick
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+
+                            stickyHeader {
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = MaterialTheme.colorScheme.background
+                                ) {
+                                    HomeTabs(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        onButtonClick = onTabClick,
+                                        currentTab = state.currentTab,
+                                    )
+                                }
+                            }
+
                             items(
                                 items = state.streamers,
                                 key = { streamer -> streamer.id }
@@ -161,6 +180,7 @@ private fun HomeContent(
                                 StreamerCard(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
                                         .defaultMinSize(minHeight = 112.dp),
                                     pseudo = streamer.userName,
                                     socials = streamer.socials,
@@ -176,9 +196,7 @@ private fun HomeContent(
                 }
             }
         }
-
     }
-
 }
 
 @Composable
