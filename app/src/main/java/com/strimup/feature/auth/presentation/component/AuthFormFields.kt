@@ -1,7 +1,10 @@
 package com.strimup.feature.auth.presentation.component
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
@@ -11,11 +14,13 @@ import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import java.time.Instant
 import java.time.ZoneOffset
@@ -39,19 +44,25 @@ fun AuthDateField(
     onExpandedChange: (Boolean) -> Unit,
     onDateSelected: (String) -> Unit,
 ) {
-    StrimupTextField(
-        value = dateTextValue,
-        onValueChange = {},
-        label = "Date de naissance",
-        trailingIcon = {
-            IconButton(onClick = { onExpandedChange(!isExpanded) }) {
+    Box {
+        StrimupTextField(
+            value = dateTextValue,
+            onValueChange = {},
+            label = "Date de naissance",
+            trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.DateRange,
-                    contentDescription = "Sélectionner la date"
+                    contentDescription = null
                 )
-            }
-        },
-    )
+            },
+        )
+
+        ClickableFieldOverlay(
+            onClickLabel = "Sélectionner la date",
+            role = Role.Button,
+            onClick = { onExpandedChange(!isExpanded) },
+        )
+    }
 
     if (!isExpanded) return
 
@@ -103,13 +114,17 @@ fun <T> AuthDropdownField(
             onValueChange = {},
             label = label,
             trailingIcon = {
-                IconButton(onClick = { onExpandedChange(!isExpanded) }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = contentDescription
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null
+                )
             },
+        )
+
+        ClickableFieldOverlay(
+            onClickLabel = contentDescription,
+            role = Role.DropdownList,
+            onClick = { onExpandedChange(!isExpanded) },
         )
 
         DropdownMenu(
@@ -127,4 +142,27 @@ fun <T> AuthDropdownField(
             }
         }
     }
+}
+
+/**
+ * Transparent layer covering a read-only field: a tap anywhere on it triggers [onClick]
+ * instead of focusing the underlying text field (no cursor, no keyboard).
+ */
+@Composable
+private fun BoxScope.ClickableFieldOverlay(
+    onClickLabel: String,
+    role: Role,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .matchParentSize()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClickLabel = onClickLabel,
+                role = role,
+                onClick = onClick,
+            )
+    )
 }

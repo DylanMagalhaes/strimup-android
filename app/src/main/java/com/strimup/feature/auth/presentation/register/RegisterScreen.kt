@@ -3,6 +3,7 @@ package com.strimup.feature.auth.presentation.register
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -190,8 +191,8 @@ fun RegisterContent(
             ) {
                 Image(
                     modifier = Modifier
-                        .padding(top = 24.dp, bottom = 16.dp)
-                        .size(96.dp),
+                        .padding(top = 8.dp, bottom = 4.dp)
+                        .size(56.dp),
                     painter = painterResource(R.drawable.ic_strimup),
                     contentDescription = "Strimup icon",
                 )
@@ -199,10 +200,10 @@ fun RegisterContent(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 24.dp),
+                        .padding(bottom = 16.dp),
                     textAlign = TextAlign.Center,
                     fontFamily = zalandoFontFamily,
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Bold,
                     text = buildAnnotatedString {
@@ -233,27 +234,36 @@ fun RegisterContent(
                     onDateSelected = onDateTextValueChange,
                 )
 
-                AuthDropdownField(
-                    label = "Sexe",
-                    selectedLabelRes = sexValue?.toLabelRes(),
-                    isExpanded = isSexDropDownExpended,
-                    onExpandedChange = onSexDropDownExpendedChange,
-                    options = Gender.entries,
-                    optionLabelRes = { it.toLabelRes() },
-                    onOptionSelected = onSexValueChange,
-                    contentDescription = "Sélectionner votre sexe",
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        AuthDropdownField(
+                            label = "Sexe",
+                            selectedLabelRes = sexValue?.toLabelRes(),
+                            isExpanded = isSexDropDownExpended,
+                            onExpandedChange = onSexDropDownExpendedChange,
+                            options = Gender.entries,
+                            optionLabelRes = { it.toLabelRes() },
+                            onOptionSelected = onSexValueChange,
+                            contentDescription = "Sélectionner votre sexe",
+                        )
+                    }
 
-                AuthDropdownField(
-                    label = "Je suis un(e)",
-                    selectedLabelRes = roleValue?.toLabelRes(),
-                    isExpanded = isRoleDropDownExpended,
-                    onExpandedChange = onRoleDropDownExpendedChange,
-                    options = listOf(UserRole.VIEWER, UserRole.STREAMER),
-                    optionLabelRes = { it.toLabelRes() },
-                    onOptionSelected = onRoleValueChange,
-                    contentDescription = "Sélectionner votre profil",
-                )
+                    Box(modifier = Modifier.weight(1f)) {
+                        AuthDropdownField(
+                            label = "Je suis un(e)",
+                            selectedLabelRes = roleValue?.toLabelRes(),
+                            isExpanded = isRoleDropDownExpended,
+                            onExpandedChange = onRoleDropDownExpendedChange,
+                            options = listOf(UserRole.VIEWER, UserRole.STREAMER),
+                            optionLabelRes = { it.toLabelRes() },
+                            onOptionSelected = onRoleValueChange,
+                            contentDescription = "Sélectionner votre profil",
+                        )
+                    }
+                }
 
                 StrimupTextField(
                     value = passwordValue,
@@ -272,7 +282,7 @@ fun RegisterContent(
 
                 PasswordChecklist(
                     checks = state.passwordChecklist,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 state.passwordErrorRes?.let { errorRes ->
@@ -308,7 +318,7 @@ fun RegisterContent(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 8.dp),
+                        .padding(top = 12.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(

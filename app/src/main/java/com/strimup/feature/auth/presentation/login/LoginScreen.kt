@@ -122,22 +122,22 @@ import com.strimup.core.ui.theme.zalandoFontFamily
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Image(
                 modifier = Modifier
-                    .padding(top = 40.dp, bottom = 16.dp)
-                    .size(112.dp),
+                    .padding(top = 16.dp)
+                    .size(72.dp),
                 painter = painterResource(R.drawable.ic_strimup),
                 contentDescription = "Strimup icon",
             )
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
+                    .padding(bottom = 16.dp),
                 textAlign = TextAlign.Center,
                 fontFamily = zalandoFontFamily,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 text = buildAnnotatedString {
@@ -180,7 +180,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 24.dp, bottom = 8.dp),
+                    .padding(top = 16.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -225,15 +225,20 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 //                Text(text = stringResource(R.string.oauth_twitch_continue))
 //            }
 
-            Text(
-                text = "Pas encore de compte ?",
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-            )
-
-            TextButton(
-                onClick = onNavToRegister,
+            Row(
+                modifier = Modifier.padding(top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = "S'inscrire maintenant")
+                Text(
+                    text = "Pas encore de compte ?",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                )
+
+                TextButton(
+                    onClick = onNavToRegister,
+                ) {
+                    Text(text = "S'inscrire")
+                }
             }
         }
     }
