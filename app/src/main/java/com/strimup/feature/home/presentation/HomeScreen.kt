@@ -6,7 +6,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -48,12 +50,15 @@ import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.presentation.component.HomeBanner
 import com.strimup.feature.home.presentation.component.HomeTabs
+import com.strimup.feature.notification.presentation.bell.NotificationBell
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     onStreamerClick: (id: String) -> Unit,
     onStreamerBannerClick: (String?) -> Unit,
+    unreadNotificationCount: Int?,
+    onNotificationsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -90,6 +95,8 @@ fun HomeScreen(
             }
         },
         onTabClick = viewModel::onTabClick,
+        unreadNotificationCount = unreadNotificationCount,
+        onNotificationsClick = onNotificationsClick,
         onBannerClick = { banner ->
             if (!banner.linkUrl.isNullOrBlank()) {
                 try {
@@ -117,6 +124,8 @@ private fun HomeContent(
     onBannerClick: (BannerItemEntity) -> Unit,
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
+    unreadNotificationCount: Int?,
+    onNotificationsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -128,12 +137,16 @@ private fun HomeContent(
             modifier = Modifier.padding(padding),
             color = MaterialTheme.colorScheme.background,
         ) {
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
-                    .padding(top = 32.dp)
             ) {
+                HomeTopBar(
+                    unreadNotificationCount = unreadNotificationCount,
+                    onNotificationsClick = onNotificationsClick,
+                )
+
                 Crossfade(targetState = state.isLoading, label = "loading_crossfade") { isLoading ->
                     if (isLoading) {
                         Box(modifier = Modifier.fillMaxSize()) {
@@ -200,6 +213,25 @@ private fun HomeContent(
 }
 
 @Composable
+private fun HomeTopBar(
+    unreadNotificationCount: Int?,
+    onNotificationsClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        unreadNotificationCount?.let { count ->
+            NotificationBell(unreadCount = count, onClick = onNotificationsClick)
+        }
+    }
+}
+
+@Composable
 @Preview
 private fun HomeScreenPreview() {
     StrimupTheme {
@@ -210,7 +242,9 @@ private fun HomeScreenPreview() {
             onStreamerClick = {},
             onSocialClick = {},
             onTabClick = {},
-            onBannerClick = {}
+            onBannerClick = {},
+            unreadNotificationCount = 3,
+            onNotificationsClick = {},
         )
     }
 }
