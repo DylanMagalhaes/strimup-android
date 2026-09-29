@@ -3,20 +3,20 @@ package com.strimup.feature.notification.injection
 import com.strimup.feature.notification.data.DefaultNotificationRepository
 import com.strimup.feature.notification.data.NotificationApiService
 import com.strimup.feature.notification.domain.NotificationRepository
-import com.strimup.feature.notification.domain.usecase.ClearNotificationsUseCase
-import com.strimup.feature.notification.domain.usecase.DefaultClearNotificationsUseCase
 import com.strimup.feature.notification.domain.usecase.DefaultDeleteNotificationUseCase
 import com.strimup.feature.notification.domain.usecase.DefaultGetNotificationsPageUseCase
 import com.strimup.feature.notification.domain.usecase.DefaultMarkAllNotificationsAsReadUseCase
 import com.strimup.feature.notification.domain.usecase.DefaultMarkNotificationAsReadUseCase
 import com.strimup.feature.notification.domain.usecase.DefaultObserveUnreadCountUseCase
 import com.strimup.feature.notification.domain.usecase.DefaultRefreshUnreadCountUseCase
+import com.strimup.feature.notification.domain.usecase.DefaultWatchUnreadNotificationCountUseCase
 import com.strimup.feature.notification.domain.usecase.DeleteNotificationUseCase
 import com.strimup.feature.notification.domain.usecase.GetNotificationsPageUseCase
 import com.strimup.feature.notification.domain.usecase.MarkAllNotificationsAsReadUseCase
 import com.strimup.feature.notification.domain.usecase.MarkNotificationAsReadUseCase
 import com.strimup.feature.notification.domain.usecase.ObserveUnreadCountUseCase
 import com.strimup.feature.notification.domain.usecase.RefreshUnreadCountUseCase
+import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -65,5 +65,7 @@ interface NotificationDomainModule {
     fun bindsDeleteNotificationUseCase(impl: DefaultDeleteNotificationUseCase): DeleteNotificationUseCase
 
     @Binds
-    fun bindsClearNotificationsUseCase(impl: DefaultClearNotificationsUseCase): ClearNotificationsUseCase
+    fun bindsWatchUnreadNotificationCountUseCase(
+        impl: DefaultWatchUnreadNotificationCountUseCase,
+    ): WatchUnreadNotificationCountUseCase
 }

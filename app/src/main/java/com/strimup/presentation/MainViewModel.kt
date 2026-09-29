@@ -11,12 +11,15 @@ import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
+import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,10 +28,18 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase,
     private val exchangeOAuthCode: ExchangeOAuthCodeUseCase,
+    watchUnreadNotificationCount: WatchUnreadNotificationCountUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
+
+    val unreadNotificationCount: StateFlow<Int> = watchUnreadNotificationCount()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(UNREAD_COUNT_STOP_TIMEOUT_MS),
+            initialValue = 0,
+        )
 
     private val _events = Channel<MainUiEvent>()
     val events = _events.receiveAsFlow()
@@ -84,6 +95,7 @@ class MainViewModel @Inject constructor(
     }
 }
 
+private const val UNREAD_COUNT_STOP_TIMEOUT_MS = 5_000L
 private const val HTTP_CLIENT_ERROR_MIN = 400
 private const val HTTP_CLIENT_ERROR_MAX = 499
 private val CLIENT_ERROR_CODES = HTTP_CLIENT_ERROR_MIN..HTTP_CLIENT_ERROR_MAX

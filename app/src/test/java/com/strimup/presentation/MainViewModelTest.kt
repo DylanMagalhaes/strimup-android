@@ -12,9 +12,11 @@ import com.strimup.feature.auth.domain.entity.LoginResultEntity
 import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
+import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -39,9 +41,13 @@ class MainViewModelTest {
     private fun buildViewModel(
         getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
         exchangeOAuthCode: ExchangeOAuthCodeUseCase = ExchangeOAuthCodeUseCase { Result.success(fakeLoginResult) },
+        watchUnreadNotificationCount: WatchUnreadNotificationCountUseCase = WatchUnreadNotificationCountUseCase {
+            flowOf(0)
+        },
     ) = MainViewModel(
         getUser = getUser,
         exchangeOAuthCode = exchangeOAuthCode,
+        watchUnreadNotificationCount = watchUnreadNotificationCount,
     )
 
     private val fakeLoginResult = LoginResultEntity(
@@ -282,5 +288,32 @@ class MainViewModelTest {
 
         // THEN
         assertThat(exchangeCalled).isFalse()
+    }
+
+    @Test
+    fun `unreadNotificationCount should expose the watched count while collected`() = runTest {
+        val viewModel = buildViewModel(watchUnreadNotificationCount = { flowOf(7) })
+
+        viewModel.unreadNotificationCount.test {
+            assertThat(awaitItem()).isEqualTo(0)
+            assertThat(awaitItem()).isEqualTo(7)
+        }
+    }
+
+    @Test
+    fun `unreadNotificationCount should not watch anything until collected`() = runTest {
+        var watchStarted = false
+        val viewModel = buildViewModel(
+            watchUnreadNotificationCount = {
+                flow {
+                    watchStarted = true
+                    emit(1)
+                }
+            },
+        )
+        advanceUntilIdle()
+
+        assertThat(watchStarted).isFalse()
+        assertThat(viewModel.unreadNotificationCount.value).isEqualTo(0)
     }
 }
