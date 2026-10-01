@@ -6,10 +6,12 @@ import com.strimup.feature.push.data.client.FirebasePushMessagingClient
 import com.strimup.feature.push.data.client.PushMessagingClient
 import com.strimup.feature.push.domain.PushRepository
 import com.strimup.feature.push.domain.usecase.DefaultDeletePushTokenUseCase
+import com.strimup.feature.push.domain.usecase.DefaultProcessIncomingPushUseCase
 import com.strimup.feature.push.domain.usecase.DefaultRegisterRefreshedPushTokenUseCase
 import com.strimup.feature.push.domain.usecase.DefaultSyncPushDeviceRegistrationUseCase
 import com.strimup.feature.push.domain.usecase.DefaultUnregisterPushDeviceUseCase
 import com.strimup.feature.push.domain.usecase.DeletePushTokenUseCase
+import com.strimup.feature.push.domain.usecase.ProcessIncomingPushUseCase
 import com.strimup.feature.push.domain.usecase.RegisterRefreshedPushTokenUseCase
 import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import com.strimup.feature.push.domain.usecase.UnregisterPushDeviceUseCase
@@ -55,6 +57,9 @@ interface PushDomainModule {
 
     @Binds
     fun bindsDeletePushTokenUseCase(impl: DefaultDeletePushTokenUseCase): DeletePushTokenUseCase
+
+    @Binds
+    fun bindsProcessIncomingPushUseCase(impl: DefaultProcessIncomingPushUseCase): ProcessIncomingPushUseCase
 
     @Binds
     fun bindsUnregisterPushDeviceUseCase(impl: DefaultUnregisterPushDeviceUseCase): UnregisterPushDeviceUseCase

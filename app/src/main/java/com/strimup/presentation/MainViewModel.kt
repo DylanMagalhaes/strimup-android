@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -58,6 +59,12 @@ class MainViewModel @Inject constructor(
                 }
             }
 
+        }
+    }
+
+    fun onOpenNotificationsRequested() {
+        viewModelScope.launch {
+            if (getUser().first() != null) _events.send(MainUiEvent.OpenNotifications)
         }
     }
 

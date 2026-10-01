@@ -120,4 +120,14 @@
         <item quantity="one">Notifications, %d non lue</item>
         <item quantity="other">Notifications, %d non lues</item>
     </plurals>
+
+    <!-- Push -->
+    <string name="push_title_default">Strimup</string>
+    <string name="push_title_new_favorite">Nouveau fan</string>
+    <string name="push_channel_favorites_name">Favoris</string>
+    <string name="push_channel_favorites_description">Quand quelqu\'un t\'ajoute à ses streamers favoris</string>
+    <string name="push_channel_announcements_name">Annonces</string>
+    <string name="push_channel_announcements_description">Nouveautés et informations de Strimup</string>
+    <string name="push_channel_general_name">Général</string>
+    <string name="push_channel_general_description">Autres notifications de ton compte</string>
 </resources>

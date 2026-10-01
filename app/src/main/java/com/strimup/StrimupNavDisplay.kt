@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -100,20 +101,11 @@ fun StrimupNavDisplay(
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
-            when (event) {
-                MainUiEvent.OAuthLoggedIn -> {
-                    backStack.clear()
-                    backStack.add(Destination.Home.StreamerList)
-                }
-
-                is MainUiEvent.OAuthOnboardingRequired -> {
-                    backStack.add(Destination.OAuthOnboarding(tmp = event.tmp))
-                }
-
-                is MainUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
-                }
-            }
+            handleMainUiEvent(
+                event = event,
+                backStack = backStack,
+                showSnackBar = { textRes -> snackBarHostState.showSnackbar(resources.getString(textRes)) },
+            )
         }
     }
 
@@ -301,6 +293,31 @@ fun StrimupNavDisplay(
                 }
             }
         )
+    }
+}
+
+private suspend fun handleMainUiEvent(
+    event: MainUiEvent,
+    backStack: NavBackStack<NavKey>,
+    showSnackBar: suspend (Int) -> Unit,
+) {
+    when (event) {
+        MainUiEvent.OAuthLoggedIn -> {
+            backStack.clear()
+            backStack.add(Destination.Home.StreamerList)
+        }
+
+        MainUiEvent.OpenNotifications -> {
+            if (backStack.lastOrNull() != Destination.Notifications) {
+                backStack.add(Destination.Notifications)
+            }
+        }
+
+        is MainUiEvent.OAuthOnboardingRequired -> {
+            backStack.add(Destination.OAuthOnboarding(tmp = event.tmp))
+        }
+
+        is MainUiEvent.ShowSnackBar -> showSnackBar(event.textRes)
     }
 }
 

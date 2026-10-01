@@ -329,4 +329,28 @@ class MainViewModelTest {
 
         assertThat(syncStarted).isTrue()
     }
+
+    @Test
+    fun `onOpenNotificationsRequested should open the notifications when logged in`() = runTest {
+        val viewModel = buildViewModel(getUser = GetUserFlowUseCase { flowOf(fakeUser) })
+
+        viewModel.events.test {
+            viewModel.onOpenNotificationsRequested()
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(MainUiEvent.OpenNotifications)
+        }
+    }
+
+    @Test
+    fun `onOpenNotificationsRequested should do nothing when logged out`() = runTest {
+        val viewModel = buildViewModel(getUser = GetUserFlowUseCase { flowOf(null) })
+
+        viewModel.events.test {
+            viewModel.onOpenNotificationsRequested()
+            advanceUntilIdle()
+
+            expectNoEvents()
+        }
+    }
 }

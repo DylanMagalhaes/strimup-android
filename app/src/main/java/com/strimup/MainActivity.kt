@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.feature.auth.presentation.toOAuthCallback
+import com.strimup.feature.push.presentation.PushIntents
 import com.strimup.presentation.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,6 +44,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleDeepLink(intent: Intent?) {
+        if (PushIntents.isOpenNotifications(intent)) {
+            mainViewModel.onOpenNotificationsRequested()
+            return
+        }
         mainViewModel.onOAuthCallback(intent?.data?.toOAuthCallback())
     }
 }
