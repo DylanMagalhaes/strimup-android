@@ -221,7 +221,10 @@ fun MatchedStreamersContent(
                     liveTitle = streamer.liveTitle,
                     onClick = { onStreamerClick(streamer.id) },
                     onSocialClick = onSocialClick,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    tags = streamer.tags.orEmpty().map { it.name },
+                    personality = streamer.personality,
+                    secondaryPersonality = streamer.personalitySecondary,
                 )
             }
 

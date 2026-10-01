@@ -202,6 +202,9 @@ private fun HomeContent(
                                     liveTitle = streamer.liveTitle,
                                     onClick = { onStreamerClick(streamer.id) },
                                     onSocialClick = onSocialClick,
+                                    tags = streamer.tags.orEmpty().map { it.name },
+                                    personality = streamer.personality,
+                                    secondaryPersonality = streamer.personalitySecondary,
                                 )
                             }
                         }
