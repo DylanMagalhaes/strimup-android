@@ -2,7 +2,6 @@ package com.strimup.core.network.injection
 
 import com.strimup.BuildConfig
 import com.strimup.core.network.logging.redactSensitiveData
-import com.strimup.core.user.data.UserApiService
 import com.strimup.feature.auth.data.remote.AuthAuthenticator
 import com.strimup.feature.auth.data.remote.AuthInterceptor
 import dagger.Module
@@ -55,11 +54,5 @@ object NetworkModule {
             .addInterceptor(loggingInterceptor)
             .authenticator(authAuthenticator)
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserApiService(retrofit: Retrofit): UserApiService {
-        return retrofit.create(UserApiService::class.java)
     }
 }
