@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "472673265386",
+    "project_id": "strimup-8a046",
+    "storage_bucket": "strimup-8a046.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472673265386:android:a55c9319295afb89369993",
+        "android_client_info": {
+          "package_name": "com.strimup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9DrRb0xOcLwV4B0j4vmotDYpnDQ_6Pk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

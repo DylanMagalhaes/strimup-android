@@ -72,6 +72,7 @@ import com.strimup.feature.auth.presentation.register.RegisterScreen
 import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
+import com.strimup.feature.notification.presentation.list.NotificationsScreen
 import com.strimup.feature.search.presentation.navigation.SearchNavigation
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation
@@ -88,6 +89,7 @@ fun StrimupNavDisplay(
     val currentDestination = backStack.lastOrNull()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val unreadNotificationCount by viewModel.unreadNotificationCount.collectAsStateWithLifecycle()
     val isLoggedIn = state.user != null
     val userId = state.user?.id
     val userRole = state.user?.role
@@ -119,7 +121,8 @@ fun StrimupNavDisplay(
             currentDestination is Destination.Login ||
             currentDestination is Destination.Register ||
             currentDestination is Destination.OAuthOnboarding ||
-            currentDestination is Destination.DeleteAccount
+            currentDestination is Destination.DeleteAccount ||
+            currentDestination is Destination.Notifications
 
     Scaffold(
         modifier = modifier,
@@ -157,7 +160,9 @@ fun StrimupNavDisplay(
                         },
                         onStreamerClick = { streamerId ->
                             backStack.add(Destination.StreamerDetail(streamerId = streamerId))
-                        }
+                        },
+                        unreadNotificationCount = unreadNotificationCount.takeIf { isLoggedIn },
+                        onNotificationsClick = { backStack.add(Destination.Notifications) },
                     )
                 }
 
@@ -258,6 +263,13 @@ fun StrimupNavDisplay(
                             backStack.clear()
                             backStack.add(Destination.Login)
                         },
+                    )
+                }
+
+                entry<Destination.Notifications> {
+                    NotificationsScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onNavUp = { backStack.removeLastOrNull() },
                     )
                 }
 

@@ -21,6 +21,8 @@ import kotlinx.serialization.modules.polymorphic
 fun HomeNavigation(
     onStreamerClick: (String) -> Unit,
     onStreamerBannerClick: (String?) -> Unit,
+    unreadNotificationCount: Int?,
+    onNotificationsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val homeBackStack = rememberNavBackStack(
@@ -48,6 +50,8 @@ fun HomeNavigation(
                     viewModel = homeViewModel,
                     onStreamerClick = onStreamerClick,
                     onStreamerBannerClick = onStreamerBannerClick,
+                    unreadNotificationCount = unreadNotificationCount,
+                    onNotificationsClick = onNotificationsClick,
                     modifier = Modifier.fillMaxSize()
                 )
             }
