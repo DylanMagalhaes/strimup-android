@@ -5,10 +5,17 @@ import com.strimup.feature.account.domain.AccountRepository
 import com.strimup.feature.account.domain.entity.AccountDeletionError
 import com.strimup.feature.account.domain.entity.AccountDeletionException
 import com.strimup.feature.account.domain.entity.AccountDeletionPolicy
+import com.strimup.feature.push.domain.usecase.DeletePushTokenUseCase
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class DefaultDeleteAccountUseCaseTest {
+
+    private var pushTokenDeletions = 0
+    private val deletePushToken = DeletePushTokenUseCase {
+        pushTokenDeletions++
+        Result.success(Unit)
+    }
 
     private class FakeAccountRepository : AccountRepository {
         val deletedWithPasswords = mutableListOf<String?>()
@@ -25,7 +32,7 @@ class DefaultDeleteAccountUseCaseTest {
     @Test
     fun `invoke with the exact confirmation word should delete the account with the password`() = runTest {
         val repository = FakeAccountRepository()
-        val useCase = DefaultDeleteAccountUseCase(repository)
+        val useCase = DefaultDeleteAccountUseCase(repository, deletePushToken)
 
         val result = useCase(confirmation = "SUPPRIMER", password = "Secret123!")
 
@@ -36,7 +43,7 @@ class DefaultDeleteAccountUseCaseTest {
     @Test
     fun `invoke with a lowercase confirmation should fail without calling the repository`() = runTest {
         val repository = FakeAccountRepository()
-        val useCase = DefaultDeleteAccountUseCase(repository)
+        val useCase = DefaultDeleteAccountUseCase(repository, deletePushToken)
 
         val result = useCase(confirmation = "supprimer", password = null)
         val exception = result.exceptionOrNull() as AccountDeletionException
@@ -48,7 +55,7 @@ class DefaultDeleteAccountUseCaseTest {
     @Test
     fun `invoke with surrounding spaces should fail without calling the repository`() = runTest {
         val repository = FakeAccountRepository()
-        val useCase = DefaultDeleteAccountUseCase(repository)
+        val useCase = DefaultDeleteAccountUseCase(repository, deletePushToken)
 
         val result = useCase(confirmation = " SUPPRIMER ", password = null)
 
@@ -59,10 +66,40 @@ class DefaultDeleteAccountUseCaseTest {
     @Test
     fun `invoke with an empty password should not send it`() = runTest {
         val repository = FakeAccountRepository()
-        val useCase = DefaultDeleteAccountUseCase(repository)
+        val useCase = DefaultDeleteAccountUseCase(repository, deletePushToken)
 
         useCase(confirmation = "SUPPRIMER", password = "")
 
         assertThat(repository.deletedWithPasswords).containsExactly(null)
+    }
+
+    @Test
+    fun `successful deletion should delete the local push token`() = runTest {
+        val useCase = DefaultDeleteAccountUseCase(FakeAccountRepository(), deletePushToken)
+
+        useCase(confirmation = "SUPPRIMER", password = null)
+
+        assertThat(pushTokenDeletions).isEqualTo(1)
+    }
+
+    @Test
+    fun `failed deletion should keep the local push token`() = runTest {
+        val useCase = DefaultDeleteAccountUseCase(FakeAccountRepository(), deletePushToken)
+
+        useCase(confirmation = "supprimer", password = null)
+
+        assertThat(pushTokenDeletions).isEqualTo(0)
+    }
+
+    @Test
+    fun `push token deletion failure should not fail the account deletion`() = runTest {
+        val useCase = DefaultDeleteAccountUseCase(
+            FakeAccountRepository(),
+            DeletePushTokenUseCase { Result.failure(IllegalStateException()) },
+        )
+
+        val result = useCase(confirmation = "SUPPRIMER", password = null)
+
+        assertThat(result.isSuccess).isTrue()
     }
 }

@@ -4,10 +4,12 @@ import com.strimup.feature.account.domain.AccountRepository
 import com.strimup.feature.account.domain.entity.AccountDeletionConfirmation
 import com.strimup.feature.account.domain.entity.AccountDeletionError
 import com.strimup.feature.account.domain.entity.AccountDeletionException
+import com.strimup.feature.push.domain.usecase.DeletePushTokenUseCase
 import javax.inject.Inject
 
 class DefaultDeleteAccountUseCase @Inject constructor(
     private val repository: AccountRepository,
+    private val deletePushToken: DeletePushTokenUseCase,
 ) : DeleteAccountUseCase {
     override suspend fun invoke(confirmation: String, password: String?): Result<Unit> {
         if (!AccountDeletionConfirmation.isValid(confirmation)) {
@@ -15,5 +17,6 @@ class DefaultDeleteAccountUseCase @Inject constructor(
         }
 
         return repository.deleteAccount(password?.takeIf { it.isNotEmpty() })
+            .onSuccess { deletePushToken() }
     }
 }

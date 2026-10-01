@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room3)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.google.services)
 }
 
 val localProperties = Properties().apply {
@@ -132,6 +133,10 @@ dependencies {
     implementation(libs.androidx.browser)
 
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     // ----- Tests unitaires (JVM, src/test) -----
     testImplementation(libs.junit)

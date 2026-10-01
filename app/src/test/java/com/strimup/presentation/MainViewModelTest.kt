@@ -13,6 +13,8 @@ import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
+import com.strimup.feature.push.domain.usecase.ObserveShouldAskNotificationPermissionUseCase
+import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,16 +40,24 @@ class MainViewModelTest {
         avatarUrl = "",
     )
 
+    private var permissionHandledCount = 0
+
     private fun buildViewModel(
         getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
         exchangeOAuthCode: ExchangeOAuthCodeUseCase = ExchangeOAuthCodeUseCase { Result.success(fakeLoginResult) },
         watchUnreadNotificationCount: WatchUnreadNotificationCountUseCase = WatchUnreadNotificationCountUseCase {
             flowOf(0)
         },
+        syncPushDeviceRegistration: SyncPushDeviceRegistrationUseCase = SyncPushDeviceRegistrationUseCase {},
+        shouldAskPermission: ObserveShouldAskNotificationPermissionUseCase =
+            ObserveShouldAskNotificationPermissionUseCase { flowOf(false) },
     ) = MainViewModel(
         getUser = getUser,
         exchangeOAuthCode = exchangeOAuthCode,
         watchUnreadNotificationCount = watchUnreadNotificationCount,
+        syncPushDeviceRegistration = syncPushDeviceRegistration,
+        observeShouldAskNotificationPermission = shouldAskPermission,
+        markNotificationPermissionAsked = { permissionHandledCount++ },
     )
 
     private val fakeLoginResult = LoginResultEntity(
@@ -315,5 +325,57 @@ class MainViewModelTest {
 
         assertThat(watchStarted).isFalse()
         assertThat(viewModel.unreadNotificationCount.value).isEqualTo(0)
+    }
+
+    @Test
+    fun `init should start the push device registration sync`() = runTest {
+        var syncStarted = false
+        buildViewModel(syncPushDeviceRegistration = { syncStarted = true })
+
+        advanceUntilIdle()
+
+        assertThat(syncStarted).isTrue()
+    }
+
+    @Test
+    fun `onOpenNotificationsRequested should open the notifications when logged in`() = runTest {
+        val viewModel = buildViewModel(getUser = GetUserFlowUseCase { flowOf(fakeUser) })
+
+        viewModel.events.test {
+            viewModel.onOpenNotificationsRequested()
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isEqualTo(MainUiEvent.OpenNotifications)
+        }
+    }
+
+    @Test
+    fun `onOpenNotificationsRequested should do nothing when logged out`() = runTest {
+        val viewModel = buildViewModel(getUser = GetUserFlowUseCase { flowOf(null) })
+
+        viewModel.events.test {
+            viewModel.onOpenNotificationsRequested()
+            advanceUntilIdle()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `shouldAskNotificationPermission should expose the use case value`() = runTest {
+        val viewModel = buildViewModel(shouldAskPermission = { flowOf(true) })
+        advanceUntilIdle()
+
+        assertThat(viewModel.shouldAskNotificationPermission.value).isTrue()
+    }
+
+    @Test
+    fun `onNotificationPermissionHandled should remember that the permission was asked`() = runTest {
+        val viewModel = buildViewModel()
+
+        viewModel.onNotificationPermissionHandled()
+        advanceUntilIdle()
+
+        assertThat(permissionHandledCount).isEqualTo(1)
     }
 }
