@@ -12,12 +12,16 @@ import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
+import com.strimup.feature.push.domain.usecase.MarkNotificationPermissionAskedUseCase
+import com.strimup.feature.push.domain.usecase.ObserveShouldAskNotificationPermissionUseCase
+import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -29,6 +33,9 @@ class MainViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase,
     private val exchangeOAuthCode: ExchangeOAuthCodeUseCase,
     watchUnreadNotificationCount: WatchUnreadNotificationCountUseCase,
+    syncPushDeviceRegistration: SyncPushDeviceRegistrationUseCase,
+    observeShouldAskNotificationPermission: ObserveShouldAskNotificationPermissionUseCase,
+    private val markNotificationPermissionAsked: MarkNotificationPermissionAskedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -41,10 +48,14 @@ class MainViewModel @Inject constructor(
             initialValue = 0,
         )
 
+    val shouldAskNotificationPermission: StateFlow<Boolean> = observeShouldAskNotificationPermission()
+        .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
+
     private val _events = Channel<MainUiEvent>()
     val events = _events.receiveAsFlow()
 
     init {
+        viewModelScope.launch { syncPushDeviceRegistration() }
         viewModelScope.launch {
             getUser().collect { user ->
                 _state.update {
@@ -55,6 +66,16 @@ class MainViewModel @Inject constructor(
                 }
             }
 
+        }
+    }
+
+    fun onNotificationPermissionHandled() {
+        viewModelScope.launch { markNotificationPermissionAsked() }
+    }
+
+    fun onOpenNotificationsRequested() {
+        viewModelScope.launch {
+            if (getUser().first() != null) _events.send(MainUiEvent.OpenNotifications)
         }
     }
 

@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -73,6 +74,7 @@ import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
 import com.strimup.feature.notification.presentation.list.NotificationsScreen
+import com.strimup.feature.push.presentation.permission.NotificationPermissionPrompt
 import com.strimup.feature.search.presentation.navigation.SearchNavigation
 import com.strimup.feature.streamerdetail.presentation.StreamerDetailScreen
 import com.strimup.feature.streamerprofile.presentation.navigation.ProfileNavigation
@@ -100,20 +102,11 @@ fun StrimupNavDisplay(
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
-            when (event) {
-                MainUiEvent.OAuthLoggedIn -> {
-                    backStack.clear()
-                    backStack.add(Destination.Home.StreamerList)
-                }
-
-                is MainUiEvent.OAuthOnboardingRequired -> {
-                    backStack.add(Destination.OAuthOnboarding(tmp = event.tmp))
-                }
-
-                is MainUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
-                }
-            }
+            handleMainUiEvent(
+                event = event,
+                backStack = backStack,
+                showSnackBar = { textRes -> snackBarHostState.showSnackbar(resources.getString(textRes)) },
+            )
         }
     }
 
@@ -123,6 +116,12 @@ fun StrimupNavDisplay(
             currentDestination is Destination.OAuthOnboarding ||
             currentDestination is Destination.DeleteAccount ||
             currentDestination is Destination.Notifications
+
+    val shouldAskNotificationPermission by viewModel.shouldAskNotificationPermission.collectAsStateWithLifecycle()
+    NotificationPermissionPrompt(
+        shouldAsk = shouldAskNotificationPermission && !currentDestination.isAuthFlow(),
+        onHandled = viewModel::onNotificationPermissionHandled,
+    )
 
     Scaffold(
         modifier = modifier,
@@ -301,6 +300,34 @@ fun StrimupNavDisplay(
                 }
             }
         )
+    }
+}
+
+private fun NavKey?.isAuthFlow(): Boolean =
+    this is Destination.Login || this is Destination.Register || this is Destination.OAuthOnboarding
+
+private suspend fun handleMainUiEvent(
+    event: MainUiEvent,
+    backStack: NavBackStack<NavKey>,
+    showSnackBar: suspend (Int) -> Unit,
+) {
+    when (event) {
+        MainUiEvent.OAuthLoggedIn -> {
+            backStack.clear()
+            backStack.add(Destination.Home.StreamerList)
+        }
+
+        MainUiEvent.OpenNotifications -> {
+            if (backStack.lastOrNull() != Destination.Notifications) {
+                backStack.add(Destination.Notifications)
+            }
+        }
+
+        is MainUiEvent.OAuthOnboardingRequired -> {
+            backStack.add(Destination.OAuthOnboarding(tmp = event.tmp))
+        }
+
+        is MainUiEvent.ShowSnackBar -> showSnackBar(event.textRes)
     }
 }
 

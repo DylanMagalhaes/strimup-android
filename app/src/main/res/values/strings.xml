@@ -76,6 +76,10 @@
 
     <!-- Account -->
     <string name="account_title">Mon compte</string>
+    <string name="account_section_preferences">Préférences</string>
+    <string name="account_notifications">Notifications</string>
+    <string name="account_notifications_enabled">Activées</string>
+    <string name="account_notifications_disabled">Désactivées</string>
     <string name="account_section_legal">Informations légales</string>
     <string name="account_terms_of_service">Conditions générales d\'utilisation</string>
     <string name="account_privacy_policy">Politique de confidentialité</string>
@@ -120,4 +124,18 @@
         <item quantity="one">Notifications, %d non lue</item>
         <item quantity="other">Notifications, %d non lues</item>
     </plurals>
+
+    <!-- Push -->
+    <string name="push_title_default">Strimup</string>
+    <string name="push_title_new_favorite">Nouveau fan</string>
+    <string name="push_channel_favorites_name">Favoris</string>
+    <string name="push_channel_favorites_description">Quand quelqu\'un t\'ajoute à ses streamers favoris</string>
+    <string name="push_channel_announcements_name">Annonces</string>
+    <string name="push_channel_announcements_description">Nouveautés et informations de Strimup</string>
+    <string name="push_channel_general_name">Général</string>
+    <string name="push_channel_general_description">Autres notifications de ton compte</string>
+    <string name="push_permission_title">Reste informé</string>
+    <string name="push_permission_message">Active les notifications pour savoir quand quelqu\'un t\'ajoute à ses streamers favoris et pour recevoir les annonces de Strimup.</string>
+    <string name="push_permission_enable">Activer</string>
+    <string name="push_permission_later">Plus tard</string>
 </resources>
