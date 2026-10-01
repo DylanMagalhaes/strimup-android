@@ -13,6 +13,7 @@ import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
+import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,10 +45,12 @@ class MainViewModelTest {
         watchUnreadNotificationCount: WatchUnreadNotificationCountUseCase = WatchUnreadNotificationCountUseCase {
             flowOf(0)
         },
+        syncPushDeviceRegistration: SyncPushDeviceRegistrationUseCase = SyncPushDeviceRegistrationUseCase {},
     ) = MainViewModel(
         getUser = getUser,
         exchangeOAuthCode = exchangeOAuthCode,
         watchUnreadNotificationCount = watchUnreadNotificationCount,
+        syncPushDeviceRegistration = syncPushDeviceRegistration,
     )
 
     private val fakeLoginResult = LoginResultEntity(
@@ -315,5 +318,15 @@ class MainViewModelTest {
 
         assertThat(watchStarted).isFalse()
         assertThat(viewModel.unreadNotificationCount.value).isEqualTo(0)
+    }
+
+    @Test
+    fun `init should start the push device registration sync`() = runTest {
+        var syncStarted = false
+        buildViewModel(syncPushDeviceRegistration = { syncStarted = true })
+
+        advanceUntilIdle()
+
+        assertThat(syncStarted).isTrue()
     }
 }

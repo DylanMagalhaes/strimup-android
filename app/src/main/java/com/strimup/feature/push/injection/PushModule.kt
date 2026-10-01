@@ -5,9 +5,13 @@ import com.strimup.feature.push.data.DeviceApiService
 import com.strimup.feature.push.data.client.FirebasePushMessagingClient
 import com.strimup.feature.push.data.client.PushMessagingClient
 import com.strimup.feature.push.domain.PushRepository
-import com.strimup.feature.push.domain.usecase.DefaultRegisterPushDeviceUseCase
+import com.strimup.feature.push.domain.usecase.DefaultDeletePushTokenUseCase
+import com.strimup.feature.push.domain.usecase.DefaultRegisterRefreshedPushTokenUseCase
+import com.strimup.feature.push.domain.usecase.DefaultSyncPushDeviceRegistrationUseCase
 import com.strimup.feature.push.domain.usecase.DefaultUnregisterPushDeviceUseCase
-import com.strimup.feature.push.domain.usecase.RegisterPushDeviceUseCase
+import com.strimup.feature.push.domain.usecase.DeletePushTokenUseCase
+import com.strimup.feature.push.domain.usecase.RegisterRefreshedPushTokenUseCase
+import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import com.strimup.feature.push.domain.usecase.UnregisterPushDeviceUseCase
 import dagger.Binds
 import dagger.Module
@@ -40,7 +44,17 @@ interface PushDomainModule {
     fun bindsPushMessagingClient(impl: FirebasePushMessagingClient): PushMessagingClient
 
     @Binds
-    fun bindsRegisterPushDeviceUseCase(impl: DefaultRegisterPushDeviceUseCase): RegisterPushDeviceUseCase
+    fun bindsSyncPushDeviceRegistrationUseCase(
+        impl: DefaultSyncPushDeviceRegistrationUseCase,
+    ): SyncPushDeviceRegistrationUseCase
+
+    @Binds
+    fun bindsRegisterRefreshedPushTokenUseCase(
+        impl: DefaultRegisterRefreshedPushTokenUseCase,
+    ): RegisterRefreshedPushTokenUseCase
+
+    @Binds
+    fun bindsDeletePushTokenUseCase(impl: DefaultDeletePushTokenUseCase): DeletePushTokenUseCase
 
     @Binds
     fun bindsUnregisterPushDeviceUseCase(impl: DefaultUnregisterPushDeviceUseCase): UnregisterPushDeviceUseCase

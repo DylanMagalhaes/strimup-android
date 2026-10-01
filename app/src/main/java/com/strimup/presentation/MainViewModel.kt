@@ -12,6 +12,7 @@ import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
+import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ class MainViewModel @Inject constructor(
     private val getUser: GetUserFlowUseCase,
     private val exchangeOAuthCode: ExchangeOAuthCodeUseCase,
     watchUnreadNotificationCount: WatchUnreadNotificationCountUseCase,
+    syncPushDeviceRegistration: SyncPushDeviceRegistrationUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -45,6 +47,7 @@ class MainViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     init {
+        viewModelScope.launch { syncPushDeviceRegistration() }
         viewModelScope.launch {
             getUser().collect { user ->
                 _state.update {
