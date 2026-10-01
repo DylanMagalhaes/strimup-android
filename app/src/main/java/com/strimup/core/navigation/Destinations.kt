@@ -67,4 +67,7 @@ sealed interface Destination : NavKey {
 
     @Serializable
     data object DeleteAccount : Destination
+
+    @Serializable
+    data object Notifications : Destination
 }
