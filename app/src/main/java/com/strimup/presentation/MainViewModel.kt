@@ -12,6 +12,8 @@ import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
+import com.strimup.feature.push.domain.usecase.MarkNotificationPermissionAskedUseCase
+import com.strimup.feature.push.domain.usecase.ObserveShouldAskNotificationPermissionUseCase
 import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -32,6 +34,8 @@ class MainViewModel @Inject constructor(
     private val exchangeOAuthCode: ExchangeOAuthCodeUseCase,
     watchUnreadNotificationCount: WatchUnreadNotificationCountUseCase,
     syncPushDeviceRegistration: SyncPushDeviceRegistrationUseCase,
+    observeShouldAskNotificationPermission: ObserveShouldAskNotificationPermissionUseCase,
+    private val markNotificationPermissionAsked: MarkNotificationPermissionAskedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -43,6 +47,9 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(UNREAD_COUNT_STOP_TIMEOUT_MS),
             initialValue = 0,
         )
+
+    val shouldAskNotificationPermission: StateFlow<Boolean> = observeShouldAskNotificationPermission()
+        .stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = false)
 
     private val _events = Channel<MainUiEvent>()
     val events = _events.receiveAsFlow()
@@ -60,6 +67,10 @@ class MainViewModel @Inject constructor(
             }
 
         }
+    }
+
+    fun onNotificationPermissionHandled() {
+        viewModelScope.launch { markNotificationPermissionAsked() }
     }
 
     fun onOpenNotificationsRequested() {

@@ -130,4 +130,8 @@
     <string name="push_channel_announcements_description">Nouveautés et informations de Strimup</string>
     <string name="push_channel_general_name">Général</string>
     <string name="push_channel_general_description">Autres notifications de ton compte</string>
+    <string name="push_permission_title">Reste informé</string>
+    <string name="push_permission_message">Active les notifications pour savoir quand quelqu\'un t\'ajoute à ses streamers favoris et pour recevoir les annonces de Strimup.</string>
+    <string name="push_permission_enable">Activer</string>
+    <string name="push_permission_later">Plus tard</string>
 </resources>

@@ -13,6 +13,7 @@ import com.strimup.feature.auth.domain.entity.OAuthCallback
 import com.strimup.feature.auth.domain.entity.OAuthFailureReason
 import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
+import com.strimup.feature.push.domain.usecase.ObserveShouldAskNotificationPermissionUseCase
 import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,6 +40,8 @@ class MainViewModelTest {
         avatarUrl = "",
     )
 
+    private var permissionHandledCount = 0
+
     private fun buildViewModel(
         getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
         exchangeOAuthCode: ExchangeOAuthCodeUseCase = ExchangeOAuthCodeUseCase { Result.success(fakeLoginResult) },
@@ -46,11 +49,15 @@ class MainViewModelTest {
             flowOf(0)
         },
         syncPushDeviceRegistration: SyncPushDeviceRegistrationUseCase = SyncPushDeviceRegistrationUseCase {},
+        shouldAskPermission: ObserveShouldAskNotificationPermissionUseCase =
+            ObserveShouldAskNotificationPermissionUseCase { flowOf(false) },
     ) = MainViewModel(
         getUser = getUser,
         exchangeOAuthCode = exchangeOAuthCode,
         watchUnreadNotificationCount = watchUnreadNotificationCount,
         syncPushDeviceRegistration = syncPushDeviceRegistration,
+        observeShouldAskNotificationPermission = shouldAskPermission,
+        markNotificationPermissionAsked = { permissionHandledCount++ },
     )
 
     private val fakeLoginResult = LoginResultEntity(
@@ -352,5 +359,23 @@ class MainViewModelTest {
 
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun `shouldAskNotificationPermission should expose the use case value`() = runTest {
+        val viewModel = buildViewModel(shouldAskPermission = { flowOf(true) })
+        advanceUntilIdle()
+
+        assertThat(viewModel.shouldAskNotificationPermission.value).isTrue()
+    }
+
+    @Test
+    fun `onNotificationPermissionHandled should remember that the permission was asked`() = runTest {
+        val viewModel = buildViewModel()
+
+        viewModel.onNotificationPermissionHandled()
+        advanceUntilIdle()
+
+        assertThat(permissionHandledCount).isEqualTo(1)
     }
 }

@@ -4,13 +4,19 @@ import com.strimup.feature.push.data.DefaultPushRepository
 import com.strimup.feature.push.data.DeviceApiService
 import com.strimup.feature.push.data.client.FirebasePushMessagingClient
 import com.strimup.feature.push.data.client.PushMessagingClient
+import com.strimup.feature.push.data.local.DataStoreNotificationPermissionRepository
+import com.strimup.feature.push.domain.NotificationPermissionRepository
 import com.strimup.feature.push.domain.PushRepository
 import com.strimup.feature.push.domain.usecase.DefaultDeletePushTokenUseCase
+import com.strimup.feature.push.domain.usecase.DefaultMarkNotificationPermissionAskedUseCase
+import com.strimup.feature.push.domain.usecase.DefaultObserveShouldAskNotificationPermissionUseCase
 import com.strimup.feature.push.domain.usecase.DefaultProcessIncomingPushUseCase
 import com.strimup.feature.push.domain.usecase.DefaultRegisterRefreshedPushTokenUseCase
 import com.strimup.feature.push.domain.usecase.DefaultSyncPushDeviceRegistrationUseCase
 import com.strimup.feature.push.domain.usecase.DefaultUnregisterPushDeviceUseCase
 import com.strimup.feature.push.domain.usecase.DeletePushTokenUseCase
+import com.strimup.feature.push.domain.usecase.MarkNotificationPermissionAskedUseCase
+import com.strimup.feature.push.domain.usecase.ObserveShouldAskNotificationPermissionUseCase
 import com.strimup.feature.push.domain.usecase.ProcessIncomingPushUseCase
 import com.strimup.feature.push.domain.usecase.RegisterRefreshedPushTokenUseCase
 import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
@@ -60,6 +66,21 @@ interface PushDomainModule {
 
     @Binds
     fun bindsProcessIncomingPushUseCase(impl: DefaultProcessIncomingPushUseCase): ProcessIncomingPushUseCase
+
+    @Binds
+    fun bindsNotificationPermissionRepository(
+        impl: DataStoreNotificationPermissionRepository,
+    ): NotificationPermissionRepository
+
+    @Binds
+    fun bindsObserveShouldAskNotificationPermissionUseCase(
+        impl: DefaultObserveShouldAskNotificationPermissionUseCase,
+    ): ObserveShouldAskNotificationPermissionUseCase
+
+    @Binds
+    fun bindsMarkNotificationPermissionAskedUseCase(
+        impl: DefaultMarkNotificationPermissionAskedUseCase,
+    ): MarkNotificationPermissionAskedUseCase
 
     @Binds
     fun bindsUnregisterPushDeviceUseCase(impl: DefaultUnregisterPushDeviceUseCase): UnregisterPushDeviceUseCase
