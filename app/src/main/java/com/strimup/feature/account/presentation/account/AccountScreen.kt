@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,6 +62,8 @@ import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
+import com.strimup.feature.push.presentation.settings.openAppNotificationSettings
+import com.strimup.feature.push.presentation.settings.rememberNotificationsEnabled
 
 @Composable
 fun AccountScreen(
@@ -91,6 +94,8 @@ fun AccountScreen(
         state = state,
         snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
+        areNotificationsEnabled = rememberNotificationsEnabled(),
+        onNotificationsClick = { context.openAppNotificationSettings() },
         onTermsClick = { context.openInCustomTab(LegalUrls.TERMS_OF_SERVICE) },
         onPrivacyPolicyClick = { context.openInCustomTab(LegalUrls.PRIVACY_POLICY) },
         onLogoutClick = viewModel::onLogoutClick,
@@ -104,6 +109,8 @@ private fun AccountContent(
     state: AccountUiState,
     snackBarHostState: SnackbarHostState,
     onNavUp: (() -> Unit)?,
+    areNotificationsEnabled: Boolean,
+    onNotificationsClick: () -> Unit,
     onTermsClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -150,6 +157,26 @@ private fun AccountContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 state.user?.let { user -> AccountHeader(user = user) }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+
+                SectionTitle(text = stringResource(R.string.account_section_preferences))
+
+                AccountMenuRow(
+                    icon = Icons.Outlined.Notifications,
+                    label = stringResource(R.string.account_notifications),
+                    supportingText = stringResource(
+                        if (areNotificationsEnabled) {
+                            R.string.account_notifications_enabled
+                        } else {
+                            R.string.account_notifications_disabled
+                        }
+                    ),
+                    onClick = onNotificationsClick,
+                )
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
@@ -270,6 +297,7 @@ private fun AccountMenuRow(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    supportingText: String? = null,
     enabled: Boolean = true,
 ) {
     Row(
@@ -285,11 +313,19 @@ private fun AccountMenuRow(
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(
-            modifier = Modifier.weight(1f),
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            supportingText?.let { text ->
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
@@ -314,6 +350,8 @@ internal fun AccountContentPreview() {
             ),
             snackBarHostState = remember { SnackbarHostState() },
             onNavUp = null,
+            areNotificationsEnabled = true,
+            onNotificationsClick = {},
             onTermsClick = {},
             onPrivacyPolicyClick = {},
             onLogoutClick = {},

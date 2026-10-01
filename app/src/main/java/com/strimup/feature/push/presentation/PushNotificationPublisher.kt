@@ -1,16 +1,14 @@
 package com.strimup.feature.push.presentation
 
-import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.strimup.R
 import com.strimup.feature.push.domain.entity.PushChannel
 import com.strimup.feature.push.domain.entity.PushMessage
+import com.strimup.feature.push.presentation.settings.canPostNotifications
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -18,7 +16,7 @@ class PushNotificationPublisher @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
     fun publish(message: PushMessage) {
-        if (!canPostNotifications()) return
+        if (!context.canPostNotifications()) return
 
         val channel = PushChannel.from(message.type)
         val title = message.title ?: context.getString(message.type.defaultPushTitleRes())
@@ -37,14 +35,6 @@ class PushNotificationPublisher @Inject constructor(
         } catch (_: SecurityException) {
             return
         }
-    }
-
-    private fun canPostNotifications(): Boolean {
-        val isPermissionGranted = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
-
-        return isPermissionGranted && NotificationManagerCompat.from(context).areNotificationsEnabled()
     }
 
     private fun openNotificationsPendingIntent(): PendingIntent = PendingIntent.getActivity(
