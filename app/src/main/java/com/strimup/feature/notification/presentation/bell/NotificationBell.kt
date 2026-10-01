@@ -54,6 +54,6 @@ fun NotificationBell(
 @Composable
 internal fun NotificationBellPreview() {
     StrimupTheme {
-        NotificationBell(unreadCount = 12, onClick = {})
+        NotificationBell(unreadCount = 10, onClick = {})
     }
 }
