@@ -4,16 +4,16 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.util.MainDispatcherRule
-import kotlin.random.Random
-import kotlin.random.nextUInt
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
-
+import kotlin.random.Random
+import kotlin.random.nextUInt
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
@@ -33,7 +33,8 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
-            getBannerItems = { Result.success(bannerItems) },
+            observeBanner = { flowOf(bannerItems) },
+            refreshBanner = { Result.success(Unit) },
         )
         advanceUntilIdle()
 
@@ -51,7 +52,8 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
-            getBannerItems = { Result.failure(Exception()) },
+            observeBanner = { flowOf(emptyList()) },
+            refreshBanner = { Result.failure(Exception()) },
         )
         advanceUntilIdle()
 
@@ -81,7 +83,8 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(streamers) },
-            getBannerItems = { Result.success(emptyList()) },
+            observeBanner = { flowOf(emptyList()) },
+            refreshBanner = { Result.success(Unit) },
         )
         advanceUntilIdle()
 
@@ -96,7 +99,8 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.failure(Exception()) },
-            getBannerItems = { Result.success(emptyList()) },
+            observeBanner = { flowOf(emptyList()) },
+            refreshBanner = { Result.success(Unit) },
         )
         advanceUntilIdle()
 
@@ -143,7 +147,8 @@ class HomeViewModelTest {
                 }
                 Result.success(list)
             },
-            getBannerItems = { Result.success(emptyList()) },
+            observeBanner = { flowOf(emptyList()) },
+            refreshBanner = { Result.success(Unit) },
         )
 
         //WHEN
@@ -154,6 +159,21 @@ class HomeViewModelTest {
         val actual = viewModel.state.value.streamers
 
         Assert.assertEquals(liveStreamers, actual)
+    }
+
+    @Test
+    fun `on init, should keep showing cached banner items when the refresh fails`() = runTest {
+        val cachedItems = listOf(Random.nextBannerItemEntity(), Random.nextBannerItemEntity())
+
+        val viewModel = HomeViewModel(
+            getStreamers = { Result.success(emptyList()) },
+            observeBanner = { flowOf(cachedItems) },
+            refreshBanner = { Result.failure(Exception()) },
+        )
+        advanceUntilIdle()
+
+        Assert.assertEquals(cachedItems, viewModel.state.value.bannerItems)
+        Assert.assertFalse(viewModel.state.value.isBannerLoading)
     }
 }
 

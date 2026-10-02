@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.home.domain.entity.FilterEntity
-import com.strimup.feature.home.domain.usecase.GetBannerUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
+import com.strimup.feature.home.domain.usecase.ObserveBannerUseCase
+import com.strimup.feature.home.domain.usecase.RefreshBannerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getStreamers: GetStreamersUseCase,
-    private val getBannerItems: GetBannerUseCase
+    private val observeBanner: ObserveBannerUseCase,
+    private val refreshBanner: RefreshBannerUseCase,
 ) : ViewModel() {
 
     val state: StateFlow<HomeUiState>
@@ -30,30 +32,31 @@ class HomeViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     private var fetchStreamersJob: Job? = null
-    private var fetchBannerJob: Job? = null
 
     init {
-        fetchBannerJob = loadBanner()
+        observeBannerItems()
+        refreshBannerItems()
         fetchStreamersJob = fetchStreamers(state.value.currentTab)
     }
 
-    private fun loadBanner(): Job {
-        state.update {
-            it.copy(
-                isBannerLoading = true,
-                errorMessageRes = null
-            )
+    private fun observeBannerItems() {
+        viewModelScope.launch {
+            observeBanner().collect { bannerItems ->
+                state.update {
+                    it.copy(
+                        bannerItems = bannerItems,
+                        isBannerLoading = it.isBannerLoading && bannerItems.isEmpty(),
+                    )
+                }
+            }
         }
+    }
 
-        return viewModelScope.launch {
-            getBannerItems()
-                .onSuccess { bannerItems ->
-                    state.update {
-                        it.copy(
-                            isBannerLoading = false,
-                            bannerItems = bannerItems
-                        )
-                    }
+    private fun refreshBannerItems() {
+        viewModelScope.launch {
+            refreshBanner()
+                .onSuccess {
+                    state.update { it.copy(isBannerLoading = false) }
                 }
                 .onFailure { exception ->
                     val messageRes = exception.toDomainError().toMessageRes()

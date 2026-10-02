@@ -23,7 +23,7 @@ class BannerMapperTest {
         )
 
         // WHEN
-        val actual = response.toDomain()
+        val actual = response.toRoomEntity(orderIndex = 0).toDomain()
 
         // THEN
         assertThat(actual.type).isEqualTo("FEATURED_STREAMER")
@@ -42,7 +42,7 @@ class BannerMapperTest {
         val response = bannerResponse(streamer = null)
 
         // WHEN
-        val entity = response.toDomain()
+        val entity = response.toRoomEntity(orderIndex = 0).toDomain()
 
         // THEN
         assertThat(entity.avatarUrl).isNull()
@@ -55,7 +55,7 @@ class BannerMapperTest {
         val response = bannerResponse(imageUrl = null)
 
         // WHEN
-        val entity = response.toDomain()
+        val entity = response.toRoomEntity(orderIndex = 0).toDomain()
 
         // THEN
         assertThat(entity.imageUrl).isEqualTo("")
@@ -69,7 +69,7 @@ class BannerMapperTest {
         )
 
         // WHEN
-        val entity = response.toDomain()
+        val entity = response.toRoomEntity(orderIndex = 0).toDomain()
 
         // THEN
         assertThat(entity.avatarUrl).isNull()
@@ -93,4 +93,20 @@ class BannerMapperTest {
         linkUrl = linkUrl,
         streamer = streamer,
     )
+
+    @Test
+    fun `toRoomEntity should keep the display order`() {
+        val entity = bannerResponse(
+            type = "AD",
+            title = "t",
+            description = "d",
+            imageUrl = null,
+            position = 7,
+            linkUrl = "https://strimup.com",
+            streamer = null,
+        ).toRoomEntity(orderIndex = 3)
+
+        assertThat(entity.orderIndex).isEqualTo(3)
+        assertThat(entity.position).isEqualTo(7)
+    }
 }
