@@ -18,8 +18,8 @@ import com.strimup.feature.filter.data.local.model.FilterRoomEntity
         FilterRoomEntity::class,
         FavoriteRoomEntity::class
     ],
-    version = 1,
-    exportSchema = false
+    version = STRIMUP_DATABASE_VERSION,
+    exportSchema = true
 )
 @ColumnTypeConverters(CommonConverters::class)
 abstract class StrimupDatabase : RoomDatabase() {

@@ -18,6 +18,19 @@ val localProperties = Properties().apply {
     }
 }
 
+val keystoreProperties = Properties().apply {
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+
+fun releaseSigningValue(name: String): String? =
+    keystoreProperties.getProperty(name) ?: System.getenv("STRIMUP_RELEASE_${name.uppercase()}")
+
+val releaseStoreFile = releaseSigningValue("storeFile")?.let { path -> rootProject.file(path) }
+val hasReleaseSigning = releaseStoreFile?.exists() == true
+
 android {
     namespace = "com.strimup"
     compileSdk {
@@ -39,9 +52,24 @@ android {
         buildConfigField("String", "BASE_URL", baseUrl)
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = releaseStoreFile
+                storePassword = releaseSigningValue("storePassword")
+                keyAlias = releaseSigningValue("keyAlias")
+                keyPassword = releaseSigningValue("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

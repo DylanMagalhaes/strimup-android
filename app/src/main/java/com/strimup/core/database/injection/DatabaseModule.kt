@@ -1,11 +1,13 @@
 package com.strimup.core.database.injection
 
-
 import android.content.Context
 import androidx.room3.Room
+import com.strimup.BuildConfig
+import com.strimup.core.database.STRIMUP_DATABASE_NAME
 import com.strimup.core.database.StrimupDatabase
-import com.strimup.core.user.data.local.dao.UserDao
+import com.strimup.core.database.StrimupDatabaseMigrations
 import com.strimup.core.favorite.data.local.dao.FavoriteDao
+import com.strimup.core.user.data.local.dao.UserDao
 import com.strimup.feature.filter.data.local.dao.FilterDao
 import dagger.Module
 import dagger.Provides
@@ -19,11 +21,15 @@ import javax.inject.Singleton
     @Provides @Singleton fun provideStrimupDatabase(
         @ApplicationContext context: Context
     ): StrimupDatabase {
-        return Room.databaseBuilder(
-            context, StrimupDatabase::class.java, "strimup_database"
-        )
-            .fallbackToDestructiveMigration() // À activer temporairement en dev pour modifier les entités Room sans faire de fichier de migration
-            .build()
+        val builder = Room.databaseBuilder(context, StrimupDatabase::class.java, STRIMUP_DATABASE_NAME)
+
+        StrimupDatabaseMigrations.all.forEach { migration -> builder.addMigrations(migration) }
+
+        if (BuildConfig.DEBUG) {
+            builder.fallbackToDestructiveMigration(dropAllTables = true)
+        }
+
+        return builder.build()
     }
 
     @Provides
