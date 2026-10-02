@@ -16,7 +16,7 @@ interface HomeDao {
     fun observeBanner(): Flow<List<HomeBannerRoomEntity>>
 
     @Query("SELECT * FROM home_streamers ORDER BY orderIndex")
-    fun observeStreamers(): Flow<List<HomeStreamerRoomEntity>>
+    suspend fun getStreamers(): List<HomeStreamerRoomEntity>
 
     @Transaction
     suspend fun replaceBanner(items: List<HomeBannerRoomEntity>) {

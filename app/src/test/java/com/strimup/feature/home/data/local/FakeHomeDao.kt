@@ -14,8 +14,8 @@ class FakeHomeDao : HomeDao {
     override fun observeBanner(): Flow<List<HomeBannerRoomEntity>> =
         banner.map { items -> items.sortedBy { it.orderIndex } }
 
-    override fun observeStreamers(): Flow<List<HomeStreamerRoomEntity>> =
-        streamers.map { items -> items.sortedBy { it.orderIndex } }
+    override suspend fun getStreamers(): List<HomeStreamerRoomEntity> =
+        streamers.value.sortedBy { it.orderIndex }
 
     override suspend fun insertBanner(items: List<HomeBannerRoomEntity>) {
         banner.value = banner.value + items

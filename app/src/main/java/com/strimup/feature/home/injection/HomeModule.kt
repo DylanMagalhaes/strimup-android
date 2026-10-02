@@ -2,9 +2,13 @@ package com.strimup.feature.home.injection
 
 import com.strimup.feature.home.data.BannerApiService
 import com.strimup.feature.home.data.DefaultBannerRepository
+import com.strimup.feature.home.data.RoomDiscoveryStreamerCache
 import com.strimup.feature.home.domain.BannerRepository
+import com.strimup.feature.home.domain.DiscoveryStreamerCache
+import com.strimup.feature.home.domain.usecase.DefaultGetCachedDiscoveryStreamersUseCase
 import com.strimup.feature.home.domain.usecase.DefaultObserveBannerUseCase
 import com.strimup.feature.home.domain.usecase.DefaultRefreshBannerUseCase
+import com.strimup.feature.home.domain.usecase.GetCachedDiscoveryStreamersUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersWithoutFavoriteUseCase
 import com.strimup.feature.home.domain.usecase.ObserveBannerUseCase
@@ -31,6 +35,14 @@ interface HomeModule {
 
     @Binds
     fun bindBannerRepository(impl: DefaultBannerRepository): BannerRepository
+
+    @Binds
+    fun bindsDiscoveryStreamerCache(impl: RoomDiscoveryStreamerCache): DiscoveryStreamerCache
+
+    @Binds
+    fun bindsGetCachedDiscoveryStreamersUseCase(
+        impl: DefaultGetCachedDiscoveryStreamersUseCase,
+    ): GetCachedDiscoveryStreamersUseCase
 
     companion object {
         @Provides
