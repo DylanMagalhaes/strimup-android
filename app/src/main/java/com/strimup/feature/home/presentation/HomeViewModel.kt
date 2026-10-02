@@ -46,6 +46,39 @@ class HomeViewModel @Inject constructor(
         reloadStreamers(filter)
     }
 
+    fun onRefresh() {
+        if (state.value.isRefreshing || state.value.isLoading) return
+
+        fetchStreamersJob?.cancel()
+        state.update { it.copy(isRefreshing = true) }
+        refreshBannerItems()
+
+        val filter = state.value.currentTab
+        fetchStreamersJob = viewModelScope.launch {
+            getStreamers(filter)
+                .onSuccess { streamers ->
+                    state.update {
+                        it.copy(
+                            streamers = streamers,
+                            isRefreshing = false,
+                            errorMessageRes = null,
+                            isShowingSavedContent = false,
+                        )
+                    }
+                }
+                .onFailure { exception ->
+                    val messageRes = exception.toDomainError().toMessageRes()
+                    state.update { current ->
+                        current.copy(
+                            isRefreshing = false,
+                            errorMessageRes = messageRes.takeIf { current.streamers.isEmpty() },
+                        )
+                    }
+                    _events.send(HomeUiEvent.ShowSnackBar(messageRes))
+                }
+        }
+    }
+
     fun onRetryClick() {
         refreshBannerItems()
         reloadStreamers(state.value.currentTab)
@@ -57,6 +90,7 @@ class HomeViewModel @Inject constructor(
         state.update {
             it.copy(
                 isLoading = true,
+                isRefreshing = false,
                 currentTab = filter,
                 errorMessageRes = null,
                 isShowingSavedContent = false,

@@ -24,11 +24,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -98,6 +100,7 @@ fun HomeScreen(
         },
         onTabClick = viewModel::onTabClick,
         onRetryClick = viewModel::onRetryClick,
+        onRefresh = viewModel::onRefresh,
         unreadNotificationCount = unreadNotificationCount,
         onNotificationsClick = onNotificationsClick,
         onBannerClick = { banner ->
@@ -118,7 +121,7 @@ fun HomeScreen(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeContent(
     state: HomeUiState,
@@ -128,6 +131,7 @@ private fun HomeContent(
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
     onRetryClick: () -> Unit,
+    onRefresh: () -> Unit,
     unreadNotificationCount: Int?,
     onNotificationsClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -160,71 +164,77 @@ private fun HomeContent(
                         val lazyListState = rememberLazyListState()
                         val snapFlingBehavior = rememberSnapFlingBehavior(lazyListState = lazyListState)
 
-                        LazyColumn(
-                            state = lazyListState,
-                            flingBehavior = snapFlingBehavior,
+                        PullToRefreshBox(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 24.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            isRefreshing = state.isRefreshing,
+                            onRefresh = onRefresh,
                         ) {
-                            item {
-                                HomeBanner(
-                                    banners = state.bannerItems,
-                                    onBannerClick = onBannerClick
-                                )
-                                Spacer(modifier = Modifier.height(24.dp))
-                            }
+                            LazyColumn(
+                                state = lazyListState,
+                                flingBehavior = snapFlingBehavior,
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 24.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                            ) {
+                                item {
+                                    HomeBanner(
+                                        banners = state.bannerItems,
+                                        onBannerClick = onBannerClick
+                                    )
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                }
 
-                            stickyHeader {
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = MaterialTheme.colorScheme.background
-                                ) {
-                                    HomeTabs(
+                                stickyHeader {
+                                    Surface(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        color = MaterialTheme.colorScheme.background
+                                    ) {
+                                        HomeTabs(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 8.dp),
+                                            onButtonClick = onTabClick,
+                                            currentTab = state.currentTab,
+                                        )
+                                    }
+                                }
+
+                                if (state.isShowingSavedContent) {
+                                    item {
+                                        HomeOfflineBanner(modifier = Modifier.padding(horizontal = 16.dp))
+                                    }
+                                }
+
+                                if (state.shouldShowStreamersError) {
+                                    item {
+                                        HomeStreamersError(
+                                            messageRes = state.errorMessageRes ?: R.string.error_unknown,
+                                            onRetryClick = onRetryClick,
+                                        )
+                                    }
+                                }
+
+                                items(
+                                    items = state.streamers,
+                                    key = { streamer -> streamer.id }
+                                ) { streamer ->
+                                    StreamerCard(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 8.dp),
-                                        onButtonClick = onTabClick,
-                                        currentTab = state.currentTab,
+                                            .padding(horizontal = 16.dp)
+                                            .defaultMinSize(minHeight = 112.dp),
+                                        pseudo = streamer.userName,
+                                        socials = streamer.socials,
+                                        imageUrl = streamer.imageUrl,
+                                        isLive = streamer.isLive,
+                                        liveTitle = streamer.liveTitle,
+                                        onClick = { onStreamerClick(streamer.id) },
+                                        onSocialClick = onSocialClick,
+                                        tags = streamer.tags.orEmpty().map { it.name },
+                                        personality = streamer.personality,
+                                        secondaryPersonality = streamer.personalitySecondary,
                                     )
                                 }
-                            }
-
-                            if (state.isShowingSavedContent) {
-                                item {
-                                    HomeOfflineBanner(modifier = Modifier.padding(horizontal = 16.dp))
-                                }
-                            }
-
-                            if (state.shouldShowStreamersError) {
-                                item {
-                                    HomeStreamersError(
-                                        messageRes = state.errorMessageRes ?: R.string.error_unknown,
-                                        onRetryClick = onRetryClick,
-                                    )
-                                }
-                            }
-
-                            items(
-                                items = state.streamers,
-                                key = { streamer -> streamer.id }
-                            ) { streamer ->
-                                StreamerCard(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp)
-                                        .defaultMinSize(minHeight = 112.dp),
-                                    pseudo = streamer.userName,
-                                    socials = streamer.socials,
-                                    imageUrl = streamer.imageUrl,
-                                    isLive = streamer.isLive,
-                                    liveTitle = streamer.liveTitle,
-                                    onClick = { onStreamerClick(streamer.id) },
-                                    onSocialClick = onSocialClick,
-                                    tags = streamer.tags.orEmpty().map { it.name },
-                                    personality = streamer.personality,
-                                    secondaryPersonality = streamer.personalitySecondary,
-                                )
                             }
                         }
                     }
@@ -265,6 +275,7 @@ private fun HomeScreenPreview() {
             onSocialClick = {},
             onTabClick = {},
             onRetryClick = {},
+            onRefresh = {},
             onBannerClick = {},
             unreadNotificationCount = 3,
             onNotificationsClick = {},

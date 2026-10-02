@@ -9,6 +9,7 @@ data class HomeUiState(
     val streamers: List<Streamer> = emptyList(),
     val currentTab: FilterEntity = FilterEntity.Discovery,
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     @param:StringRes val errorMessageRes: Int? = null,
     val isShowingSavedContent: Boolean = false,
     val isBannerLoading: Boolean = true,

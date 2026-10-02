@@ -302,6 +302,121 @@ class HomeViewModelTest {
         Assert.assertEquals(freshStreamers, viewModel.state.value.streamers)
         Assert.assertFalse(viewModel.state.value.shouldShowStreamersError)
     }
+
+    @Test
+    fun `onRefresh should reload the current tab without the full screen loader`() = runTest {
+        val network = CompletableDeferred<Result<List<Streamer>>>()
+        var calls = 0
+        val viewModel = homeViewModel(
+            getStreamers = {
+                calls++
+                if (calls == 1) Result.success(freshStreamers) else network.await()
+            },
+        )
+        advanceUntilIdle()
+
+        viewModel.onRefresh()
+        advanceUntilIdle()
+
+        val refreshing = viewModel.state.value
+        Assert.assertTrue(refreshing.isRefreshing)
+        Assert.assertFalse(refreshing.isLoading)
+        Assert.assertEquals(freshStreamers, refreshing.streamers)
+
+        val newStreamers = listOf(Streamer(id = "new-1", userName = "Locklear", imageUrl = ""))
+        network.complete(Result.success(newStreamers))
+        advanceUntilIdle()
+
+        Assert.assertFalse(viewModel.state.value.isRefreshing)
+        Assert.assertEquals(newStreamers, viewModel.state.value.streamers)
+    }
+
+    @Test
+    fun `onRefresh should refresh the banner too`() = runTest {
+        var bannerRefreshes = 0
+        val viewModel = HomeViewModel(
+            getStreamers = { Result.success(freshStreamers) },
+            getCachedDiscoveryStreamers = { emptyList() },
+            observeBanner = { flowOf(emptyList()) },
+            refreshBanner = {
+                bannerRefreshes++
+                Result.success(Unit)
+            },
+        )
+        advanceUntilIdle()
+
+        viewModel.onRefresh()
+        advanceUntilIdle()
+
+        Assert.assertEquals(2, bannerRefreshes)
+    }
+
+    @Test
+    fun `failed refresh should keep the current list and show a snackbar`() = runTest {
+        var calls = 0
+        val viewModel = homeViewModel(
+            getStreamers = {
+                calls++
+                if (calls == 1) Result.success(freshStreamers) else Result.failure(DomainException(DomainError.Network))
+            },
+        )
+        advanceUntilIdle()
+
+        viewModel.events.test {
+            viewModel.onRefresh()
+            advanceUntilIdle()
+
+            val event = awaitItem() as HomeUiEvent.ShowSnackBar
+            Assert.assertEquals(R.string.error_network, event.textRes)
+        }
+
+        val state = viewModel.state.value
+        Assert.assertEquals(freshStreamers, state.streamers)
+        Assert.assertFalse(state.isRefreshing)
+        Assert.assertFalse(state.shouldShowStreamersError)
+    }
+
+    @Test
+    fun `onRefresh should be ignored while a refresh is already running`() = runTest {
+        val network = CompletableDeferred<Result<List<Streamer>>>()
+        var calls = 0
+        val viewModel = homeViewModel(
+            getStreamers = {
+                calls++
+                if (calls == 1) Result.success(freshStreamers) else network.await()
+            },
+        )
+        advanceUntilIdle()
+
+        viewModel.onRefresh()
+        viewModel.onRefresh()
+        advanceUntilIdle()
+
+        Assert.assertEquals(2, calls)
+        network.complete(Result.success(freshStreamers))
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `switching tab during a refresh should stop the refresh indicator`() = runTest {
+        val network = CompletableDeferred<Result<List<Streamer>>>()
+        var calls = 0
+        val viewModel = homeViewModel(
+            getStreamers = {
+                calls++
+                if (calls == 2) network.await() else Result.success(freshStreamers)
+            },
+        )
+        advanceUntilIdle()
+
+        viewModel.onRefresh()
+        advanceUntilIdle()
+        viewModel.onTabClick(FilterEntity.Live)
+        advanceUntilIdle()
+
+        Assert.assertFalse(viewModel.state.value.isRefreshing)
+        Assert.assertEquals(FilterEntity.Live, viewModel.state.value.currentTab)
+    }
 }
 
 
