@@ -51,6 +51,7 @@ import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.spacer.VerticalSpacer
@@ -70,6 +71,7 @@ fun StreamerProfileScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+    val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
 
     LaunchedEffect(Unit) {
         viewModel.refresh()
@@ -89,6 +91,7 @@ fun StreamerProfileScreen(
         state = state,
         snackBarHostState = snackBarHostState,
         onEditProfileNav = onEditProfileNav,
+        onSocialClick = openExternalLink::invoke,
         onRetryClick = viewModel::refresh,
         onAccountClick = onAccountNav,
         modifier = modifier
@@ -101,6 +104,7 @@ private fun StreamerProfileScreen(
     state: ProfileUiState,
     snackBarHostState: SnackbarHostState,
     onEditProfileNav: () -> Unit,
+    onSocialClick: (String?) -> Unit,
     onRetryClick: () -> Unit,
     onAccountClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -140,6 +144,7 @@ private fun StreamerProfileScreen(
                 .padding(padding)
                 .fillMaxSize(),
             onEditProfileNav = onEditProfileNav,
+            onSocialClick = onSocialClick,
             onRetryClick = onRetryClick,
             state = state,
         )
@@ -150,6 +155,7 @@ private fun StreamerProfileScreen(
 private fun StreamerProfileContent(
     state: ProfileUiState,
     onEditProfileNav: () -> Unit,
+    onSocialClick: (String?) -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -172,6 +178,7 @@ private fun StreamerProfileContent(
             StreamerProfileSuccessContent(
                 streamer = state.streamer,
                 onEditProfileNav = onEditProfileNav,
+                onSocialClick = onSocialClick,
                 modifier = modifier
             )
         }
@@ -182,6 +189,7 @@ private fun StreamerProfileContent(
 private fun StreamerProfileSuccessContent(
     streamer: Streamer,
     onEditProfileNav: () -> Unit,
+    onSocialClick: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -252,7 +260,7 @@ private fun StreamerProfileSuccessContent(
                                     R.string.streamer_open_social,
                                     social.type.displayName(),
                                 ),
-                                onClick = { /* TODO : Gérer le clic réseau social */ }
+                                onClick = { onSocialClick(social.url) }
                             )
                         }
                     }
@@ -341,6 +349,7 @@ private fun StreamerProfileScreenPreview() {
                 )
             ),
             onEditProfileNav = {},
+            onSocialClick = {},
             onRetryClick = {},
             onAccountClick = {}
         )

@@ -1,6 +1,5 @@
 package com.strimup.feature.streamerdetail.presentation
 
-import android.content.ActivityNotFoundException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,13 +37,13 @@ import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
+import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import kotlinx.coroutines.launch
 
 @Composable
 fun StreamerDetailScreen(
@@ -58,9 +55,8 @@ fun StreamerDetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
-    val uriHandler = LocalUriHandler.current
     val resources = LocalResources.current
-    val coroutineScope = rememberCoroutineScope()
+    val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
 
     LaunchedEffect(streamerId) {
         viewModel.loadStreamer(streamerId)
@@ -81,17 +77,7 @@ fun StreamerDetailScreen(
         state = state,
         snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
-        onSocialClick = { socialUrl ->
-            if (!socialUrl.isNullOrBlank()) {
-                try {
-                    uriHandler.openUri(socialUrl)
-                } catch (_: ActivityNotFoundException) {
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
-                    }
-                }
-            }
-        },
+        onSocialClick = openExternalLink::invoke,
         onVideoClick = onVideoClick,
         onFavoriteClick = { viewModel.onFavoriteClick() },
         onRetryClick = { viewModel.loadStreamer(streamerId) }

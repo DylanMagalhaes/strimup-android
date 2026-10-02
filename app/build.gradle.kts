@@ -48,8 +48,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val baseUrl = localProperties.getProperty("BASE_URL") ?: "\"https://strimup-back-fd5v.onrender.com/\""
-        buildConfigField("String", "BASE_URL", baseUrl)
+        buildConfigField("String", "BASE_URL", "\"https://strimup-back-fd5v.onrender.com/\"")
     }
 
     signingConfigs {
@@ -64,6 +63,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            localProperties.getProperty("BASE_URL")?.let { baseUrl ->
+                buildConfigField("String", "BASE_URL", baseUrl)
+            }
+        }
         release {
             if (hasReleaseSigning) {
                 signingConfig = signingConfigs.getByName("release")

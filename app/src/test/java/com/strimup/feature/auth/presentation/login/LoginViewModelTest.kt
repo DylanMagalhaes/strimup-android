@@ -186,6 +186,23 @@ class LoginViewModelTest {
     }
 
     @Test
+    fun `onForgotPasswordClick should open the forgot password page`() = runTest {
+        // GIVEN
+        val viewModel = LoginViewModel(
+            login = { _, _ -> Result.success(fakeLoginResult) },
+            startTwitchLogin = { Result.success("") },
+        )
+
+        // WHEN & THEN
+        viewModel.event.test {
+            viewModel.onForgotPasswordClick()
+
+            val event = awaitItem() as LoginUiEvent.OpenCustomTab
+            assertThat(event.url).isEqualTo("https://www.strimup.com/forgot-password")
+        }
+    }
+
+    @Test
     fun `wrong credentials should show the server message instead of a session expiry`() = runTest {
         val viewModel = LoginViewModel(
             startTwitchLogin = noopStartTwitchLogin,

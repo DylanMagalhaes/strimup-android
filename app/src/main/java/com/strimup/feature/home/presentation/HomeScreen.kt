@@ -1,6 +1,5 @@
 package com.strimup.feature.home.presentation
 
-import android.content.ActivityNotFoundException
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -35,16 +34,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
+import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
@@ -56,7 +54,6 @@ import com.strimup.feature.home.presentation.component.HomeOfflineBanner
 import com.strimup.feature.home.presentation.component.HomeStreamersError
 import com.strimup.feature.home.presentation.component.HomeTabs
 import com.strimup.feature.notification.presentation.bell.NotificationBell
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -69,9 +66,8 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
-    val uriHandler = LocalUriHandler.current
     val resources = LocalResources.current
-    val coroutineScope = rememberCoroutineScope()
+    val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -88,35 +84,17 @@ fun HomeScreen(
         state = state,
         snackBarHostState = snackBarHostState,
         onStreamerClick = onStreamerClick,
-        onSocialClick = { socialUrl ->
-            if (!socialUrl.isNullOrBlank()) {
-                try {
-                    uriHandler.openUri(socialUrl)
-                } catch (_: ActivityNotFoundException) {
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
-                    }
-                }
-            }
-        },
+        onSocialClick = openExternalLink::invoke,
         onTabClick = viewModel::onTabClick,
         onRetryClick = viewModel::onRetryClick,
         onRefresh = viewModel::onRefresh,
         unreadNotificationCount = unreadNotificationCount,
         onNotificationsClick = onNotificationsClick,
         onBannerClick = { banner ->
-            if (!banner.linkUrl.isNullOrBlank()) {
-                try {
-                    if (banner.type == BannerType.FeaturedStreamer) {
-                        onStreamerBannerClick(banner.streamerId)
-                    } else {
-                        uriHandler.openUri(banner.linkUrl)
-                    }
-                } catch (_: ActivityNotFoundException) {
-                    coroutineScope.launch {
-                        snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
-                    }
-                }
+            when {
+                banner.linkUrl.isNullOrBlank() -> Unit
+                banner.type == BannerType.FeaturedStreamer -> onStreamerBannerClick(banner.streamerId)
+                else -> openExternalLink(banner.linkUrl)
             }
         }
     )
