@@ -63,7 +63,7 @@ class DefaultStreamerRepository @Inject constructor(
             val requestBody = avatarFile.bytes.toRequestBody(avatarFile.mimeType.toMediaTypeOrNull())
             val bodyPart = MultipartBody.Part.createFormData(
                 "avatar",
-                "profile_avatar.jpg",
+                "avatar.jpg",
                 requestBody
             )
 

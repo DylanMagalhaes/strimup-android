@@ -1,8 +1,8 @@
 package com.strimup.feature.streamerprofile.presentation.editprofile
 
-import androidx.annotation.StringRes
+import com.strimup.core.ui.text.UiText
 
 sealed interface EditProfileUiEvent {
-    data class ShowSnackBar(@StringRes val textRes: Int) : EditProfileUiEvent
+    data class ShowSnackBar(val message: UiText) : EditProfileUiEvent
     data object ProfileSaved : EditProfileUiEvent
 }

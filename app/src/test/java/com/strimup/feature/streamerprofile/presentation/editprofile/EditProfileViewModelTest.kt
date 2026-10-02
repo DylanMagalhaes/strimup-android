@@ -13,6 +13,8 @@ import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
+import com.strimup.core.ui.text.UiText
+import com.strimup.core.user.domain.UserRepository
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
@@ -22,6 +24,7 @@ import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerOptionsUseC
 import com.strimup.feature.streamerprofile.domain.usecase.GetStreamerUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -75,6 +78,18 @@ class EditProfileViewModelTest {
             override suspend fun invoke(id: String): Result<Streamer> = fn(id)
         }
 
+    private class FakeUserRepository : UserRepository {
+        val updatedAvatarUrls = mutableListOf<String>()
+
+        override fun getCurrentUser(): Flow<UserEntity?> = flowOf(null)
+
+        override suspend fun updateCurrentUserAvatar(avatarUrl: String) {
+            updatedAvatarUrls += avatarUrl
+        }
+    }
+
+    private val userRepository = FakeUserRepository()
+
     private fun buildViewModel(
         getStreamer: GetStreamerUseCase = getStreamerUseCase { Result.success(fakeStreamer) },
         getUser: GetUserFlowUseCase = GetUserFlowUseCase { flowOf(fakeUser) },
@@ -83,7 +98,7 @@ class EditProfileViewModelTest {
     ) = EditProfileViewModel(
         getStreamer = getStreamer,
         updateProfile = DefaultUpdateProfileUseCase(repository),
-        updateAvatar = DefaultUpdateAvatarUseCase(repository),
+        updateAvatar = DefaultUpdateAvatarUseCase(repository, userRepository),
         getUser = getUser,
         getOptions = GetStreamerOptionsUseCase(repository),
         getTags = getTags,
@@ -201,7 +216,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_unknown))
         }
         assertThat(viewModel.state.value.availableOptions).isEqualTo(
             StreamerOptions(emptyList(), emptyList(), emptyList(), emptyList())
@@ -222,7 +237,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_timeout)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_timeout))
         }
     }
 
@@ -238,7 +253,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_unknown))
         }
         assertThat(viewModel.state.value.availableTags).isEmpty()
         assertThat(viewModel.state.value.availableCategories).isEmpty()
@@ -256,7 +271,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_server)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_server))
         }
     }
 
@@ -558,7 +573,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_unknown))
         }
         assertThat(repository.updateProfileCallCount).isEqualTo(0)
         assertThat(viewModel.state.value.isSaving).isFalse()
@@ -580,8 +595,39 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_network)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_network))
         }
+    }
+
+    @Test
+    fun `saveProfile when the server rejects the avatar should show its message`() = runTest {
+        val repository = FakeStreamerRepository(
+            avatarResult = Result.failure(DomainException(DomainError.Server(400, "Fichier trop volumineux"))),
+        )
+        val viewModel = buildViewModel(repository = repository)
+        advanceUntilIdle()
+        viewModel.onImageSelected("content://media/42")
+
+        viewModel.events.test {
+            viewModel.saveProfile()
+            advanceUntilIdle()
+
+            val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
+            assertThat(event.message).isEqualTo(UiText.Dynamic("Fichier trop volumineux"))
+        }
+    }
+
+    @Test
+    fun `saveProfile with a new avatar should update the avatar of the local user`() = runTest {
+        val repository = FakeStreamerRepository(avatarResult = Result.success("https://example.com/new-avatar.jpg"))
+        val viewModel = buildViewModel(repository = repository)
+        advanceUntilIdle()
+        viewModel.onImageSelected("content://media/42")
+
+        viewModel.saveProfile()
+        advanceUntilIdle()
+
+        assertThat(userRepository.updatedAvatarUrls).containsExactly("https://example.com/new-avatar.jpg")
     }
 
     @Test
@@ -623,7 +669,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_unknown)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_unknown))
         }
         assertThat(viewModel.state.value.isSaving).isFalse()
     }
@@ -643,7 +689,7 @@ class EditProfileViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as EditProfileUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_unauthorized)
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_unauthorized))
         }
     }
 

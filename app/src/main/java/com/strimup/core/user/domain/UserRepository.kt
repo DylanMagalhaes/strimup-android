@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     fun getCurrentUser(): Flow<UserEntity?>
+
+    suspend fun updateCurrentUserAvatar(avatarUrl: String)
 }

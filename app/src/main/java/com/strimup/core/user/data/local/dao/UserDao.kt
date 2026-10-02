@@ -16,6 +16,9 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: UserRoomEntity)
 
+    @Query("UPDATE users SET imageUrl = :avatarUrl")
+    suspend fun updateAvatarUrl(avatarUrl: String)
+
     @Query("DELETE FROM users")
     suspend fun deleteAllUsers()
 }
