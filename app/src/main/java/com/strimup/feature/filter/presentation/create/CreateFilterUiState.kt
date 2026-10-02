@@ -1,5 +1,6 @@
 package com.strimup.feature.filter.presentation.create
 
+import androidx.annotation.StringRes
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterOptionsEntity
@@ -9,7 +10,7 @@ sealed interface CreateFilterUiState {
 
     data class Content(
         val filterName: String = "",
-        val nameError: String? = null,
+        @param:StringRes val nameError: Int? = null,
         val criteria: FilterCriteria = FilterCriteria(),
         val isSubmitting: Boolean = false,
         val availableOptions: FilterOptionsEntity? = null,

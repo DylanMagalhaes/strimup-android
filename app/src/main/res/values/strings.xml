@@ -146,6 +146,37 @@
     <string name="tags_category_placeholder">Choisis une catégorie</string>
     <string name="tags_select_category">Choisir une catégorie</string>
 
+    <!-- Filters -->
+    <string name="filters_title">Mes filtres</string>
+    <string name="filters_create">Créer un filtre</string>
+    <string name="filters_empty_title">Aucun filtre enregistré</string>
+    <string name="filters_empty_description">Crée tes filtres personnalisés pour retrouver rapidement tes streamers.</string>
+    <string name="filter_options">Options du filtre</string>
+    <string name="filter_delete">Supprimer</string>
+    <string name="filter_editor_title">Filtre</string>
+    <string name="filter_criteria_section">Critères de recherche</string>
+    <string name="filter_name">Nom du filtre</string>
+    <string name="filter_name_hint">Donne un nom clair à ton filtre</string>
+    <string name="filter_name_error_blank">Le nom du filtre ne peut pas être vide</string>
+    <string name="filter_tags">Tags</string>
+    <string name="filter_tags_title">Tags du filtre</string>
+    <string name="filter_tags_description">Sélectionne les tags recherchés pour cibler des streamers spécifiques.</string>
+    <string name="filter_personality">Personnalité</string>
+    <string name="filter_personalities">Personnalités</string>
+    <string name="filter_platforms">Plateformes</string>
+    <string name="filter_age_range">Tranche d\'âge</string>
+    <string name="filter_age_range_value">%1$d - %2$d ans</string>
+    <string name="filter_age_range_short">%1$d-%2$d ans</string>
+    <string name="filter_average_viewers_value">%1$s viewers</string>
+    <string name="filter_results_default_title">Résultats du filtre</string>
+    <string name="filter_results_live_only">En live</string>
+    <string name="filter_results_empty_title">Aucun streamer trouvé</string>
+    <string name="filter_results_empty_description">Essaie de modifier tes critères de recherche.</string>
+    <plurals name="filter_results_count_label">
+        <item quantity="one">streamer trouvé</item>
+        <item quantity="other">streamers trouvés</item>
+    </plurals>
+
     <!-- Account -->
     <string name="account_title">Mon compte</string>
     <string name="account_section_preferences">Préférences</string>

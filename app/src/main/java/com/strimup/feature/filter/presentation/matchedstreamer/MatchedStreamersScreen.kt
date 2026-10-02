@@ -39,12 +39,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
@@ -112,8 +115,8 @@ fun MatchedStreamersScreen(
     modifier: Modifier = Modifier
 ) {
     val topBarTitle = when (state) {
-        is MatchedStreamersUiState.Success -> state.filterName ?: "Résultat filtre"
-        else -> "Résultat filtre"
+        is MatchedStreamersUiState.Success -> state.filterName ?: stringResource(R.string.filter_results_default_title)
+        else -> stringResource(R.string.filter_results_default_title)
     }
 
     Scaffold(
@@ -134,7 +137,7 @@ fun MatchedStreamersScreen(
                     IconButton(onClick = onNavUp) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Retour"
+                            contentDescription = stringResource(R.string.action_back)
                         )
                     }
                 }
@@ -272,7 +275,7 @@ private fun TotalStreamersHeader(
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = if (total > 1) "streamers trouvés" else "streamer trouvé",
+                text = pluralStringResource(R.plurals.filter_results_count_label, total),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -302,7 +305,7 @@ private fun TotalStreamersHeader(
                 )
 
                 Text(
-                    text = "En live",
+                    text = stringResource(R.string.filter_results_live_only),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = if (isLive) FontWeight.Bold else FontWeight.Medium,
                     color = if (isLive) Color(0xFFFF2E4D) else MaterialTheme.colorScheme.onSurfaceVariant
@@ -331,7 +334,7 @@ private fun EmptyMatchedStreamers(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Aucun streamer trouvé",
+                text = stringResource(R.string.filter_results_empty_title),
                 fontFamily = zalandoFontFamily,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -339,7 +342,7 @@ private fun EmptyMatchedStreamers(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Essayez de modifier vos critères de recherche.",
+                text = stringResource(R.string.filter_results_empty_description),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

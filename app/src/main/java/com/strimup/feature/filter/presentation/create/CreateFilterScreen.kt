@@ -33,12 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.ui.component.editrow.ProfileEditRow
 import com.strimup.core.ui.component.editsBottomSheet.EditTextBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
@@ -84,7 +86,7 @@ fun CreateFilterScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Filtre",
+                        text = stringResource(R.string.filter_editor_title),
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -94,7 +96,7 @@ fun CreateFilterScreen(
                     IconButton(onClick = onNavUp) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Retour"
+                            contentDescription = stringResource(R.string.action_back)
                         )
                     }
                 },
@@ -107,7 +109,7 @@ fun CreateFilterScreen(
                             enabled = contentState?.isFormValid == true
                         ) {
                             Text(
-                                text = "Enregistrer",
+                                text = stringResource(R.string.action_save),
                                 fontFamily = zalandoFontFamily,
                                 fontWeight = FontWeight.Bold,
                                 color = if (contentState?.isFormValid == true) {
@@ -160,20 +162,20 @@ fun CreateFilterScreen(
                 when (uiState.activeEdit) {
                     ActiveEditType.FilterName -> {
                         EditTextBottomSheet(
-                            title = "Nom du filtre",
+                            title = stringResource(R.string.filter_name),
                             currentText = uiState.filterName,
                             onDone = { filterName ->
                                 viewModel.onFilterNameChange(filterName)
                                 viewModel.dismissEdit()
                             },
                             onDismiss = { viewModel.dismissEdit() },
-                            description = "Donne un nom clair à ton filtre"
+                            description = stringResource(R.string.filter_name_hint)
                         )
                     }
 
                     ActiveEditType.Personalities -> {
                         MultipleSelectBottomSheet(
-                            title = "Personnalités",
+                            title = stringResource(R.string.filter_personalities),
                             options = availableOptions.personalities,
                             selectedOptions = uiState.criteria.personalities,
                             onOptionSelected = { personality ->
@@ -185,7 +187,7 @@ fun CreateFilterScreen(
 
                     ActiveEditType.StreamFrequency -> {
                         SingleSelectBottomSheet(
-                            title = "Fréquence de stream",
+                            title = stringResource(R.string.profile_stream_frequency),
                             options = availableOptions.streamFrequencies,
                             selectedOption = uiState.criteria.streamFrequency,
                             onOptionSelected = { newFrequency ->
@@ -198,7 +200,7 @@ fun CreateFilterScreen(
 
                     ActiveEditType.AverageViewers -> {
                         SingleSelectBottomSheet(
-                            title = "Nombre de viewers moyen",
+                            title = stringResource(R.string.profile_average_viewers),
                             options = availableOptions.averageViewers,
                             selectedOption = uiState.criteria.averageViewers,
                             onOptionSelected = { newAverage ->
@@ -211,7 +213,7 @@ fun CreateFilterScreen(
 
                     ActiveEditType.Languages -> {
                         MultipleSelectBottomSheet(
-                            title = "Langues",
+                            title = stringResource(R.string.profile_languages),
                             options = availableOptions.languages,
                             selectedOptions = uiState.criteria.languages,
                             onOptionSelected = { language ->
@@ -223,7 +225,7 @@ fun CreateFilterScreen(
 
                     ActiveEditType.Platforms -> {
                         MultipleSelectBottomSheet(
-                            title = "Plateformes",
+                            title = stringResource(R.string.filter_platforms),
                             options = availableOptions.platforms,
                             selectedOptions = uiState.criteria.platforms,
                             onOptionSelected = { platform ->
@@ -262,7 +264,7 @@ fun CreateFilterContent(
     ) {
         item {
             Text(
-                text = "Critère de recherche",
+                text = stringResource(R.string.filter_criteria_section),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -279,8 +281,8 @@ fun CreateFilterContent(
             ) {
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
                     ProfileEditRow(
-                        label = "Nom du filtre",
-                        value = state.filterName.ifEmpty { "Non renseigné" },
+                        label = stringResource(R.string.filter_name),
+                        value = state.filterName,
                         onClick = onEditFilterNameClicked
                     )
 
@@ -289,41 +291,33 @@ fun CreateFilterContent(
                     )
 
                     ProfileEditRow(
-                        label = "Tags",
-                        value = state.criteria.tags.map { it.name }.ifEmpty { listOf("Non renseigné") }.joinToString(
-                            ", "
-                        ),
+                        label = stringResource(R.string.filter_tags),
+                        value = state.criteria.tags.joinToString(", ") { it.name },
                         onClick = onEditTagClicked
                     )
                     ProfileEditRow(
-                        label = "Personnalité",
-                        value = state.criteria.personalities.ifEmpty { listOf("Non renseigné") }.joinToString(
-                            ", "
-                        ),
+                        label = stringResource(R.string.filter_personality),
+                        value = state.criteria.personalities.joinToString(", "),
                         onClick = onEditPersonalitiesClicked
                     )
                     ProfileEditRow(
-                        label = "Fréquence de stream",
-                        value = state.criteria.streamFrequency.ifEmpty { "Non renseigné" },
+                        label = stringResource(R.string.profile_stream_frequency),
+                        value = state.criteria.streamFrequency,
                         onClick = onEditStreamFrequencyClicked
                     )
                     ProfileEditRow(
-                        label = "Nombre de viewers moyen",
-                        value = state.criteria.averageViewers.ifEmpty { "Non renseigné" },
+                        label = stringResource(R.string.profile_average_viewers),
+                        value = state.criteria.averageViewers,
                         onClick = onEditAverageViewersClicked
                     )
                     ProfileEditRow(
-                        label = "Langues",
-                        value = state.criteria.languages.ifEmpty { listOf("Non renseigné") }.joinToString(
-                            ", "
-                        ),
+                        label = stringResource(R.string.profile_languages),
+                        value = state.criteria.languages.joinToString(", "),
                         onClick = onEditLanguagesClicked
                     )
                     ProfileEditRow(
-                        label = "Plateformes",
-                        value = state.criteria.platforms.ifEmpty { listOf("Non renseigné") }.joinToString(
-                            ", "
-                        ),
+                        label = stringResource(R.string.filter_platforms),
+                        value = state.criteria.platforms.joinToString(", "),
                         onClick = onEditPlatformsClicked
                     )
                 }

@@ -138,7 +138,7 @@ class CreateFilterViewModelTest {
 
         // THEN
         val state = viewModel.state.value as CreateFilterUiState.Content
-        assertThat(state.nameError).isEqualTo("Le nom du filtre ne peut pas être vide")
+        assertThat(state.nameError).isEqualTo(R.string.filter_name_error_blank)
         assertThat(createCalled).isFalse()
     }
 

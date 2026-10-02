@@ -2,6 +2,7 @@ package com.strimup.feature.filter.presentation.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
 import com.strimup.core.network.toDomainError
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
@@ -84,7 +85,7 @@ class CreateFilterViewModel @Inject constructor(
         val criteria = currentState.criteria
 
         if (filterName.isBlank()) {
-            updateContentState { it.copy(nameError = "Le nom du filtre ne peut pas être vide") }
+            updateContentState { it.copy(nameError = R.string.filter_name_error_blank) }
             return
         }
 
