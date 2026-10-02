@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -122,7 +123,7 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
                     .padding(top = 16.dp)
                     .size(72.dp),
                 painter = painterResource(R.drawable.ic_strimup),
-                contentDescription = "Strimup icon",
+                contentDescription = stringResource(R.string.auth_logo_description),
             )
             Text(
                 modifier = Modifier
@@ -134,7 +135,7 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Bold,
                 text = buildAnnotatedString {
-                    append("Connexion")
+                    append(stringResource(R.string.login_title))
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                         append(".")
                     }
@@ -144,13 +145,13 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
             StrimupTextField(
                 value = emailValue,
                 onValueChange = onEmailChange,
-                label = "Email",
+                label = stringResource(R.string.auth_email_label),
             )
 
             StrimupTextField(
                 value = passwordValue,
                 onValueChange = onPasswordChange,
-                label = "Mot de passe",
+                label = stringResource(R.string.auth_password_label),
                 isPassword = true,
             )
 
@@ -160,13 +161,13 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End,
-                    text = "Mot de passe oublié ?"
+                    text = stringResource(R.string.login_forgot_password)
                 )
             }
 
             PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
-                label = if (state.isLoading) "Connexion en cours..." else "Se connecter",
+                label = stringResource(if (state.isLoading) R.string.login_submit_loading else R.string.login_submit),
                 onClick = onLoginClick,
             )
 
@@ -177,14 +178,14 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Pas encore de compte ?",
+                    text = stringResource(R.string.login_no_account),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                 )
 
                 TextButton(
                     onClick = onNavToRegister,
                 ) {
-                    Text(text = "S'inscrire")
+                    Text(text = stringResource(R.string.login_register_link))
                 }
             }
         }

@@ -19,6 +19,10 @@
     <!-- Actions -->
     <string name="action_retry">Réessayer</string>
     <string name="action_back">Retour</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="password_show">Montrer le mot de passe</string>
+    <string name="password_hide">Cacher le mot de passe</string>
 
     <!-- Gender -->
     <string name="gender_male">Homme</string>
@@ -75,6 +79,37 @@
     <string name="oauth_onboarding_submit">Continuer</string>
     <string name="oauth_onboarding_submit_loading">Finalisation…</string>
 
+    <!-- Auth -->
+    <string name="auth_logo_description">Logo Strimup</string>
+    <string name="auth_email_label">E-mail</string>
+    <string name="auth_password_label">Mot de passe</string>
+    <string name="auth_birth_date_label">Date de naissance</string>
+    <string name="auth_birth_date_pick">Choisir ta date de naissance</string>
+    <string name="auth_gender_label">Sexe</string>
+    <string name="auth_gender_pick">Choisir ton sexe</string>
+    <string name="auth_role_label">Je suis un(e)</string>
+    <string name="auth_role_pick">Choisir ton profil</string>
+    <string name="auth_legal_sentence">%1$s les %2$s et la %3$s.</string>
+    <string name="auth_legal_terms">CGU</string>
+    <string name="auth_legal_privacy_policy">politique de confidentialité</string>
+    <string name="auth_oauth_divider">Ou continuer avec</string>
+    <string name="auth_oauth_legal_prefix">En continuant avec Twitch, j\'accepte</string>
+    <string name="login_title">Connexion</string>
+    <string name="login_forgot_password">Mot de passe oublié ?</string>
+    <string name="login_submit">Se connecter</string>
+    <string name="login_submit_loading">Connexion en cours…</string>
+    <string name="login_no_account">Pas encore de compte ?</string>
+    <string name="login_register_link">S\'inscrire</string>
+    <string name="register_title">Créer un compte</string>
+    <string name="register_pseudo_label">Pseudo</string>
+    <string name="register_password_confirmation_label">Confirmation</string>
+    <string name="register_legal_prefix">J\'accepte</string>
+    <string name="register_submit">S\'inscrire</string>
+    <string name="register_submit_loading">Inscription en cours…</string>
+    <string name="register_has_account">Déjà un compte ?</string>
+    <string name="register_login_link">Se connecter</string>
+    <string name="oauth_onboarding_legal_prefix">En continuant, j\'accepte</string>
+
     <!-- Account -->
     <string name="account_title">Mon compte</string>
     <string name="account_section_preferences">Préférences</string>
@@ -96,8 +131,6 @@
     <string name="account_deletion_confirmation_label">Confirmation</string>
     <string name="account_deletion_password_instruction">Saisis ton mot de passe pour confirmer qu\'il s\'agit bien de toi.</string>
     <string name="account_deletion_password_label">Mot de passe</string>
-    <string name="account_deletion_password_show">Montrer le mot de passe</string>
-    <string name="account_deletion_password_hide">Cacher le mot de passe</string>
     <string name="account_deletion_submit">Supprimer définitivement</string>
     <string name="account_deletion_success">Ton compte a bien été supprimé.</string>
     <string name="account_deletion_error_invalid_password">Mot de passe incorrect.</string>

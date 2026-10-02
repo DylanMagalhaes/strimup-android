@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import com.strimup.R
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import java.time.Instant
 import java.time.ZoneOffset
@@ -49,7 +50,7 @@ fun AuthDateField(
         StrimupTextField(
             value = dateTextValue,
             onValueChange = {},
-            label = "Date de naissance",
+            label = stringResource(R.string.auth_birth_date_label),
             errorText = errorText,
             trailingIcon = {
                 Icon(
@@ -60,7 +61,7 @@ fun AuthDateField(
         )
 
         ClickableFieldOverlay(
-            onClickLabel = "Sélectionner la date",
+            onClickLabel = stringResource(R.string.auth_birth_date_pick),
             role = Role.Button,
             onClick = { onExpandedChange(!isExpanded) },
         )
@@ -79,12 +80,12 @@ fun AuthDateField(
                     onExpandedChange(false)
                 }
             ) {
-                Text("OK")
+                Text(stringResource(R.string.action_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = { onExpandedChange(false) }) {
-                Text("Annuler")
+                Text(stringResource(R.string.action_cancel))
             }
         }
     ) {
