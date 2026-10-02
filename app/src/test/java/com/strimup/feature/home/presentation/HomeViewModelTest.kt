@@ -1,9 +1,15 @@
 package com.strimup.feature.home.presentation
 
+import app.cash.turbine.test
+import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.FilterEntity
+import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
 import com.strimup.util.MainDispatcherRule
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -33,6 +39,7 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
+            getCachedDiscoveryStreamers = { emptyList() },
             observeBanner = { flowOf(bannerItems) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -52,6 +59,7 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
+            getCachedDiscoveryStreamers = { emptyList() },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.failure(Exception()) },
         )
@@ -83,6 +91,7 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(streamers) },
+            getCachedDiscoveryStreamers = { emptyList() },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -99,6 +108,7 @@ class HomeViewModelTest {
         //WHEN
         val viewModel = HomeViewModel(
             getStreamers = { Result.failure(Exception()) },
+            getCachedDiscoveryStreamers = { emptyList() },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -147,6 +157,7 @@ class HomeViewModelTest {
                 }
                 Result.success(list)
             },
+            getCachedDiscoveryStreamers = { emptyList() },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -167,6 +178,7 @@ class HomeViewModelTest {
 
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
+            getCachedDiscoveryStreamers = { emptyList() },
             observeBanner = { flowOf(cachedItems) },
             refreshBanner = { Result.failure(Exception()) },
         )
@@ -174,6 +186,121 @@ class HomeViewModelTest {
 
         Assert.assertEquals(cachedItems, viewModel.state.value.bannerItems)
         Assert.assertFalse(viewModel.state.value.isBannerLoading)
+    }
+
+    private val cachedStreamers = listOf(
+        Streamer(id = "cached-1", userName = "Inox", imageUrl = ""),
+        Streamer(id = "cached-2", userName = "Gotaga", imageUrl = ""),
+    )
+
+    private val freshStreamers = listOf(
+        Streamer(id = "fresh-1", userName = "Squeezie", imageUrl = "", isLive = true),
+    )
+
+    private fun homeViewModel(
+        getStreamers: GetStreamersUseCase,
+        cached: List<Streamer> = cachedStreamers,
+    ) = HomeViewModel(
+        getStreamers = getStreamers,
+        getCachedDiscoveryStreamers = { cached },
+        observeBanner = { flowOf(emptyList()) },
+        refreshBanner = { Result.success(Unit) },
+    )
+
+    @Test
+    fun `discovery should show saved streamers immediately while the network is loading`() = runTest {
+        val network = CompletableDeferred<Result<List<Streamer>>>()
+        val viewModel = homeViewModel(getStreamers = { network.await() })
+
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        Assert.assertEquals(cachedStreamers, state.streamers)
+        Assert.assertFalse(state.isLoading)
+        Assert.assertFalse(state.isShowingSavedContent)
+
+        network.complete(Result.success(freshStreamers))
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `fresh streamers should replace the saved ones`() = runTest {
+        val viewModel = homeViewModel(getStreamers = { Result.success(freshStreamers) })
+
+        advanceUntilIdle()
+
+        Assert.assertEquals(freshStreamers, viewModel.state.value.streamers)
+        Assert.assertFalse(viewModel.state.value.isShowingSavedContent)
+    }
+
+    @Test
+    fun `offline discovery should keep saved streamers and flag them without error`() = runTest {
+        val viewModel = homeViewModel(getStreamers = { Result.failure(DomainException(DomainError.Network)) })
+
+        viewModel.events.test {
+            advanceUntilIdle()
+            expectNoEvents()
+        }
+
+        val state = viewModel.state.value
+        Assert.assertEquals(cachedStreamers, state.streamers)
+        Assert.assertTrue(state.isShowingSavedContent)
+        Assert.assertFalse(state.shouldShowStreamersError)
+    }
+
+    @Test
+    fun `offline discovery without saved streamers should show a retryable error`() = runTest {
+        val viewModel = homeViewModel(
+            getStreamers = { Result.failure(DomainException(DomainError.Network)) },
+            cached = emptyList(),
+        )
+
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        Assert.assertTrue(state.shouldShowStreamersError)
+        Assert.assertEquals(R.string.error_network, state.errorMessageRes)
+    }
+
+    @Test
+    fun `live tab should never show saved streamers when offline`() = runTest {
+        val viewModel = homeViewModel(
+            getStreamers = { filter ->
+                if (filter == FilterEntity.Live) {
+                    Result.failure(DomainException(DomainError.Network))
+                } else {
+                    Result.success(freshStreamers)
+                }
+            },
+        )
+        advanceUntilIdle()
+
+        viewModel.onTabClick(FilterEntity.Live)
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        Assert.assertTrue(state.streamers.isEmpty())
+        Assert.assertTrue(state.shouldShowStreamersError)
+        Assert.assertFalse(state.isShowingSavedContent)
+    }
+
+    @Test
+    fun `onRetryClick should load the current tab again`() = runTest {
+        var calls = 0
+        val viewModel = homeViewModel(
+            getStreamers = {
+                calls++
+                if (calls == 1) Result.failure(DomainException(DomainError.Network)) else Result.success(freshStreamers)
+            },
+            cached = emptyList(),
+        )
+        advanceUntilIdle()
+
+        viewModel.onRetryClick()
+        advanceUntilIdle()
+
+        Assert.assertEquals(freshStreamers, viewModel.state.value.streamers)
+        Assert.assertFalse(viewModel.state.value.shouldShowStreamersError)
     }
 }
 

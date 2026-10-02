@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.home.domain.entity.FilterEntity
+import com.strimup.feature.home.domain.usecase.GetCachedDiscoveryStreamersUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
 import com.strimup.feature.home.domain.usecase.ObserveBannerUseCase
 import com.strimup.feature.home.domain.usecase.RefreshBannerUseCase
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getStreamers: GetStreamersUseCase,
+    private val getCachedDiscoveryStreamers: GetCachedDiscoveryStreamersUseCase,
     private val observeBanner: ObserveBannerUseCase,
     private val refreshBanner: RefreshBannerUseCase,
 ) : ViewModel() {
@@ -39,6 +41,31 @@ class HomeViewModel @Inject constructor(
         fetchStreamersJob = fetchStreamers(state.value.currentTab)
     }
 
+    fun onTabClick(filter: FilterEntity) {
+        if (state.value.currentTab == filter && !state.value.isLoading) return
+        reloadStreamers(filter)
+    }
+
+    fun onRetryClick() {
+        refreshBannerItems()
+        reloadStreamers(state.value.currentTab)
+    }
+
+    private fun reloadStreamers(filter: FilterEntity) {
+        fetchStreamersJob?.cancel()
+
+        state.update {
+            it.copy(
+                isLoading = true,
+                currentTab = filter,
+                errorMessageRes = null,
+                isShowingSavedContent = false,
+            )
+        }
+
+        fetchStreamersJob = fetchStreamers(filter)
+    }
+
     private fun observeBannerItems() {
         viewModelScope.launch {
             observeBanner().collect { bannerItems ->
@@ -55,39 +82,21 @@ class HomeViewModel @Inject constructor(
     private fun refreshBannerItems() {
         viewModelScope.launch {
             refreshBanner()
-                .onSuccess {
-                    state.update { it.copy(isBannerLoading = false) }
-                }
-                .onFailure { exception ->
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    state.update {
-                        it.copy(
-                            isBannerLoading = false,
-                            errorMessageRes = messageRes,
-                        )
-                    }
-                }
+            state.update { it.copy(isBannerLoading = false) }
         }
-    }
-
-    fun onTabClick(filter: FilterEntity) {
-        if (state.value.currentTab == filter && !state.value.isLoading) return
-
-        fetchStreamersJob?.cancel()
-
-        state.update {
-            it.copy(
-                isLoading = true,
-                currentTab = filter,
-                errorMessageRes = null,
-            )
-        }
-
-        fetchStreamersJob = fetchStreamers(filter)
     }
 
     private fun fetchStreamers(filter: FilterEntity): Job {
         return viewModelScope.launch {
+            val savedStreamers = when (filter) {
+                FilterEntity.Discovery -> getCachedDiscoveryStreamers()
+                FilterEntity.Live -> emptyList()
+            }
+
+            if (savedStreamers.isNotEmpty()) {
+                state.update { it.copy(streamers = savedStreamers, isLoading = false) }
+            }
+
             getStreamers(filter)
                 .onSuccess { streamers ->
                     state.update {
@@ -95,15 +104,23 @@ class HomeViewModel @Inject constructor(
                             streamers = streamers,
                             isLoading = false,
                             errorMessageRes = null,
+                            isShowingSavedContent = false,
                         )
                     }
                 }
                 .onFailure { exception ->
+                    if (savedStreamers.isNotEmpty()) {
+                        state.update { it.copy(isShowingSavedContent = true) }
+                        return@onFailure
+                    }
+
                     val messageRes = exception.toDomainError().toMessageRes()
                     state.update {
                         it.copy(
+                            streamers = emptyList(),
                             isLoading = false,
                             errorMessageRes = messageRes,
+                            isShowingSavedContent = false,
                         )
                     }
                     _events.send(HomeUiEvent.ShowSnackBar(messageRes))
