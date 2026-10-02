@@ -1,6 +1,5 @@
 package com.strimup.feature.auth.data.mapper
 
-import com.strimup.core.user.data.local.model.UserRoomEntity
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.data.response.UserLoggedResponse
@@ -18,25 +17,5 @@ fun UserLoggedResponse.toEntity(): LoginResultEntity {
             role = UserRole.fromApi(userLogged.role),
             avatarUrl = this.userLogged.avatarUrl
             )
-    )
-}
-
-fun UserEntity.toRoomEntity(): UserRoomEntity {
-    return UserRoomEntity(
-        id = this.id,
-        userName = this.userName,
-        email = this.email,
-        role = this.role.name,
-        imageUrl = this.avatarUrl
-    )
-}
-
-fun UserRoomEntity.toDomainEntity(): UserEntity {
-    return UserEntity(
-        id = this.id,
-        userName = this.userName,
-        email = this.email,
-        role = UserRole.fromApi(this.role),
-        avatarUrl = this.imageUrl
     )
 }

@@ -226,7 +226,7 @@ fun RegisterContent(
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Bold,
                     text = buildAnnotatedString {
-                        append("Creer un compte")
+                        append("Créer un compte")
                         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                             append(".")
                         }

@@ -3,6 +3,9 @@ package com.strimup.feature.auth.presentation.login
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.common.DomainException
+import com.strimup.core.ui.text.UiText
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.auth.domain.entity.LoginResultEntity
@@ -123,7 +126,7 @@ class LoginViewModelTest {
     @Test
     fun `onLoginButtonClick when login fails should reset isLoading and emit ShowSnackBar event`() = runTest {
         // GIVEN
-        val errorMessage = "Identifiants invalides"
+        val errorMessage = "Erreur technique brute"
         val viewModel = LoginViewModel(
             startTwitchLogin = noopStartTwitchLogin,
             login = LoginUseCase { _, _ -> Result.failure(Exception(errorMessage)) }
@@ -140,7 +143,7 @@ class LoginViewModelTest {
             assertThat(event).isInstanceOf(LoginUiEvent.ShowSnackBar::class.java)
 
             val snackBarEvent = event as LoginUiEvent.ShowSnackBar
-            assertThat(snackBarEvent.text).isEqualTo(errorMessage)
+            assertThat(snackBarEvent.message).isEqualTo(UiText.Resource(R.string.error_unknown))
             
             val state = viewModel.state.value
             assertThat(state.isLoading).isFalse()
@@ -177,8 +180,44 @@ class LoginViewModelTest {
         viewModel.event.test {
             viewModel.onTwitchLoginClick()
 
-            val event = awaitItem() as LoginUiEvent.ShowSnackBarRes
-            assertThat(event.textRes).isEqualTo(R.string.oauth_error_failed)
+            val event = awaitItem() as LoginUiEvent.ShowSnackBar
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.oauth_error_failed))
+        }
+    }
+
+    @Test
+    fun `wrong credentials should show the server message instead of a session expiry`() = runTest {
+        val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
+            login = { _, _ ->
+                Result.failure(DomainException(DomainError.Server(401, "E-mail ou mot de passe incorrect")))
+            },
+        )
+        viewModel.onEmailChange("test@strimup.com")
+        viewModel.onPasswordChange("wrong")
+
+        viewModel.event.test {
+            viewModel.onLoginButtonClick()
+
+            val event = awaitItem() as LoginUiEvent.ShowSnackBar
+            assertThat(event.message).isEqualTo(UiText.Dynamic("E-mail ou mot de passe incorrect"))
+        }
+    }
+
+    @Test
+    fun `wrong credentials without server message should show the default message`() = runTest {
+        val viewModel = LoginViewModel(
+            startTwitchLogin = noopStartTwitchLogin,
+            login = { _, _ -> Result.failure(DomainException(DomainError.Server(401))) },
+        )
+        viewModel.onEmailChange("test@strimup.com")
+        viewModel.onPasswordChange("wrong")
+
+        viewModel.event.test {
+            viewModel.onLoginButtonClick()
+
+            val event = awaitItem() as LoginUiEvent.ShowSnackBar
+            assertThat(event.message).isEqualTo(UiText.Resource(R.string.error_invalid_credentials))
         }
     }
 

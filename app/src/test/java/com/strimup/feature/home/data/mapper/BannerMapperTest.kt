@@ -2,6 +2,7 @@ package com.strimup.feature.home.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import com.strimup.feature.home.data.response.BannerItemsResponse
+import com.strimup.feature.home.domain.entity.BannerType
 import org.junit.Test
 
 class BannerMapperTest {
@@ -26,7 +27,7 @@ class BannerMapperTest {
         val actual = response.toRoomEntity(orderIndex = 0).toDomain()
 
         // THEN
-        assertThat(actual.type).isEqualTo("FEATURED_STREAMER")
+        assertThat(actual.type).isEqualTo(BannerType.FeaturedStreamer)
         assertThat(actual.title).isEqualTo("Streamer de la semaine")
         assertThat(actual.description).isEqualTo("Decouvre raziu")
         assertThat(actual.imageUrl).isEqualTo("https://cdn/banner.png")

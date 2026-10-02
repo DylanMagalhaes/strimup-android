@@ -41,6 +41,7 @@ import com.strimup.core.ui.browser.openInCustomTab
 import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.text.asString
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.auth.presentation.component.AuthOAuthSection
@@ -60,11 +61,7 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
         viewModel.event.collect { event ->
             when (event) {
                 is LoginUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(event.text)
-                }
-
-                is LoginUiEvent.ShowSnackBarRes -> {
-                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
+                    snackBarHostState.showSnackbar(event.message.asString(resources))
                 }
 
                 is LoginUiEvent.OpenCustomTab -> {

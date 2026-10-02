@@ -5,11 +5,12 @@ import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
 import com.strimup.core.network.toDomainResult
 import com.strimup.core.user.data.local.dao.UserDao
+import com.strimup.core.user.data.mapper.toRoomEntity
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
 import com.strimup.feature.auth.data.local.LocalSessionDataSource
 import com.strimup.feature.auth.data.local.OAuthVerifierDataSource
+import com.strimup.feature.auth.data.mapper.asInvalidCredentialsError
 import com.strimup.feature.auth.data.mapper.toEntity
-import com.strimup.feature.auth.data.mapper.toRoomEntity
 import com.strimup.feature.auth.data.pkce.Pkce
 import com.strimup.feature.auth.data.request.LoginRequest
 import com.strimup.feature.auth.data.request.LogoutRequest
@@ -45,7 +46,8 @@ class DefaultAuthRepository @Inject constructor(
             userDao.insertUser(loginResult.user.toRoomEntity())
 
             loginResult
-        }.toDomainResult()
+        }.recoverCatching { throwable -> throw throwable.asInvalidCredentialsError() }
+            .toDomainResult()
     }
 
     override suspend fun register(credentials: RegisterCredentials): Result<LoginResultEntity> {
