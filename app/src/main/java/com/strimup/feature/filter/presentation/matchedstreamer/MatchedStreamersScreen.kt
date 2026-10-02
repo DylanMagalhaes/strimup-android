@@ -38,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +50,7 @@ import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
+import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -67,8 +67,8 @@ fun MatchedStreamersScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
-    val uriHandler = LocalUriHandler.current
     val resources = LocalResources.current
+    val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
 
     LaunchedEffect(filterId) {
         viewModel.initData(filterId)
@@ -89,11 +89,7 @@ fun MatchedStreamersScreen(
         snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
         onStreamerClick = onStreamerClick,
-        onSocialClick = { socialUrl ->
-            if (socialUrl != null) {
-                uriHandler.openUri(socialUrl)
-            }
-        },
+        onSocialClick = openExternalLink::invoke,
         onLoadNextPage = viewModel::loadNextPage,
         onLiveCheckedChange = viewModel::onLiveSwitch,
         onRetryClick = viewModel::retry,

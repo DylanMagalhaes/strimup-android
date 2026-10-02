@@ -66,7 +66,9 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
                 }
 
                 is LoginUiEvent.OpenCustomTab -> {
-                    context.openInCustomTab(event.url)
+                    if (!context.openInCustomTab(event.url)) {
+                        snackBarHostState.showSnackbar(resources.getString(R.string.error_open_link))
+                    }
                 }
 
                 LoginUiEvent.ShowHomeUi -> {
@@ -87,7 +89,7 @@ import com.strimup.feature.auth.presentation.component.AuthOAuthSection
             onEmailChange = { viewModel.onEmailChange(it) },
             passwordValue = state.passwordInput,
             onPasswordChange = { viewModel.onPasswordChange(it) },
-            onForgetPasswordClick = { /* TODO */ },
+            onForgetPasswordClick = viewModel::onForgotPasswordClick,
             onLoginClick = { viewModel.onLoginButtonClick() },
             onNavToRegister = onNavToRegister,
             onTwitchLoginClick = viewModel::onTwitchLoginClick,

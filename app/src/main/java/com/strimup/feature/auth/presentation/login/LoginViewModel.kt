@@ -9,6 +9,7 @@ import com.strimup.core.ui.error.toUiText
 import com.strimup.core.ui.text.UiText
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
 import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
+import com.strimup.feature.auth.presentation.AuthWebUrls
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,6 +65,12 @@ class LoginViewModel @Inject constructor(
                 .onFailure {
                     _events.send(LoginUiEvent.ShowSnackBar(UiText.Resource(R.string.oauth_error_failed)))
                 }
+        }
+    }
+
+    fun onForgotPasswordClick() {
+        viewModelScope.launch {
+            _events.send(LoginUiEvent.OpenCustomTab(AuthWebUrls.FORGOT_PASSWORD))
         }
     }
 
