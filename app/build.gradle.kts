@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.room3)
     alias(libs.plugins.detekt)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 val localProperties = Properties().apply {
@@ -49,6 +50,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "BASE_URL", "\"https://strimup-back-fd5v.onrender.com/\"")
+        manifestPlaceholders["crashlyticsCollectionEnabled"] = true
     }
 
     signingConfigs {
@@ -64,6 +66,7 @@ android {
 
     buildTypes {
         debug {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             localProperties.getProperty("BASE_URL")?.let { baseUrl ->
                 buildConfigField("String", "BASE_URL", baseUrl)
             }
@@ -170,6 +173,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.crashlytics)
 
     // ----- Tests unitaires (JVM, src/test) -----
     testImplementation(libs.junit)
