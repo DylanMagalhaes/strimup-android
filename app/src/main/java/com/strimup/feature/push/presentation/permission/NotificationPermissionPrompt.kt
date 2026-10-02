@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material3.AlertDialog
@@ -27,12 +28,22 @@ fun NotificationPermissionPrompt(
 ) {
     if (!shouldAsk) return
 
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        LaunchedEffect(Unit) { onHandled() }
+        return
+    }
+
+    NotificationPermissionRequest(onHandled = onHandled)
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+private fun NotificationPermissionRequest(onHandled: () -> Unit) {
     val context = LocalContext.current
-    val isPermissionRequired = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+    val isPermissionGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
         PackageManager.PERMISSION_GRANTED
 
-    if (!isPermissionRequired) {
+    if (isPermissionGranted) {
         LaunchedEffect(Unit) { onHandled() }
         return
     }

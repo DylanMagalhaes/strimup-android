@@ -65,7 +65,9 @@ fun FilterItemCard(
             filter.criteria.averageViewers.takeIf { it.isNotBlank() }
                 ?.let { resources.getString(R.string.filter_average_viewers_value, it) },
             filter.criteria.streamFrequency.takeIf { it.isNotBlank() },
-            filter.criteria.ageRange.let { resources.getString(R.string.filter_age_range_short, it.first, it.last) }
+            filter.criteria.ageRange.let { range ->
+                resources.getQuantityString(R.plurals.filter_age_range_short, range.last, range.first, range.last)
+            }
         ).joinToString(" • ")
     }
 

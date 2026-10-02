@@ -132,6 +132,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.room3.runtime)
     ksp(libs.androidx.room3.compiler)

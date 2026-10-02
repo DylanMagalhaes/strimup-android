@@ -56,6 +56,7 @@ import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -247,6 +248,10 @@ private fun StreamerProfileSuccessContent(
                         streamer.socials.forEach { social ->
                             SocialIconButton(
                                 iconRes = social.getIconRes(),
+                                contentDescription = stringResource(
+                                    R.string.streamer_open_social,
+                                    social.type.displayName(),
+                                ),
                                 onClick = { /* TODO : Gérer le clic réseau social */ }
                             )
                         }

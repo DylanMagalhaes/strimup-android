@@ -44,8 +44,8 @@ fun MultipleSelectBottomSheet(
     selectedOptions: List<String>,
     onOptionSelected: (String) -> Unit,
     onDismiss: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
 
     val scope = rememberCoroutineScope()

@@ -62,8 +62,8 @@ fun MatchedStreamersScreen(
     onNavUp: () -> Unit,
     onStreamerClick: (String) -> Unit,
     filterId: String,
+    modifier: Modifier = Modifier,
     viewModel: MatchedStreamerListViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }

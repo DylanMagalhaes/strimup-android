@@ -22,9 +22,9 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 @Composable
 fun TagBadge(
     tag: String,
+    modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     onTagClick: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     val containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
     val hashtagColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary

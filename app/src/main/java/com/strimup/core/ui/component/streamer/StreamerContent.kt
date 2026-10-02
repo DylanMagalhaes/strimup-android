@@ -32,6 +32,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -64,6 +65,10 @@ fun StreamerContent(
                     socials.forEach { social ->
                         SocialIconButton(
                             iconRes = social.getIconRes(),
+                            contentDescription = stringResource(
+                                R.string.streamer_open_social,
+                                social.type.displayName(),
+                            ),
                             onClick = { onSocialClick(social.url) }
                         )
                     }

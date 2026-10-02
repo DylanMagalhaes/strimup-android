@@ -61,9 +61,9 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 
 @Composable
 fun FavoriteStreamerScreen(
-    viewModel: FavoriteStreamersViewModel = hiltViewModel(),
     onStreamerClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: FavoriteStreamersViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }

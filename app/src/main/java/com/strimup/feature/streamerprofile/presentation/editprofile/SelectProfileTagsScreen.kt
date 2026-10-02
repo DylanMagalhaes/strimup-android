@@ -7,6 +7,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,7 +33,11 @@ fun SelectProfileTagsScreen(
     ) { innerPadding ->
         SelectTagsContent(
             title = stringResource(R.string.profile_tags_title),
-            description = stringResource(R.string.profile_tags_description, PROFILE_MAX_TAGS),
+            description = pluralStringResource(
+                R.plurals.profile_tags_description,
+                PROFILE_MAX_TAGS,
+                PROFILE_MAX_TAGS,
+            ),
             categories = state.availableCategories,
             selectedCategory = state.selectedCategory,
             tags = state.availableTags,
@@ -64,7 +69,11 @@ private fun SelectProfileTagsScreenPreview() {
         Surface {
             SelectTagsContent(
                 title = stringResource(R.string.profile_tags_title),
-                description = stringResource(R.string.profile_tags_description, PROFILE_MAX_TAGS),
+                description = pluralStringResource(
+                    R.plurals.profile_tags_description,
+                    PROFILE_MAX_TAGS,
+                    PROFILE_MAX_TAGS,
+                ),
                 categories = sampleCategories,
                 selectedCategory = sampleCategories.first(),
                 tags = sampleTags,

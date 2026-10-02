@@ -42,6 +42,7 @@ import com.strimup.core.streamer.domain.entity.Social.Type
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.tag.TagBadge
+import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -278,6 +279,7 @@ private fun StreamerCardFooter(
             socials.take(MAX_VISIBLE_SOCIALS).forEach { social ->
                 SocialIconButton(
                     iconRes = social.getIconRes(),
+                    contentDescription = stringResource(R.string.streamer_open_social, social.type.displayName()),
                     onClick = { onSocialClick(social.url) },
                 )
             }

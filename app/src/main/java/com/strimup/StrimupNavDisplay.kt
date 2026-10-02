@@ -84,8 +84,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun StrimupNavDisplay(
+    modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
 ) {
     val backStack = rememberNavBackStack(Destination.Home.StreamerList)
     val currentDestination = backStack.lastOrNull()

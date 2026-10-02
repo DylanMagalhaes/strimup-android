@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">strimup</string>
 
     <!-- Errors -->
@@ -73,7 +73,7 @@
     <string name="birth_date_error_required">La date de naissance est obligatoire.</string>
     <string name="birth_date_error_invalid">Date de naissance invalide.</string>
     <string name="birth_date_error_in_future">La date de naissance ne peut pas être dans le futur.</string>
-    <string name="birth_date_error_too_young">Tu dois avoir au moins %1$d ans pour créer ce type de compte.</string>
+    <string name="birth_date_error_too_young" tools:ignore="PluralsCandidate">Tu dois avoir au moins %1$d ans pour créer ce type de compte.</string>
 
     <!-- OAuth -->
     <string name="oauth_twitch_continue">Continuer avec Twitch</string>
@@ -139,7 +139,11 @@
     <string name="profile_social_link_title">Lien %1$s</string>
     <string name="profile_social_link_hint">Colle l\'URL de ton compte ici</string>
     <string name="profile_tags_title">Tes tags de stream</string>
-    <string name="profile_tags_description">Choisis jusqu\'à %1$d tags pour aider les viewers à découvrir ton contenu.</string>
+
+    <plurals name="profile_tags_description">
+        <item quantity="one">Choisis jusqu\'à %1$d tag pour aider les viewers à découvrir ton contenu.</item>
+        <item quantity="other">Choisis jusqu\'à %1$d tags pour aider les viewers à découvrir ton contenu.</item>
+    </plurals>
 
     <!-- Tags -->
     <string name="tags_selected_count">Tags sélectionnés (%1$d/%2$d) :</string>
@@ -166,13 +170,19 @@
     <string name="filter_personalities">Personnalités</string>
     <string name="filter_platforms">Plateformes</string>
     <string name="filter_age_range">Tranche d\'âge</string>
-    <string name="filter_age_range_value">%1$d - %2$d ans</string>
-    <string name="filter_age_range_short">%1$d-%2$d ans</string>
     <string name="filter_average_viewers_value">%1$s viewers</string>
     <string name="filter_results_default_title">Résultats du filtre</string>
     <string name="filter_results_live_only">En live</string>
     <string name="filter_results_empty_title">Aucun streamer trouvé</string>
     <string name="filter_results_empty_description">Essaie de modifier tes critères de recherche.</string>
+    <plurals name="filter_age_range_value">
+        <item quantity="one">%1$d - %2$d an</item>
+        <item quantity="other">%1$d - %2$d ans</item>
+    </plurals>
+    <plurals name="filter_age_range_short">
+        <item quantity="one">%1$d-%2$d an</item>
+        <item quantity="other">%1$d-%2$d ans</item>
+    </plurals>
     <plurals name="filter_results_count_label">
         <item quantity="one">streamer trouvé</item>
         <item quantity="other">streamers trouvés</item>
@@ -219,6 +229,7 @@
     <string name="streamer_add_favorite">Ajouter aux favoris</string>
     <string name="streamer_remove_favorite">Retirer des favoris</string>
     <string name="streamer_videos">Vidéos</string>
+    <string name="streamer_open_social">Ouvrir %1$s</string>
     <string name="search_placeholder">Rechercher un streamer…</string>
     <string name="search_no_result">Aucun streamer trouvé pour « %1$s »</string>
 

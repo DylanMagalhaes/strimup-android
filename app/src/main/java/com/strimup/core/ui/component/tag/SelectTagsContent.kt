@@ -45,11 +45,11 @@ fun SelectTagsContent(
     selectedCategory: TagEntity?,
     tags: List<TagEntity>,
     selectedTags: List<TagEntity>,
-    maxTags: Int = 4,
     onCategorySelected: (TagEntity) -> Unit,
     onTagClick: (TagEntity) -> Unit,
     onDone: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxTags: Int = 4,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
