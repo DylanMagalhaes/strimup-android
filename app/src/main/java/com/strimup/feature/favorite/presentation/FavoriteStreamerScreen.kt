@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
@@ -104,7 +106,7 @@ private fun FavoriteStreamerScreenContent(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mes Streamers",
+                        text = stringResource(R.string.favorites_title),
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -124,7 +126,7 @@ private fun FavoriteStreamerScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp),
-                placeholder = { Text("Rechercher un streamer...") },
+                placeholder = { Text(stringResource(R.string.search_placeholder)) },
                 leadingIcon = {
                     Icon(imageVector = Icons.Default.Search, contentDescription = null)
                 },
@@ -213,7 +215,7 @@ private fun FavoriteStreamerScreenContent(
                                                 containerColor = MaterialTheme.colorScheme.tertiary,
                                                 content = {
                                                     Text(
-                                                        text = "Live",
+                                                        text = stringResource(R.string.favorites_live),
                                                         color = MaterialTheme.colorScheme.onBackground,
                                                         fontFamily = zalandoFontFamily,
                                                         fontStyle = FontStyle.Italic,
@@ -271,13 +273,13 @@ private fun EmptyFavoriteState(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Aucun streamer enregistré",
+            text = stringResource(R.string.favorites_empty_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Ajoutez des streamers à vos favoris pour les retrouver rapidement.",
+            text = stringResource(R.string.favorites_empty_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center

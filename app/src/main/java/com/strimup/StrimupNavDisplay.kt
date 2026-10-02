@@ -357,7 +357,7 @@ private fun StrimupBottomBar(
             icon = {
                 Icon(
                     imageVector = if (isHomeSelected) Icons.Filled.Home else Icons.Outlined.Home,
-                    contentDescription = "Home"
+                    contentDescription = stringResource(R.string.nav_home)
                 )
             }
         )
@@ -370,7 +370,7 @@ private fun StrimupBottomBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Tune,
-                    contentDescription = "Mes filtres",
+                    contentDescription = stringResource(R.string.filters_title),
                 )
             }
         )
@@ -381,7 +381,7 @@ private fun StrimupBottomBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Rechercher",
+                    contentDescription = stringResource(R.string.nav_search),
                 )
             }
         )
@@ -394,7 +394,7 @@ private fun StrimupBottomBar(
             icon = {
                 Icon(
                     imageVector = if (isFavoriteSelected) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    contentDescription = "Mes streamers favoris",
+                    contentDescription = stringResource(R.string.nav_favorites),
                 )
             }
         )
@@ -482,7 +482,7 @@ private fun ProfileNavigationIcon(
     if (!isLoggedIn) {
         Icon(
             imageVector = if (isSelected) Icons.Filled.Person else Icons.Outlined.Person,
-            contentDescription = "Connexion"
+            contentDescription = stringResource(R.string.login_title)
         )
         return
     }
@@ -497,7 +497,7 @@ private fun ProfileNavigationIcon(
 
     AsyncImage(
         model = avatarUrl,
-        contentDescription = "Profile",
+        contentDescription = stringResource(R.string.nav_profile),
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(24.dp)

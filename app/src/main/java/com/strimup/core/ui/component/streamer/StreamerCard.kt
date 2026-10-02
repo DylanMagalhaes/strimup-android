@@ -29,12 +29,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Social.Type
 import com.strimup.core.streamer.domain.mapper.getIconRes
@@ -203,7 +205,7 @@ private fun LiveBadge() {
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 6.dp, vertical = 2.dp),
-        text = "LIVE",
+        text = stringResource(R.string.streamer_live_badge),
         style = MaterialTheme.typography.labelSmall,
         fontWeight = FontWeight.Black,
         color = MaterialTheme.colorScheme.onTertiary,
@@ -247,7 +249,7 @@ private fun StreamerTags(
 
         val hiddenTagsCount = tags.size - MAX_VISIBLE_TAGS
         if (hiddenTagsCount > 0) {
-            TagBadge(tag = "+$hiddenTagsCount", onTagClick = onTagClick)
+            TagBadge(tag = stringResource(R.string.streamer_more_tags, hiddenTagsCount), onTagClick = onTagClick)
         }
     }
 }
@@ -265,7 +267,7 @@ private fun StreamerCardFooter(
         if (isLive) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "EN DIRECT MAINTENANT",
+                text = stringResource(R.string.streamer_live_now),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.tertiary,

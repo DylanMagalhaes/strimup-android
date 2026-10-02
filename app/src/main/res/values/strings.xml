@@ -23,6 +23,7 @@
     <string name="action_cancel">Annuler</string>
     <string name="action_save">Enregistrer</string>
     <string name="action_done">Terminer</string>
+    <string name="action_close">Fermer</string>
     <string name="not_specified">Non renseigné</string>
     <string name="edit_field_content_description">Modifier %1$s</string>
     <string name="multi_select_hint">Plusieurs choix possibles</string>
@@ -205,7 +206,32 @@
     <string name="account_deletion_error_pending_obligations">Ton compte ne peut pas être supprimé pour le moment.</string>
     <string name="account_deletion_error_too_many_attempts">Trop d\'essais. Réessaie dans quelques minutes.</string>
 
+    <!-- Navigation -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_search">Rechercher</string>
+    <string name="nav_favorites">Mes streamers favoris</string>
+    <string name="nav_profile">Mon profil</string>
+
+    <!-- Streamer -->
+    <string name="streamer_live_badge">LIVE</string>
+    <string name="streamer_live_now">EN DIRECT MAINTENANT</string>
+    <string name="streamer_more_tags">+%1$d</string>
+    <string name="streamer_add_favorite">Ajouter aux favoris</string>
+    <string name="streamer_remove_favorite">Retirer des favoris</string>
+    <string name="streamer_videos">Vidéos</string>
+    <string name="search_placeholder">Rechercher un streamer…</string>
+    <string name="search_no_result">Aucun streamer trouvé pour « %1$s »</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">Mes streamers</string>
+    <string name="favorites_live">Live</string>
+    <string name="favorites_empty_title">Aucun streamer enregistré</string>
+    <string name="favorites_empty_description">Ajoute des streamers à tes favoris pour les retrouver rapidement.</string>
+
     <!-- Home -->
+    <string name="home_tab_discover">Découvrir</string>
+    <string name="home_tab_live">En live</string>
+    <string name="home_banner_avatar_description">Avatar de %1$s</string>
     <string name="home_offline_saved_content">Hors ligne · contenu enregistré</string>
 
     <!-- Notifications -->

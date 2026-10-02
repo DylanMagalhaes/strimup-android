@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.strimup.R
 import com.strimup.core.ui.component.tag.TagBadge
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -96,7 +98,7 @@ fun StreamerHero(
                             tonalElevation = 2.dp
                         ) {
                             Text(
-                                text = "LIVE",
+                                text = stringResource(R.string.streamer_live_badge),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 fontFamily = zalandoFontFamily,
@@ -162,9 +164,11 @@ fun StreamerHero(
                             onClick = onFavoriteClick,
                             modifier = Modifier.size(32.dp)
                         ) {
+                            val favoriteLabelRes =
+                                if (isFavorite) R.string.streamer_remove_favorite else R.string.streamer_add_favorite
                             Icon(
                                 imageVector = if (isFavorite) Icons.Default.Bookmark else Icons.Outlined.BookmarkBorder,
-                                contentDescription = if (isFavorite) "Retirer des favoris" else "Ajouter aux favoris",
+                                contentDescription = stringResource(favoriteLabelRes),
                                 tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }

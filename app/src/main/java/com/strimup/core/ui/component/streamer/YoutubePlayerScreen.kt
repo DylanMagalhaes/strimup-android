@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
@@ -35,6 +36,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.strimup.R
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -141,7 +143,7 @@ fun YouTubePlayerScreen(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Fermer",
+                contentDescription = stringResource(R.string.action_close),
                 tint = Color.White,
                 modifier = Modifier.size(24.dp),
             )
