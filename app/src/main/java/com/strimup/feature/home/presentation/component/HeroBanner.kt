@@ -34,11 +34,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.strimup.R
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.BannerType
@@ -190,7 +192,7 @@ private fun BannerCard(
                 if (banner.type == BannerType.FeaturedStreamer && !banner.avatarUrl.isNullOrBlank()) {
                     AsyncImage(
                         model = banner.avatarUrl,
-                        contentDescription = "Avatar ${banner.title}",
+                        contentDescription = stringResource(R.string.home_banner_avatar_description, banner.title),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(80.dp)

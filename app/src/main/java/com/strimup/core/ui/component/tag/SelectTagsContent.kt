@@ -28,11 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.strimup.R
+import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.core.tag.domain.entity.TagEntity
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -43,11 +45,11 @@ fun SelectTagsContent(
     selectedCategory: TagEntity?,
     tags: List<TagEntity>,
     selectedTags: List<TagEntity>,
-    maxTags: Int = 4,
     onCategorySelected: (TagEntity) -> Unit,
     onTagClick: (TagEntity) -> Unit,
     onDone: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxTags: Int = 4,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -80,7 +82,7 @@ fun SelectTagsContent(
         VerticalSpacer(16.dp)
 
         Text(
-            text = "Tags sélectionnés (${selectedTags.size}/$maxTags) :",
+            text = stringResource(R.string.tags_selected_count, selectedTags.size, maxTags),
             style = MaterialTheme.typography.labelLarge,
             fontFamily = zalandoFontFamily,
             fontWeight = FontWeight.Bold,
@@ -91,7 +93,7 @@ fun SelectTagsContent(
 
         if (selectedTags.isEmpty()) {
             Text(
-                text = "Aucun tag sélectionné pour le moment",
+                text = stringResource(R.string.tags_none_selected),
                 style = MaterialTheme.typography.bodyMedium,
                 fontFamily = zalandoFontFamily,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
@@ -120,12 +122,12 @@ fun SelectTagsContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             OutlinedTextField(
-                value = selectedCategory?.category ?: "Choisissez une catégorie",
+                value = selectedCategory?.category ?: stringResource(R.string.tags_category_placeholder),
                 onValueChange = {},
                 readOnly = true,
                 label = {
                     Text(
-                        text = "Sélectionner une catégorie",
+                        text = stringResource(R.string.tags_select_category),
                         fontFamily = zalandoFontFamily
                     )
                 },
@@ -203,7 +205,7 @@ fun SelectTagsContent(
             )
         ) {
             Text(
-                text = "Terminer",
+                text = stringResource(R.string.action_done),
                 fontFamily = zalandoFontFamily,
                 fontWeight = FontWeight.Bold
             )

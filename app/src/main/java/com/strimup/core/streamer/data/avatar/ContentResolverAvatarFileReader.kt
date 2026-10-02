@@ -4,9 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
+import androidx.core.graphics.scale
 import androidx.core.net.toUri
+import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -66,7 +67,7 @@ class ContentResolverAvatarFileReader @Inject constructor(
         val (targetWidth, targetHeight) = avatarTargetSize(width, height)
         if (targetWidth == width && targetHeight == height) return this
 
-        return Bitmap.createScaledBitmap(this, targetWidth, targetHeight, true).also { if (it !== this) recycle() }
+        return scale(targetWidth, targetHeight).also { if (it !== this) recycle() }
     }
 
     private fun Bitmap.rotate(degrees: Float): Bitmap {

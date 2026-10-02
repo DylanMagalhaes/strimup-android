@@ -18,8 +18,9 @@ import com.strimup.core.ui.theme.StrimupTheme
 
 @Composable fun SocialIconButton(
     @DrawableRes iconRes: Int,
-    modifier: Modifier = Modifier,
+    contentDescription: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(12.dp)
     IconButton(
@@ -40,7 +41,7 @@ import com.strimup.core.ui.theme.StrimupTheme
         Icon(
             modifier = Modifier.size(14.dp),
             painter = painterResource(iconRes),
-            contentDescription = null,
+            contentDescription = contentDescription,
         )
     }
 }
@@ -49,6 +50,7 @@ import com.strimup.core.ui.theme.StrimupTheme
     StrimupTheme {
         SocialIconButton(
             iconRes = R.drawable.ic_twitch,
+            contentDescription = "Twitch",
             onClick = {},
         )
     }

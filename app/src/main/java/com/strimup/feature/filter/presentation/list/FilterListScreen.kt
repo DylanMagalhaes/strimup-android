@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -102,7 +104,7 @@ private fun FiltersListContent(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mes filtres",
+                        text = stringResource(R.string.filters_title),
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
@@ -122,7 +124,7 @@ private fun FiltersListContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Créer un filtre"
+                    contentDescription = stringResource(R.string.filters_create)
                 )
             }
         }
@@ -190,13 +192,13 @@ private fun EmptyFilterState(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Aucun filtre enregistré",
+            text = stringResource(R.string.filters_empty_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Créez vos filtres personnalisés pour retrouver rapidement vos streamers.",
+            text = stringResource(R.string.filters_empty_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center

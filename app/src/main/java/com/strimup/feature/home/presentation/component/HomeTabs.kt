@@ -10,9 +10,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.R
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.home.domain.entity.FilterEntity
@@ -40,7 +42,7 @@ fun HomeTabs(
             onClick = { onButtonClick(FilterEntity.Discovery) }
         ) {
             Text(
-                text = "Découvrir",
+                text = stringResource(R.string.home_tab_discover),
                 fontFamily = zalandoFontFamily,
                 fontWeight = FontWeight.Bold,
             )
@@ -61,7 +63,7 @@ fun HomeTabs(
 
         ) {
             Text(
-                text = "En live",
+                text = stringResource(R.string.home_tab_live),
                 fontFamily = zalandoFontFamily,
                 fontWeight = FontWeight.Bold,
             )

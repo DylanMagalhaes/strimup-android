@@ -20,18 +20,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.strimup.core.ui.component.button.SocialIconButton
-import com.strimup.core.ui.component.spacer.VerticalSpacer
-import com.strimup.core.ui.theme.StrimupTheme
-import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
+import com.strimup.core.ui.component.button.SocialIconButton
+import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.streamer.displayName
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
 
 @Composable
 fun StreamerContent(
@@ -62,6 +65,10 @@ fun StreamerContent(
                     socials.forEach { social ->
                         SocialIconButton(
                             iconRes = social.getIconRes(),
+                            contentDescription = stringResource(
+                                R.string.streamer_open_social,
+                                social.type.displayName(),
+                            ),
                             onClick = { onSocialClick(social.url) }
                         )
                     }
@@ -70,7 +77,7 @@ fun StreamerContent(
             }
 
             Text(
-                text = "À propos",
+                text = stringResource(R.string.profile_about),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -93,7 +100,9 @@ fun StreamerContent(
 
             if (description.length > 120) {
                 Text(
-                    text = if (isExpanded) "Voir moins" else "Lire la suite",
+                    text = stringResource(
+                        if (isExpanded) R.string.profile_read_less else R.string.profile_read_more
+                    ),
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
@@ -107,7 +116,7 @@ fun StreamerContent(
 
             if(videos.isNotEmpty()){
                 Text(
-                    text = "Mes vidéos",
+                    text = stringResource(R.string.streamer_videos),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = zalandoFontFamily,

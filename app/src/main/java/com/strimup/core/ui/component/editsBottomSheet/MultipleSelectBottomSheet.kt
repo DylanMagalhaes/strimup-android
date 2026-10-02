@@ -24,10 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.R
 import com.strimup.core.ui.component.helper.animateDismiss
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.theme.StrimupTheme
@@ -42,8 +44,8 @@ fun MultipleSelectBottomSheet(
     selectedOptions: List<String>,
     onOptionSelected: (String) -> Unit,
     onDismiss: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     modifier: Modifier = Modifier,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
 
     val scope = rememberCoroutineScope()
@@ -88,7 +90,7 @@ fun MultipleSelectContent(
 
         VerticalSpacer(8.dp)
         Text(
-            text = "Plusieurs choix possibles",
+            text = stringResource(R.string.multi_select_hint),
             style = MaterialTheme.typography.titleSmall,
             fontFamily = zalandoFontFamily,
             fontStyle = FontStyle.Italic,
@@ -143,7 +145,7 @@ fun MultipleSelectContent(
             )
         ) {
             Text(
-                text = "Terminer",
+                text = stringResource(R.string.action_done),
                 fontFamily = zalandoFontFamily,
                 fontWeight = FontWeight.Bold
             )

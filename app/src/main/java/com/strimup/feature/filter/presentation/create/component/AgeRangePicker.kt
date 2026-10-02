@@ -16,19 +16,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.R
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import kotlin.math.roundToInt
 
 @Composable
 fun AgeRangePicker(
+    modifier: Modifier = Modifier,
     minAge: Float = 18f,
     maxAge: Float = 80f,
-    modifier: Modifier = Modifier,
-    onRangeSelected: (IntRange) -> Unit = {}
+    onRangeSelected: (IntRange) -> Unit = {},
 ) {
     var sliderPosition by remember { mutableStateOf(18f..40f) }
 
@@ -42,7 +45,7 @@ fun AgeRangePicker(
     ) {
         // Aligné sur le layout de ProfileEditRow
         Text(
-            text = "Tranche d'âge",
+            text = stringResource(R.string.filter_age_range),
             fontFamily = zalandoFontFamily,
             fontWeight = FontWeight.Medium,
             style = MaterialTheme.typography.bodyMedium,
@@ -52,7 +55,7 @@ fun AgeRangePicker(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "$selectedMin - $selectedMax ans",
+            text = pluralStringResource(R.plurals.filter_age_range_value, selectedMax, selectedMin, selectedMax),
             fontFamily = zalandoFontFamily,
             style = MaterialTheme.typography.bodyLarge
         )

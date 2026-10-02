@@ -7,12 +7,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.tag.SelectTagsContent
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
+
+private const val PROFILE_MAX_TAGS = 4
 
 @Composable
 fun SelectProfileTagsScreen(
@@ -27,13 +32,17 @@ fun SelectProfileTagsScreen(
         contentWindowInsets = screenTopWindowInsets,
     ) { innerPadding ->
         SelectTagsContent(
-            title = "Vos tags de stream",
-            description = "Choisissez jusqu'à 4 tags pour aider les viewers à découvrir votre contenu.",
+            title = stringResource(R.string.profile_tags_title),
+            description = pluralStringResource(
+                R.plurals.profile_tags_description,
+                PROFILE_MAX_TAGS,
+                PROFILE_MAX_TAGS,
+            ),
             categories = state.availableCategories,
             selectedCategory = state.selectedCategory,
             tags = state.availableTags,
             selectedTags = state.selectedTags,
-            maxTags = 4,
+            maxTags = PROFILE_MAX_TAGS,
             onCategorySelected = { viewModel.onCategorySelected(it) },
             onTagClick = { viewModel.onTagSelected(it) },
             onDone = onNavUp,
@@ -59,13 +68,17 @@ private fun SelectProfileTagsScreenPreview() {
     StrimupTheme {
         Surface {
             SelectTagsContent(
-                title = "Vos tags de stream",
-                description = "Choisissez jusqu'à 4 tags pour aider les viewers à découvrir votre contenu.",
+                title = stringResource(R.string.profile_tags_title),
+                description = pluralStringResource(
+                    R.plurals.profile_tags_description,
+                    PROFILE_MAX_TAGS,
+                    PROFILE_MAX_TAGS,
+                ),
                 categories = sampleCategories,
                 selectedCategory = sampleCategories.first(),
                 tags = sampleTags,
                 selectedTags = listOf(sampleTags[0]),
-                maxTags = 4,
+                maxTags = PROFILE_MAX_TAGS,
                 onCategorySelected = {},
                 onTagClick = {},
                 onDone = {}

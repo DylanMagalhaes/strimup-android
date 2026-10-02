@@ -10,8 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.R
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.ui.component.tag.SelectTagsContent
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -43,8 +45,8 @@ fun SelectFilterTagsScreen(
 
             is CreateFilterUiState.Content -> {
                 SelectTagsContent(
-                    title = "Tags du filtre",
-                    description = "Sélectionne les tags recherchés pour cibler des streamers spécifiques.",
+                    title = stringResource(R.string.filter_tags_title),
+                    description = stringResource(R.string.filter_tags_description),
                     categories = uiState.availableCategories,
                     selectedCategory = uiState.selectedCategory,
                     tags = uiState.availableTags,
@@ -78,8 +80,8 @@ private fun SelectFilterTagsScreenPreview() {
     StrimupTheme {
         Surface {
             SelectTagsContent(
-                title = "Tags du filtre",
-                description = "Sélectionne les tags recherchés pour cibler des streamers spécifiques.",
+                title = stringResource(R.string.filter_tags_title),
+                description = stringResource(R.string.filter_tags_description),
                 categories = sampleCategories,
                 selectedCategory = sampleCategories.first(),
                 tags = sampleTags,

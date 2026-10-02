@@ -27,9 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.R
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.entity.FilterEntity
@@ -55,12 +58,16 @@ fun FilterItemCard(
         }
     }
 
-    val infoFooter = remember(filter.criteria) {
+    val resources = LocalResources.current
+    val infoFooter = remember(filter.criteria, resources) {
         listOfNotNull(
             filter.criteria.status.takeIf { it.isNotBlank() },
-            filter.criteria.averageViewers.takeIf { it.isNotBlank() }?.let { "$it viewers" },
+            filter.criteria.averageViewers.takeIf { it.isNotBlank() }
+                ?.let { resources.getString(R.string.filter_average_viewers_value, it) },
             filter.criteria.streamFrequency.takeIf { it.isNotBlank() },
-            filter.criteria.ageRange.let { "${it.first}-${it.last} ans" }
+            filter.criteria.ageRange.let { range ->
+                resources.getQuantityString(R.plurals.filter_age_range_short, range.last, range.first, range.last)
+            }
         ).joinToString(" • ")
     }
 
@@ -91,7 +98,7 @@ fun FilterItemCard(
                     IconButton(onClick = { isMenuExpanded = true }) {
                         Icon(
                             imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "Options du filtre",
+                            contentDescription = stringResource(R.string.filter_options),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -103,7 +110,7 @@ fun FilterItemCard(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    text = "Supprimer",
+                                    text = stringResource(R.string.filter_delete),
                                     color = MaterialTheme.colorScheme.error
                                 )
                             },

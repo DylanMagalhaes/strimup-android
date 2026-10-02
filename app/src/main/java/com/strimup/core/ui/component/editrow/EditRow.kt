@@ -17,10 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.strimup.R
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -49,7 +51,7 @@ fun ProfileEditRow(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = value.ifBlank { "Non renseigné" },
+                text = value.ifBlank { stringResource(R.string.not_specified) },
                 fontFamily = zalandoFontFamily,
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
@@ -59,7 +61,7 @@ fun ProfileEditRow(
 
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            contentDescription = "Modifier $label",
+            contentDescription = stringResource(R.string.edit_field_content_description, label),
             tint = Color.Gray
         )
     }

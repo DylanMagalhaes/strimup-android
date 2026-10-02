@@ -56,6 +56,7 @@ import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 
@@ -229,7 +230,7 @@ private fun StreamerProfileSuccessContent(
                     )
                 ) {
                     Text(
-                        text = "Modifier le profil",
+                        text = stringResource(R.string.profile_edit_title),
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
@@ -247,6 +248,10 @@ private fun StreamerProfileSuccessContent(
                         streamer.socials.forEach { social ->
                             SocialIconButton(
                                 iconRes = social.getIconRes(),
+                                contentDescription = stringResource(
+                                    R.string.streamer_open_social,
+                                    social.type.displayName(),
+                                ),
                                 onClick = { /* TODO : Gérer le clic réseau social */ }
                             )
                         }
@@ -255,7 +260,7 @@ private fun StreamerProfileSuccessContent(
                 }
 
                 Text(
-                    text = "À propos",
+                    text = stringResource(R.string.profile_about),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = zalandoFontFamily,
@@ -279,7 +284,9 @@ private fun StreamerProfileSuccessContent(
 
                     if (bioText.length > 120) {
                         Text(
-                            text = if (isExpanded) "Voir moins" else "Lire la suite",
+                            text = stringResource(
+                                if (isExpanded) R.string.profile_read_less else R.string.profile_read_more
+                            ),
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,

@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,7 @@ import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.SingleSelectBottomSheet
 import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.text.asString
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -99,7 +101,7 @@ fun EditProfileScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = "Modifier le profil",
+                            text = stringResource(R.string.profile_edit_title),
                             fontFamily = zalandoFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
@@ -109,7 +111,7 @@ fun EditProfileScreen(
                         IconButton(onClick = onNavUp) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Retour"
+                                contentDescription = stringResource(R.string.action_back)
                             )
                         }
                     },
@@ -122,7 +124,7 @@ fun EditProfileScreen(
                                 enabled = !state.isSaving
                             ) {
                                 Text(
-                                    text = "Enregistrer",
+                                    text = stringResource(R.string.action_save),
                                     fontFamily = zalandoFontFamily,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary
@@ -164,7 +166,7 @@ fun EditProfileScreen(
             when (val editType = state.activeEdit) {
                 ActiveEditType.Bio -> {
                     EditTextBottomSheet(
-                        title = "Modifier la bio",
+                        title = stringResource(R.string.profile_edit_bio_title),
                         currentText = state.bio,
                         onDone = { newBio ->
                             viewModel.onBioChanged(newBio)
@@ -177,7 +179,7 @@ fun EditProfileScreen(
 
                 ActiveEditType.DailyStatus -> {
                     EditTextBottomSheet(
-                        title = "Modifier le statut du jour",
+                        title = stringResource(R.string.profile_edit_status_title),
                         currentText = state.dailyStatus,
                         onDone = { newStatus ->
                             viewModel.onDailyStatusChanged(newStatus)
@@ -194,7 +196,7 @@ fun EditProfileScreen(
                     }
 
                     SingleSelectBottomSheet(
-                        title = "Personnalité principale",
+                        title = stringResource(R.string.profile_personality_primary),
                         options = availablePersonalities,
                         selectedOption = state.personality,
                         onOptionSelected = { newPersonality ->
@@ -211,7 +213,7 @@ fun EditProfileScreen(
                     }
 
                     SingleSelectBottomSheet(
-                        title = "Personnalité secondaire",
+                        title = stringResource(R.string.profile_personality_secondary),
                         options = availablePersonalities,
                         selectedOption = state.personalitySecondary,
                         onOptionSelected = { newPersonality ->
@@ -224,7 +226,7 @@ fun EditProfileScreen(
 
                 ActiveEditType.StreamFrequency -> {
                     SingleSelectBottomSheet(
-                        title = "Fréquence de stream",
+                        title = stringResource(R.string.profile_stream_frequency),
                         options = availableOptions.streamFrequencies,
                         selectedOption = state.streamFrequency,
                         onOptionSelected = { newFrequency ->
@@ -237,7 +239,7 @@ fun EditProfileScreen(
 
                 ActiveEditType.AverageViewers -> {
                     SingleSelectBottomSheet(
-                        title = "Nombre de viewers moyen",
+                        title = stringResource(R.string.profile_average_viewers),
                         options = availableOptions.averageViewers,
                         selectedOption = state.averageViewers,
                         onOptionSelected = { newAverage ->
@@ -250,7 +252,7 @@ fun EditProfileScreen(
 
                 is ActiveEditType.Languages -> {
                     MultipleSelectBottomSheet(
-                        title = "Langues",
+                        title = stringResource(R.string.profile_languages),
                         options = availableOptions.languages,
                         selectedOptions = state.selectedLanguages,
                         onOptionSelected = { language ->
@@ -263,14 +265,14 @@ fun EditProfileScreen(
                 is ActiveEditType.SocialEdit -> {
                     val existingUrl = state.socials.find { it.type == editType.type }?.url ?: ""
                     EditTextBottomSheet(
-                        title = "Lien ${editType.type.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                        title = stringResource(R.string.profile_social_link_title, editType.type.displayName()),
                         currentText = existingUrl,
                         onDone = { newUrl ->
                             viewModel.onSocialUrlChanged(newUrl, editType.type)
                             viewModel.dismissEdit()
                         },
                         onDismiss = { viewModel.dismissEdit() },
-                        description = "Collez l'URL de votre compte ici"
+                        description = stringResource(R.string.profile_social_link_hint)
                     )
                 }
 
@@ -302,7 +304,7 @@ fun EditProfileContent(
     ) {
         item {
             Text(
-                text = "Photo de profil",
+                text = stringResource(R.string.profile_photo_section),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -326,7 +328,7 @@ fun EditProfileContent(
 
         item {
             Text(
-                text = "Informations Générales",
+                text = stringResource(R.string.profile_general_section),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -343,12 +345,12 @@ fun EditProfileContent(
             ) {
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
                     ProfileEditRow(
-                        label = "Bio",
+                        label = stringResource(R.string.profile_bio),
                         value = state.bio,
                         onClick = onEditBioClicked
                     )
                     ProfileEditRow(
-                        label = "Statut du jour",
+                        label = stringResource(R.string.profile_daily_status),
                         value = state.dailyStatus,
                         onClick = onEditDailyStatusClicked
                     )
@@ -358,7 +360,7 @@ fun EditProfileContent(
 
         item {
             Text(
-                text = "Détails du profil",
+                text = stringResource(R.string.profile_details_section),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -375,37 +377,33 @@ fun EditProfileContent(
             ) {
                 Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
                     ProfileEditRow(
-                        label = "Mes tags",
-                        value = state.selectedTags.map { it.name }.ifEmpty { listOf("Non renseigné") }.joinToString(
-                            ", "
-                        ),
+                        label = stringResource(R.string.profile_my_tags),
+                        value = state.selectedTags.joinToString(", ") { it.name },
                         onClick = onEditTagsClicked
                     )
                     ProfileEditRow(
-                        label = "Personnalité principale",
-                        value = state.personality ?: "Non renseigné",
+                        label = stringResource(R.string.profile_personality_primary),
+                        value = state.personality ?: stringResource(R.string.not_specified),
                         onClick = onEditPrimaryPersonalityClicked
                     )
                     ProfileEditRow(
-                        label = "Personnalité secondaire",
-                        value = state.personalitySecondary ?: "Non renseigné",
+                        label = stringResource(R.string.profile_personality_secondary),
+                        value = state.personalitySecondary ?: stringResource(R.string.not_specified),
                         onClick = onEditSecondaryPersonalityClicked
                     )
                     ProfileEditRow(
-                        label = "Fréquence de stream",
-                        value = state.streamFrequency ?: "Non renseigné",
+                        label = stringResource(R.string.profile_stream_frequency),
+                        value = state.streamFrequency ?: stringResource(R.string.not_specified),
                         onClick = onEditStreamFrequencyClicked
                     )
                     ProfileEditRow(
-                        label = "Nombre de viewers moyen",
-                        value = state.averageViewers ?: "Non renseigné",
+                        label = stringResource(R.string.profile_average_viewers),
+                        value = state.averageViewers ?: stringResource(R.string.not_specified),
                         onClick = onEditAverageViewersClicked
                     )
                     ProfileEditRow(
-                        label = "Langues",
-                        value = state.selectedLanguages.ifEmpty { listOf("Non renseigné") }.joinToString(
-                            ", "
-                        ),
+                        label = stringResource(R.string.profile_languages),
+                        value = state.selectedLanguages.joinToString(", "),
                         onClick = onEditLanguagesClicked
                     )
                 }
@@ -414,7 +412,7 @@ fun EditProfileContent(
 
         item {
             Text(
-                text = "Réseaux sociaux",
+                text = stringResource(R.string.profile_socials_section),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontFamily = zalandoFontFamily,
@@ -434,7 +432,7 @@ fun EditProfileContent(
                         val existingSocial = state.socials.find { it.type == socialType }
                         ProfileEditRow(
                             label = socialType.name.lowercase().replaceFirstChar { it.uppercase() },
-                            value = existingSocial?.url ?: "Non renseigné",
+                            value = existingSocial?.url ?: stringResource(R.string.not_specified),
                             onClick = { onEditSocialClicked(socialType) }
                         )
                     }

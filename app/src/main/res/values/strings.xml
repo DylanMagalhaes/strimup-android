@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">strimup</string>
 
     <!-- Errors -->
@@ -21,6 +21,12 @@
     <string name="action_back">Retour</string>
     <string name="action_ok">OK</string>
     <string name="action_cancel">Annuler</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="action_done">Terminer</string>
+    <string name="action_close">Fermer</string>
+    <string name="not_specified">Non renseigné</string>
+    <string name="edit_field_content_description">Modifier %1$s</string>
+    <string name="multi_select_hint">Plusieurs choix possibles</string>
     <string name="password_show">Montrer le mot de passe</string>
     <string name="password_hide">Cacher le mot de passe</string>
 
@@ -67,7 +73,7 @@
     <string name="birth_date_error_required">La date de naissance est obligatoire.</string>
     <string name="birth_date_error_invalid">Date de naissance invalide.</string>
     <string name="birth_date_error_in_future">La date de naissance ne peut pas être dans le futur.</string>
-    <string name="birth_date_error_too_young">Tu dois avoir au moins %1$d ans pour créer ce type de compte.</string>
+    <string name="birth_date_error_too_young" tools:ignore="PluralsCandidate">Tu dois avoir au moins %1$d ans pour créer ce type de compte.</string>
 
     <!-- OAuth -->
     <string name="oauth_twitch_continue">Continuer avec Twitch</string>
@@ -110,6 +116,78 @@
     <string name="register_login_link">Se connecter</string>
     <string name="oauth_onboarding_legal_prefix">En continuant, j\'accepte</string>
 
+    <!-- Profile -->
+    <string name="profile_edit_title">Modifier le profil</string>
+    <string name="profile_about">À propos</string>
+    <string name="profile_read_more">Lire la suite</string>
+    <string name="profile_read_less">Voir moins</string>
+    <string name="profile_photo_section">Photo de profil</string>
+    <string name="profile_change_photo">Modifier ma photo de profil</string>
+    <string name="profile_general_section">Informations générales</string>
+    <string name="profile_bio">Bio</string>
+    <string name="profile_edit_bio_title">Modifier la bio</string>
+    <string name="profile_daily_status">Statut du jour</string>
+    <string name="profile_edit_status_title">Modifier le statut du jour</string>
+    <string name="profile_details_section">Détails du profil</string>
+    <string name="profile_my_tags">Mes tags</string>
+    <string name="profile_personality_primary">Personnalité principale</string>
+    <string name="profile_personality_secondary">Personnalité secondaire</string>
+    <string name="profile_stream_frequency">Fréquence de stream</string>
+    <string name="profile_average_viewers">Nombre de viewers moyen</string>
+    <string name="profile_languages">Langues</string>
+    <string name="profile_socials_section">Réseaux sociaux</string>
+    <string name="profile_social_link_title">Lien %1$s</string>
+    <string name="profile_social_link_hint">Colle l\'URL de ton compte ici</string>
+    <string name="profile_tags_title">Tes tags de stream</string>
+
+    <plurals name="profile_tags_description">
+        <item quantity="one">Choisis jusqu\'à %1$d tag pour aider les viewers à découvrir ton contenu.</item>
+        <item quantity="other">Choisis jusqu\'à %1$d tags pour aider les viewers à découvrir ton contenu.</item>
+    </plurals>
+
+    <!-- Tags -->
+    <string name="tags_selected_count">Tags sélectionnés (%1$d/%2$d) :</string>
+    <string name="tags_none_selected">Aucun tag sélectionné pour le moment</string>
+    <string name="tags_category_placeholder">Choisis une catégorie</string>
+    <string name="tags_select_category">Choisir une catégorie</string>
+
+    <!-- Filters -->
+    <string name="filters_title">Mes filtres</string>
+    <string name="filters_create">Créer un filtre</string>
+    <string name="filters_empty_title">Aucun filtre enregistré</string>
+    <string name="filters_empty_description">Crée tes filtres personnalisés pour retrouver rapidement tes streamers.</string>
+    <string name="filter_options">Options du filtre</string>
+    <string name="filter_delete">Supprimer</string>
+    <string name="filter_editor_title">Filtre</string>
+    <string name="filter_criteria_section">Critères de recherche</string>
+    <string name="filter_name">Nom du filtre</string>
+    <string name="filter_name_hint">Donne un nom clair à ton filtre</string>
+    <string name="filter_name_error_blank">Le nom du filtre ne peut pas être vide</string>
+    <string name="filter_tags">Tags</string>
+    <string name="filter_tags_title">Tags du filtre</string>
+    <string name="filter_tags_description">Sélectionne les tags recherchés pour cibler des streamers spécifiques.</string>
+    <string name="filter_personality">Personnalité</string>
+    <string name="filter_personalities">Personnalités</string>
+    <string name="filter_platforms">Plateformes</string>
+    <string name="filter_age_range">Tranche d\'âge</string>
+    <string name="filter_average_viewers_value">%1$s viewers</string>
+    <string name="filter_results_default_title">Résultats du filtre</string>
+    <string name="filter_results_live_only">En live</string>
+    <string name="filter_results_empty_title">Aucun streamer trouvé</string>
+    <string name="filter_results_empty_description">Essaie de modifier tes critères de recherche.</string>
+    <plurals name="filter_age_range_value">
+        <item quantity="one">%1$d - %2$d an</item>
+        <item quantity="other">%1$d - %2$d ans</item>
+    </plurals>
+    <plurals name="filter_age_range_short">
+        <item quantity="one">%1$d-%2$d an</item>
+        <item quantity="other">%1$d-%2$d ans</item>
+    </plurals>
+    <plurals name="filter_results_count_label">
+        <item quantity="one">streamer trouvé</item>
+        <item quantity="other">streamers trouvés</item>
+    </plurals>
+
     <!-- Account -->
     <string name="account_title">Mon compte</string>
     <string name="account_section_preferences">Préférences</string>
@@ -138,7 +216,33 @@
     <string name="account_deletion_error_pending_obligations">Ton compte ne peut pas être supprimé pour le moment.</string>
     <string name="account_deletion_error_too_many_attempts">Trop d\'essais. Réessaie dans quelques minutes.</string>
 
+    <!-- Navigation -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_search">Rechercher</string>
+    <string name="nav_favorites">Mes streamers favoris</string>
+    <string name="nav_profile">Mon profil</string>
+
+    <!-- Streamer -->
+    <string name="streamer_live_badge">LIVE</string>
+    <string name="streamer_live_now">EN DIRECT MAINTENANT</string>
+    <string name="streamer_more_tags">+%1$d</string>
+    <string name="streamer_add_favorite">Ajouter aux favoris</string>
+    <string name="streamer_remove_favorite">Retirer des favoris</string>
+    <string name="streamer_videos">Vidéos</string>
+    <string name="streamer_open_social">Ouvrir %1$s</string>
+    <string name="search_placeholder">Rechercher un streamer…</string>
+    <string name="search_no_result">Aucun streamer trouvé pour « %1$s »</string>
+
+    <!-- Favorites -->
+    <string name="favorites_title">Mes streamers</string>
+    <string name="favorites_live">Live</string>
+    <string name="favorites_empty_title">Aucun streamer enregistré</string>
+    <string name="favorites_empty_description">Ajoute des streamers à tes favoris pour les retrouver rapidement.</string>
+
     <!-- Home -->
+    <string name="home_tab_discover">Découvrir</string>
+    <string name="home_tab_live">En live</string>
+    <string name="home_banner_avatar_description">Avatar de %1$s</string>
     <string name="home_offline_saved_content">Hors ligne · contenu enregistré</string>
 
     <!-- Notifications -->
