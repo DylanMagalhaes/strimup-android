@@ -49,6 +49,8 @@ import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.presentation.component.HomeBanner
+import com.strimup.feature.home.presentation.component.HomeOfflineBanner
+import com.strimup.feature.home.presentation.component.HomeStreamersError
 import com.strimup.feature.home.presentation.component.HomeTabs
 import com.strimup.feature.notification.presentation.bell.NotificationBell
 import kotlinx.coroutines.launch
@@ -95,6 +97,7 @@ fun HomeScreen(
             }
         },
         onTabClick = viewModel::onTabClick,
+        onRetryClick = viewModel::onRetryClick,
         unreadNotificationCount = unreadNotificationCount,
         onNotificationsClick = onNotificationsClick,
         onBannerClick = { banner ->
@@ -124,6 +127,7 @@ private fun HomeContent(
     onBannerClick: (BannerItemEntity) -> Unit,
     onSocialClick: (String?) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
+    onRetryClick: () -> Unit,
     unreadNotificationCount: Int?,
     onNotificationsClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -182,6 +186,21 @@ private fun HomeContent(
                                             .padding(vertical = 8.dp),
                                         onButtonClick = onTabClick,
                                         currentTab = state.currentTab,
+                                    )
+                                }
+                            }
+
+                            if (state.isShowingSavedContent) {
+                                item {
+                                    HomeOfflineBanner(modifier = Modifier.padding(horizontal = 16.dp))
+                                }
+                            }
+
+                            if (state.shouldShowStreamersError) {
+                                item {
+                                    HomeStreamersError(
+                                        messageRes = state.errorMessageRes ?: R.string.error_unknown,
+                                        onRetryClick = onRetryClick,
                                     )
                                 }
                             }
@@ -245,6 +264,7 @@ private fun HomeScreenPreview() {
             onStreamerClick = {},
             onSocialClick = {},
             onTabClick = {},
+            onRetryClick = {},
             onBannerClick = {},
             unreadNotificationCount = 3,
             onNotificationsClick = {},

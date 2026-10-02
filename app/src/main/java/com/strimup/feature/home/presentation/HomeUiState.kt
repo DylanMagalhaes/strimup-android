@@ -9,7 +9,11 @@ data class HomeUiState(
     val streamers: List<Streamer> = emptyList(),
     val currentTab: FilterEntity = FilterEntity.Discovery,
     val isLoading: Boolean = true,
-    @StringRes val errorMessageRes: Int? = null,
+    @param:StringRes val errorMessageRes: Int? = null,
+    val isShowingSavedContent: Boolean = false,
     val isBannerLoading: Boolean = true,
     val bannerItems: List<BannerItemEntity> = emptyList()
-)
+) {
+    val shouldShowStreamersError: Boolean
+        get() = !isLoading && streamers.isEmpty() && errorMessageRes != null
+}

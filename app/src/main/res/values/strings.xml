@@ -104,6 +104,9 @@
     <string name="account_deletion_error_pending_obligations">Ton compte ne peut pas être supprimé pour le moment.</string>
     <string name="account_deletion_error_too_many_attempts">Trop d\'essais. Réessaie dans quelques minutes.</string>
 
+    <!-- Home -->
+    <string name="home_offline_saved_content">Hors ligne · contenu enregistré</string>
+
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>
     <string name="notifications_empty">Aucune notification</string>

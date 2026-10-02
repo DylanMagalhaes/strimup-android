@@ -2,18 +2,24 @@ package com.strimup.feature.home.injection
 
 import com.strimup.feature.home.data.BannerApiService
 import com.strimup.feature.home.data.DefaultBannerRepository
+import com.strimup.feature.home.data.RoomDiscoveryStreamerCache
 import com.strimup.feature.home.domain.BannerRepository
-import com.strimup.feature.home.domain.usecase.GetBannerItemsUseCase
-import com.strimup.feature.home.domain.usecase.GetBannerUseCase
+import com.strimup.feature.home.domain.DiscoveryStreamerCache
+import com.strimup.feature.home.domain.usecase.DefaultGetCachedDiscoveryStreamersUseCase
+import com.strimup.feature.home.domain.usecase.DefaultObserveBannerUseCase
+import com.strimup.feature.home.domain.usecase.DefaultRefreshBannerUseCase
+import com.strimup.feature.home.domain.usecase.GetCachedDiscoveryStreamersUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
 import com.strimup.feature.home.domain.usecase.GetStreamersWithoutFavoriteUseCase
+import com.strimup.feature.home.domain.usecase.ObserveBannerUseCase
+import com.strimup.feature.home.domain.usecase.RefreshBannerUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 import retrofit2.Retrofit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,10 +28,21 @@ interface HomeModule {
     fun bindsStreamerUseCase(impl: GetStreamersWithoutFavoriteUseCase): GetStreamersUseCase
 
     @Binds
-    fun bindsBannerUseCase(impl: GetBannerItemsUseCase): GetBannerUseCase
+    fun bindsObserveBannerUseCase(impl: DefaultObserveBannerUseCase): ObserveBannerUseCase
+
+    @Binds
+    fun bindsRefreshBannerUseCase(impl: DefaultRefreshBannerUseCase): RefreshBannerUseCase
 
     @Binds
     fun bindBannerRepository(impl: DefaultBannerRepository): BannerRepository
+
+    @Binds
+    fun bindsDiscoveryStreamerCache(impl: RoomDiscoveryStreamerCache): DiscoveryStreamerCache
+
+    @Binds
+    fun bindsGetCachedDiscoveryStreamersUseCase(
+        impl: DefaultGetCachedDiscoveryStreamersUseCase,
+    ): GetCachedDiscoveryStreamersUseCase
 
     companion object {
         @Provides

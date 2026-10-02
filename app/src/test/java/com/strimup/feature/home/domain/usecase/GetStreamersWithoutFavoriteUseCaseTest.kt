@@ -6,6 +6,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.streamer.domain.repository.StreamerRepository
+import com.strimup.feature.home.domain.DiscoveryStreamerCache
 import com.strimup.feature.home.domain.entity.FilterEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -13,6 +14,18 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetStreamersWithoutFavoriteUseCaseTest {
+
+    private class FakeDiscoveryStreamerCache : DiscoveryStreamerCache {
+        val savedLists = mutableListOf<List<Streamer>>()
+
+        override suspend fun getStreamers(): List<Streamer> = savedLists.lastOrNull().orEmpty()
+
+        override suspend fun saveStreamers(streamers: List<Streamer>) {
+            savedLists += streamers
+        }
+    }
+
+    private val discoveryCache = FakeDiscoveryStreamerCache()
 
     private val discoveryStreamers = listOf(
         Streamer(id = "1", userName = "inox", imageUrl = ""),
@@ -28,7 +41,7 @@ class GetStreamersWithoutFavoriteUseCaseTest {
         val repository = FakeStreamerRepository(
             randomStreamers = Result.success(discoveryStreamers),
         )
-        val useCase = GetStreamersWithoutFavoriteUseCase(repository)
+        val useCase = GetStreamersWithoutFavoriteUseCase(repository, discoveryCache)
 
         // WHEN
         val result = useCase(FilterEntity.Discovery)
@@ -45,7 +58,7 @@ class GetStreamersWithoutFavoriteUseCaseTest {
         val repository = FakeStreamerRepository(
             liveStreamers = Result.success(liveStreamers),
         )
-        val useCase = GetStreamersWithoutFavoriteUseCase(repository)
+        val useCase = GetStreamersWithoutFavoriteUseCase(repository, discoveryCache)
 
         // WHEN
         val result = useCase(FilterEntity.Live)
@@ -63,7 +76,7 @@ class GetStreamersWithoutFavoriteUseCaseTest {
         val repository = FakeStreamerRepository(
             randomStreamers = Result.failure(error),
         )
-        val useCase = GetStreamersWithoutFavoriteUseCase(repository)
+        val useCase = GetStreamersWithoutFavoriteUseCase(repository, discoveryCache)
 
         // WHEN
         val result = useCase(FilterEntity.Discovery)
@@ -79,13 +92,43 @@ class GetStreamersWithoutFavoriteUseCaseTest {
         val repository = FakeStreamerRepository(
             liveStreamers = Result.failure(error),
         )
-        val useCase = GetStreamersWithoutFavoriteUseCase(repository)
+        val useCase = GetStreamersWithoutFavoriteUseCase(repository, discoveryCache)
 
         // WHEN
         val result = useCase(FilterEntity.Live)
 
         // THEN
         assertThat(result.exceptionOrNull()).isEqualTo(error)
+    }
+
+    @Test
+    fun `successful Discovery should save the streamers in the cache`() = runTest {
+        val repository = FakeStreamerRepository(randomStreamers = Result.success(discoveryStreamers))
+        val useCase = GetStreamersWithoutFavoriteUseCase(repository, discoveryCache)
+
+        useCase(FilterEntity.Discovery)
+
+        assertThat(discoveryCache.savedLists).containsExactly(discoveryStreamers)
+    }
+
+    @Test
+    fun `failed Discovery should keep the cache untouched`() = runTest {
+        val repository = FakeStreamerRepository(randomStreamers = Result.failure(Exception()))
+        val useCase = GetStreamersWithoutFavoriteUseCase(repository, discoveryCache)
+
+        useCase(FilterEntity.Discovery)
+
+        assertThat(discoveryCache.savedLists).isEmpty()
+    }
+
+    @Test
+    fun `Live streamers should never be cached`() = runTest {
+        val repository = FakeStreamerRepository(liveStreamers = Result.success(liveStreamers))
+        val useCase = GetStreamersWithoutFavoriteUseCase(repository, discoveryCache)
+
+        useCase(FilterEntity.Live)
+
+        assertThat(discoveryCache.savedLists).isEmpty()
     }
 
     private class FakeStreamerRepository(

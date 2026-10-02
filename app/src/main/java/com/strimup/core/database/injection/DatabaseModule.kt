@@ -9,6 +9,7 @@ import com.strimup.core.database.StrimupDatabaseMigrations
 import com.strimup.core.favorite.data.local.dao.FavoriteDao
 import com.strimup.core.user.data.local.dao.UserDao
 import com.strimup.feature.filter.data.local.dao.FilterDao
+import com.strimup.feature.home.data.local.dao.HomeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,6 +43,12 @@ import javax.inject.Singleton
     @Singleton
     fun provideFavoriteDao(database: StrimupDatabase): FavoriteDao{
         return database.favoritesDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHomeDao(database: StrimupDatabase): HomeDao {
+        return database.homeDao()
     }
 
     @Provides

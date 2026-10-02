@@ -1,7 +1,10 @@
 package com.strimup.feature.home.domain
 
 import com.strimup.feature.home.domain.entity.BannerItemEntity
+import kotlinx.coroutines.flow.Flow
 
 interface BannerRepository {
-    suspend fun getBannerItems(): Result<List<BannerItemEntity>>
+    fun observeBannerItems(): Flow<List<BannerItemEntity>>
+
+    suspend fun refreshBannerItems(): Result<Unit>
 }
