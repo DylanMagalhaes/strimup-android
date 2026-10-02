@@ -10,7 +10,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,7 +27,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -44,16 +51,25 @@ import com.strimup.core.ui.component.streamer.StreamerHero
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.feature.report.presentation.ReportStreamerSheet
+import com.strimup.feature.report.presentation.ReportStreamerUiEvent
+import com.strimup.feature.report.presentation.ReportStreamerViewModel
 
 @Composable
 fun StreamerDetailScreen(
     streamerId: String,
     onNavUp: () -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
+    isLoggedIn: Boolean,
+    isOwnProfile: Boolean,
+    onLoginRequired: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: StreamerDetailViewModel = hiltViewModel(),
+    reportViewModel: ReportStreamerViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val reportState by reportViewModel.state.collectAsStateWithLifecycle()
+    var isReportSheetVisible by rememberSaveable { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
@@ -72,6 +88,17 @@ fun StreamerDetailScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        reportViewModel.events.collect { event ->
+            when (event) {
+                is ReportStreamerUiEvent.Reported -> {
+                    isReportSheetVisible = false
+                    snackBarHostState.showSnackbar(resources.getString(event.messageRes))
+                }
+            }
+        }
+    }
+
     StreamerDetailScreen(
         modifier = modifier,
         state = state,
@@ -80,8 +107,27 @@ fun StreamerDetailScreen(
         onSocialClick = openExternalLink::invoke,
         onVideoClick = onVideoClick,
         onFavoriteClick = { viewModel.onFavoriteClick() },
-        onRetryClick = { viewModel.loadStreamer(streamerId) }
+        onRetryClick = { viewModel.loadStreamer(streamerId) },
+        isReportAvailable = !isOwnProfile,
+        onReportClick = {
+            if (isLoggedIn) isReportSheetVisible = true else onLoginRequired()
+        },
     )
+
+    val reportedStreamer = (state as? StreamerDetailUiState.Success)?.streamer
+    if (isReportSheetVisible && reportedStreamer != null) {
+        ReportStreamerSheet(
+            streamerName = reportedStreamer.userName,
+            state = reportState,
+            onReasonSelected = reportViewModel::onReasonSelected,
+            onDetailsChange = reportViewModel::onDetailsChange,
+            onSubmitClick = { reportViewModel.onSubmitClick(reportedStreamer.id) },
+            onDismiss = {
+                isReportSheetVisible = false
+                reportViewModel.onDismiss()
+            },
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,6 +140,8 @@ private fun StreamerDetailScreen(
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
+    isReportAvailable: Boolean,
+    onReportClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -117,7 +165,12 @@ private fun StreamerDetailScreen(
                             contentDescription = stringResource(R.string.action_back)
                         )
                     }
-                }
+                },
+                actions = {
+                    if (state is StreamerDetailUiState.Success && isReportAvailable) {
+                        StreamerDetailMenu(onReportClick = onReportClick)
+                    }
+                },
             )
         },
     ) { padding ->
@@ -131,6 +184,36 @@ private fun StreamerDetailScreen(
             onFavoriteClick = onFavoriteClick,
             onRetryClick = onRetryClick,
         )
+    }
+}
+
+@Composable
+private fun StreamerDetailMenu(
+    onReportClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier) {
+        IconButton(onClick = { isExpanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.action_more_options),
+            )
+        }
+        DropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text(text = stringResource(R.string.report_action)) },
+                leadingIcon = { Icon(imageVector = Icons.Outlined.Flag, contentDescription = null) },
+                onClick = {
+                    isExpanded = false
+                    onReportClick()
+                },
+            )
+        }
     }
 }
 
@@ -230,7 +313,9 @@ private fun StreamerDetailScreenPreview() {
                 ),
                 isFavorite = true
             ),
-            onRetryClick = {}
+            onRetryClick = {},
+            isReportAvailable = true,
+            onReportClick = {},
         )
     }
 }

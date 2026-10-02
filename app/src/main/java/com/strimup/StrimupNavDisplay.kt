@@ -199,6 +199,9 @@ fun StrimupNavDisplay(
                             backStack.add(Destination.YouTubePlayer(videoId, isVertical))
                         },
                         onNavUp = { backStack.removeLastOrNull() },
+                        isLoggedIn = isLoggedIn,
+                        isOwnProfile = destination.streamerId == userId,
+                        onLoginRequired = { backStack.add(Destination.Login) },
                     )
                 }
 

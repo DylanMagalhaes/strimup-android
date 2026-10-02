@@ -19,6 +19,7 @@
     <!-- Actions -->
     <string name="action_retry">Réessayer</string>
     <string name="action_back">Retour</string>
+    <string name="action_more_options">Plus d\'options</string>
     <string name="action_ok">OK</string>
     <string name="action_cancel">Annuler</string>
     <string name="action_save">Enregistrer</string>
@@ -232,6 +233,24 @@
     <string name="streamer_open_social">Ouvrir %1$s</string>
     <string name="search_placeholder">Rechercher un streamer…</string>
     <string name="search_no_result">Aucun streamer trouvé pour « %1$s »</string>
+
+    <!-- Report -->
+    <string name="report_action">Signaler ce profil</string>
+    <string name="report_title">Signaler %1$s</string>
+    <string name="report_subtitle">Pourquoi signales-tu ce profil ? Le streamer ne saura pas qui l\'a signalé.</string>
+    <string name="report_reason_sexual_content">Contenu sexuel ou choquant</string>
+    <string name="report_reason_harassment_or_hate">Harcèlement ou discours haineux</string>
+    <string name="report_reason_impersonation">Usurpation d\'identité</string>
+    <string name="report_reason_spam_or_scam">Spam ou arnaque</string>
+    <string name="report_reason_underage">Semble trop jeune pour être sur Strimup</string>
+    <string name="report_reason_other">Autre</string>
+    <string name="report_details_label_optional">Détails (facultatif)</string>
+    <string name="report_details_label_required">Détails (obligatoire)</string>
+    <string name="report_details_counter">%1$d/%2$d</string>
+    <string name="report_details_required">Précise la raison du signalement.</string>
+    <string name="report_submit">Envoyer le signalement</string>
+    <string name="report_sent">Merci ! Notre équipe va examiner ce profil.</string>
+    <string name="report_already_sent">Tu as déjà signalé ce profil. Notre équipe s\'en occupe.</string>
 
     <!-- Favorites -->
     <string name="favorites_title">Mes streamers</string>
