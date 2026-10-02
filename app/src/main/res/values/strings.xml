@@ -21,6 +21,11 @@
     <string name="action_back">Retour</string>
     <string name="action_ok">OK</string>
     <string name="action_cancel">Annuler</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="action_done">Terminer</string>
+    <string name="not_specified">Non renseigné</string>
+    <string name="edit_field_content_description">Modifier %1$s</string>
+    <string name="multi_select_hint">Plusieurs choix possibles</string>
     <string name="password_show">Montrer le mot de passe</string>
     <string name="password_hide">Cacher le mot de passe</string>
 
@@ -109,6 +114,37 @@
     <string name="register_has_account">Déjà un compte ?</string>
     <string name="register_login_link">Se connecter</string>
     <string name="oauth_onboarding_legal_prefix">En continuant, j\'accepte</string>
+
+    <!-- Profile -->
+    <string name="profile_edit_title">Modifier le profil</string>
+    <string name="profile_about">À propos</string>
+    <string name="profile_read_more">Lire la suite</string>
+    <string name="profile_read_less">Voir moins</string>
+    <string name="profile_photo_section">Photo de profil</string>
+    <string name="profile_change_photo">Modifier ma photo de profil</string>
+    <string name="profile_general_section">Informations générales</string>
+    <string name="profile_bio">Bio</string>
+    <string name="profile_edit_bio_title">Modifier la bio</string>
+    <string name="profile_daily_status">Statut du jour</string>
+    <string name="profile_edit_status_title">Modifier le statut du jour</string>
+    <string name="profile_details_section">Détails du profil</string>
+    <string name="profile_my_tags">Mes tags</string>
+    <string name="profile_personality_primary">Personnalité principale</string>
+    <string name="profile_personality_secondary">Personnalité secondaire</string>
+    <string name="profile_stream_frequency">Fréquence de stream</string>
+    <string name="profile_average_viewers">Nombre de viewers moyen</string>
+    <string name="profile_languages">Langues</string>
+    <string name="profile_socials_section">Réseaux sociaux</string>
+    <string name="profile_social_link_title">Lien %1$s</string>
+    <string name="profile_social_link_hint">Colle l\'URL de ton compte ici</string>
+    <string name="profile_tags_title">Tes tags de stream</string>
+    <string name="profile_tags_description">Choisis jusqu\'à %1$d tags pour aider les viewers à découvrir ton contenu.</string>
+
+    <!-- Tags -->
+    <string name="tags_selected_count">Tags sélectionnés (%1$d/%2$d) :</string>
+    <string name="tags_none_selected">Aucun tag sélectionné pour le moment</string>
+    <string name="tags_category_placeholder">Choisis une catégorie</string>
+    <string name="tags_select_category">Choisir une catégorie</string>
 
     <!-- Account -->
     <string name="account_title">Mon compte</string>

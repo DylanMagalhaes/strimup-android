@@ -229,7 +229,7 @@ private fun StreamerProfileSuccessContent(
                     )
                 ) {
                     Text(
-                        text = "Modifier le profil",
+                        text = stringResource(R.string.profile_edit_title),
                         fontFamily = zalandoFontFamily,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
@@ -255,7 +255,7 @@ private fun StreamerProfileSuccessContent(
                 }
 
                 Text(
-                    text = "À propos",
+                    text = stringResource(R.string.profile_about),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = zalandoFontFamily,
@@ -279,7 +279,9 @@ private fun StreamerProfileSuccessContent(
 
                     if (bioText.length > 120) {
                         Text(
-                            text = if (isExpanded) "Voir moins" else "Lire la suite",
+                            text = stringResource(
+                                if (isExpanded) R.string.profile_read_less else R.string.profile_read_more
+                            ),
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
