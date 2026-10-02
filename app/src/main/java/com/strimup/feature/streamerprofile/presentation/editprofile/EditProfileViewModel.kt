@@ -9,6 +9,8 @@ import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
 import com.strimup.core.ui.error.toMessageRes
+import com.strimup.core.ui.error.toUiText
+import com.strimup.core.ui.text.UiText
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateAvatarUseCase
 import com.strimup.feature.streamerprofile.domain.usecase.DefaultUpdateProfileUseCase
@@ -73,8 +75,7 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
+                    _events.send(EditProfileUiEvent.ShowSnackBar(exception.toDomainError().toUiText()))
                 }
         }
     }
@@ -92,8 +93,7 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
                 .onFailure { exception ->
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
+                    _events.send(EditProfileUiEvent.ShowSnackBar(exception.toDomainError().toUiText()))
                 }
         }
     }
@@ -299,9 +299,9 @@ class EditProfileViewModel @Inject constructor(
 
                 if (avatarResult.isFailure) {
                     _state.update { state -> state.copy(isSaving = false) }
-                    val messageRes = avatarResult.exceptionOrNull()?.toDomainError()?.toMessageRes()
-                        ?: R.string.error_unknown
-                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
+                    val message = avatarResult.exceptionOrNull()?.toDomainError()?.toUiText()
+                        ?: UiText.Resource(R.string.error_unknown)
+                    _events.send(EditProfileUiEvent.ShowSnackBar(message))
                     return@launch
                 }
 
@@ -336,8 +336,7 @@ class EditProfileViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     _state.update { state -> state.copy(isSaving = false) }
-                    val messageRes = exception.toDomainError().toMessageRes()
-                    _events.send(EditProfileUiEvent.ShowSnackBar(messageRes))
+                    _events.send(EditProfileUiEvent.ShowSnackBar(exception.toDomainError().toUiText()))
                 }
         }
     }

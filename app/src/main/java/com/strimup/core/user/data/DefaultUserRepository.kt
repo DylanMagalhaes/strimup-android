@@ -16,4 +16,8 @@ class DefaultUserRepository @Inject constructor(
             userRoomEntity?.toDomainEntity()
         }
     }
+
+    override suspend fun updateCurrentUserAvatar(avatarUrl: String) {
+        userDao.updateAvatarUrl(avatarUrl)
+    }
 }

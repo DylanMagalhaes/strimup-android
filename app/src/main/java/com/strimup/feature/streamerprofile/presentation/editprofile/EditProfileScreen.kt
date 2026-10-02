@@ -50,6 +50,7 @@ import com.strimup.core.ui.component.editsBottomSheet.MultipleSelectBottomSheet
 import com.strimup.core.ui.component.editsBottomSheet.SingleSelectBottomSheet
 import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.text.asString
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamerprofile.presentation.editprofile.component.EditProfileImageSection
@@ -70,7 +71,7 @@ fun EditProfileScreen(
         viewModel.events.collect { event ->
             when (event) {
                 is EditProfileUiEvent.ShowSnackBar -> {
-                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
+                    snackBarHostState.showSnackbar(event.message.asString(resources))
                 }
                 is EditProfileUiEvent.ProfileSaved -> {
                     onNavUp()
