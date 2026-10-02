@@ -6,6 +6,7 @@ import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.feature.home.domain.entity.BannerItemEntity
+import com.strimup.feature.home.domain.entity.BannerType
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.domain.usecase.GetStreamersUseCase
 import com.strimup.util.MainDispatcherRule
@@ -427,7 +428,7 @@ private fun Random.nextBannerItemEntity(): BannerItemEntity {
         imageUrl = "${Random.nextInt()}",
         position = Random.nextUInt().toInt(),
         linkUrl = "${Random.nextInt()}",
-        type = "${Random.nextInt()}",
+        type = BannerType.Other,
         avatarUrl = "${Random.nextInt()}",
         streamerId = "${Random.nextInt()}",
     )

@@ -1,10 +1,9 @@
 package com.strimup.feature.auth.presentation.login
 
-import androidx.annotation.StringRes
+import com.strimup.core.ui.text.UiText
 
 sealed interface LoginUiEvent {
-    data class ShowSnackBar(val text: String) : LoginUiEvent
-    data class ShowSnackBarRes(@StringRes val textRes: Int) : LoginUiEvent
+    data class ShowSnackBar(val message: UiText) : LoginUiEvent
     data class OpenCustomTab(val url: String) : LoginUiEvent
     data object ShowHomeUi : LoginUiEvent
 }

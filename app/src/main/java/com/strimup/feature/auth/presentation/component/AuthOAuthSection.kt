@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.strimup.R
@@ -46,7 +47,7 @@ fun AuthOAuthSection(
             )
 
             Text(
-                text = "Ou continuer avec",
+                text = stringResource(R.string.auth_oauth_divider),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
             )
 
@@ -58,7 +59,7 @@ fun AuthOAuthSection(
         }
 
         AuthLegalText(
-            prefix = "En continuant avec Twitch, j'accepte",
+            prefixRes = R.string.auth_oauth_legal_prefix,
             textAlign = TextAlign.Center,
         )
 
@@ -74,7 +75,7 @@ fun AuthOAuthSection(
             Icon(
                 modifier = Modifier.size(26.dp),
                 painter = painterResource(R.drawable.ic_twitch),
-                contentDescription = "Continuer avec Twitch",
+                contentDescription = stringResource(R.string.oauth_twitch_continue),
             )
         }
     }

@@ -49,6 +49,7 @@ import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.feature.home.domain.entity.BannerItemEntity
+import com.strimup.feature.home.domain.entity.BannerType
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.presentation.component.HomeBanner
 import com.strimup.feature.home.presentation.component.HomeOfflineBanner
@@ -106,7 +107,7 @@ fun HomeScreen(
         onBannerClick = { banner ->
             if (!banner.linkUrl.isNullOrBlank()) {
                 try {
-                    if (banner.type == "FEATURED_STREAMER") {
+                    if (banner.type == BannerType.FeaturedStreamer) {
                         onStreamerBannerClick(banner.streamerId)
                     } else {
                         uriHandler.openUri(banner.linkUrl)

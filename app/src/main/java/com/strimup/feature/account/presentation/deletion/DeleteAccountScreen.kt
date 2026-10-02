@@ -14,8 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
 import com.strimup.core.ui.component.button.DangerButton
 import com.strimup.core.ui.component.error.ErrorState
+import com.strimup.core.ui.component.textfield.PasswordVisibilityToggle
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.text.asString
@@ -280,21 +279,6 @@ private fun ConfirmationInstruction(modifier: Modifier = Modifier) {
             }
         },
     )
-}
-
-@Composable
-private fun PasswordVisibilityToggle(
-    isVisible: Boolean,
-    onVisibleChange: (Boolean) -> Unit,
-) {
-    IconButton(onClick = { onVisibleChange(!isVisible) }) {
-        Icon(
-            imageVector = if (isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-            contentDescription = stringResource(
-                if (isVisible) R.string.account_deletion_password_hide else R.string.account_deletion_password_show
-            ),
-        )
-    }
 }
 
 @Preview

@@ -17,13 +17,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -55,6 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
 import com.strimup.core.ui.browser.openInCustomTab
 import com.strimup.core.ui.component.button.PrimaryButton
+import com.strimup.core.ui.component.textfield.PasswordVisibilityToggle
 import com.strimup.core.ui.component.textfield.StrimupTextField
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.text.asString
@@ -213,7 +211,7 @@ fun RegisterContent(
                         .padding(top = 8.dp, bottom = 4.dp)
                         .size(56.dp),
                     painter = painterResource(R.drawable.ic_strimup),
-                    contentDescription = "Strimup icon",
+                    contentDescription = stringResource(R.string.auth_logo_description),
                 )
 
                 Text(
@@ -226,7 +224,7 @@ fun RegisterContent(
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Bold,
                     text = buildAnnotatedString {
-                        append("Creer un compte")
+                        append(stringResource(R.string.register_title))
                         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                             append(".")
                         }
@@ -236,14 +234,14 @@ fun RegisterContent(
                 StrimupTextField(
                     value = pseudoValue,
                     onValueChange = onPseudoChange,
-                    label = "Pseudo",
+                    label = stringResource(R.string.register_pseudo_label),
                     errorText = state.pseudoError?.asString(),
                 )
 
                 StrimupTextField(
                     value = emailValue,
                     onValueChange = onEmailChange,
-                    label = "email",
+                    label = stringResource(R.string.auth_email_label),
                     errorText = state.emailError?.asString(),
                 )
 
@@ -262,28 +260,28 @@ fun RegisterContent(
                 ) {
                     Box(modifier = Modifier.weight(1f)) {
                         AuthDropdownField(
-                            label = "Sexe",
+                            label = stringResource(R.string.auth_gender_label),
                             selectedLabelRes = sexValue?.toLabelRes(),
                             isExpanded = isSexDropDownExpended,
                             onExpandedChange = onSexDropDownExpendedChange,
                             options = Gender.entries,
                             optionLabelRes = { it.toLabelRes() },
                             onOptionSelected = onSexValueChange,
-                            contentDescription = "Sélectionner votre sexe",
+                            contentDescription = stringResource(R.string.auth_gender_pick),
                             errorText = state.genderError?.asString(),
                         )
                     }
 
                     Box(modifier = Modifier.weight(1f)) {
                         AuthDropdownField(
-                            label = "Je suis un(e)",
+                            label = stringResource(R.string.auth_role_label),
                             selectedLabelRes = roleValue?.toLabelRes(),
                             isExpanded = isRoleDropDownExpended,
                             onExpandedChange = onRoleDropDownExpendedChange,
                             options = listOf(UserRole.VIEWER, UserRole.STREAMER),
                             optionLabelRes = { it.toLabelRes() },
                             onOptionSelected = onRoleValueChange,
-                            contentDescription = "Sélectionner votre profil",
+                            contentDescription = stringResource(R.string.auth_role_pick),
                             errorText = state.roleError?.asString(),
                         )
                     }
@@ -292,16 +290,14 @@ fun RegisterContent(
                 StrimupTextField(
                     value = passwordValue,
                     onValueChange = onPasswordChange,
-                    label = "Mot de passe",
+                    label = stringResource(R.string.auth_password_label),
                     isPassword = !isPasswordVisible,
                     errorText = state.passwordError?.asString(),
                     trailingIcon = {
-                        IconButton(onClick = { onPasswordVisibleChange(!isPasswordVisible) }) {
-                            Icon(
-                                imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (isPasswordVisible) "Cacher le mot de passe" else "Montrer le mot de passe"
-                            )
-                        }
+                        PasswordVisibilityToggle(
+                            isVisible = isPasswordVisible,
+                            onVisibleChange = onPasswordVisibleChange,
+                        )
                     }
                 )
 
@@ -313,16 +309,14 @@ fun RegisterContent(
                 StrimupTextField(
                     value = confirmPasswordValue,
                     onValueChange = onConfirmPasswordChange,
-                    label = "Confirmation",
+                    label = stringResource(R.string.register_password_confirmation_label),
                     isPassword = !isConfirmPasswordVisible,
                     errorText = state.confirmPasswordError?.asString(),
                     trailingIcon = {
-                        IconButton(onClick = { onConfirmPasswordVisibleChange(!isConfirmPasswordVisible) }) {
-                            Icon(
-                                imageVector = if (isConfirmPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (isConfirmPasswordVisible) "Cacher le mot de passe" else "Montrer le mot de passe"
-                            )
-                        }
+                        PasswordVisibilityToggle(
+                            isVisible = isConfirmPasswordVisible,
+                            onVisibleChange = onConfirmPasswordVisibleChange,
+                        )
                     }
                 )
 
@@ -343,7 +337,7 @@ fun RegisterContent(
                     )
                     AuthLegalText(
                         modifier = Modifier.padding(start = 12.dp),
-                        prefix = "J'accepte",
+                        prefixRes = R.string.register_legal_prefix,
                     )
                 }
 
@@ -371,7 +365,9 @@ fun RegisterContent(
 
                 PrimaryButton(
                     modifier = Modifier.fillMaxWidth(),
-                    label = if (state.isLoading) "Inscription en cours..." else "S'inscrire",
+                    label = stringResource(
+                        if (state.isLoading) R.string.register_submit_loading else R.string.register_submit
+                    ),
                     enabled = !state.isLoading,
                     onClick = onRegisterClick,
                 )
@@ -385,12 +381,12 @@ fun RegisterContent(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = "Déjà un compte ? ",
+                        text = stringResource(R.string.register_has_account) + " ",
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                     )
                     Text(
                         modifier = Modifier.clickable(onClick = onLoginClick),
-                        text = "Se connecter",
+                        text = stringResource(R.string.register_login_link),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                     )

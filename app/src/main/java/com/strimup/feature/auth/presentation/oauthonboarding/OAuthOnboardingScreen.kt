@@ -133,7 +133,7 @@ fun OAuthOnboardingContent(
                         .padding(top = 24.dp, bottom = 16.dp)
                         .size(96.dp),
                     painter = painterResource(R.drawable.ic_strimup),
-                    contentDescription = "Strimup icon",
+                    contentDescription = stringResource(R.string.auth_logo_description),
                 )
 
                 Text(
@@ -157,32 +157,32 @@ fun OAuthOnboardingContent(
                 )
 
                 AuthDropdownField(
-                    label = "Sexe",
+                    label = stringResource(R.string.auth_gender_label),
                     selectedLabelRes = state.genderInput?.toLabelRes(),
                     isExpanded = state.isSexDropDownExpended,
                     onExpandedChange = onSexDropDownExpendedChange,
                     options = Gender.entries,
                     optionLabelRes = { it.toLabelRes() },
                     onOptionSelected = onGenderChange,
-                    contentDescription = "Sélectionner votre sexe",
+                    contentDescription = stringResource(R.string.auth_gender_pick),
                 )
 
                 AuthDropdownField(
-                    label = "Je suis un(e)",
+                    label = stringResource(R.string.auth_role_label),
                     selectedLabelRes = state.roleInput?.toLabelRes(),
                     isExpanded = state.isRoleDropDownExpended,
                     onExpandedChange = onRoleDropDownExpendedChange,
                     options = listOf(UserRole.VIEWER, UserRole.STREAMER),
                     optionLabelRes = { it.toLabelRes() },
                     onOptionSelected = onRoleChange,
-                    contentDescription = "Sélectionner votre profil",
+                    contentDescription = stringResource(R.string.auth_role_pick),
                 )
 
                 AuthLegalText(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
-                    prefix = "En continuant, j'accepte",
+                    prefixRes = R.string.oauth_onboarding_legal_prefix,
                     textAlign = TextAlign.Center,
                 )
 

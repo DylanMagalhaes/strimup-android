@@ -3,6 +3,10 @@ package com.strimup.feature.auth.presentation.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.R
+import com.strimup.core.common.DomainError
+import com.strimup.core.network.toDomainError
+import com.strimup.core.ui.error.toUiText
+import com.strimup.core.ui.text.UiText
 import com.strimup.feature.auth.domain.usecase.LoginUseCase
 import com.strimup.feature.auth.domain.usecase.StartTwitchLoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,8 +50,7 @@ class LoginViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     _state.update { it.copy(isLoading = false) }
-                    val errorMessage = exception.localizedMessage ?: "Une erreur est survenue"
-                    _events.send(LoginUiEvent.ShowSnackBar(text = errorMessage))
+                    _events.send(LoginUiEvent.ShowSnackBar(exception.toLoginErrorUiText()))
                 }
         }
     }
@@ -59,7 +62,7 @@ class LoginViewModel @Inject constructor(
                     _events.send(LoginUiEvent.OpenCustomTab(url))
                 }
                 .onFailure {
-                    _events.send(LoginUiEvent.ShowSnackBarRes(R.string.oauth_error_failed))
+                    _events.send(LoginUiEvent.ShowSnackBar(UiText.Resource(R.string.oauth_error_failed)))
                 }
         }
     }
@@ -75,4 +78,14 @@ class LoginViewModel @Inject constructor(
             it.copy(passwordInput = password)
         }
     }
+}
+
+private const val HTTP_UNAUTHORIZED = 401
+
+private fun Throwable.toLoginErrorUiText(): UiText {
+    val error = toDomainError()
+    if (error is DomainError.Server && error.code == HTTP_UNAUTHORIZED) {
+        return error.message?.let(UiText::Dynamic) ?: UiText.Resource(R.string.error_invalid_credentials)
+    }
+    return error.toUiText()
 }

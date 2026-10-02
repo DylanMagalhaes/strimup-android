@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.home.domain.entity.BannerItemEntity
+import com.strimup.feature.home.domain.entity.BannerType
 import kotlinx.coroutines.delay
 
 
@@ -186,7 +187,7 @@ private fun BannerCard(
                     }
                 }
 
-                if (banner.type == "FEATURED_STREAMER" && !banner.avatarUrl.isNullOrBlank()) {
+                if (banner.type == BannerType.FeaturedStreamer && !banner.avatarUrl.isNullOrBlank()) {
                     AsyncImage(
                         model = banner.avatarUrl,
                         contentDescription = "Avatar ${banner.title}",
