@@ -234,6 +234,18 @@
     <string name="search_placeholder">Rechercher un streamer…</string>
     <string name="search_no_result">Aucun streamer trouvé pour « %1$s »</string>
 
+    <!-- Schedule -->
+    <string name="schedule_title">Planning</string>
+    <string name="schedule_empty">Aucun stream prévu pour le moment.</string>
+    <string name="schedule_today">Aujourd\'hui</string>
+    <string name="schedule_day_monday">Lundi</string>
+    <string name="schedule_day_tuesday">Mardi</string>
+    <string name="schedule_day_wednesday">Mercredi</string>
+    <string name="schedule_day_thursday">Jeudi</string>
+    <string name="schedule_day_friday">Vendredi</string>
+    <string name="schedule_day_saturday">Samedi</string>
+    <string name="schedule_day_sunday">Dimanche</string>
+
     <!-- Report -->
     <string name="report_action">Signaler ce profil</string>
     <string name="report_title">Signaler %1$s</string>
