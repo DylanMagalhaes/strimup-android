@@ -43,6 +43,7 @@ internal val montserratFontFamily = FontFamily(
             weight = FontWeight.Bold,
             style = FontStyle.Italic
         ),
+        Font(resId = R.font.montserrat_black, weight = FontWeight.Black),
     ),
 )
 
@@ -64,6 +65,12 @@ internal val zalandoFontFamily = FontFamily(
         Font(
             resId = R.font.zalando_sans_bold_italic,
             weight = FontWeight.Bold,
+            style = FontStyle.Italic
+        ),
+        Font(resId = R.font.zalando_sans_black, weight = FontWeight.Black),
+        Font(
+            resId = R.font.zalando_sans_black_italic,
+            weight = FontWeight.Black,
             style = FontStyle.Italic
         ),
     ),
