@@ -239,6 +239,17 @@
     <string name="schedule_empty">Aucun stream prévu pour le moment.</string>
     <string name="schedule_today">Aujourd\'hui</string>
     <string name="schedule_delete_item">Supprimer « %1$s »</string>
+    <string name="schedule_add_item">Ajouter un stream</string>
+    <string name="schedule_full">Planning complet (%1$d/%2$d)</string>
+    <string name="schedule_add_title">Nouveau stream</string>
+    <string name="schedule_add_subtitle">Choisis le jour, l\'horaire et le titre de ton stream.</string>
+    <string name="schedule_add_day_label">Jour</string>
+    <string name="schedule_add_time_label">Horaire</string>
+    <string name="schedule_add_time_placeholder">Choisir un horaire</string>
+    <string name="schedule_add_title_label">Titre</string>
+    <string name="schedule_add_title_counter">%1$d/%2$d</string>
+    <string name="schedule_add_submit">Ajouter au planning</string>
+    <string name="schedule_add_invalid">Choisis un jour, un horaire et un titre.</string>
     <string name="schedule_day_monday">Lundi</string>
     <string name="schedule_day_tuesday">Mardi</string>
     <string name="schedule_day_wednesday">Mercredi</string>

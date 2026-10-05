@@ -9,8 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,7 +22,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -34,6 +41,7 @@ import com.strimup.R
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.feature.schedule.domain.entity.SchedulePolicy
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -46,6 +54,8 @@ fun ScheduleSection(
     viewModel: ScheduleSectionViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val addItemState by viewModel.addItemState.collectAsStateWithLifecycle()
+    var isAddSheetVisible by rememberSaveable { mutableStateOf(false) }
     val today = remember { LocalDate.now().dayOfWeek }
     val resources = LocalResources.current
 
@@ -59,6 +69,10 @@ fun ScheduleSection(
                 is ScheduleSectionUiEvent.ShowSnackBar -> {
                     snackBarHostState?.showSnackbar(resources.getString(event.textRes))
                 }
+
+                ScheduleSectionUiEvent.ItemAdded -> {
+                    isAddSheetVisible = false
+                }
             }
         }
     }
@@ -69,8 +83,23 @@ fun ScheduleSection(
         isEditable = isEditable,
         onRetryClick = { viewModel.loadSchedule(streamerId) },
         onDeleteClick = viewModel::onDeleteClick,
+        onAddClick = { isAddSheetVisible = true },
         modifier = modifier,
     )
+
+    if (isAddSheetVisible) {
+        AddScheduleItemSheet(
+            state = addItemState,
+            onDaySelected = viewModel::onAddDaySelected,
+            onStartTimeSelected = viewModel::onAddStartTimeSelected,
+            onTitleChange = viewModel::onAddTitleChange,
+            onSubmitClick = viewModel::onAddSubmitClick,
+            onDismiss = {
+                isAddSheetVisible = false
+                viewModel.onAddDismiss()
+            },
+        )
+    }
 }
 
 @Composable
@@ -80,6 +109,7 @@ private fun ScheduleSection(
     isEditable: Boolean,
     onRetryClick: () -> Unit,
     onDeleteClick: (itemId: String) -> Unit,
+    onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -110,19 +140,27 @@ private fun ScheduleSection(
             }
 
             is ScheduleSectionUiState.Success -> {
-                if (state.days.isEmpty()) {
-                    ScheduleMessage(messageRes = R.string.schedule_empty)
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        state.days.forEach { day ->
-                            ScheduleDayCard(
-                                day = day,
-                                isToday = day.dayOfWeek == today,
-                                isEditable = isEditable,
-                                deletingItemIds = state.deletingItemIds,
-                                onDeleteClick = onDeleteClick,
-                            )
-                        }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (state.days.isEmpty()) {
+                        ScheduleMessage(messageRes = R.string.schedule_empty)
+                    }
+
+                    state.days.forEach { day ->
+                        ScheduleDayCard(
+                            day = day,
+                            isToday = day.dayOfWeek == today,
+                            isEditable = isEditable,
+                            deletingItemIds = state.deletingItemIds,
+                            onDeleteClick = onDeleteClick,
+                        )
+                    }
+
+                    if (isEditable) {
+                        AddScheduleItemButton(
+                            canAddItem = state.canAddItem,
+                            itemCount = state.itemCount,
+                            onClick = onAddClick,
+                        )
                     }
                 }
             }
@@ -139,6 +177,38 @@ private fun ScheduleSection(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AddScheduleItemButton(
+    canAddItem: Boolean,
+    itemCount: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (canAddItem) {
+        OutlinedButton(
+            onClick = onClick,
+            modifier = modifier.fillMaxWidth(),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 8.dp),
+            )
+            Text(
+                text = stringResource(R.string.schedule_add_item),
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    } else {
+        Text(
+            text = stringResource(R.string.schedule_full, itemCount, SchedulePolicy.MAX_ITEMS),
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = modifier,
+        )
     }
 }
 
@@ -190,6 +260,7 @@ internal fun ScheduleSectionPreview() {
                 isEditable = false,
                 onRetryClick = {},
                 onDeleteClick = {},
+                onAddClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -204,9 +275,10 @@ internal fun ScheduleSectionEmptyPreview() {
             ScheduleSection(
                 state = ScheduleSectionUiState.Success(days = emptyList()),
                 today = DayOfWeek.WEDNESDAY,
-                isEditable = false,
+                isEditable = true,
                 onRetryClick = {},
                 onDeleteClick = {},
+                onAddClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -224,6 +296,7 @@ internal fun ScheduleSectionErrorPreview() {
                 isEditable = false,
                 onRetryClick = {},
                 onDeleteClick = {},
+                onAddClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -241,6 +314,7 @@ internal fun ScheduleSectionEditablePreview() {
                 isEditable = true,
                 onRetryClick = {},
                 onDeleteClick = {},
+                onAddClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }

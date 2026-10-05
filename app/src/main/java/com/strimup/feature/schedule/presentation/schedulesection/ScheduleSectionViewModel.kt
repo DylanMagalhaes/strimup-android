@@ -2,9 +2,15 @@ package com.strimup.feature.schedule.presentation.schedulesection
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.R
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
-import com.strimup.feature.schedule.domain.entity.ScheduleItemEntity
+import com.strimup.core.ui.error.toUiText
+import com.strimup.core.ui.text.UiText
+import com.strimup.feature.schedule.domain.entity.InvalidScheduleItemException
+import com.strimup.feature.schedule.domain.entity.NewScheduleItemEntity
+import com.strimup.feature.schedule.domain.entity.SchedulePolicy
+import com.strimup.feature.schedule.domain.usecase.CreateScheduleItemUseCase
 import com.strimup.feature.schedule.domain.usecase.DeleteScheduleItemUseCase
 import com.strimup.feature.schedule.domain.usecase.GetScheduleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,20 +21,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.DateTimeException
 import java.time.DayOfWeek
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleSectionViewModel @Inject constructor(
     private val getSchedule: GetScheduleUseCase,
     private val deleteScheduleItem: DeleteScheduleItemUseCase,
+    private val createScheduleItem: CreateScheduleItemUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ScheduleSectionUiState>(ScheduleSectionUiState.Loading)
     val state: StateFlow<ScheduleSectionUiState> = _state.asStateFlow()
+
+    private val _addItemState = MutableStateFlow(AddScheduleItemUiState())
+    val addItemState: StateFlow<AddScheduleItemUiState> = _addItemState.asStateFlow()
 
     private val _events = Channel<ScheduleSectionUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -72,43 +80,61 @@ class ScheduleSectionViewModel @Inject constructor(
         }
     }
 
+    fun onAddDaySelected(day: DayOfWeek) {
+        _addItemState.update { it.copy(selectedDay = day, errorMessage = null) }
+    }
+
+    fun onAddStartTimeSelected(startTime: LocalTime) {
+        _addItemState.update { it.copy(startTime = startTime, errorMessage = null) }
+    }
+
+    fun onAddTitleChange(title: String) {
+        _addItemState.update { it.copy(title = title.take(SchedulePolicy.MAX_TITLE_LENGTH), errorMessage = null) }
+    }
+
+    fun onAddSubmitClick() {
+        val currentState = _addItemState.value
+        val day = currentState.selectedDay
+        val startTime = currentState.startTime
+        if (!currentState.isSubmitEnabled || day == null || startTime == null) return
+
+        _addItemState.update { it.copy(isSubmitting = true, errorMessage = null) }
+
+        viewModelScope.launch {
+            val newItem = NewScheduleItemEntity(
+                title = currentState.title,
+                dayOfWeek = day.toDayIndex(),
+                startTime = startTime.toDisplayTime(),
+            )
+
+            createScheduleItem(newItem)
+                .onSuccess { createdItem ->
+                    _addItemState.value = AddScheduleItemUiState()
+                    updateSuccess { it.copy(days = it.days.withSlot(day, createdItem.toSlotUi())) }
+                    _events.send(ScheduleSectionUiEvent.ItemAdded)
+                }
+                .onFailure { exception ->
+                    _addItemState.update {
+                        it.copy(isSubmitting = false, errorMessage = exception.toAddItemErrorUiText())
+                    }
+                }
+        }
+    }
+
+    fun onAddDismiss() {
+        if (!_addItemState.value.isSubmitting) {
+            _addItemState.value = AddScheduleItemUiState()
+        }
+    }
+
+    private fun Throwable.toAddItemErrorUiText(): UiText = when (this) {
+        is InvalidScheduleItemException -> UiText.Resource(R.string.schedule_add_invalid)
+        else -> toDomainError().toUiText()
+    }
+
     private fun updateSuccess(transform: (ScheduleSectionUiState.Success) -> ScheduleSectionUiState.Success) {
         _state.update { state ->
             if (state is ScheduleSectionUiState.Success) transform(state) else state
         }
-    }
-
-    private fun List<ScheduleDayUi>.withoutSlot(itemId: String): List<ScheduleDayUi> =
-        map { day -> day.copy(slots = day.slots.filterNot { it.id == itemId }) }
-            .filter { it.slots.isNotEmpty() }
-
-    private fun List<ScheduleItemEntity>.toScheduleDays(): List<ScheduleDayUi> =
-        mapNotNull { item -> item.dayOfWeek.toDayOfWeekOrNull()?.let { day -> day to item.toSlotUi() } }
-            .groupBy(keySelector = { it.first }, valueTransform = { it.second })
-            .toSortedMap()
-            .map { (day, slots) ->
-                ScheduleDayUi(dayOfWeek = day, slots = slots.sortedBy { it.startTime })
-            }
-
-    private fun Int.toDayOfWeekOrNull(): DayOfWeek? = try {
-        DayOfWeek.of(this + 1)
-    } catch (_: DateTimeException) {
-        null
-    }
-
-    private fun ScheduleItemEntity.toSlotUi(): ScheduleSlotUi = ScheduleSlotUi(
-        id = id,
-        startTime = startTime.toDisplayTime(),
-        title = title,
-    )
-
-    private fun String.toDisplayTime(): String = try {
-        LocalTime.parse(this).format(TIME_FORMATTER)
-    } catch (_: DateTimeException) {
-        this
-    }
-
-    private companion object {
-        val TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     }
 }
