@@ -5,11 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.schedule.domain.entity.ScheduleItemEntity
+import com.strimup.feature.schedule.domain.usecase.DeleteScheduleItemUseCase
 import com.strimup.feature.schedule.domain.usecase.GetScheduleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DateTimeException
 import java.time.DayOfWeek
@@ -20,10 +24,14 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleSectionViewModel @Inject constructor(
     private val getSchedule: GetScheduleUseCase,
+    private val deleteScheduleItem: DeleteScheduleItemUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ScheduleSectionUiState>(ScheduleSectionUiState.Loading)
     val state: StateFlow<ScheduleSectionUiState> = _state.asStateFlow()
+
+    private val _events = Channel<ScheduleSectionUiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
     fun loadSchedule(streamerId: String) {
         viewModelScope.launch {
@@ -40,6 +48,39 @@ class ScheduleSectionViewModel @Inject constructor(
                 }
         }
     }
+
+    fun onDeleteClick(itemId: String) {
+        val currentState = _state.value
+        if (currentState !is ScheduleSectionUiState.Success || itemId in currentState.deletingItemIds) return
+
+        updateSuccess { it.copy(deletingItemIds = it.deletingItemIds + itemId) }
+
+        viewModelScope.launch {
+            deleteScheduleItem(itemId)
+                .onSuccess {
+                    updateSuccess {
+                        it.copy(
+                            days = it.days.withoutSlot(itemId),
+                            deletingItemIds = it.deletingItemIds - itemId,
+                        )
+                    }
+                }
+                .onFailure { exception ->
+                    updateSuccess { it.copy(deletingItemIds = it.deletingItemIds - itemId) }
+                    _events.send(ScheduleSectionUiEvent.ShowSnackBar(exception.toDomainError().toMessageRes()))
+                }
+        }
+    }
+
+    private fun updateSuccess(transform: (ScheduleSectionUiState.Success) -> ScheduleSectionUiState.Success) {
+        _state.update { state ->
+            if (state is ScheduleSectionUiState.Success) transform(state) else state
+        }
+    }
+
+    private fun List<ScheduleDayUi>.withoutSlot(itemId: String): List<ScheduleDayUi> =
+        map { day -> day.copy(slots = day.slots.filterNot { it.id == itemId }) }
+            .filter { it.slots.isNotEmpty() }
 
     private fun List<ScheduleItemEntity>.toScheduleDays(): List<ScheduleDayUi> =
         mapNotNull { item -> item.dayOfWeek.toDayOfWeekOrNull()?.let { day -> day to item.toSlotUi() } }

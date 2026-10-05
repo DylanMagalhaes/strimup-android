@@ -8,6 +8,7 @@ sealed interface ScheduleSectionUiState {
 
     data class Success(
         val days: List<ScheduleDayUi>,
+        val deletingItemIds: Set<String> = emptySet(),
     ) : ScheduleSectionUiState
 
     data class Error(

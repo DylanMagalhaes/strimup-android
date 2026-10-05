@@ -1,8 +1,6 @@
 package com.strimup.feature.schedule.presentation.schedulesection
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,13 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -40,7 +34,6 @@ import com.strimup.R
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.feature.schedule.presentation.labelRes
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -48,19 +41,34 @@ import java.time.LocalDate
 fun ScheduleSection(
     streamerId: String,
     modifier: Modifier = Modifier,
+    isEditable: Boolean = false,
+    snackBarHostState: SnackbarHostState? = null,
     viewModel: ScheduleSectionViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val today = remember { LocalDate.now().dayOfWeek }
+    val resources = LocalResources.current
 
     LaunchedEffect(streamerId) {
         viewModel.loadSchedule(streamerId)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ScheduleSectionUiEvent.ShowSnackBar -> {
+                    snackBarHostState?.showSnackbar(resources.getString(event.textRes))
+                }
+            }
+        }
+    }
+
     ScheduleSection(
         state = state,
         today = today,
+        isEditable = isEditable,
         onRetryClick = { viewModel.loadSchedule(streamerId) },
+        onDeleteClick = viewModel::onDeleteClick,
         modifier = modifier,
     )
 }
@@ -69,7 +77,9 @@ fun ScheduleSection(
 private fun ScheduleSection(
     state: ScheduleSectionUiState,
     today: DayOfWeek,
+    isEditable: Boolean,
     onRetryClick: () -> Unit,
+    onDeleteClick: (itemId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -108,6 +118,9 @@ private fun ScheduleSection(
                             ScheduleDayCard(
                                 day = day,
                                 isToday = day.dayOfWeek == today,
+                                isEditable = isEditable,
+                                deletingItemIds = state.deletingItemIds,
+                                onDeleteClick = onDeleteClick,
                             )
                         }
                     }
@@ -127,95 +140,6 @@ private fun ScheduleSection(
             }
         }
     }
-}
-
-@Composable
-private fun ScheduleDayCard(
-    day: ScheduleDayUi,
-    isToday: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        border = if (isToday) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null,
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(day.dayOfWeek.labelRes()),
-                    color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontFamily = zalandoFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .weight(1f)
-                        .semantics { heading() },
-                )
-                if (isToday) {
-                    TodayPill()
-                }
-            }
-
-            day.slots.forEach { slot ->
-                ScheduleSlotRow(slot = slot, isToday = isToday)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ScheduleSlotRow(
-    slot: ScheduleSlotUi,
-    isToday: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .semantics(mergeDescendants = true) {},
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(
-            text = slot.startTime,
-            color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
-                .widthIn(min = 56.dp)
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-        )
-        Text(
-            text = slot.title,
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
-
-@Composable
-private fun TodayPill(modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(R.string.schedule_today),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelSmall,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-    )
 }
 
 @Composable
@@ -263,7 +187,9 @@ internal fun ScheduleSectionPreview() {
             ScheduleSection(
                 state = ScheduleSectionUiState.Success(days = previewDays),
                 today = DayOfWeek.WEDNESDAY,
+                isEditable = false,
                 onRetryClick = {},
+                onDeleteClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -278,7 +204,9 @@ internal fun ScheduleSectionEmptyPreview() {
             ScheduleSection(
                 state = ScheduleSectionUiState.Success(days = emptyList()),
                 today = DayOfWeek.WEDNESDAY,
+                isEditable = false,
                 onRetryClick = {},
+                onDeleteClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -293,7 +221,26 @@ internal fun ScheduleSectionErrorPreview() {
             ScheduleSection(
                 state = ScheduleSectionUiState.Error(messageRes = R.string.error_network),
                 today = DayOfWeek.WEDNESDAY,
+                isEditable = false,
                 onRetryClick = {},
+                onDeleteClick = {},
+                modifier = Modifier.padding(16.dp),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+internal fun ScheduleSectionEditablePreview() {
+    StrimupTheme {
+        Surface {
+            ScheduleSection(
+                state = ScheduleSectionUiState.Success(days = previewDays, deletingItemIds = setOf("4")),
+                today = DayOfWeek.WEDNESDAY,
+                isEditable = true,
+                onRetryClick = {},
+                onDeleteClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
