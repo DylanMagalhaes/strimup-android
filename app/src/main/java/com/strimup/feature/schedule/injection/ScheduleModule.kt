@@ -12,8 +12,10 @@ import com.strimup.feature.schedule.domain.usecase.DeleteScheduleItemUseCase
 import com.strimup.feature.schedule.domain.usecase.GetMyScheduleUseCase
 import com.strimup.feature.schedule.domain.usecase.GetScheduleUseCase
 import com.strimup.feature.schedule.presentation.export.DefaultScheduleExportImageGenerator
+import com.strimup.feature.schedule.presentation.export.DefaultScheduleImageGallerySaver
 import com.strimup.feature.schedule.presentation.export.DefaultScheduleImageRenderer
 import com.strimup.feature.schedule.presentation.export.ScheduleExportImageGenerator
+import com.strimup.feature.schedule.presentation.export.ScheduleImageGallerySaver
 import com.strimup.feature.schedule.presentation.export.ScheduleImageRenderer
 import dagger.Binds
 import dagger.Module
@@ -48,6 +50,9 @@ interface ScheduleModule {
 
     @Binds
     fun bindScheduleExportImageGenerator(impl: DefaultScheduleExportImageGenerator): ScheduleExportImageGenerator
+
+    @Binds
+    fun bindScheduleImageGallerySaver(impl: DefaultScheduleImageGallerySaver): ScheduleImageGallerySaver
 
     companion object {
         @Provides

@@ -1,5 +1,6 @@
 package com.strimup.feature.schedule.presentation.export
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.strimup.R
 import com.strimup.core.common.DomainError
@@ -35,12 +36,26 @@ class ScheduleExportViewModelTest {
 
     private val generateCalls = mutableListOf<GenerateCall>()
 
+    private class FakeGallerySaver(
+        override val isAvailable: Boolean = true,
+        private val result: () -> Result<Unit> = { Result.success(Unit) },
+    ) : ScheduleImageGallerySaver {
+        val savedFiles = mutableListOf<File>()
+
+        override suspend fun save(file: File): Result<Unit> {
+            savedFiles += file
+            return result()
+        }
+    }
+
     private fun createViewModel(
         getMySchedule: GetMyScheduleUseCase = GetMyScheduleUseCase { Result.success(mySchedule) },
         generate: suspend (ScheduleExportTemplate) -> Result<File> = { template ->
             Result.success(File("planning-${template.name}.png"))
         },
+        gallerySaver: ScheduleImageGallerySaver = FakeGallerySaver(),
     ) = ScheduleExportViewModel(
+        gallerySaver = gallerySaver,
         getMySchedule = getMySchedule,
         imageGenerator = ScheduleExportImageGenerator { username, days, template ->
             generateCalls += GenerateCall(username, days, template)
@@ -52,7 +67,7 @@ class ScheduleExportViewModelTest {
     fun `initial state should be preparing the image with the black template`() {
         val viewModel = createViewModel()
 
-        assertThat(viewModel.state.value).isEqualTo(ScheduleExportUiState())
+        assertThat(viewModel.state.value).isEqualTo(ScheduleExportUiState(isGallerySaveAvailable = true))
         assertThat(viewModel.state.value.selectedTemplate).isEqualTo(ScheduleExportTemplate.Black)
     }
 
@@ -199,5 +214,65 @@ class ScheduleExportViewModelTest {
 
         // THEN
         assertThat(loadCalls).isEqualTo(1)
+    }
+
+    @Test
+    fun `gallery save should be hidden when the device does not support it`() {
+        val viewModel = createViewModel(gallerySaver = FakeGallerySaver(isAvailable = false))
+
+        assertThat(viewModel.state.value.isGallerySaveAvailable).isFalse()
+    }
+
+    @Test
+    fun `onSaveToGalleryClick should save the generated image and confirm it`() = runTest {
+        // GIVEN
+        val gallerySaver = FakeGallerySaver()
+        val viewModel = createViewModel(gallerySaver = gallerySaver)
+        viewModel.load("raziuko")
+        advanceUntilIdle()
+
+        viewModel.events.test {
+            // WHEN
+            viewModel.onSaveToGalleryClick()
+            advanceUntilIdle()
+
+            // THEN
+            assertThat(awaitItem()).isEqualTo(ScheduleExportUiEvent.ShowSnackBar(R.string.schedule_export_saved))
+        }
+        assertThat(gallerySaver.savedFiles).containsExactly(File("planning-Black.png"))
+        assertThat(viewModel.state.value.isSavingToGallery).isFalse()
+    }
+
+    @Test
+    fun `onSaveToGalleryClick when saving fails should show the save error`() = runTest {
+        // GIVEN
+        val viewModel = createViewModel(
+            gallerySaver = FakeGallerySaver(result = { Result.failure(IllegalStateException()) }),
+        )
+        viewModel.load("raziuko")
+        advanceUntilIdle()
+
+        viewModel.events.test {
+            // WHEN
+            viewModel.onSaveToGalleryClick()
+            advanceUntilIdle()
+
+            // THEN
+            assertThat(awaitItem()).isEqualTo(ScheduleExportUiEvent.ShowSnackBar(R.string.schedule_export_save_error))
+        }
+    }
+
+    @Test
+    fun `onSaveToGalleryClick before the image is ready should do nothing`() = runTest {
+        // GIVEN
+        val gallerySaver = FakeGallerySaver()
+        val viewModel = createViewModel(gallerySaver = gallerySaver)
+
+        // WHEN
+        viewModel.onSaveToGalleryClick()
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(gallerySaver.savedFiles).isEmpty()
     }
 }

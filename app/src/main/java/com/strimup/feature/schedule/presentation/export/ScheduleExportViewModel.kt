@@ -9,9 +9,11 @@ import com.strimup.core.ui.text.UiText
 import com.strimup.feature.schedule.domain.usecase.GetMyScheduleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,10 +22,14 @@ import javax.inject.Inject
 class ScheduleExportViewModel @Inject constructor(
     private val getMySchedule: GetMyScheduleUseCase,
     private val imageGenerator: ScheduleExportImageGenerator,
+    private val gallerySaver: ScheduleImageGallerySaver,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ScheduleExportUiState())
+    private val _state = MutableStateFlow(ScheduleExportUiState(isGallerySaveAvailable = gallerySaver.isAvailable))
     val state: StateFlow<ScheduleExportUiState> = _state.asStateFlow()
+
+    private val _events = Channel<ScheduleExportUiEvent>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
     private var username: String = ""
     private var days: List<ScheduleExportDay>? = null
@@ -66,6 +72,23 @@ class ScheduleExportViewModel @Inject constructor(
         } else {
             job?.cancel()
             job = viewModelScope.launch { generate() }
+        }
+    }
+
+    fun onSaveToGalleryClick() {
+        val currentState = _state.value
+        val file = currentState.imageFile
+        if (!currentState.isImageReady || currentState.isSavingToGallery || file == null) return
+
+        _state.update { it.copy(isSavingToGallery = true) }
+
+        viewModelScope.launch {
+            val messageRes = gallerySaver.save(file).fold(
+                onSuccess = { R.string.schedule_export_saved },
+                onFailure = { R.string.schedule_export_save_error },
+            )
+            _state.update { it.copy(isSavingToGallery = false) }
+            _events.send(ScheduleExportUiEvent.ShowSnackBar(messageRes))
         }
     }
 

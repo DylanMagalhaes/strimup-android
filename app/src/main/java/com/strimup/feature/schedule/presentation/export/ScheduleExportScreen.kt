@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -24,18 +25,23 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +53,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.strimup.R
+import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.text.UiText
 import com.strimup.core.ui.text.asString
@@ -65,16 +72,32 @@ fun ScheduleExportScreen(
     viewModel: ScheduleExportViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
+    val shareImage = rememberScheduleImageSharer(snackBarHostState)
 
     LaunchedEffect(username) {
         viewModel.load(username)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ScheduleExportUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
+                }
+            }
+        }
+    }
+
     ScheduleExportScreen(
         state = state,
+        snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
         onTemplateSelected = viewModel::onTemplateSelected,
         onRetryClick = viewModel::onRetryClick,
+        onShareClick = { state.imageFile?.let(shareImage::invoke) },
+        onSaveToGalleryClick = viewModel::onSaveToGalleryClick,
         modifier = modifier,
     )
 }
@@ -83,14 +106,18 @@ fun ScheduleExportScreen(
 @Composable
 private fun ScheduleExportScreen(
     state: ScheduleExportUiState,
+    snackBarHostState: SnackbarHostState,
     onNavUp: () -> Unit,
     onTemplateSelected: (ScheduleExportTemplate) -> Unit,
     onRetryClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onSaveToGalleryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
         contentWindowInsets = screenTopWindowInsets,
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -130,6 +157,12 @@ private fun ScheduleExportScreen(
             TemplateSelector(
                 selectedTemplate = state.selectedTemplate,
                 onTemplateSelected = onTemplateSelected,
+            )
+
+            ExportActions(
+                state = state,
+                onShareClick = onShareClick,
+                onSaveToGalleryClick = onSaveToGalleryClick,
             )
         }
     }
@@ -267,15 +300,56 @@ private fun TemplateOption(
     }
 }
 
+@Composable
+private fun ExportActions(
+    state: ScheduleExportUiState,
+    onShareClick: () -> Unit,
+    onSaveToGalleryClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PrimaryButton(
+            label = stringResource(R.string.schedule_export_share),
+            onClick = onShareClick,
+            enabled = state.isImageReady,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        if (state.isGallerySaveAvailable) {
+            OutlinedButton(
+                onClick = onSaveToGalleryClick,
+                enabled = state.isImageReady && !state.isSavingToGallery,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                if (state.isSavingToGallery) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                } else {
+                    Text(
+                        text = stringResource(R.string.schedule_export_save_to_gallery),
+                        fontFamily = zalandoFontFamily,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 internal fun ScheduleExportScreenGeneratingPreview() {
     StrimupTheme {
         ScheduleExportScreen(
-            state = ScheduleExportUiState(isGenerating = true),
+            state = ScheduleExportUiState(isGenerating = true, isGallerySaveAvailable = true),
+            snackBarHostState = remember { SnackbarHostState() },
             onNavUp = {},
             onTemplateSelected = {},
             onRetryClick = {},
+            onShareClick = {},
+            onSaveToGalleryClick = {},
         )
     }
 }
@@ -290,9 +364,12 @@ internal fun ScheduleExportScreenErrorPreview() {
                 isGenerating = false,
                 errorMessage = UiText.Resource(R.string.schedule_export_error),
             ),
+            snackBarHostState = remember { SnackbarHostState() },
             onNavUp = {},
             onTemplateSelected = {},
             onRetryClick = {},
+            onShareClick = {},
+            onSaveToGalleryClick = {},
         )
     }
 }

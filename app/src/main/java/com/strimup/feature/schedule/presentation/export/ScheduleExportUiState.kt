@@ -8,6 +8,8 @@ data class ScheduleExportUiState(
     val imageFile: File? = null,
     val isGenerating: Boolean = true,
     val errorMessage: UiText? = null,
+    val isGallerySaveAvailable: Boolean = false,
+    val isSavingToGallery: Boolean = false,
 ) {
     val isImageReady: Boolean
         get() = imageFile != null && !isGenerating && errorMessage == null
