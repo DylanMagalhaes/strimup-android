@@ -8,7 +8,6 @@ import javax.inject.Inject
 class DefaultCreateScheduleItemUseCase @Inject constructor(
     private val repository: ScheduleRepository
 ) : CreateScheduleItemUseCase {
-    override suspend fun invoke(item: NewScheduleItemEntity): Result<ScheduleItemEntity> = repository.createScheduleItem(
-        item
-    )
+    override suspend fun invoke(item: NewScheduleItemEntity): Result<ScheduleItemEntity> =
+        repository.createScheduleItem(item)
 }

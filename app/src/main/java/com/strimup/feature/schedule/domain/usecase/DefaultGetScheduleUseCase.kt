@@ -7,7 +7,6 @@ import javax.inject.Inject
 class DefaultGetScheduleUseCase @Inject constructor(
     private val repository: ScheduleRepository
 ) : GetScheduleUseCase {
-    override suspend fun invoke(streamerId: String): Result<List<ScheduleItemEntity>> = repository.getSchedule(
-        streamerId
-    )
+    override suspend fun invoke(streamerId: String): Result<List<ScheduleItemEntity>> =
+        repository.getSchedule(streamerId)
 }

@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class DefaultDeleteScheduleItemUseCase @Inject constructor(
     private val repository: ScheduleRepository
-): DeleteScheduleItemUseCase {
+) : DeleteScheduleItemUseCase {
     override suspend fun invoke(id: String): Result<Unit> = repository.deleteScheduleItem(id)
 }
