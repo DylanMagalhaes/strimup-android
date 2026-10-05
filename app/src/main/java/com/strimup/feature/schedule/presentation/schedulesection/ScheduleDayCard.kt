@@ -48,7 +48,11 @@ internal fun ScheduleDayCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        border = if (isToday) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null,
+        border = if (isToday) {
+            BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
+        } else {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
+        },
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -101,7 +105,7 @@ private fun ScheduleSlotRow(
     ) {
         Text(
             text = slot.startTime,
-            color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+            color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,

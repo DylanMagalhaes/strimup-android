@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.IosShare
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -199,7 +200,7 @@ private fun AddScheduleItemButton(
     modifier: Modifier = Modifier,
 ) {
     if (canAddItem) {
-        OutlinedButton(
+        Button(
             onClick = onClick,
             modifier = modifier.fillMaxWidth(),
         ) {
