@@ -258,6 +258,18 @@
     <string name="schedule_day_saturday">Samedi</string>
     <string name="schedule_day_sunday">Dimanche</string>
 
+    <string name="schedule_export_week_label">PLANNING DE LA SEMAINE</string>
+    <string name="schedule_export_off">OFF</string>
+    <string name="schedule_export_template_black">NOIR</string>
+    <string name="schedule_export_template_pink">ROSE</string>
+    <string name="schedule_export_day_monday">LUN</string>
+    <string name="schedule_export_day_tuesday">MAR</string>
+    <string name="schedule_export_day_wednesday">MER</string>
+    <string name="schedule_export_day_thursday">JEU</string>
+    <string name="schedule_export_day_friday">VEN</string>
+    <string name="schedule_export_day_saturday">SAM</string>
+    <string name="schedule_export_day_sunday">DIM</string>
+
     <!-- Report -->
     <string name="report_action">Signaler ce profil</string>
     <string name="report_title">Signaler %1$s</string>
