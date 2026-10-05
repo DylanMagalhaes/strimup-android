@@ -258,6 +258,11 @@
     <string name="schedule_day_saturday">Samedi</string>
     <string name="schedule_day_sunday">Dimanche</string>
 
+    <string name="schedule_export_title">Exporter mon planning</string>
+    <string name="schedule_export_preparing">Préparation de l\'image…</string>
+    <string name="schedule_export_error">Erreur lors de la génération de l\'image. Réessaie.</string>
+    <string name="schedule_export_preview_description">Aperçu de l\'image de ton planning</string>
+    <string name="schedule_export_template_label">Modèle</string>
     <string name="schedule_export_week_label">PLANNING DE LA SEMAINE</string>
     <string name="schedule_export_off">OFF</string>
     <string name="schedule_export_template_black">NOIR</string>
