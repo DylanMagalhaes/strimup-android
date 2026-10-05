@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.IosShare
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +52,7 @@ fun ScheduleSection(
     modifier: Modifier = Modifier,
     isEditable: Boolean = false,
     snackBarHostState: SnackbarHostState? = null,
+    onExportClick: (() -> Unit)? = null,
     viewModel: ScheduleSectionViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -84,6 +86,7 @@ fun ScheduleSection(
         onRetryClick = { viewModel.loadSchedule(streamerId) },
         onDeleteClick = viewModel::onDeleteClick,
         onAddClick = { isAddSheetVisible = true },
+        onExportClick = onExportClick,
         modifier = modifier,
     )
 
@@ -110,6 +113,7 @@ private fun ScheduleSection(
     onRetryClick: () -> Unit,
     onDeleteClick: (itemId: String) -> Unit,
     onAddClick: () -> Unit,
+    onExportClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -160,6 +164,13 @@ private fun ScheduleSection(
                             canAddItem = state.canAddItem,
                             itemCount = state.itemCount,
                             onClick = onAddClick,
+                        )
+                    }
+
+                    if (isEditable && onExportClick != null) {
+                        ExportScheduleButton(
+                            isEnabled = state.itemCount > 0,
+                            onClick = onExportClick,
                         )
                     }
                 }
@@ -213,6 +224,29 @@ private fun AddScheduleItemButton(
 }
 
 @Composable
+private fun ExportScheduleButton(
+    isEnabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        enabled = isEnabled,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.IosShare,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp),
+        )
+        Text(
+            text = stringResource(R.string.schedule_export_action),
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
 private fun ScheduleMessage(
     @StringRes messageRes: Int,
     modifier: Modifier = Modifier,
@@ -261,6 +295,7 @@ internal fun ScheduleSectionPreview() {
                 onRetryClick = {},
                 onDeleteClick = {},
                 onAddClick = {},
+                onExportClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -279,6 +314,7 @@ internal fun ScheduleSectionEmptyPreview() {
                 onRetryClick = {},
                 onDeleteClick = {},
                 onAddClick = {},
+                onExportClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -297,6 +333,7 @@ internal fun ScheduleSectionErrorPreview() {
                 onRetryClick = {},
                 onDeleteClick = {},
                 onAddClick = {},
+                onExportClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -315,6 +352,7 @@ internal fun ScheduleSectionEditablePreview() {
                 onRetryClick = {},
                 onDeleteClick = {},
                 onAddClick = {},
+                onExportClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }

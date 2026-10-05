@@ -67,6 +67,7 @@ fun StreamerProfileScreen(
     modifier: Modifier = Modifier,
     onEditProfileNav: () -> Unit,
     onAccountNav: () -> Unit,
+    onScheduleExportNav: (username: String) -> Unit,
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -95,11 +96,12 @@ fun StreamerProfileScreen(
         onSocialClick = openExternalLink::invoke,
         onRetryClick = viewModel::refresh,
         onAccountClick = onAccountNav,
-        scheduleContent = { streamerId ->
+        scheduleContent = { streamer ->
             ScheduleSection(
-                streamerId = streamerId,
+                streamerId = streamer.id,
                 isEditable = true,
                 snackBarHostState = snackBarHostState,
+                onExportClick = { onScheduleExportNav(streamer.userName) },
             )
         },
         modifier = modifier
@@ -115,7 +117,7 @@ private fun StreamerProfileScreen(
     onSocialClick: (String?) -> Unit,
     onRetryClick: () -> Unit,
     onAccountClick: () -> Unit,
-    scheduleContent: @Composable (streamerId: String) -> Unit,
+    scheduleContent: @Composable (streamer: Streamer) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val titleText = when (state) {
@@ -167,7 +169,7 @@ private fun StreamerProfileContent(
     onEditProfileNav: () -> Unit,
     onSocialClick: (String?) -> Unit,
     onRetryClick: () -> Unit,
-    scheduleContent: @Composable (streamerId: String) -> Unit,
+    scheduleContent: @Composable (streamer: Streamer) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -202,7 +204,7 @@ private fun StreamerProfileSuccessContent(
     streamer: Streamer,
     onEditProfileNav: () -> Unit,
     onSocialClick: (String?) -> Unit,
-    scheduleContent: @Composable (streamerId: String) -> Unit,
+    scheduleContent: @Composable (streamer: Streamer) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -320,7 +322,7 @@ private fun StreamerProfileSuccessContent(
 
                 VerticalSpacer(24.dp)
 
-                scheduleContent(streamer.id)
+                scheduleContent(streamer)
 
                 VerticalSpacer(24.dp)
             }
