@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,6 +55,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.report.presentation.ReportStreamerSheet
 import com.strimup.feature.report.presentation.ReportStreamerUiEvent
 import com.strimup.feature.report.presentation.ReportStreamerViewModel
+import com.strimup.feature.schedule.presentation.schedulesection.ScheduleSection
 
 @Composable
 fun StreamerDetailScreen(
@@ -112,6 +114,7 @@ fun StreamerDetailScreen(
         onReportClick = {
             if (isLoggedIn) isReportSheetVisible = true else onLoginRequired()
         },
+        scheduleContent = { ScheduleSection(streamerId = streamerId) },
     )
 
     val reportedStreamer = (state as? StreamerDetailUiState.Success)?.streamer
@@ -142,6 +145,7 @@ private fun StreamerDetailScreen(
     onRetryClick: () -> Unit,
     isReportAvailable: Boolean,
     onReportClick: () -> Unit,
+    scheduleContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -183,6 +187,7 @@ private fun StreamerDetailScreen(
             onVideoClick = onVideoClick,
             onFavoriteClick = onFavoriteClick,
             onRetryClick = onRetryClick,
+            scheduleContent = scheduleContent,
         )
     }
 }
@@ -224,6 +229,7 @@ private fun StreamerDetailContent(
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
+    scheduleContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -263,6 +269,10 @@ private fun StreamerDetailContent(
                     videos = state.streamer.videos,
                     onVideoClick = onVideoClick,
                 )
+
+                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 24.dp)) {
+                    scheduleContent()
+                }
             }
         }
 
@@ -316,6 +326,7 @@ private fun StreamerDetailScreenPreview() {
             onRetryClick = {},
             isReportAvailable = true,
             onReportClick = {},
+            scheduleContent = {},
         )
     }
 }
