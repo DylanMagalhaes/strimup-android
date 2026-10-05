@@ -16,5 +16,5 @@ interface ScheduleApiService {
     suspend fun deleteScheduleItem(@Path("id") id: String)
 
     @POST("api/streamer/schedule")
-    suspend fun addScheduleItem(@Body request: CreateScheduleItemRequest): ScheduleResponse
+    suspend fun createScheduleItem(@Body request: CreateScheduleItemRequest): ScheduleResponse
 }
