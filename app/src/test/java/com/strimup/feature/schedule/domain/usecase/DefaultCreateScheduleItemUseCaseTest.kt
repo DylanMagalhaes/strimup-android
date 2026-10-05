@@ -17,6 +17,8 @@ class DefaultCreateScheduleItemUseCaseTest {
         override suspend fun getSchedule(streamerId: String): Result<List<ScheduleItemEntity>> =
             Result.success(emptyList())
 
+        override suspend fun getMySchedule(): Result<List<ScheduleItemEntity>> = Result.success(emptyList())
+
         override suspend fun createScheduleItem(item: NewScheduleItemEntity): Result<ScheduleItemEntity> {
             createdItems += item
             return Result.success(

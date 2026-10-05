@@ -6,8 +6,10 @@ import com.strimup.feature.schedule.domain.ScheduleRepository
 import com.strimup.feature.schedule.domain.usecase.CreateScheduleItemUseCase
 import com.strimup.feature.schedule.domain.usecase.DefaultCreateScheduleItemUseCase
 import com.strimup.feature.schedule.domain.usecase.DefaultDeleteScheduleItemUseCase
+import com.strimup.feature.schedule.domain.usecase.DefaultGetMyScheduleUseCase
 import com.strimup.feature.schedule.domain.usecase.DefaultGetScheduleUseCase
 import com.strimup.feature.schedule.domain.usecase.DeleteScheduleItemUseCase
+import com.strimup.feature.schedule.domain.usecase.GetMyScheduleUseCase
 import com.strimup.feature.schedule.domain.usecase.GetScheduleUseCase
 import dagger.Binds
 import dagger.Module
@@ -33,6 +35,9 @@ interface ScheduleModule {
 
     @Binds
     fun bindGetScheduleUseCase(impl: DefaultGetScheduleUseCase): GetScheduleUseCase
+
+    @Binds
+    fun bindGetMyScheduleUseCase(impl: DefaultGetMyScheduleUseCase): GetMyScheduleUseCase
 
     companion object {
         @Provides

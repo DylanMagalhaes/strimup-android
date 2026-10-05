@@ -19,6 +19,12 @@ class DefaultScheduleRepository @Inject constructor(
         }.toDomainResult()
     }
 
+    override suspend fun getMySchedule(): Result<List<ScheduleItemEntity>> {
+        return runCatching {
+            service.getMySchedule().map { it.toEntity() }
+        }.toDomainResult()
+    }
+
     override suspend fun createScheduleItem(item: NewScheduleItemEntity): Result<ScheduleItemEntity> {
         return runCatching {
             service.createScheduleItem(item.toCreateScheduleItemRequest()).toEntity()

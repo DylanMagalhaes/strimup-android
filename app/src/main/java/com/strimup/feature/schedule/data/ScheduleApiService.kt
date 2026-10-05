@@ -12,6 +12,9 @@ interface ScheduleApiService {
     @GET("api/streamer/schedule/streamer/{streamerId}")
     suspend fun getSchedule(@Path("streamerId") streamerId: String): List<ScheduleResponse>
 
+    @GET("api/streamer/schedule/mine")
+    suspend fun getMySchedule(): List<ScheduleResponse>
+
     @DELETE("api/streamer/schedule/{id}")
     suspend fun deleteScheduleItem(@Path("id") id: String)
 
