@@ -249,7 +249,7 @@
     <string name="schedule_add_title_label">Titre</string>
     <string name="schedule_add_title_counter">%1$d/%2$d</string>
     <string name="schedule_add_submit">Ajouter au planning</string>
-    <string name="schedule_add_invalid">Choisis un jour, un horaire et un titre.</string>
+    <string name="schedule_add_invalid">Choisis un jour, un horaire et un titre d\'au moins 2 caractères.</string>
     <string name="schedule_day_monday">Lundi</string>
     <string name="schedule_day_tuesday">Mardi</string>
     <string name="schedule_day_wednesday">Mercredi</string>

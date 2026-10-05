@@ -56,6 +56,15 @@ class DefaultCreateScheduleItemUseCaseTest {
     }
 
     @Test
+    fun `a title shorter than the minimum after trimming should fail`() = runTest {
+        val useCase = DefaultCreateScheduleItemUseCase(FakeScheduleRepository())
+
+        val result = useCase(NewScheduleItemEntity(title = " a ", dayOfWeek = 0, startTime = "20:00"))
+
+        assertThat(result.exceptionOrNull()).isInstanceOf(InvalidScheduleItemException::class.java)
+    }
+
+    @Test
     fun `a title longer than the limit should fail`() = runTest {
         val useCase = DefaultCreateScheduleItemUseCase(FakeScheduleRepository())
         val tooLongTitle = "a".repeat(SchedulePolicy.MAX_TITLE_LENGTH + 1)

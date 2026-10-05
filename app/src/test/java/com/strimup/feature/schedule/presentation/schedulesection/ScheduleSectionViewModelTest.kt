@@ -401,6 +401,18 @@ class ScheduleSectionViewModelTest {
     }
 
     @Test
+    fun `submit should stay disabled while the title is shorter than the minimum`() {
+        // GIVEN
+        val viewModel = createViewModel()
+
+        // WHEN
+        viewModel.fillAddForm(title = "a")
+
+        // THEN
+        assertThat(viewModel.addItemState.value.isSubmitEnabled).isFalse()
+    }
+
+    @Test
     fun `onAddTitleChange should cut the title at the maximum length`() {
         // GIVEN
         val viewModel = createViewModel()

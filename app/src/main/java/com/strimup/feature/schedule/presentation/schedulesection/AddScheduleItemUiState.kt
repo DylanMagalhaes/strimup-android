@@ -1,6 +1,7 @@
 package com.strimup.feature.schedule.presentation.schedulesection
 
 import com.strimup.core.ui.text.UiText
+import com.strimup.feature.schedule.domain.entity.SchedulePolicy
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -12,5 +13,5 @@ data class AddScheduleItemUiState(
     val errorMessage: UiText? = null,
 ) {
     val isSubmitEnabled: Boolean
-        get() = !isSubmitting && selectedDay != null && startTime != null && title.isNotBlank()
+        get() = !isSubmitting && selectedDay != null && startTime != null && SchedulePolicy.isValidTitle(title)
 }
