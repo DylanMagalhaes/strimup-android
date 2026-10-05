@@ -43,7 +43,8 @@ fun StreamerContent(
     socials: List<Social>,
     onSocialClick: (String?) -> Unit,
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    belowAboutContent: (@Composable () -> Unit)? = null,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -113,6 +114,11 @@ fun StreamerContent(
             }
 
             VerticalSpacer(24.dp)
+
+            belowAboutContent?.let { content ->
+                content()
+                VerticalSpacer(24.dp)
+            }
 
             if(videos.isNotEmpty()){
                 Text(

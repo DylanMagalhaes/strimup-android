@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -268,11 +267,8 @@ private fun StreamerDetailContent(
                     onSocialClick = onSocialClick,
                     videos = state.streamer.videos,
                     onVideoClick = onVideoClick,
+                    belowAboutContent = scheduleContent,
                 )
-
-                Box(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 24.dp)) {
-                    scheduleContent()
-                }
             }
         }
 
