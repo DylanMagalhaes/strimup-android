@@ -10,10 +10,6 @@ import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
@@ -28,15 +24,14 @@ import kotlin.math.roundToInt
 
 @Composable
 fun AgeRangePicker(
+    range: IntRange,
     modifier: Modifier = Modifier,
     minAge: Float = 18f,
     maxAge: Float = 80f,
     onRangeSelected: (IntRange) -> Unit = {},
 ) {
-    var sliderPosition by remember { mutableStateOf(18f..40f) }
-
-    val selectedMin = sliderPosition.start.roundToInt()
-    val selectedMax = sliderPosition.endInclusive.roundToInt()
+    val selectedMin = range.first
+    val selectedMax = range.last
 
     Column(
         modifier = modifier
@@ -61,10 +56,9 @@ fun AgeRangePicker(
         )
 
         RangeSlider(
-            value = sliderPosition,
-            onValueChange = { range ->
-                sliderPosition = range
-                onRangeSelected(range.start.roundToInt()..range.endInclusive.roundToInt())
+            value = selectedMin.toFloat()..selectedMax.toFloat(),
+            onValueChange = { sliderRange ->
+                onRangeSelected(sliderRange.start.roundToInt()..sliderRange.endInclusive.roundToInt())
             },
             valueRange = minAge..maxAge,
             steps = (maxAge - minAge).toInt() - 1,
@@ -83,6 +77,7 @@ fun AgeRangePicker(
 fun AgeRangePickerPreview() {
     StrimupTheme {
         AgeRangePicker(
+            range = 18..80,
             onRangeSelected = {}
         )
     }
