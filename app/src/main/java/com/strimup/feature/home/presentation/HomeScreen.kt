@@ -61,6 +61,8 @@ fun HomeScreen(
     onStreamerBannerClick: (String?) -> Unit,
     unreadNotificationCount: Int?,
     onNotificationsClick: () -> Unit,
+    isLoggedIn: Boolean,
+    onLoginRequired: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -85,6 +87,9 @@ fun HomeScreen(
         snackBarHostState = snackBarHostState,
         onStreamerClick = onStreamerClick,
         onSocialClick = openExternalLink::invoke,
+        onFavoriteClick = { streamerId ->
+            if (isLoggedIn) viewModel.onFavoriteClick(streamerId) else onLoginRequired()
+        },
         onTabClick = viewModel::onTabClick,
         onRetryClick = viewModel::onRetryClick,
         onRefresh = viewModel::onRefresh,
@@ -108,6 +113,7 @@ private fun HomeContent(
     onStreamerClick: (id: String) -> Unit,
     onBannerClick: (BannerItemEntity) -> Unit,
     onSocialClick: (String?) -> Unit,
+    onFavoriteClick: (id: String) -> Unit,
     onTabClick: (FilterEntity) -> Unit,
     onRetryClick: () -> Unit,
     onRefresh: () -> Unit,
@@ -209,9 +215,10 @@ private fun HomeContent(
                                         liveTitle = streamer.liveTitle,
                                         onClick = { onStreamerClick(streamer.id) },
                                         onSocialClick = onSocialClick,
+                                        onFavoriteClick = { onFavoriteClick(streamer.id) },
                                         tags = streamer.tags.orEmpty().map { it.name },
-                                        personality = streamer.personality,
-                                        secondaryPersonality = streamer.personalitySecondary,
+                                        schedule = streamer.schedule,
+                                        isFavorite = streamer.id in state.favoriteStreamerIds,
                                     )
                                 }
                             }
@@ -252,6 +259,7 @@ private fun HomeScreenPreview() {
             snackBarHostState = remember { SnackbarHostState() },
             onStreamerClick = {},
             onSocialClick = {},
+            onFavoriteClick = {},
             onTabClick = {},
             onRetryClick = {},
             onRefresh = {},

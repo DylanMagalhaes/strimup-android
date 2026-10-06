@@ -37,11 +37,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.R
 import com.strimup.core.ui.component.button.PrimaryButton
+import com.strimup.core.ui.schedule.labelRes
 import com.strimup.core.ui.text.asString
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.schedule.domain.entity.SchedulePolicy
-import com.strimup.feature.schedule.presentation.labelRes
 import java.time.DayOfWeek
 import java.time.LocalTime
 

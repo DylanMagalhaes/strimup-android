@@ -20,6 +20,7 @@ data class Streamer(
     val personality: String? = null,
     val personalitySecondary: String? = null,
     val streamFrequency: String? = null,
+    val schedule: List<ScheduleSlot> = emptyList(),
 ) {
     data class Video(
         val id: String,
@@ -27,5 +28,11 @@ data class Streamer(
         val description: String,
         val url: String,
         val order: Int
+    )
+
+    data class ScheduleSlot(
+        val dayOfWeek: Int,
+        val startTime: String,
+        val title: String,
     )
 }

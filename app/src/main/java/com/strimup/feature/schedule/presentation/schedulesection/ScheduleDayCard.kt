@@ -1,7 +1,6 @@
 package com.strimup.feature.schedule.presentation.schedulesection
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,8 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
@@ -23,17 +20,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.strimup.R
+import com.strimup.core.ui.component.schedule.ScheduleTimePill
+import com.strimup.core.ui.component.schedule.TodayPill
+import com.strimup.core.ui.schedule.labelRes
 import com.strimup.core.ui.theme.zalandoFontFamily
-import com.strimup.feature.schedule.presentation.labelRes
 
 @Composable
 internal fun ScheduleDayCard(
@@ -103,18 +100,7 @@ private fun ScheduleSlotRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(
-            text = slot.startTime,
-            color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
-                .widthIn(min = 56.dp)
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-        )
+        ScheduleTimePill(time = slot.startTime, isHighlighted = isToday)
         Text(
             text = slot.title,
             color = MaterialTheme.colorScheme.onSurface,
@@ -160,18 +146,4 @@ private fun DeleteSlotButton(
             }
         }
     }
-}
-
-@Composable
-private fun TodayPill(modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(R.string.schedule_today),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.labelSmall,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-    )
 }

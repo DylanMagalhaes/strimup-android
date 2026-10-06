@@ -27,6 +27,7 @@ data class StreamerDto(
     val isTwitchConnected: Boolean? = null,
     val videos: List<Video> = emptyList(),
     val tags: List<Tag> = emptyList(),
+    val schedule: List<ScheduleSlot> = emptyList(),
 ) {
     val isFullProfile: Boolean get() = followersCount != null
 
@@ -56,5 +57,12 @@ data class StreamerDto(
         val id: Int,
         val name: String,
         val category: String,
+    )
+
+    @Serializable
+    data class ScheduleSlot(
+        val dayOfWeek: Int,
+        val startTime: String,
+        val title: String,
     )
 }

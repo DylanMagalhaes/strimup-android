@@ -42,6 +42,9 @@ fun StreamerDto.toEntity(isFavorite: Boolean? = null): Streamer {
         personality = this.personality,
         personalitySecondary = this.personalitySecondary,
         streamFrequency = this.streamFrequency,
+        schedule = this.schedule.map {
+            Streamer.ScheduleSlot(dayOfWeek = it.dayOfWeek, startTime = it.startTime, title = it.title)
+        },
     )
 }
 

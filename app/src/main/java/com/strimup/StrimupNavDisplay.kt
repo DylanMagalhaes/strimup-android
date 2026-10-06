@@ -162,6 +162,8 @@ fun StrimupNavDisplay(
                         },
                         unreadNotificationCount = unreadNotificationCount.takeIf { isLoggedIn },
                         onNotificationsClick = { backStack.add(Destination.Notifications) },
+                        isLoggedIn = isLoggedIn,
+                        onLoginRequired = { backStack.add(Destination.Login) },
                     )
                 }
 

@@ -2,6 +2,8 @@ package com.strimup.feature.filter.presentation.matchedstreamer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase
+import com.strimup.core.favorite.domain.usecase.ToggleFavoriteStreamerUseCase
 import com.strimup.core.network.toDomainError
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.core.ui.error.toMessageRes
@@ -20,7 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class MatchedStreamerListViewModel @Inject constructor(
     private val getMatchedStreamers: GetStreamersByFilterUseCase,
-    private val getFilterById: GetFilterByIdUseCase
+    private val getFilterById: GetFilterByIdUseCase,
+    private val observeFavorites: ObserveFavoritesStreamersUseCase,
+    private val toggleFavoriteStreamer: ToggleFavoriteStreamerUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<MatchedStreamersUiState>(MatchedStreamersUiState.Loading)
@@ -29,11 +33,22 @@ class MatchedStreamerListViewModel @Inject constructor(
     private val _events = Channel<MatchedStreamersUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
+    private val _favoriteStreamerIds = MutableStateFlow<Set<String>>(emptySet())
+    val favoriteStreamerIds = _favoriteStreamerIds.asStateFlow()
+
     private var filterId: String = ""
     private var filterName: String? = null
     private var cachedCriteria: FilterCriteria? = null
     private var currentPage = 1
     private var isEndReached = false
+
+    init {
+        viewModelScope.launch {
+            observeFavorites().collect { favorites ->
+                _favoriteStreamerIds.value = favorites.map { it.id }.toSet()
+            }
+        }
+    }
 
     fun initData(id: String) {
         if (filterId.isEmpty()) {
@@ -60,6 +75,19 @@ class MatchedStreamerListViewModel @Inject constructor(
                     _state.value = MatchedStreamersUiState.Error(
                         errorMessageRes = throwable.toDomainError().toMessageRes()
                     )
+                }
+        }
+    }
+
+    fun onFavoriteClick(streamerId: String) {
+        val isFavorite = streamerId in _favoriteStreamerIds.value
+        _favoriteStreamerIds.update { it.toggle(streamerId) }
+
+        viewModelScope.launch {
+            toggleFavoriteStreamer(streamerId = streamerId, isFavorite = isFavorite)
+                .onFailure { throwable ->
+                    _favoriteStreamerIds.update { it.toggle(streamerId) }
+                    _events.send(MatchedStreamersUiEvent.ShowSnackBar(throwable.toDomainError().toMessageRes()))
                 }
         }
     }
@@ -174,3 +202,5 @@ class MatchedStreamerListViewModel @Inject constructor(
         }
     }
 }
+
+private fun Set<String>.toggle(id: String): Set<String> = if (id in this) this - id else this + id

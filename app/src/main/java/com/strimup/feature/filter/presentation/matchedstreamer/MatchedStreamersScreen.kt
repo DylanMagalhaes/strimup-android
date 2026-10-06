@@ -66,6 +66,7 @@ fun MatchedStreamersScreen(
     viewModel: MatchedStreamerListViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val favoriteStreamerIds by viewModel.favoriteStreamerIds.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
@@ -86,10 +87,12 @@ fun MatchedStreamersScreen(
 
     MatchedStreamersScreen(
         state = state,
+        favoriteStreamerIds = favoriteStreamerIds,
         snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
         onStreamerClick = onStreamerClick,
         onSocialClick = openExternalLink::invoke,
+        onFavoriteClick = viewModel::onFavoriteClick,
         onLoadNextPage = viewModel::loadNextPage,
         onLiveCheckedChange = viewModel::onLiveSwitch,
         onRetryClick = viewModel::retry,
@@ -101,10 +104,12 @@ fun MatchedStreamersScreen(
 @Composable
 fun MatchedStreamersScreen(
     state: MatchedStreamersUiState,
+    favoriteStreamerIds: Set<String>,
     snackBarHostState: SnackbarHostState,
     onNavUp: () -> Unit,
     onStreamerClick: (String) -> Unit,
     onSocialClick: (String?) -> Unit,
+    onFavoriteClick: (String) -> Unit,
     onLoadNextPage: () -> Unit,
     onLiveCheckedChange: () -> Unit,
     onRetryClick: () -> Unit,
@@ -161,8 +166,10 @@ fun MatchedStreamersScreen(
                 is MatchedStreamersUiState.Success -> {
                     MatchedStreamersContent(
                         state = state,
+                        favoriteStreamerIds = favoriteStreamerIds,
                         onStreamerClick = onStreamerClick,
                         onSocialClick = onSocialClick,
+                        onFavoriteClick = onFavoriteClick,
                         onLoadNextPage = onLoadNextPage,
                         onLiveCheckedChange = onLiveCheckedChange,
                         modifier = Modifier.fillMaxSize()
@@ -176,8 +183,10 @@ fun MatchedStreamersScreen(
 @Composable
 fun MatchedStreamersContent(
     state: MatchedStreamersUiState.Success,
+    favoriteStreamerIds: Set<String>,
     onStreamerClick: (String) -> Unit,
     onSocialClick: (String?) -> Unit,
+    onFavoriteClick: (String) -> Unit,
     onLoadNextPage: () -> Unit,
     onLiveCheckedChange: () -> Unit,
     modifier: Modifier = Modifier
@@ -220,10 +229,11 @@ fun MatchedStreamersContent(
                     liveTitle = streamer.liveTitle,
                     onClick = { onStreamerClick(streamer.id) },
                     onSocialClick = onSocialClick,
+                    onFavoriteClick = { onFavoriteClick(streamer.id) },
                     modifier = Modifier.fillMaxWidth(),
                     tags = streamer.tags.orEmpty().map { it.name },
-                    personality = streamer.personality,
-                    secondaryPersonality = streamer.personalitySecondary,
+                    schedule = streamer.schedule,
+                    isFavorite = streamer.id in favoriteStreamerIds,
                 )
             }
 
@@ -355,8 +365,10 @@ private fun MatchedStreamersScreenPreview() {
             onLiveCheckedChange = {},
             onStreamerClick = {},
             onSocialClick = {},
+            onFavoriteClick = {},
             onLoadNextPage = {},
             onRetryClick = {},
+            favoriteStreamerIds = emptySet(),
             snackBarHostState = remember { SnackbarHostState() },
             state = MatchedStreamersUiState.Success(
                 filterName = "Mon Filtre",

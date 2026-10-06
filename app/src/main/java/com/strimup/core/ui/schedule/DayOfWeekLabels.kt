@@ -1,4 +1,4 @@
-package com.strimup.feature.schedule.presentation
+package com.strimup.core.ui.schedule
 
 import androidx.annotation.StringRes
 import com.strimup.R

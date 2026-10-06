@@ -230,8 +230,10 @@
 
     <!-- Streamer -->
     <string name="streamer_live_badge">LIVE</string>
-    <string name="streamer_live_now">EN DIRECT MAINTENANT</string>
     <string name="streamer_more_tags">+%1$d</string>
+    <string name="streamer_next_live">Prochain live</string>
+    <string name="streamer_next_live_tomorrow">Demain</string>
+    <string name="streamer_next_live_next_week">%1$s prochain</string>
     <string name="streamer_add_favorite">Ajouter aux favoris</string>
     <string name="streamer_remove_favorite">Retirer des favoris</string>
     <string name="streamer_videos">Vidéos</string>

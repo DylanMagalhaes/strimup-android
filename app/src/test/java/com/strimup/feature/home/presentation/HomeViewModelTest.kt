@@ -41,6 +41,8 @@ class HomeViewModelTest {
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
             getCachedDiscoveryStreamers = { emptyList() },
+            observeFavorites = { flowOf(emptyList()) },
+            toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
             observeBanner = { flowOf(bannerItems) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -61,6 +63,8 @@ class HomeViewModelTest {
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
             getCachedDiscoveryStreamers = { emptyList() },
+            observeFavorites = { flowOf(emptyList()) },
+            toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.failure(Exception()) },
         )
@@ -93,6 +97,8 @@ class HomeViewModelTest {
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(streamers) },
             getCachedDiscoveryStreamers = { emptyList() },
+            observeFavorites = { flowOf(emptyList()) },
+            toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -110,6 +116,8 @@ class HomeViewModelTest {
         val viewModel = HomeViewModel(
             getStreamers = { Result.failure(Exception()) },
             getCachedDiscoveryStreamers = { emptyList() },
+            observeFavorites = { flowOf(emptyList()) },
+            toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -159,6 +167,8 @@ class HomeViewModelTest {
                 Result.success(list)
             },
             getCachedDiscoveryStreamers = { emptyList() },
+            observeFavorites = { flowOf(emptyList()) },
+            toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = { Result.success(Unit) },
         )
@@ -180,6 +190,8 @@ class HomeViewModelTest {
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(emptyList()) },
             getCachedDiscoveryStreamers = { emptyList() },
+            observeFavorites = { flowOf(emptyList()) },
+            toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
             observeBanner = { flowOf(cachedItems) },
             refreshBanner = { Result.failure(Exception()) },
         )
@@ -204,6 +216,8 @@ class HomeViewModelTest {
     ) = HomeViewModel(
         getStreamers = getStreamers,
         getCachedDiscoveryStreamers = { cached },
+        observeFavorites = { flowOf(emptyList()) },
+        toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
         observeBanner = { flowOf(emptyList()) },
         refreshBanner = { Result.success(Unit) },
     )
@@ -338,6 +352,8 @@ class HomeViewModelTest {
         val viewModel = HomeViewModel(
             getStreamers = { Result.success(freshStreamers) },
             getCachedDiscoveryStreamers = { emptyList() },
+            observeFavorites = { flowOf(emptyList()) },
+            toggleFavoriteStreamer = { _, _ -> Result.success(Unit) },
             observeBanner = { flowOf(emptyList()) },
             refreshBanner = {
                 bannerRefreshes++

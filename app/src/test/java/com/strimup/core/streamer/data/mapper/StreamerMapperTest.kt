@@ -64,6 +64,27 @@ class StreamerMapperTest {
     }
 
     @Test
+    fun `toEntity should map the schedule`() {
+        // GIVEN
+        val streamerData = StreamerDto(
+            id = "1",
+            username = "Inox",
+            avatarUrl = "https://example.com/avatar.png",
+            schedule = listOf(
+                StreamerDto.ScheduleSlot(dayOfWeek = 2, startTime = "21:00:00", title = "Ranked"),
+            ),
+        )
+
+        // WHEN
+        val result = streamerData.toEntity()
+
+        // THEN
+        assertThat(result.schedule).containsExactly(
+            Streamer.ScheduleSlot(dayOfWeek = 2, startTime = "21:00:00", title = "Ranked"),
+        )
+    }
+
+    @Test
     fun `toEntity should filter out unknown social types`() {
         // GIVEN
         val streamerData = StreamerDto(
