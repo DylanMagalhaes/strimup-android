@@ -25,6 +25,11 @@
     <string name="action_save">Enregistrer</string>
     <string name="action_done">Terminer</string>
     <string name="action_close">Fermer</string>
+    <string name="action_play">Lire</string>
+    <string name="action_pause">Pause</string>
+    <string name="player_seek_backward">-%1$d s</string>
+    <string name="player_seek_forward">+%1$d s</string>
+    <string name="player_progress">Progression de la vidéo</string>
     <string name="not_specified">Non renseigné</string>
     <string name="edit_field_content_description">Modifier %1$s</string>
     <string name="multi_select_hint">Plusieurs choix possibles</string>
