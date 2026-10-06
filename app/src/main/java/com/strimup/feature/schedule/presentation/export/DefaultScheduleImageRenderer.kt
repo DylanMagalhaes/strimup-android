@@ -10,7 +10,7 @@ import android.graphics.Rect
 import android.text.TextUtils
 import androidx.annotation.DrawableRes
 import com.strimup.R
-import com.strimup.feature.schedule.presentation.exportLabelRes
+import com.strimup.core.ui.schedule.exportLabelRes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

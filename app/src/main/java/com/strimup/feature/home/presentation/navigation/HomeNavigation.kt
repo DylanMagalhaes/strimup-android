@@ -23,6 +23,8 @@ fun HomeNavigation(
     onStreamerBannerClick: (String?) -> Unit,
     unreadNotificationCount: Int?,
     onNotificationsClick: () -> Unit,
+    isLoggedIn: Boolean,
+    onLoginRequired: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val homeBackStack = rememberNavBackStack(
@@ -52,6 +54,8 @@ fun HomeNavigation(
                     onStreamerBannerClick = onStreamerBannerClick,
                     unreadNotificationCount = unreadNotificationCount,
                     onNotificationsClick = onNotificationsClick,
+                    isLoggedIn = isLoggedIn,
+                    onLoginRequired = onLoginRequired,
                     modifier = Modifier.fillMaxSize()
                 )
             }

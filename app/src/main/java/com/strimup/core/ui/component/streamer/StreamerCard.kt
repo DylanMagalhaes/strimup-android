@@ -2,10 +2,11 @@ package com.strimup.core.ui.component.streamer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +17,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,29 +37,39 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Social.Type
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.tag.TagBadge
 import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 private const val MAX_VISIBLE_TAGS = 4
-private const val MAX_VISIBLE_SOCIALS = 3
+private const val AVATAR_WIDTH_RATIO = 0.5f
 private const val LIVE_GRADIENT_ALPHA = 0.10f
 private const val LIVE_GRADIENT_WIDTH_RATIO = 0.65f
 private const val AVATAR_PLACEHOLDER_ALPHA = 0.08f
+private const val DIVIDER_ALPHA = 0.3f
+private val ScheduleZone: ZoneId = ZoneId.of("Europe/Paris")
 private val CardShape = RoundedCornerShape(22.dp)
 private val AvatarShape = RoundedCornerShape(16.dp)
+private val FavoriteButtonShape = RoundedCornerShape(12.dp)
 
 @Composable
 fun StreamerCard(
@@ -62,14 +79,18 @@ fun StreamerCard(
     isLive: Boolean,
     liveTitle: String?,
     tags: List<String>,
-    personality: String?,
-    secondaryPersonality: String?,
+    schedule: List<Streamer.ScheduleSlot>,
+    isFavorite: Boolean,
     onClick: () -> Unit,
     onSocialClick: (String?) -> Unit,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val liveColor = MaterialTheme.colorScheme.tertiary
     val visibleLiveTitle = liveTitle?.takeIf { isLive && it.isNotBlank() }
+    val nextLive = remember(schedule, isLive) {
+        if (isLive) null else schedule.nextLive(now = LocalDateTime.now(ScheduleZone))
+    }
 
     Card(
         onClick = onClick,
@@ -91,31 +112,28 @@ fun StreamerCard(
                         )
                     }
                 }
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             StreamerCardHeader(
-                pseudo = pseudo,
                 imageUrl = imageUrl,
                 isLive = isLive,
-                liveTitle = visibleLiveTitle,
+                tags = tags,
+                isFavorite = isFavorite,
+                onTagClick = onClick,
+                onFavoriteClick = onFavoriteClick,
             )
 
-            if (tags.isNotEmpty()) {
-                StreamerTags(tags = tags, onTagClick = onClick)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = DIVIDER_ALPHA))
+
+            StreamerIdentity(pseudo = pseudo, liveTitle = visibleLiveTitle)
+
+            if (socials.isNotEmpty()) {
+                StreamerSocials(socials = socials, onSocialClick = onSocialClick)
             }
 
-            PersonalityLine(
-                personality = personality,
-                secondaryPersonality = secondaryPersonality,
-            )
-
-            if (isLive || socials.isNotEmpty()) {
-                StreamerCardFooter(
-                    isLive = isLive,
-                    socials = socials,
-                    onSocialClick = onSocialClick,
-                )
+            if (nextLive != null) {
+                StreamerNextLiveCard(nextLive = nextLive)
             }
         }
     }
@@ -123,42 +141,30 @@ fun StreamerCard(
 
 @Composable
 private fun StreamerCardHeader(
-    pseudo: String,
     imageUrl: String?,
     isLive: Boolean,
-    liveTitle: String?,
+    tags: List<String>,
+    isFavorite: Boolean,
+    onTagClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = if (liveTitle == null) Alignment.CenterVertically else Alignment.Top,
-    ) {
-        StreamerAvatar(imageUrl = imageUrl, isLive = isLive)
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val avatarSize = maxWidth * AVATAR_WIDTH_RATIO
 
-        Spacer(modifier = Modifier.width(14.dp))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            StreamerAvatar(imageUrl = imageUrl, isLive = isLive, size = avatarSize)
 
-        Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    modifier = Modifier.weight(1f, fill = false),
-                    text = pseudo,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontFamily = zalandoFontFamily,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            Spacer(modifier = Modifier.width(12.dp))
 
-                if (isLive) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    LiveBadge()
-                }
-            }
-
-            if (liveTitle != null) {
-                Spacer(modifier = Modifier.height(6.dp))
-                LiveTitle(title = liveTitle)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(avatarSize),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                StreamerTags(tags = tags, onTagClick = onTagClick)
+                FavoriteButton(isFavorite = isFavorite, onClick = onFavoriteClick)
             }
         }
     }
@@ -168,6 +174,7 @@ private fun StreamerCardHeader(
 private fun StreamerAvatar(
     imageUrl: String?,
     isLive: Boolean,
+    size: Dp,
 ) {
     Box {
         AsyncImage(
@@ -175,7 +182,7 @@ private fun StreamerAvatar(
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(72.dp)
+                .size(size)
                 .clip(AvatarShape)
                 .background(MaterialTheme.colorScheme.onBackground.copy(alpha = AVATAR_PLACEHOLDER_ALPHA))
                 .then(
@@ -188,6 +195,12 @@ private fun StreamerAvatar(
         )
 
         if (isLive) {
+            LiveBadge(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp),
+            )
+
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -201,48 +214,13 @@ private fun StreamerAvatar(
 }
 
 @Composable
-private fun LiveBadge() {
-    Text(
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(6.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp),
-        text = stringResource(R.string.streamer_live_badge),
-        style = MaterialTheme.typography.labelSmall,
-        fontWeight = FontWeight.Black,
-        color = MaterialTheme.colorScheme.onTertiary,
-    )
-}
-
-@Composable
-private fun LiveTitle(title: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .width(3.dp)
-                .height(18.dp)
-                .background(color = MaterialTheme.colorScheme.tertiary, shape = RoundedCornerShape(2.dp)),
-        )
-
-        Spacer(modifier = Modifier.width(7.dp))
-
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
-
-@Composable
 private fun StreamerTags(
     tags: List<String>,
     onTagClick: () -> Unit,
 ) {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+    Column(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(1.dp),
     ) {
         tags.take(MAX_VISIBLE_TAGS).forEach { tag ->
             TagBadge(tag = tag, onTagClick = onTagClick)
@@ -256,36 +234,85 @@ private fun StreamerTags(
 }
 
 @Composable
-private fun StreamerCardFooter(
-    isLive: Boolean,
+private fun FavoriteButton(
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(FavoriteButtonShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+            contentDescription = stringResource(
+                if (isFavorite) R.string.streamer_remove_favorite else R.string.streamer_add_favorite,
+            ),
+            tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun StreamerIdentity(
+    pseudo: String,
+    liveTitle: String?,
+) {
+    val accentColor = MaterialTheme.colorScheme.primary
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                append(pseudo.uppercase())
+                withStyle(SpanStyle(color = accentColor)) { append(".") }
+            },
+            style = MaterialTheme.typography.titleLarge,
+            fontFamily = zalandoFontFamily,
+            fontWeight = FontWeight.Black,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+
+        if (liveTitle != null) {
+            LiveTitle(title = liveTitle)
+        }
+    }
+}
+
+@Composable
+private fun StreamerSocials(
     socials: List<Social>,
     onSocialClick: (String?) -> Unit,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        if (isLive) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(R.string.streamer_live_now),
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.tertiary,
+        socials.forEach { social ->
+            SocialIconButton(
+                iconRes = social.getIconRes(),
+                contentDescription = stringResource(R.string.streamer_open_social, social.type.displayName()),
+                onClick = { onSocialClick(social.url) },
             )
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            socials.take(MAX_VISIBLE_SOCIALS).forEach { social ->
-                SocialIconButton(
-                    iconRes = social.getIconRes(),
-                    contentDescription = stringResource(R.string.streamer_open_social, social.type.displayName()),
-                    onClick = { onSocialClick(social.url) },
-                )
-            }
         }
     }
 }
+
+private val previewSchedule = listOf(
+    Streamer.ScheduleSlot(dayOfWeek = 0, startTime = "21:00:00", title = "Ranked"),
+    Streamer.ScheduleSlot(dayOfWeek = 2, startTime = "20:30:00", title = "Just Chatting"),
+    Streamer.ScheduleSlot(dayOfWeek = 4, startTime = "21:00:00", title = "Soirée horreur"),
+    Streamer.ScheduleSlot(dayOfWeek = 5, startTime = "15:00:00", title = "Speedrun"),
+    )
 
 @Preview(showBackground = true, backgroundColor = 0xFF080808, widthDp = 420)
 @Composable
@@ -295,20 +322,22 @@ internal fun StreamerCardOfflinePreview() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            pseudo = "RaziU",
+            pseudo = "LeBreakStudio",
             socials = listOf(
                 Social(url = "", type = Type.Twitch),
                 Social(url = "", type = Type.Instagram),
                 Social(url = "", type = Type.Youtube),
+                Social(url = "", type = Type.Tiktok),
             ),
             imageUrl = "",
             isLive = false,
             liveTitle = "Ancien titre qui ne doit pas s'afficher",
-            tags = listOf("FPS", "RPG", "MMORPG", "Énergique", "Fun"),
-            personality = "Chill",
-            secondaryPersonality = "Compétitif",
+            tags = listOf("FPS", "RPG", "MMORPG", "Énergique"),
+            schedule = previewSchedule,
+            isFavorite = false,
             onClick = {},
             onSocialClick = {},
+            onFavoriteClick = {},
         )
     }
 }
@@ -327,10 +356,11 @@ internal fun StreamerCardLivePreview() {
             isLive = true,
             liveTitle = "Ranked jusqu'au top 500, on ne lâche rien ce soir !",
             tags = listOf("FPS", "Compétitif"),
-            personality = "Énergique",
-            secondaryPersonality = null,
+            schedule = previewSchedule,
+            isFavorite = true,
             onClick = {},
             onSocialClick = {},
+            onFavoriteClick = {},
         )
     }
 }

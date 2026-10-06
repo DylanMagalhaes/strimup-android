@@ -13,7 +13,8 @@ data class HomeUiState(
     @param:StringRes val errorMessageRes: Int? = null,
     val isShowingSavedContent: Boolean = false,
     val isBannerLoading: Boolean = true,
-    val bannerItems: List<BannerItemEntity> = emptyList()
+    val bannerItems: List<BannerItemEntity> = emptyList(),
+    val favoriteStreamerIds: Set<String> = emptySet(),
 ) {
     val shouldShowStreamersError: Boolean
         get() = !isLoading && streamers.isEmpty() && errorMessageRes != null

@@ -2,6 +2,8 @@ package com.strimup.feature.home.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase
+import com.strimup.core.favorite.domain.usecase.ToggleFavoriteStreamerUseCase
 import com.strimup.core.network.toDomainError
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.feature.home.domain.entity.FilterEntity
@@ -25,6 +27,8 @@ class HomeViewModel @Inject constructor(
     private val getCachedDiscoveryStreamers: GetCachedDiscoveryStreamersUseCase,
     private val observeBanner: ObserveBannerUseCase,
     private val refreshBanner: RefreshBannerUseCase,
+    private val observeFavorites: ObserveFavoritesStreamersUseCase,
+    private val toggleFavoriteStreamer: ToggleFavoriteStreamerUseCase,
 ) : ViewModel() {
 
     val state: StateFlow<HomeUiState>
@@ -37,6 +41,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         observeBannerItems()
+        observeFavoriteStreamers()
         refreshBannerItems()
         fetchStreamersJob = fetchStreamers(state.value.currentTab)
     }
@@ -79,6 +84,19 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onFavoriteClick(streamerId: String) {
+        val isFavorite = streamerId in state.value.favoriteStreamerIds
+        state.update { it.copy(favoriteStreamerIds = it.favoriteStreamerIds.toggle(streamerId)) }
+
+        viewModelScope.launch {
+            toggleFavoriteStreamer(streamerId = streamerId, isFavorite = isFavorite)
+                .onFailure { exception ->
+                    state.update { it.copy(favoriteStreamerIds = it.favoriteStreamerIds.toggle(streamerId)) }
+                    _events.send(HomeUiEvent.ShowSnackBar(exception.toDomainError().toMessageRes()))
+                }
+        }
+    }
+
     fun onRetryClick() {
         refreshBannerItems()
         reloadStreamers(state.value.currentTab)
@@ -109,6 +127,14 @@ class HomeViewModel @Inject constructor(
                         isBannerLoading = it.isBannerLoading && bannerItems.isEmpty(),
                     )
                 }
+            }
+        }
+    }
+
+    private fun observeFavoriteStreamers() {
+        viewModelScope.launch {
+            observeFavorites().collect { favorites ->
+                state.update { it.copy(favoriteStreamerIds = favorites.map { favorite -> favorite.id }.toSet()) }
             }
         }
     }
@@ -162,3 +188,5 @@ class HomeViewModel @Inject constructor(
         }
     }
 }
+
+private fun Set<String>.toggle(id: String): Set<String> = if (id in this) this - id else this + id

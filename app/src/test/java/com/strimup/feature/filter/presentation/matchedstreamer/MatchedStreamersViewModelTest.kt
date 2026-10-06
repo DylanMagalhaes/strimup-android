@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.strimup.R
 import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
+import com.strimup.core.favorite.domain.usecase.ToggleFavoriteStreamerUseCase
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.feature.filter.domain.entity.FilterCriteria
@@ -14,6 +15,7 @@ import com.strimup.feature.filter.domain.usecase.GetStreamersByFilterUseCase
 import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -33,6 +35,8 @@ class MatchedStreamersViewModelTest {
         userId = "u1",
     )
 
+    private val favorites = MutableStateFlow<List<Streamer>>(emptyList())
+
     private val page1Streamers = listOf(
         Streamer(id = "1", userName = "inox", imageUrl = "", isLive = true),
         Streamer(id = "2", userName = "gotaga", imageUrl = "", isLive = false),
@@ -51,9 +55,14 @@ class MatchedStreamersViewModelTest {
                 Result.success(StreamerMatchResult(streamers = page2Streamers, total = 3))
             }
         },
+        toggleFavoriteStreamer: ToggleFavoriteStreamerUseCase = ToggleFavoriteStreamerUseCase { _, _ ->
+            Result.success(Unit)
+        },
     ) = MatchedStreamerListViewModel(
         getMatchedStreamers = getMatchedStreamers,
         getFilterById = getFilterById,
+        observeFavorites = { favorites },
+        toggleFavoriteStreamer = toggleFavoriteStreamer,
     )
 
     // region initData
@@ -396,6 +405,55 @@ class MatchedStreamersViewModelTest {
         // page1Streamers[0] (live) + page2Streamers[0] (live) are kept, page1Streamers[1] (not live) is filtered out
         assertThat(state.matchedResult.streamers).containsExactly(page1Streamers[0], page2Streamers[0])
         assertThat(state.originalMatchedResult.streamers).isEqualTo(page1Streamers + page2Streamers)
+    }
+
+    // endregion
+
+    // region favorites
+
+    @Test
+    fun `favorite ids should follow the saved favorites`() = runTest {
+        val viewModel = buildViewModel()
+        advanceUntilIdle()
+
+        favorites.value = listOf(Streamer(id = "2", userName = "gotaga", imageUrl = ""))
+        advanceUntilIdle()
+
+        assertThat(viewModel.favoriteStreamerIds.value).containsExactly("2")
+    }
+
+    @Test
+    fun `favorite click should add the streamer and ask to add it`() = runTest {
+        var receivedIsFavorite: Boolean? = null
+        val viewModel = buildViewModel(
+            toggleFavoriteStreamer = { _, isFavorite ->
+                receivedIsFavorite = isFavorite
+                Result.success(Unit)
+            },
+        )
+        advanceUntilIdle()
+
+        viewModel.onFavoriteClick("1")
+        advanceUntilIdle()
+
+        assertThat(viewModel.favoriteStreamerIds.value).containsExactly("1")
+        assertThat(receivedIsFavorite).isFalse()
+    }
+
+    @Test
+    fun `favorite click failure should restore the previous state and show a snackbar`() = runTest {
+        val viewModel = buildViewModel(
+            toggleFavoriteStreamer = { _, _ -> Result.failure(DomainException(DomainError.Network)) },
+        )
+        advanceUntilIdle()
+
+        viewModel.events.test {
+            viewModel.onFavoriteClick("1")
+            advanceUntilIdle()
+
+            assertThat(awaitItem()).isInstanceOf(MatchedStreamersUiEvent.ShowSnackBar::class.java)
+            assertThat(viewModel.favoriteStreamerIds.value).isEmpty()
+        }
     }
 
     // endregion

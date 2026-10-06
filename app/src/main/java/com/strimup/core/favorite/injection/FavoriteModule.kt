@@ -8,16 +8,18 @@ import com.strimup.core.favorite.domain.usecase.DefaultAddStreamerToFavoritesUse
 import com.strimup.core.favorite.domain.usecase.DefaultDeleteStreamerFromFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DefaultObserveFavoritesStreamersUseCase
 import com.strimup.core.favorite.domain.usecase.DefaultRefreshFavoriteStreamersUseCase
+import com.strimup.core.favorite.domain.usecase.DefaultToggleFavoriteStreamerUseCase
 import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.ObserveFavoritesStreamersUseCase
 import com.strimup.core.favorite.domain.usecase.RefreshFavoriteStreamerUseCase
+import com.strimup.core.favorite.domain.usecase.ToggleFavoriteStreamerUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 import retrofit2.Retrofit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -38,6 +40,9 @@ interface FavoriteModule {
 
     @Binds
     fun bindDeleteStreamerFromFavoritesUseCase(impl: DefaultDeleteStreamerFromFavoritesUseCase): DeleteStreamerFromFavoritesUseCase
+
+    @Binds
+    fun bindToggleFavoriteStreamerUseCase(impl: DefaultToggleFavoriteStreamerUseCase): ToggleFavoriteStreamerUseCase
 
 
     companion object {
