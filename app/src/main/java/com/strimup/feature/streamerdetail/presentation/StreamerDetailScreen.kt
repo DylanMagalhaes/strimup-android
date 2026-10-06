@@ -54,6 +54,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.report.presentation.ReportStreamerSheet
 import com.strimup.feature.report.presentation.ReportStreamerUiEvent
 import com.strimup.feature.report.presentation.ReportStreamerViewModel
+import com.strimup.feature.schedule.presentation.schedulesection.ScheduleSection
 
 @Composable
 fun StreamerDetailScreen(
@@ -112,6 +113,7 @@ fun StreamerDetailScreen(
         onReportClick = {
             if (isLoggedIn) isReportSheetVisible = true else onLoginRequired()
         },
+        scheduleContent = { ScheduleSection(streamerId = streamerId) },
     )
 
     val reportedStreamer = (state as? StreamerDetailUiState.Success)?.streamer
@@ -142,6 +144,7 @@ private fun StreamerDetailScreen(
     onRetryClick: () -> Unit,
     isReportAvailable: Boolean,
     onReportClick: () -> Unit,
+    scheduleContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -183,6 +186,7 @@ private fun StreamerDetailScreen(
             onVideoClick = onVideoClick,
             onFavoriteClick = onFavoriteClick,
             onRetryClick = onRetryClick,
+            scheduleContent = scheduleContent,
         )
     }
 }
@@ -224,6 +228,7 @@ private fun StreamerDetailContent(
     onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
+    scheduleContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -262,6 +267,7 @@ private fun StreamerDetailContent(
                     onSocialClick = onSocialClick,
                     videos = state.streamer.videos,
                     onVideoClick = onVideoClick,
+                    belowAboutContent = scheduleContent,
                 )
             }
         }
@@ -316,6 +322,7 @@ private fun StreamerDetailScreenPreview() {
             onRetryClick = {},
             isReportAvailable = true,
             onReportClick = {},
+            scheduleContent = {},
         )
     }
 }

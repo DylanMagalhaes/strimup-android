@@ -12,6 +12,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.strimup.core.navigation.Destination
+import com.strimup.feature.schedule.presentation.export.ScheduleExportScreen
 import com.strimup.feature.streamerprofile.presentation.editprofile.EditProfileScreen
 import com.strimup.feature.streamerprofile.presentation.editprofile.EditProfileViewModel
 import com.strimup.feature.streamerprofile.presentation.editprofile.SelectProfileTagsScreen
@@ -34,6 +35,7 @@ fun ProfileNavigation(
                     subclass(Destination.Profile.View::class, Destination.Profile.View.serializer())
                     subclass(Destination.Profile.Edit::class, Destination.Profile.Edit.serializer())
                     subclass(Destination.Profile.EditTags::class, Destination.Profile.EditTags.serializer())
+                    subclass(Destination.Profile.ScheduleExport::class, Destination.Profile.ScheduleExport.serializer())
                 }
             }
         },
@@ -57,6 +59,9 @@ fun ProfileNavigation(
                         profileBackStack.add(Destination.Profile.Edit)
                     },
                     onAccountNav = onAccountNav,
+                    onScheduleExportNav = { username ->
+                        profileBackStack.add(Destination.Profile.ScheduleExport(username = username))
+                    },
                 )
             }
 
@@ -68,6 +73,14 @@ fun ProfileNavigation(
                     onEditTagsNav = {
                         profileBackStack.add(Destination.Profile.EditTags)
                     }
+                )
+            }
+
+            entry<Destination.Profile.ScheduleExport> { destination ->
+                ScheduleExportScreen(
+                    username = destination.username,
+                    modifier = Modifier.fillMaxSize(),
+                    onNavUp = { profileBackStack.removeLastOrNull() },
                 )
             }
 

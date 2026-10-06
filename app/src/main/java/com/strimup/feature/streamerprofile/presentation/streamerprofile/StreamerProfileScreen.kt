@@ -60,12 +60,14 @@ import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.feature.schedule.presentation.schedulesection.ScheduleSection
 
 @Composable
 fun StreamerProfileScreen(
     modifier: Modifier = Modifier,
     onEditProfileNav: () -> Unit,
     onAccountNav: () -> Unit,
+    onScheduleExportNav: (username: String) -> Unit,
     viewModel: StreamerProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -94,6 +96,14 @@ fun StreamerProfileScreen(
         onSocialClick = openExternalLink::invoke,
         onRetryClick = viewModel::refresh,
         onAccountClick = onAccountNav,
+        scheduleContent = { streamer ->
+            ScheduleSection(
+                streamerId = streamer.id,
+                isEditable = true,
+                snackBarHostState = snackBarHostState,
+                onExportClick = { onScheduleExportNav(streamer.userName) },
+            )
+        },
         modifier = modifier
     )
 }
@@ -107,6 +117,7 @@ private fun StreamerProfileScreen(
     onSocialClick: (String?) -> Unit,
     onRetryClick: () -> Unit,
     onAccountClick: () -> Unit,
+    scheduleContent: @Composable (streamer: Streamer) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val titleText = when (state) {
@@ -146,6 +157,7 @@ private fun StreamerProfileScreen(
             onEditProfileNav = onEditProfileNav,
             onSocialClick = onSocialClick,
             onRetryClick = onRetryClick,
+            scheduleContent = scheduleContent,
             state = state,
         )
     }
@@ -157,6 +169,7 @@ private fun StreamerProfileContent(
     onEditProfileNav: () -> Unit,
     onSocialClick: (String?) -> Unit,
     onRetryClick: () -> Unit,
+    scheduleContent: @Composable (streamer: Streamer) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -179,6 +192,7 @@ private fun StreamerProfileContent(
                 streamer = state.streamer,
                 onEditProfileNav = onEditProfileNav,
                 onSocialClick = onSocialClick,
+                scheduleContent = scheduleContent,
                 modifier = modifier
             )
         }
@@ -190,6 +204,7 @@ private fun StreamerProfileSuccessContent(
     streamer: Streamer,
     onEditProfileNav: () -> Unit,
     onSocialClick: (String?) -> Unit,
+    scheduleContent: @Composable (streamer: Streamer) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -306,6 +321,10 @@ private fun StreamerProfileSuccessContent(
                 }
 
                 VerticalSpacer(24.dp)
+
+                scheduleContent(streamer)
+
+                VerticalSpacer(24.dp)
             }
         }
     }
@@ -351,7 +370,8 @@ private fun StreamerProfileScreenPreview() {
             onEditProfileNav = {},
             onSocialClick = {},
             onRetryClick = {},
-            onAccountClick = {}
+            onAccountClick = {},
+            scheduleContent = {},
         )
     }
 }

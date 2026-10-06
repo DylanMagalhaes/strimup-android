@@ -42,6 +42,9 @@ sealed interface Destination : NavKey {
 
         @Serializable
         data object EditTags : Profile
+
+        @Serializable
+        data class ScheduleExport(val username: String) : Profile
     }
 
     @Serializable
