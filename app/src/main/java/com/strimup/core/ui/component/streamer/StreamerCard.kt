@@ -65,7 +65,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 private const val MAX_VISIBLE_TAGS = 4
-private const val AVATAR_WIDTH_RATIO = 0.5f
+private const val AVATAR_WIDTH_RATIO = 0.4f
 private const val LIVE_GRADIENT_ALPHA = 0.10f
 private const val LIVE_GRADIENT_WIDTH_RATIO = 0.65f
 private const val AVATAR_PLACEHOLDER_ALPHA = 0.08f
@@ -161,7 +161,7 @@ private fun StreamerCardHeader(
         Row(modifier = Modifier.fillMaxWidth()) {
             StreamerAvatar(imageUrl = imageUrl, isLive = isLive, size = avatarSize)
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(24.dp))
 
             Box(
                 modifier = Modifier
@@ -278,7 +278,7 @@ private fun StreamerIdentity(
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
