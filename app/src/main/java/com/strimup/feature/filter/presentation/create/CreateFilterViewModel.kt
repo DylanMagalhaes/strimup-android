@@ -7,6 +7,7 @@ import com.strimup.core.network.toDomainError
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.usecase.GetTagsUseCase
 import com.strimup.core.ui.error.toMessageRes
+import com.strimup.feature.filter.domain.entity.FilterCriteria
 import com.strimup.feature.filter.domain.usecase.CreateFilterUseCase
 import com.strimup.feature.filter.domain.usecase.GetFilterOptionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,7 +100,13 @@ class CreateFilterViewModel @Inject constructor(
 
             createFilter(filterName, criteria)
                 .onSuccess {
-                    updateContentState { it.copy(isSubmitting = false) }
+                    updateContentState {
+                        it.copy(
+                            filterName = "",
+                            criteria = FilterCriteria(),
+                            isSubmitting = false,
+                        )
+                    }
                     _events.send(CreateFilterUiEvent.FilterCreated)
                 }
                 .onFailure { error ->

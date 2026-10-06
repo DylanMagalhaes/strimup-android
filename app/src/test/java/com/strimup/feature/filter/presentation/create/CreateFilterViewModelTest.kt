@@ -173,6 +173,46 @@ class CreateFilterViewModelTest {
     }
 
     @Test
+    fun `saveFilter when it succeeds should reset the form`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel()
+        advanceUntilIdle()
+        viewModel.onFilterNameChange("Mon filtre")
+        viewModel.onRangeSelected(20..30)
+        viewModel.onTagSelected(fakeTags[0])
+        viewModel.onLanguagesSelected("FR")
+
+        // WHEN
+        viewModel.saveFilter()
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as CreateFilterUiState.Content
+        assertThat(state.filterName).isEmpty()
+        assertThat(state.criteria).isEqualTo(FilterCriteria())
+    }
+
+    @Test
+    fun `saveFilter when it fails should keep the form filled`() = runTest {
+        // GIVEN
+        val viewModel = buildViewModel(
+            createFilter = CreateFilterUseCase { _, _ -> Result.failure(Exception("peu importe")) },
+        )
+        advanceUntilIdle()
+        viewModel.onFilterNameChange("Mon filtre")
+        viewModel.onRangeSelected(20..30)
+
+        // WHEN
+        viewModel.saveFilter()
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as CreateFilterUiState.Content
+        assertThat(state.filterName).isEqualTo("Mon filtre")
+        assertThat(state.criteria.ageRange).isEqualTo(20..30)
+    }
+
+    @Test
     fun `saveFilter when createFilter fails should emit ShowSnackBar and reset isSubmitting`() = runTest {
         // GIVEN
         val viewModel = buildViewModel(
