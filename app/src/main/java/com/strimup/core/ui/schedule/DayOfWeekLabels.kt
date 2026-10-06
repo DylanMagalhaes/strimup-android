@@ -25,3 +25,14 @@ fun DayOfWeek.exportLabelRes(): Int = when (this) {
     DayOfWeek.SATURDAY -> R.string.schedule_export_day_saturday
     DayOfWeek.SUNDAY -> R.string.schedule_export_day_sunday
 }
+
+@StringRes
+fun DayOfWeek.shortLabelRes(): Int = when (this) {
+    DayOfWeek.MONDAY -> R.string.day_short_monday
+    DayOfWeek.TUESDAY -> R.string.day_short_tuesday
+    DayOfWeek.WEDNESDAY -> R.string.day_short_wednesday
+    DayOfWeek.THURSDAY -> R.string.day_short_thursday
+    DayOfWeek.FRIDAY -> R.string.day_short_friday
+    DayOfWeek.SATURDAY -> R.string.day_short_saturday
+    DayOfWeek.SUNDAY -> R.string.day_short_sunday
+}

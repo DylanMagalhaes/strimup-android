@@ -1,6 +1,7 @@
 package com.strimup.core.streamer.domain.entity
 
 import com.strimup.core.tag.domain.entity.TagEntity
+import java.time.Instant
 
 data class Streamer(
     val id: String,
@@ -20,7 +21,7 @@ data class Streamer(
     val personality: String? = null,
     val personalitySecondary: String? = null,
     val streamFrequency: String? = null,
-    val schedule: List<ScheduleSlot> = emptyList(),
+    val nextLive: NextLive? = null,
 ) {
     data class Video(
         val id: String,
@@ -30,9 +31,8 @@ data class Streamer(
         val order: Int
     )
 
-    data class ScheduleSlot(
-        val dayOfWeek: Int,
-        val startTime: String,
+    data class NextLive(
         val title: String,
+        val startsAt: Instant,
     )
 }

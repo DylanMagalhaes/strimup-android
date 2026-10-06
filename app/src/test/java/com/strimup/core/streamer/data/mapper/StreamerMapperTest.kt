@@ -10,6 +10,7 @@ import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
 import org.junit.Test
+import java.time.Instant
 
 class StreamerMapperTest {
 
@@ -64,14 +65,17 @@ class StreamerMapperTest {
     }
 
     @Test
-    fun `toEntity should map the schedule`() {
+    fun `toEntity should map the next live with its exact start instant`() {
         // GIVEN
         val streamerData = StreamerDto(
             id = "1",
             username = "Inox",
             avatarUrl = "https://example.com/avatar.png",
-            schedule = listOf(
-                StreamerDto.ScheduleSlot(dayOfWeek = 2, startTime = "21:00:00", title = "Ranked"),
+            nextLive = StreamerDto.NextLive(
+                dayOfWeek = 0,
+                startTime = "20:00",
+                title = "Valorant ranked",
+                startsAt = "2026-10-12T18:00:00.000Z",
             ),
         )
 
@@ -79,9 +83,38 @@ class StreamerMapperTest {
         val result = streamerData.toEntity()
 
         // THEN
-        assertThat(result.schedule).containsExactly(
-            Streamer.ScheduleSlot(dayOfWeek = 2, startTime = "21:00:00", title = "Ranked"),
+        assertThat(result.nextLive).isEqualTo(
+            Streamer.NextLive(title = "Valorant ranked", startsAt = Instant.parse("2026-10-12T18:00:00Z")),
         )
+    }
+
+    @Test
+    fun `toEntity should drop a next live with an invalid start instant`() {
+        // GIVEN
+        val streamerData = StreamerDto(
+            id = "1",
+            username = "Inox",
+            avatarUrl = "https://example.com/avatar.png",
+            nextLive = StreamerDto.NextLive(dayOfWeek = 0, startTime = "20:00", title = "Live", startsAt = "demain"),
+        )
+
+        // WHEN
+        val result = streamerData.toEntity()
+
+        // THEN
+        assertThat(result.nextLive).isNull()
+    }
+
+    @Test
+    fun `toEntity should have no next live when the streamer has no schedule`() {
+        // GIVEN
+        val streamerData = StreamerDto(id = "1", username = "Inox", avatarUrl = "https://example.com/avatar.png")
+
+        // WHEN
+        val result = streamerData.toEntity()
+
+        // THEN
+        assertThat(result.nextLive).isNull()
     }
 
     @Test

@@ -232,7 +232,7 @@ fun MatchedStreamersContent(
                     onFavoriteClick = { onFavoriteClick(streamer.id) },
                     modifier = Modifier.fillMaxWidth(),
                     tags = streamer.tags.orEmpty().map { it.name },
-                    schedule = streamer.schedule,
+                    nextLive = streamer.nextLive,
                     isFavorite = streamer.id in favoriteStreamerIds,
                 )
             }

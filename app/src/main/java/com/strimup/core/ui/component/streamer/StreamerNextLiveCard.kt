@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.strimup.R
 import com.strimup.core.ui.component.schedule.ScheduleTimePill
 import com.strimup.core.ui.component.schedule.TodayPill
-import com.strimup.core.ui.schedule.labelRes
+import com.strimup.core.ui.schedule.shortLabelRes
 import com.strimup.core.ui.theme.zalandoFontFamily
 
 private const val BORDER_ALPHA = 0.4f
@@ -92,9 +92,5 @@ fun StreamerNextLiveCard(
 private fun NextLiveDay.label(): String = when (this) {
     NextLiveDay.Today -> stringResource(R.string.schedule_today)
     NextLiveDay.Tomorrow -> stringResource(R.string.streamer_next_live_tomorrow)
-    is NextLiveDay.ThisWeek -> stringResource(dayOfWeek.labelRes())
-    is NextLiveDay.NextWeek -> stringResource(
-        R.string.streamer_next_live_next_week,
-        stringResource(dayOfWeek.labelRes()),
-    )
+    is NextLiveDay.Later -> stringResource(dayOfWeek.shortLabelRes())
 }
