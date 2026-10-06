@@ -29,9 +29,14 @@
 ## App preview
 
 <p align="center">
-  <img src="docs/screenshots/home.webp" width="30%" alt="Home screen" />
-  <img src="docs/screenshots/filter.webp" width="30%" alt="Filter creation" />
-  <img src="docs/screenshots/tags.webp" width="30%" alt="Tag selection" />
+  <img src="docs/screenshots/live.jpg" width="30%" alt="Home, live streamers" />
+  <img src="docs/screenshots/streamer-profile.jpg" width="30%" alt="Streamer profile" />
+  <img src="docs/screenshots/streamer-edit.jpg" width="30%" alt="Streamer profile editing" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/filters.jpg" width="30%" alt="My filters" />
+  <img src="docs/screenshots/tags.jpg" width="30%" alt="Tag selection" />
+  <img src="docs/screenshots/schedule-export.jpg" width="30%" alt="Schedule export" />
 </p>
 
 ## Table of Contents
