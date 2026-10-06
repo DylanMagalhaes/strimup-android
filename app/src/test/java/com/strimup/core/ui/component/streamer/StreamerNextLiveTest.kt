@@ -4,80 +4,57 @@ import com.google.common.truth.Truth.assertThat
 import com.strimup.core.streamer.domain.entity.Streamer
 import org.junit.Test
 import java.time.DayOfWeek
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 class StreamerNextLiveTest {
 
-    private val thursdayAt20h = LocalDateTime.of(2026, 10, 8, 20, 0)
+    private val paris = ZoneId.of("Europe/Paris")
+    private val thursday = LocalDate.of(2026, 10, 8)
 
     @Test
-    fun `no schedule should give no next live`() {
-        assertThat(emptyList<Streamer.ScheduleSlot>().nextLive(thursdayAt20h)).isNull()
-    }
+    fun `a live later today should be today with the local time`() {
+        val nextLive = nextLive(startsAt = "2026-10-08T19:30:00Z", title = "Ranked")
 
-    @Test
-    fun `a slot later today should be today`() {
-        val nextLive = listOf(slot(dayOfWeek = 3, startTime = "21:00:00", title = "Ranked"))
-            .nextLive(thursdayAt20h)
-
-        assertThat(nextLive).isEqualTo(
-            StreamerNextLive(day = NextLiveDay.Today, startTime = "21:00", title = "Ranked"),
+        assertThat(nextLive.toDisplay(today = thursday, zone = paris)).isEqualTo(
+            StreamerNextLive(day = NextLiveDay.Today, startTime = "21:30", title = "Ranked"),
         )
     }
 
     @Test
-    fun `a slot starting right now should still be today`() {
-        val nextLive = listOf(slot(dayOfWeek = 3, startTime = "20:00:00")).nextLive(thursdayAt20h)
+    fun `a live tomorrow should be tomorrow`() {
+        val display = nextLive(startsAt = "2026-10-09T18:00:00Z").toDisplay(today = thursday, zone = paris)
 
-        assertThat(nextLive?.day).isEqualTo(NextLiveDay.Today)
+        assertThat(display?.day).isEqualTo(NextLiveDay.Tomorrow)
     }
 
     @Test
-    fun `a slot tomorrow should be tomorrow`() {
-        val nextLive = listOf(slot(dayOfWeek = 4)).nextLive(thursdayAt20h)
+    fun `a live later in the week should give its day`() {
+        val display = nextLive(startsAt = "2026-10-10T18:00:00Z").toDisplay(today = thursday, zone = paris)
 
-        assertThat(nextLive?.day).isEqualTo(NextLiveDay.Tomorrow)
+        assertThat(display?.day).isEqualTo(NextLiveDay.Later(DayOfWeek.SATURDAY))
     }
 
     @Test
-    fun `a slot later this week should give its day`() {
-        val nextLive = listOf(slot(dayOfWeek = 0)).nextLive(thursdayAt20h)
+    fun `the day and time should follow the phone time zone`() {
+        val montreal = ZoneId.of("America/Montreal")
 
-        assertThat(nextLive?.day).isEqualTo(NextLiveDay.ThisWeek(DayOfWeek.MONDAY))
+        val display = nextLive(startsAt = "2026-10-09T02:00:00Z").toDisplay(today = thursday, zone = montreal)
+
+        assertThat(display?.day).isEqualTo(NextLiveDay.Today)
+        assertThat(display?.startTime).isEqualTo("22:00")
     }
 
     @Test
-    fun `a slot already passed today should move to next week`() {
-        val nextLive = listOf(slot(dayOfWeek = 3, startTime = "18:00:00")).nextLive(thursdayAt20h)
+    fun `a live on a past day should not be shown`() {
+        val display = nextLive(startsAt = "2026-10-07T18:00:00Z").toDisplay(today = thursday, zone = paris)
 
-        assertThat(nextLive?.day).isEqualTo(NextLiveDay.NextWeek(DayOfWeek.THURSDAY))
+        assertThat(display).isNull()
     }
 
-    @Test
-    fun `the closest slot should win`() {
-        val nextLive = listOf(
-            slot(dayOfWeek = 1, title = "Mardi"),
-            slot(dayOfWeek = 5, startTime = "15:00:00", title = "Samedi aprem"),
-            slot(dayOfWeek = 5, startTime = "10:00:00", title = "Samedi matin"),
-        ).nextLive(thursdayAt20h)
-
-        assertThat(nextLive?.title).isEqualTo("Samedi matin")
-        assertThat(nextLive?.startTime).isEqualTo("10:00")
-    }
-
-    @Test
-    fun `invalid slots should be ignored`() {
-        val nextLive = listOf(
-            slot(dayOfWeek = 9),
-            slot(dayOfWeek = 4, startTime = "pas une heure"),
-        ).nextLive(thursdayAt20h)
-
-        assertThat(nextLive).isNull()
-    }
-
-    private fun slot(
-        dayOfWeek: Int,
-        startTime: String = "21:00:00",
+    private fun nextLive(
+        startsAt: String,
         title: String = "Live",
-    ) = Streamer.ScheduleSlot(dayOfWeek = dayOfWeek, startTime = startTime, title = title)
+    ) = Streamer.NextLive(title = title, startsAt = Instant.parse(startsAt))
 }

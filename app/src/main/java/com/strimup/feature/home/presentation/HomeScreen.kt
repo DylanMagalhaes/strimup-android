@@ -217,7 +217,7 @@ private fun HomeContent(
                                         onSocialClick = onSocialClick,
                                         onFavoriteClick = { onFavoriteClick(streamer.id) },
                                         tags = streamer.tags.orEmpty().map { it.name },
-                                        schedule = streamer.schedule,
+                                        nextLive = streamer.nextLive,
                                         isFavorite = streamer.id in state.favoriteStreamerIds,
                                     )
                                 }

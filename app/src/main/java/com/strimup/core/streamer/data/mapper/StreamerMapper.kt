@@ -12,6 +12,8 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.entity.StreamerMatchResult
 import com.strimup.core.streamer.domain.entity.StreamerOptions
 import com.strimup.core.tag.domain.entity.TagEntity
+import java.time.Instant
+import java.time.format.DateTimeParseException
 
 fun StreamerDto.toEntity(isFavorite: Boolean? = null): Streamer {
     return Streamer(
@@ -42,10 +44,17 @@ fun StreamerDto.toEntity(isFavorite: Boolean? = null): Streamer {
         personality = this.personality,
         personalitySecondary = this.personalitySecondary,
         streamFrequency = this.streamFrequency,
-        schedule = this.schedule.map {
-            Streamer.ScheduleSlot(dayOfWeek = it.dayOfWeek, startTime = it.startTime, title = it.title)
-        },
+        nextLive = this.nextLive?.toEntity(),
     )
+}
+
+fun StreamerDto.NextLive.toEntity(): Streamer.NextLive? {
+    val instant = try {
+        Instant.parse(startsAt)
+    } catch (_: DateTimeParseException) {
+        return null
+    }
+    return Streamer.NextLive(title = title, startsAt = instant)
 }
 
 fun StreamerDto.Social.toEntity(): Social? {

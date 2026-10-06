@@ -59,7 +59,9 @@ import com.strimup.core.ui.component.tag.TagBadge
 import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
-import java.time.LocalDateTime
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 
 private const val MAX_VISIBLE_TAGS = 4
@@ -68,7 +70,7 @@ private const val LIVE_GRADIENT_ALPHA = 0.10f
 private const val LIVE_GRADIENT_WIDTH_RATIO = 0.65f
 private const val AVATAR_PLACEHOLDER_ALPHA = 0.08f
 private const val DIVIDER_ALPHA = 0.3f
-private val ScheduleZone: ZoneId = ZoneId.of("Europe/Paris")
+private const val PREVIEW_NEXT_LIVE_HOURS = 3L
 private val HeaderItemSpacing = 8.dp
 private val CardShape = RoundedCornerShape(22.dp)
 private val AvatarShape = RoundedCornerShape(16.dp)
@@ -82,7 +84,7 @@ fun StreamerCard(
     isLive: Boolean,
     liveTitle: String?,
     tags: List<String>,
-    schedule: List<Streamer.ScheduleSlot>,
+    nextLive: Streamer.NextLive?,
     isFavorite: Boolean,
     onClick: () -> Unit,
     onSocialClick: (String?) -> Unit,
@@ -91,8 +93,10 @@ fun StreamerCard(
 ) {
     val liveColor = MaterialTheme.colorScheme.tertiary
     val visibleLiveTitle = liveTitle?.takeIf { isLive && it.isNotBlank() }
-    val nextLive = remember(schedule, isLive) {
-        if (isLive) null else schedule.nextLive(now = LocalDateTime.now(ScheduleZone))
+    val zone = ZoneId.systemDefault()
+    val today = LocalDate.now(zone)
+    val nextLiveDisplay = remember(nextLive, isLive, today, zone) {
+        if (isLive) null else nextLive?.toDisplay(today = today, zone = zone)
     }
 
     Card(
@@ -135,8 +139,8 @@ fun StreamerCard(
                 StreamerSocials(socials = socials, onSocialClick = onSocialClick)
             }
 
-            if (nextLive != null) {
-                StreamerNextLiveCard(nextLive = nextLive)
+            if (nextLiveDisplay != null) {
+                StreamerNextLiveCard(nextLive = nextLiveDisplay)
             }
         }
     }
@@ -316,12 +320,10 @@ private fun StreamerSocials(
     }
 }
 
-private val previewSchedule = listOf(
-    Streamer.ScheduleSlot(dayOfWeek = 0, startTime = "21:00:00", title = "Ranked"),
-    Streamer.ScheduleSlot(dayOfWeek = 2, startTime = "20:30:00", title = "Just Chatting"),
-    Streamer.ScheduleSlot(dayOfWeek = 4, startTime = "21:00:00", title = "Soirée horreur"),
-    Streamer.ScheduleSlot(dayOfWeek = 5, startTime = "15:00:00", title = "Speedrun"),
-    )
+private val previewNextLive = Streamer.NextLive(
+    title = "Valorant ranked",
+    startsAt = Instant.now().plus(Duration.ofHours(PREVIEW_NEXT_LIVE_HOURS)),
+)
 
 @Preview(showBackground = true, backgroundColor = 0xFF080808, widthDp = 420)
 @Composable
@@ -342,7 +344,7 @@ internal fun StreamerCardOfflinePreview() {
             isLive = false,
             liveTitle = "Ancien titre qui ne doit pas s'afficher",
             tags = listOf("FPS", "RPG", "MMORPG", "Énergique"),
-            schedule = previewSchedule,
+            nextLive = previewNextLive,
             isFavorite = false,
             onClick = {},
             onSocialClick = {},
@@ -365,7 +367,7 @@ internal fun StreamerCardLivePreview() {
             isLive = true,
             liveTitle = "Ranked jusqu'au top 500, on ne lâche rien ce soir !",
             tags = listOf("FPS", "Compétitif"),
-            schedule = previewSchedule,
+            nextLive = previewNextLive,
             isFavorite = true,
             onClick = {},
             onSocialClick = {},
