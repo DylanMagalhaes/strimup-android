@@ -287,6 +287,7 @@ fun CreateFilterContent(
                     )
 
                     AgeRangePicker(
+                        range = state.criteria.ageRange,
                         onRangeSelected = { range -> onRangeSelected(range) }
                     )
 
