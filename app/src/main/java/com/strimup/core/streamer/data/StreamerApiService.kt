@@ -19,7 +19,7 @@ import retrofit2.http.Query
 
 interface StreamerApiService {
     @GET("api/streamer/random")
-    suspend fun getRandomStreamers(): StreamerListResponse
+    suspend fun getRandomStreamers(@Query("limit") limit: Int): StreamerListResponse
 
     @GET("api/streamer/live")
     suspend fun getInliveStreamers(): StreamerListResponse

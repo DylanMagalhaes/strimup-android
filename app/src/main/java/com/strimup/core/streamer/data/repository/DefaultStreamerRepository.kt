@@ -16,6 +16,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
+private const val DISCOVERY_PAGE_SIZE = 100
+
 class DefaultStreamerRepository @Inject constructor(
     private val service: StreamerApiService,
     private val avatarFileReader: AvatarFileReader
@@ -23,7 +25,7 @@ class DefaultStreamerRepository @Inject constructor(
 
     override suspend fun getRandomStreamers(favoriteStreamerIds: List<String>): Result<List<Streamer>> {
         return runCatching {
-            service.getRandomStreamers()
+            service.getRandomStreamers(limit = DISCOVERY_PAGE_SIZE)
                 .items
                 .map { it.toEntity(isFavorite = favoriteStreamerIds.contains(it.id)) }
         }.toDomainResult()
