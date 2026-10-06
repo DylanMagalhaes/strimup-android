@@ -164,7 +164,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    implementation(libs.youtube.player.core)
 
     implementation(libs.androidx.browser)
 
