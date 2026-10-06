@@ -63,7 +63,7 @@ import androidx.navigation3.ui.NavDisplay
 import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination
 import com.strimup.core.navigation.navigateAsTab
-import com.strimup.core.ui.component.streamer.YouTubePlayerScreen
+import com.strimup.core.ui.component.player.YouTubePlayerScreen
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.account.presentation.account.AccountScreen
 import com.strimup.feature.account.presentation.deletion.DeleteAccountScreen
