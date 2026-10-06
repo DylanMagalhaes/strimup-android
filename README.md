@@ -29,9 +29,14 @@
 ## Aperçu de l'application
 
 <p align="center">
-  <img src="docs/screenshots/home.webp" width="30%" alt="Écran d'accueil" />
-  <img src="docs/screenshots/filter.webp" width="30%" alt="Création de filtre" />
-  <img src="docs/screenshots/tags.webp" width="30%" alt="Sélection des tags" />
+  <img src="docs/screenshots/live.jpg" width="30%" alt="Accueil, streamers en live" />
+  <img src="docs/screenshots/streamer-profile.jpg" width="30%" alt="Fiche d'un streamer" />
+  <img src="docs/screenshots/streamer-edit.jpg" width="30%" alt="Profil streamer en édition" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/filters.jpg" width="30%" alt="Mes filtres" />
+  <img src="docs/screenshots/tags.jpg" width="30%" alt="Sélection des tags" />
+  <img src="docs/screenshots/schedule-export.jpg" width="30%" alt="Export du planning" />
 </p>
 
 ## Sommaire
