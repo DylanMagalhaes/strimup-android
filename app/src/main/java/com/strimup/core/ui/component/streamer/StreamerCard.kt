@@ -24,9 +24,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,6 +69,7 @@ private const val LIVE_GRADIENT_WIDTH_RATIO = 0.65f
 private const val AVATAR_PLACEHOLDER_ALPHA = 0.08f
 private const val DIVIDER_ALPHA = 0.3f
 private val ScheduleZone: ZoneId = ZoneId.of("Europe/Paris")
+private val HeaderItemSpacing = 8.dp
 private val CardShape = RoundedCornerShape(22.dp)
 private val AvatarShape = RoundedCornerShape(16.dp)
 private val FavoriteButtonShape = RoundedCornerShape(12.dp)
@@ -156,15 +159,19 @@ private fun StreamerCardHeader(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(
+            Box(
                 modifier = Modifier
                     .weight(1f)
                     .height(avatarSize),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween,
+                contentAlignment = Alignment.CenterStart,
             ) {
-                StreamerTags(tags = tags, onTagClick = onTagClick)
-                FavoriteButton(isFavorite = isFavorite, onClick = onFavoriteClick)
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
+                ) {
+                    StreamerTags(tags = tags, onTagClick = onTagClick)
+                    FavoriteButton(isFavorite = isFavorite, onClick = onFavoriteClick)
+                }
             }
         }
     }
@@ -218,17 +225,19 @@ private fun StreamerTags(
     tags: List<String>,
     onTagClick: () -> Unit,
 ) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(1.dp),
-    ) {
-        tags.take(MAX_VISIBLE_TAGS).forEach { tag ->
-            TagBadge(tag = tag, onTagClick = onTagClick)
-        }
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
+        ) {
+            tags.take(MAX_VISIBLE_TAGS).forEach { tag ->
+                TagBadge(tag = tag, onTagClick = onTagClick)
+            }
 
-        val hiddenTagsCount = tags.size - MAX_VISIBLE_TAGS
-        if (hiddenTagsCount > 0) {
-            TagBadge(tag = stringResource(R.string.streamer_more_tags, hiddenTagsCount), onTagClick = onTagClick)
+            val hiddenTagsCount = tags.size - MAX_VISIBLE_TAGS
+            if (hiddenTagsCount > 0) {
+                TagBadge(tag = stringResource(R.string.streamer_more_tags, hiddenTagsCount), onTagClick = onTagClick)
+            }
         }
     }
 }
@@ -277,7 +286,7 @@ private fun StreamerIdentity(
             fontFamily = zalandoFontFamily,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
