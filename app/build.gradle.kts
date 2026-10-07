@@ -146,6 +146,8 @@ dependencies {
 
     implementation(libs.coil)
     implementation(libs.coil.network)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
