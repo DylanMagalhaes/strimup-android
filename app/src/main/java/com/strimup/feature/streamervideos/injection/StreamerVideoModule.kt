@@ -5,6 +5,14 @@ import com.strimup.feature.streamervideos.data.StreamerVideoApiService
 import com.strimup.feature.streamervideos.data.file.ContentResolverVideoFileReader
 import com.strimup.feature.streamervideos.data.file.VideoFileReader
 import com.strimup.feature.streamervideos.domain.StreamerVideoRepository
+import com.strimup.feature.streamervideos.domain.usecase.DefaultDeleteVideoUseCase
+import com.strimup.feature.streamervideos.domain.usecase.DefaultGetMyVideosUseCase
+import com.strimup.feature.streamervideos.domain.usecase.DefaultSelectVideoFileUseCase
+import com.strimup.feature.streamervideos.domain.usecase.DefaultUploadVideoUseCase
+import com.strimup.feature.streamervideos.domain.usecase.DeleteVideoUseCase
+import com.strimup.feature.streamervideos.domain.usecase.GetMyVideosUseCase
+import com.strimup.feature.streamervideos.domain.usecase.SelectVideoFileUseCase
+import com.strimup.feature.streamervideos.domain.usecase.UploadVideoUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,6 +38,18 @@ interface StreamerVideoModule {
     @Binds
     @Singleton
     fun bindVideoFileReader(impl: ContentResolverVideoFileReader): VideoFileReader
+
+    @Binds
+    fun bindGetMyVideosUseCase(impl: DefaultGetMyVideosUseCase): GetMyVideosUseCase
+
+    @Binds
+    fun bindSelectVideoFileUseCase(impl: DefaultSelectVideoFileUseCase): SelectVideoFileUseCase
+
+    @Binds
+    fun bindUploadVideoUseCase(impl: DefaultUploadVideoUseCase): UploadVideoUseCase
+
+    @Binds
+    fun bindDeleteVideoUseCase(impl: DefaultDeleteVideoUseCase): DeleteVideoUseCase
 
     companion object {
         @Provides
