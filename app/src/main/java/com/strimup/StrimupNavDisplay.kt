@@ -63,7 +63,6 @@ import androidx.navigation3.ui.NavDisplay
 import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination
 import com.strimup.core.navigation.navigateAsTab
-import com.strimup.core.ui.component.player.YouTubePlayerScreen
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.account.presentation.account.AccountScreen
 import com.strimup.feature.account.presentation.deletion.DeleteAccountScreen
@@ -202,16 +201,6 @@ fun StrimupNavDisplay(
                         isOwnProfile = destination.streamerId == userId,
                         onLoginRequired = { backStack.add(Destination.Login) },
                     )
-                }
-
-                entry<Destination.YouTubePlayer> { destination ->
-                    YouTubePlayerScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        videoId = destination.videoId,
-                        isVertical = destination.isVertical,
-                        onBack = { backStack.removeLastOrNull() }
-                    )
-
                 }
 
                 entry<Destination.Favorite> {

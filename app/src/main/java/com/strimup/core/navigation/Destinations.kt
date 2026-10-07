@@ -51,12 +51,6 @@ sealed interface Destination : NavKey {
     data class StreamerDetail(val streamerId: String) : Destination
 
     @Serializable
-    data class YouTubePlayer(
-        val videoId: String,
-        val isVertical: Boolean = false,
-    ) : Destination
-
-    @Serializable
     data object Login : Destination
 
     @Serializable
