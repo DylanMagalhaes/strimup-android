@@ -30,7 +30,5 @@ data class UpdateProfileRequest(
     @SerialName("languages")
     val languages: List<String>?,
     @SerialName("tags")
-    val tags: List<Int> = emptyList(),
-    @SerialName("videos")
-    val videos: List<String> = emptyList()
+    val tags: List<Int> = emptyList()
 )
