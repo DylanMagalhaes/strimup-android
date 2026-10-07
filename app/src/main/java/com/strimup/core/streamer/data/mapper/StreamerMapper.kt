@@ -30,15 +30,7 @@ fun StreamerDto.toEntity(isFavorite: Boolean? = null): Streamer {
         tags = this.tags.map {
             TagEntity(id = it.id, name = it.name, category = it.category)
         },
-        videos = this.videos.map {
-            Streamer.Video(
-                id = it.id,
-                title = it.title,
-                description = it.description.orEmpty(),
-                url = it.url,
-                order = it.order,
-            )
-        },
+        videos = this.videos.map { it.toEntity() },
         averageViewers = this.averageViewers,
         languages = this.languages,
         personality = this.personality,
@@ -130,8 +122,7 @@ fun Streamer.toUpdateProfileRequest(): UpdateProfileRequest {
         streamFrequency = streamFrequency,
         averageViewers = averageViewers,
         languages = languages?.filter { it.isNotBlank() },
-        tags = tags?.map { it.id } ?: emptyList(),
-        videos = emptyList()
+        tags = tags?.map { it.id } ?: emptyList()
     )
 }
 

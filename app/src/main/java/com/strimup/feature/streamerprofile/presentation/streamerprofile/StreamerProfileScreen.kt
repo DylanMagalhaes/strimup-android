@@ -61,6 +61,7 @@ import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.schedule.presentation.schedulesection.ScheduleSection
+import com.strimup.feature.streamervideos.presentation.videossection.VideosSection
 
 @Composable
 fun StreamerProfileScreen(
@@ -104,6 +105,7 @@ fun StreamerProfileScreen(
                 onExportClick = { onScheduleExportNav(streamer.userName) },
             )
         },
+        videosContent = { VideosSection(snackBarHostState = snackBarHostState) },
         modifier = modifier
     )
 }
@@ -118,6 +120,7 @@ private fun StreamerProfileScreen(
     onRetryClick: () -> Unit,
     onAccountClick: () -> Unit,
     scheduleContent: @Composable (streamer: Streamer) -> Unit,
+    videosContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val titleText = when (state) {
@@ -158,6 +161,7 @@ private fun StreamerProfileScreen(
             onSocialClick = onSocialClick,
             onRetryClick = onRetryClick,
             scheduleContent = scheduleContent,
+            videosContent = videosContent,
             state = state,
         )
     }
@@ -170,6 +174,7 @@ private fun StreamerProfileContent(
     onSocialClick: (String?) -> Unit,
     onRetryClick: () -> Unit,
     scheduleContent: @Composable (streamer: Streamer) -> Unit,
+    videosContent: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (state) {
@@ -193,6 +198,7 @@ private fun StreamerProfileContent(
                 onEditProfileNav = onEditProfileNav,
                 onSocialClick = onSocialClick,
                 scheduleContent = scheduleContent,
+                videosContent = videosContent,
                 modifier = modifier
             )
         }
@@ -205,6 +211,7 @@ private fun StreamerProfileSuccessContent(
     onEditProfileNav: () -> Unit,
     onSocialClick: (String?) -> Unit,
     scheduleContent: @Composable (streamer: Streamer) -> Unit,
+    videosContent: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -325,6 +332,10 @@ private fun StreamerProfileSuccessContent(
                 scheduleContent(streamer)
 
                 VerticalSpacer(24.dp)
+
+                videosContent()
+
+                VerticalSpacer(24.dp)
             }
         }
     }
@@ -372,6 +383,7 @@ private fun StreamerProfileScreenPreview() {
             onRetryClick = {},
             onAccountClick = {},
             scheduleContent = {},
+            videosContent = {},
         )
     }
 }
