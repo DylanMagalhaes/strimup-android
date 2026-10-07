@@ -48,6 +48,8 @@ import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
+import com.strimup.core.ui.component.video.StreamerVideoPlayerHost
+import com.strimup.core.ui.component.video.rememberStreamerVideoOpener
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -60,7 +62,6 @@ import com.strimup.feature.schedule.presentation.schedulesection.ScheduleSection
 fun StreamerDetailScreen(
     streamerId: String,
     onNavUp: () -> Unit,
-    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
     isLoggedIn: Boolean,
     isOwnProfile: Boolean,
     onLoginRequired: () -> Unit,
@@ -74,6 +75,7 @@ fun StreamerDetailScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
+    val videoOpener = rememberStreamerVideoOpener(snackBarHostState)
 
     LaunchedEffect(streamerId) {
         viewModel.loadStreamer(streamerId)
@@ -106,7 +108,7 @@ fun StreamerDetailScreen(
         snackBarHostState = snackBarHostState,
         onNavUp = onNavUp,
         onSocialClick = openExternalLink::invoke,
-        onVideoClick = onVideoClick,
+        onVideoClick = videoOpener::open,
         onFavoriteClick = { viewModel.onFavoriteClick() },
         onRetryClick = { viewModel.loadStreamer(streamerId) },
         isReportAvailable = !isOwnProfile,
@@ -115,6 +117,8 @@ fun StreamerDetailScreen(
         },
         scheduleContent = { ScheduleSection(streamerId = streamerId) },
     )
+
+    StreamerVideoPlayerHost(opener = videoOpener)
 
     val reportedStreamer = (state as? StreamerDetailUiState.Success)?.streamer
     if (isReportSheetVisible && reportedStreamer != null) {
@@ -139,7 +143,7 @@ private fun StreamerDetailScreen(
     snackBarHostState: SnackbarHostState,
     onNavUp: () -> Unit,
     onSocialClick: (String?) -> Unit,
-    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
+    onVideoClick: (Streamer.Video) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
     isReportAvailable: Boolean,
@@ -225,7 +229,7 @@ private fun StreamerDetailMenu(
 private fun StreamerDetailContent(
     state: StreamerDetailUiState,
     onSocialClick: (String?) -> Unit,
-    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
+    onVideoClick: (Streamer.Video) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
     scheduleContent: @Composable () -> Unit,
@@ -289,7 +293,7 @@ private fun StreamerDetailScreenPreview() {
         StreamerDetailScreen(
             onNavUp = {},
             onFavoriteClick = {},
-            onVideoClick = { _, _ -> },
+            onVideoClick = {},
             onSocialClick = {},
             snackBarHostState = remember { SnackbarHostState() },
             state = StreamerDetailUiState.Success(

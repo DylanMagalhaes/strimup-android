@@ -16,6 +16,6 @@ sealed interface VideosSectionUiState {
     }
 
     data class Error(
-        @StringRes val messageRes: Int,
+        @param:StringRes val messageRes: Int,
     ) : VideosSectionUiState
 }

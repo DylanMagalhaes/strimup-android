@@ -12,11 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,7 +48,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.R
 import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.streamer.domain.entity.VideoSource
+import com.strimup.core.streamer.domain.entity.source
 import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.component.video.StreamerVideoPlayerHost
+import com.strimup.core.ui.component.video.StreamerVideoPreview
+import com.strimup.core.ui.component.video.rememberStreamerVideoOpener
 import com.strimup.core.ui.text.asString
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -63,6 +69,8 @@ fun VideosSection(
     val addVideoState by viewModel.addVideoState.collectAsStateWithLifecycle()
     var videoToDelete by rememberSaveable { mutableStateOf<String?>(null) }
     val resources = LocalResources.current
+    val fallbackSnackBarHostState = remember { SnackbarHostState() }
+    val videoOpener = rememberStreamerVideoOpener(snackBarHostState ?: fallbackSnackBarHostState)
     val videoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         viewModel.onVideoPicked(uri?.toString())
     }
@@ -88,8 +96,11 @@ fun VideosSection(
             videoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
         },
         onDeleteClick = { videoId -> videoToDelete = videoId },
+        onVideoClick = videoOpener::open,
         modifier = modifier,
     )
+
+    StreamerVideoPlayerHost(opener = videoOpener)
 
     if (addVideoState.isVisible) {
         AddVideoSheet(
@@ -121,6 +132,7 @@ private fun VideosSection(
     onRetryClick: () -> Unit,
     onAddClick: () -> Unit,
     onDeleteClick: (videoId: String) -> Unit,
+    onVideoClick: (Streamer.Video) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -172,6 +184,7 @@ private fun VideosSection(
                             video = video,
                             isDeleting = video.id in state.deletingVideoIds,
                             onDeleteClick = { onDeleteClick(video.id) },
+                            onClick = { onVideoClick(video) },
                         )
                     }
 
@@ -213,9 +226,14 @@ private fun VideoRow(
     video: Streamer.Video,
     isDeleting: Boolean,
     onDeleteClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val source = video.source()
+
     Surface(
+        onClick = onClick,
+        enabled = source !is VideoSource.Unavailable,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -224,10 +242,11 @@ private fun VideoRow(
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Movie,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+            StreamerVideoPreview(
+                source = source,
+                title = video.title,
+                isCompact = true,
+                modifier = Modifier.width(96.dp),
             )
             Column(
                 modifier = Modifier
@@ -330,6 +349,7 @@ internal fun VideosSectionPreview() {
                 onRetryClick = {},
                 onAddClick = {},
                 onDeleteClick = {},
+                onVideoClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -346,6 +366,7 @@ internal fun VideosSectionFullPreview() {
                 onRetryClick = {},
                 onAddClick = {},
                 onDeleteClick = {},
+                onVideoClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }
@@ -362,6 +383,7 @@ internal fun VideosSectionEmptyPreview() {
                 onRetryClick = {},
                 onAddClick = {},
                 onDeleteClick = {},
+                onVideoClick = {},
                 modifier = Modifier.padding(16.dp),
             )
         }

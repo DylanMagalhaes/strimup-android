@@ -384,4 +384,12 @@
     <string name="videos_error_size">Vidéo trop lourde : 80 Mo maximum.</string>
     <string name="videos_error_title">Le titre doit faire entre 2 et 120 caractères.</string>
     <string name="videos_error_description">La description ne doit pas dépasser 1000 caractères.</string>
+    <string name="video_playback_error">Lecture impossible sur cet appareil</string>
+    <string name="video_close">Fermer la vidéo</string>
+    <string name="video_link_unavailable">Lien indisponible</string>
+    <string name="video_platform_youtube">YouTube</string>
+    <string name="video_platform_tiktok">TikTok</string>
+    <string name="video_platform_twitch">Twitch</string>
+    <string name="video_platform_instagram">Instagram</string>
+    <string name="video_platform_kick">Kick</string>
 </resources>

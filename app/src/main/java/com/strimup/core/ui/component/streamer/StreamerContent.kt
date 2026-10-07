@@ -32,6 +32,7 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.mapper.getIconRes
 import com.strimup.core.ui.component.button.SocialIconButton
 import com.strimup.core.ui.component.spacer.VerticalSpacer
+import com.strimup.core.ui.component.video.StreamerVideoCard
 import com.strimup.core.ui.streamer.displayName
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -42,7 +43,7 @@ fun StreamerContent(
     videos: List<Streamer.Video>,
     socials: List<Social>,
     onSocialClick: (String?) -> Unit,
-    onVideoClick: (videoId: String, isVertical: Boolean) -> Unit,
+    onVideoClick: (Streamer.Video) -> Unit,
     modifier: Modifier = Modifier,
     belowAboutContent: (@Composable () -> Unit)? = null,
 ) {
@@ -135,11 +136,10 @@ fun StreamerContent(
                     horizontalArrangement = Arrangement.spacedBy( 8. dp),
 
                 ) {
-                    items(videos) { video ->
-                        YouTubeThumbnail(
-                            videoUrl = video.url,
-                            videoName = video.title,
-                            onVideoClick = onVideoClick
+                    items(videos, key = { it.id }) { video ->
+                        StreamerVideoCard(
+                            video = video,
+                            onClick = onVideoClick,
                         )
                     }
                 }
@@ -175,7 +175,7 @@ private fun StreamerContentPreview() {
             description = "Joueuse roleplay (Gtarp), multigaming et pas mal de sessions Just Chatting (Petit bonus si t'aimes t'enjailler en musique). Je partage également toutes mes activités (Création graphique, montage vidéo), session cinéma sur Discord, ainsi que montage Lego ou activités communautaires. Contact: moontsuki.pro@gmail.com",
             onSocialClick = {},
             videos = emptyList(),
-            onVideoClick = { _, _ -> }
+            onVideoClick = {}
         )
     }
 }

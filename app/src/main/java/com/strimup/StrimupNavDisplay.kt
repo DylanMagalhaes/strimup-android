@@ -197,9 +197,6 @@ fun StrimupNavDisplay(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = destination.streamerId,
-                        onVideoClick = { videoId, isVertical ->
-                            backStack.add(Destination.YouTubePlayer(videoId, isVertical))
-                        },
                         onNavUp = { backStack.removeLastOrNull() },
                         isLoggedIn = isLoggedIn,
                         isOwnProfile = destination.streamerId == userId,
