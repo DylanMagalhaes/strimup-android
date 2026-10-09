@@ -7,3 +7,12 @@ fun <T : NavKey> MutableList<T>.navigateAsTab(destination: T) {
     remove(destination)
     add(destination)
 }
+
+fun <T : NavKey> MutableList<T>.popOrReplaceWith(fallback: T) {
+    if (size > 1) {
+        removeAt(lastIndex)
+    } else {
+        clear()
+        add(fallback)
+    }
+}

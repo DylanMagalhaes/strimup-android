@@ -63,6 +63,7 @@ import androidx.navigation3.ui.NavDisplay
 import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination
 import com.strimup.core.navigation.navigateAsTab
+import com.strimup.core.navigation.popOrReplaceWith
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.account.presentation.account.AccountScreen
 import com.strimup.feature.account.presentation.deletion.DeleteAccountScreen
@@ -196,7 +197,7 @@ fun StrimupNavDisplay(
                     StreamerDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         streamerId = destination.streamerId,
-                        onNavUp = { backStack.removeLastOrNull() },
+                        onNavUp = { backStack.popOrReplaceWith(Destination.Home.StreamerList) },
                         isLoggedIn = isLoggedIn,
                         isOwnProfile = destination.streamerId == userId,
                         onLoginRequired = { backStack.add(Destination.Login) },
@@ -234,7 +235,7 @@ fun StrimupNavDisplay(
                             backStack.add(Destination.Home.StreamerList)
                         },
                         modifier = Modifier.fillMaxSize(),
-                        onNavToLogin = { backStack.removeLastOrNull() }
+                        onNavToLogin = { backStack.popOrReplaceWith(Destination.Login) }
                     )
                 }
 
@@ -242,7 +243,7 @@ fun StrimupNavDisplay(
                     val accountNavUp: (() -> Unit)? = when (userRole) {
                         UserRole.VIEWER -> null
                         else -> {
-                            { backStack.removeLastOrNull() }
+                            { backStack.popOrReplaceWith(Destination.Home.StreamerList) }
                         }
                     }
                     AccountScreen(
@@ -259,14 +260,14 @@ fun StrimupNavDisplay(
                 entry<Destination.Notifications> {
                     NotificationsScreen(
                         modifier = Modifier.fillMaxSize(),
-                        onNavUp = { backStack.removeLastOrNull() },
+                        onNavUp = { backStack.popOrReplaceWith(Destination.Home.StreamerList) },
                     )
                 }
 
                 entry<Destination.DeleteAccount> {
                     DeleteAccountScreen(
                         modifier = Modifier.fillMaxSize(),
-                        onNavUp = { backStack.removeLastOrNull() },
+                        onNavUp = { backStack.popOrReplaceWith(Destination.Home.StreamerList) },
                         onAccountDeleted = {
                             backStack.clear()
                             backStack.add(Destination.Home.StreamerList)
