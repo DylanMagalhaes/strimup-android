@@ -1,7 +1,7 @@
 package com.strimup.core.favorite.data.mapper
 
 import com.strimup.core.streamer.domain.entity.Streamer
-import com.strimup.core.favorite.data.local.model.FavoriteRoomEntity
+import com.strimup.core.database.model.FavoriteRoomEntity
 import com.strimup.core.favorite.data.response.FavoriteStreamerResponse
 
 fun FavoriteStreamerResponse.toDomain(): Streamer {
@@ -24,6 +24,14 @@ fun FavoriteStreamerResponse.toRoomEntity(): FavoriteRoomEntity {
 
 fun FavoriteRoomEntity.toDomain(): Streamer {
     return Streamer(
+        id = this.id,
+        userName = this.userName,
+        imageUrl = this.imageUrl
+    )
+}
+
+fun Streamer.toFavoriteRoom(): FavoriteRoomEntity {
+    return FavoriteRoomEntity(
         id = this.id,
         userName = this.userName,
         imageUrl = this.imageUrl

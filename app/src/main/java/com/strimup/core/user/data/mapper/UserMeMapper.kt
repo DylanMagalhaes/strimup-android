@@ -1,6 +1,6 @@
 package com.strimup.core.user.data.mapper
 
-import com.strimup.core.user.data.local.model.UserRoomEntity
+import com.strimup.core.database.model.UserRoomEntity
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 

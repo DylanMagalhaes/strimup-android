@@ -1,6 +1,5 @@
 package com.strimup.core.streamer.data.mapper
 
-import com.strimup.core.favorite.data.local.model.FavoriteRoomEntity
 import com.strimup.core.streamer.data.request.UpdateProfileRequest
 import com.strimup.core.streamer.data.response.FilterOptionsResponse
 import com.strimup.core.streamer.data.response.StreamerDto
@@ -123,14 +122,6 @@ fun Streamer.toUpdateProfileRequest(): UpdateProfileRequest {
         averageViewers = averageViewers,
         languages = languages?.filter { it.isNotBlank() },
         tags = tags?.map { it.id } ?: emptyList()
-    )
-}
-
-fun Streamer.toFavoriteRoom(): FavoriteRoomEntity{
-    return FavoriteRoomEntity(
-        id= this.id,
-        userName= this.userName,
-        imageUrl =  this.imageUrl
     )
 }
 

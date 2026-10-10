@@ -1,7 +1,7 @@
 package com.strimup.feature.filter.data
 
 import com.strimup.core.network.toDomainResult
-import com.strimup.feature.filter.data.local.dao.FilterDao
+import com.strimup.core.database.dao.FilterDao
 import com.strimup.feature.filter.data.mapper.toDomain
 import com.strimup.feature.filter.data.mapper.toDomainEntity
 import com.strimup.feature.filter.data.mapper.toDto

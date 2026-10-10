@@ -1,8 +1,8 @@
 package com.strimup.feature.auth.data.local
 
-import com.strimup.core.favorite.data.local.dao.FavoriteDao
-import com.strimup.core.user.data.local.dao.UserDao
-import com.strimup.feature.filter.data.local.dao.FilterDao
+import com.strimup.core.database.dao.FavoriteDao
+import com.strimup.core.database.dao.UserDao
+import com.strimup.core.database.dao.FilterDao
 import javax.inject.Inject
 
 interface LocalSessionDataSource {

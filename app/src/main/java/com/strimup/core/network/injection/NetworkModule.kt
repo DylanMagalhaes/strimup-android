@@ -2,13 +2,13 @@ package com.strimup.core.network.injection
 
 import com.strimup.BuildConfig
 import com.strimup.core.network.logging.redactSensitiveData
-import com.strimup.feature.auth.data.remote.AuthAuthenticator
-import com.strimup.feature.auth.data.remote.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.Authenticator
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -38,8 +38,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        authInterceptor: AuthInterceptor,
-        authAuthenticator: AuthAuthenticator
+        interceptors: Set<@JvmSuppressWildcards Interceptor>,
+        authenticator: Authenticator
     ): OkHttpClient {
 
         val loggingInterceptor = HttpLoggingInterceptor { message ->
@@ -50,9 +50,9 @@ object NetworkModule {
         }
 
         return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
+            .apply { interceptors.forEach(::addInterceptor) }
             .addInterceptor(loggingInterceptor)
-            .authenticator(authAuthenticator)
+            .authenticator(authenticator)
             .build()
     }
 }

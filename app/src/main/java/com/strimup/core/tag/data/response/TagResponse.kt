@@ -1,4 +1,4 @@
-package com.strimup.feature.streamerprofile.data.response
+package com.strimup.core.tag.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -4,6 +4,8 @@ import com.strimup.feature.auth.data.AuthApiService
 import com.strimup.feature.auth.data.DefaultAuthRepository
 import com.strimup.feature.auth.data.local.DefaultLocalSessionDataSource
 import com.strimup.feature.auth.data.local.LocalSessionDataSource
+import com.strimup.feature.auth.data.remote.AuthAuthenticator
+import com.strimup.feature.auth.data.remote.AuthInterceptor
 import com.strimup.feature.auth.domain.AuthRepository
 import com.strimup.feature.auth.domain.usecase.CompleteOAuthUseCase
 import com.strimup.feature.auth.domain.usecase.DefaultCompleteOAuthUseCase
@@ -22,6 +24,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
+import okhttp3.Authenticator
+import okhttp3.Interceptor
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -34,6 +39,18 @@ object AuthNetworkModule {
     fun providesAuthApiService(retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+interface AuthHttpModule {
+
+    @Binds
+    @IntoSet
+    fun bindsAuthInterceptor(impl: AuthInterceptor): Interceptor
+
+    @Binds
+    fun bindsAuthAuthenticator(impl: AuthAuthenticator): Authenticator
 }
 
 @Module

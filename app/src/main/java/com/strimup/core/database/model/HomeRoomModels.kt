@@ -1,4 +1,4 @@
-package com.strimup.feature.home.data.local.model
+package com.strimup.core.database.model
 
 import kotlinx.serialization.Serializable
 

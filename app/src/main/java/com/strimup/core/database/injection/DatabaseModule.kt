@@ -6,10 +6,10 @@ import com.strimup.BuildConfig
 import com.strimup.core.database.STRIMUP_DATABASE_NAME
 import com.strimup.core.database.StrimupDatabase
 import com.strimup.core.database.StrimupDatabaseMigrations
-import com.strimup.core.favorite.data.local.dao.FavoriteDao
-import com.strimup.core.user.data.local.dao.UserDao
-import com.strimup.feature.filter.data.local.dao.FilterDao
-import com.strimup.feature.home.data.local.dao.HomeDao
+import com.strimup.core.database.dao.FavoriteDao
+import com.strimup.core.database.dao.UserDao
+import com.strimup.core.database.dao.FilterDao
+import com.strimup.core.database.dao.HomeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

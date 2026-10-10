@@ -1,6 +1,6 @@
 package com.strimup.core.user.data
 
-import com.strimup.core.user.data.local.dao.UserDao
+import com.strimup.core.database.dao.UserDao
 import com.strimup.core.user.data.mapper.toDomainEntity
 import com.strimup.core.user.domain.UserRepository
 import com.strimup.core.user.domain.entity.UserEntity

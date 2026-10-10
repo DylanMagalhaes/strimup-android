@@ -1,11 +1,11 @@
-package com.strimup.core.user.data.local.dao
+package com.strimup.core.database.dao
 
 
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
-import com.strimup.core.user.data.local.model.UserRoomEntity
+import com.strimup.core.database.model.UserRoomEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

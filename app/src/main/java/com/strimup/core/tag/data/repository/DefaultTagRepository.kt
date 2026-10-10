@@ -4,7 +4,7 @@ import com.strimup.core.network.toDomainResult
 import com.strimup.core.tag.data.remote.TagApiService
 import com.strimup.core.tag.domain.entity.TagEntity
 import com.strimup.core.tag.domain.repository.TagRepository
-import com.strimup.feature.streamerprofile.data.mapper.toEntity
+import com.strimup.core.tag.data.mapper.toEntity
 import javax.inject.Inject
 
 class DefaultTagRepository @Inject constructor(

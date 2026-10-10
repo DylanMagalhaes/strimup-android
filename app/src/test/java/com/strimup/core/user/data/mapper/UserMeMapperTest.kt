@@ -1,7 +1,7 @@
 package com.strimup.core.user.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import com.strimup.core.user.data.local.model.UserRoomEntity
+import com.strimup.core.database.model.UserRoomEntity
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import org.junit.Test

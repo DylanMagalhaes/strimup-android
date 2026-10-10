@@ -3,9 +3,9 @@ package com.strimup.feature.home.data.mapper
 import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.tag.domain.entity.TagEntity
-import com.strimup.feature.home.data.local.model.HomeSocialRoomModel
-import com.strimup.feature.home.data.local.model.HomeStreamerRoomEntity
-import com.strimup.feature.home.data.local.model.HomeTagRoomModel
+import com.strimup.core.database.model.HomeSocialRoomModel
+import com.strimup.core.database.model.HomeStreamerRoomEntity
+import com.strimup.core.database.model.HomeTagRoomModel
 
 fun Streamer.toHomeRoomEntity(orderIndex: Int): HomeStreamerRoomEntity {
     return HomeStreamerRoomEntity(

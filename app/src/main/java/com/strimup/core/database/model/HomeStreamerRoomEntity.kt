@@ -1,4 +1,4 @@
-package com.strimup.feature.home.data.local.model
+package com.strimup.core.database.model
 
 import androidx.room3.ColumnTypeConverters
 import androidx.room3.Entity

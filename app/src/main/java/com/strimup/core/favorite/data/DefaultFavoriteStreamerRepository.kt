@@ -1,11 +1,11 @@
 package com.strimup.core.favorite.data
 
-import com.strimup.core.favorite.data.local.dao.FavoriteDao
+import com.strimup.core.database.dao.FavoriteDao
 import com.strimup.core.favorite.data.mapper.toDomain
 import com.strimup.core.favorite.data.mapper.toRoomEntity
 import com.strimup.core.favorite.domain.FavoriteStreamerRepository
 import com.strimup.core.network.toDomainResult
-import com.strimup.core.streamer.data.mapper.toFavoriteRoom
+import com.strimup.core.favorite.data.mapper.toFavoriteRoom
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.streamer.domain.repository.StreamerRepository
 import kotlinx.coroutines.flow.Flow

@@ -1,7 +1,7 @@
 package com.strimup.feature.home.data
 
 import com.strimup.core.streamer.domain.entity.Streamer
-import com.strimup.feature.home.data.local.dao.HomeDao
+import com.strimup.core.database.dao.HomeDao
 import com.strimup.feature.home.data.mapper.toHomeRoomEntity
 import com.strimup.feature.home.data.mapper.toStreamer
 import com.strimup.feature.home.domain.DISCOVERY_CACHE_SIZE

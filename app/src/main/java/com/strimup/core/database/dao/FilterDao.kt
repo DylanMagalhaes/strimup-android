@@ -1,10 +1,10 @@
-package com.strimup.feature.filter.data.local.dao
+package com.strimup.core.database.dao
 
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
-import com.strimup.feature.filter.data.local.model.FilterRoomEntity
+import com.strimup.core.database.model.FilterRoomEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

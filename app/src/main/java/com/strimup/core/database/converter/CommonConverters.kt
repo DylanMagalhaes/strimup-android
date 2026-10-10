@@ -1,7 +1,7 @@
 package com.strimup.core.database.converter
 
 import androidx.room3.ColumnTypeConverter
-import com.strimup.feature.filter.data.local.model.TagRoomModel
+import com.strimup.core.database.model.TagRoomModel
 import kotlinx.serialization.json.Json
 
 class CommonConverters {

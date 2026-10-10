@@ -1,12 +1,12 @@
-package com.strimup.feature.home.data.local.dao
+package com.strimup.core.database.dao
 
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
 import androidx.room3.Transaction
-import com.strimup.feature.home.data.local.model.HomeBannerRoomEntity
-import com.strimup.feature.home.data.local.model.HomeStreamerRoomEntity
+import com.strimup.core.database.model.HomeBannerRoomEntity
+import com.strimup.core.database.model.HomeStreamerRoomEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

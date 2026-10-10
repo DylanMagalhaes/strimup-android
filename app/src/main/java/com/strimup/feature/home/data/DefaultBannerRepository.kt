@@ -1,7 +1,7 @@
 package com.strimup.feature.home.data
 
 import com.strimup.core.network.toDomainResult
-import com.strimup.feature.home.data.local.dao.HomeDao
+import com.strimup.core.database.dao.HomeDao
 import com.strimup.feature.home.data.mapper.toDomain
 import com.strimup.feature.home.data.mapper.toRoomEntity
 import com.strimup.feature.home.domain.BannerRepository

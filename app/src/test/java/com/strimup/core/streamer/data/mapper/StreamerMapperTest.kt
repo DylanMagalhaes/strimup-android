@@ -305,26 +305,6 @@ class StreamerMapperTest {
         assertThat(request.languages).containsExactly("FR")
     }
 
-    // --- Streamer.toFavoriteRoom() ---
-
-    @Test
-    fun `toFavoriteRoom should correctly map Streamer to FavoriteRoomEntity`() {
-        // GIVEN
-        val streamer = Streamer(
-            id = "1",
-            userName = "Inox",
-            imageUrl = "https://example.com/avatar.png"
-        )
-
-        // WHEN
-        val favoriteRoom = streamer.toFavoriteRoom()
-
-        // THEN
-        assertThat(favoriteRoom.id).isEqualTo("1")
-        assertThat(favoriteRoom.userName).isEqualTo("Inox")
-        assertThat(favoriteRoom.imageUrl).isEqualTo("https://example.com/avatar.png")
-    }
-
     // --- FilterOptionsResponse.toEntity() ---
 
     @Test

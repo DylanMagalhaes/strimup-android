@@ -1,8 +1,8 @@
 package com.strimup.feature.home.data.local
 
-import com.strimup.feature.home.data.local.dao.HomeDao
-import com.strimup.feature.home.data.local.model.HomeBannerRoomEntity
-import com.strimup.feature.home.data.local.model.HomeStreamerRoomEntity
+import com.strimup.core.database.dao.HomeDao
+import com.strimup.core.database.model.HomeBannerRoomEntity
+import com.strimup.core.database.model.HomeStreamerRoomEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

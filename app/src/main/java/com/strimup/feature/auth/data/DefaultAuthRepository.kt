@@ -4,7 +4,7 @@ import com.strimup.BuildConfig
 import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
 import com.strimup.core.network.toDomainResult
-import com.strimup.core.user.data.local.dao.UserDao
+import com.strimup.core.database.dao.UserDao
 import com.strimup.core.user.data.mapper.toRoomEntity
 import com.strimup.feature.auth.data.local.AuthPreferencesDataSource
 import com.strimup.feature.auth.data.local.LocalSessionDataSource
