@@ -30,6 +30,14 @@ gradlePlugin {
             id = "strimup.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+        register("androidLibrary") {
+            id = "strimup.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidFeature") {
+            id = "strimup.android.feature"
+            implementationClass = "AndroidFeatureConventionPlugin"
+        }
         register("androidCompose") {
             id = "strimup.android.compose"
             implementationClass = "AndroidComposeConventionPlugin"

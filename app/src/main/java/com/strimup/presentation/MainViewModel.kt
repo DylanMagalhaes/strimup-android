@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.strimup.core.ui.R as CoreUiR
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -123,8 +124,9 @@ private val CLIENT_ERROR_CODES = HTTP_CLIENT_ERROR_MIN..HTTP_CLIENT_ERROR_MAX
 
 @StringRes
 private fun Throwable.toOAuthMessageRes(): Int = when (val error = toDomainError()) {
-    is DomainError.Server -> if (error.code in CLIENT_ERROR_CODES) R.string.oauth_error_failed else error.toMessageRes()
-    DomainError.Unknown -> R.string.oauth_error_failed
+    is DomainError.Server ->
+        if (error.code in CLIENT_ERROR_CODES) CoreUiR.string.oauth_error_failed else error.toMessageRes()
+    DomainError.Unknown -> CoreUiR.string.oauth_error_failed
     else -> error.toMessageRes()
 }
 
@@ -134,5 +136,5 @@ private fun OAuthFailureReason.toMessageRes(): Int = when (this) {
     OAuthFailureReason.INVALID_STATE -> R.string.oauth_error_expired
     OAuthFailureReason.INVALID_REQUEST,
     OAuthFailureReason.SERVER_ERROR,
-    OAuthFailureReason.UNKNOWN -> R.string.oauth_error_failed
+    OAuthFailureReason.UNKNOWN -> CoreUiR.string.oauth_error_failed
 }

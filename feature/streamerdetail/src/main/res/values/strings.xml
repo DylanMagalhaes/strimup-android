@@ -1,0 +1,7 @@
+<resources>
+    <!-- Actions -->
+    <string name="action_more_options">Plus d\'options</string>
+
+    <!-- Report -->
+    <string name="report_action">Signaler ce profil</string>
+</resources>

@@ -4,17 +4,8 @@ plugins {
     alias(libs.plugins.strimup.android.application)
     alias(libs.plugins.strimup.android.compose)
     alias(libs.plugins.strimup.hilt)
-    alias(libs.plugins.strimup.android.room)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
-}
-
-val localProperties = Properties().apply {
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localPropertiesFile.inputStream().use { load(it) }
-    }
 }
 
 val keystoreProperties = Properties().apply {
@@ -38,7 +29,6 @@ android {
         versionCode = 3
         versionName = "1.1.1"
 
-        buildConfigField("String", "BASE_URL", "\"https://strimup-back-fd5v.onrender.com/\"")
         manifestPlaceholders["crashlyticsCollectionEnabled"] = true
     }
 
@@ -56,9 +46,6 @@ android {
     buildTypes {
         debug {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
-            localProperties.getProperty("BASE_URL")?.let { baseUrl ->
-                buildConfigField("String", "BASE_URL", baseUrl)
-            }
         }
         release {
             if (hasReleaseSigning) {
@@ -72,43 +59,57 @@ android {
             )
         }
     }
-    buildFeatures {
-        buildConfig = true
-    }
 }
 
 dependencies {
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.exifinterface)
-    implementation(libs.androidx.compose.material.icons)
+    implementation(projects.core.common)
+    implementation(projects.core.database)
+    implementation(projects.core.favorite)
+    implementation(projects.core.legal)
+    implementation(projects.core.navigation)
+    implementation(projects.core.network)
+    implementation(projects.core.security)
+    implementation(projects.core.streamer)
+    implementation(projects.core.tag)
+    implementation(projects.core.ui)
+    implementation(projects.core.user)
+    implementation(projects.core.util)
+    implementation(projects.feature.account)
+    implementation(projects.feature.auth)
+    implementation(projects.feature.favorite)
+    implementation(projects.feature.filter)
+    implementation(projects.feature.home)
+    implementation(projects.feature.notification)
+    implementation(projects.feature.push)
+    implementation(projects.feature.report)
+    implementation(projects.feature.schedule)
+    implementation(projects.feature.search)
+    implementation(projects.feature.streamerdetail)
+    implementation(projects.feature.streamerprofile)
+    implementation(projects.feature.streamervideos)
 
-    implementation(libs.coil)
-    implementation(libs.coil.network)
-    implementation(libs.media3.exoplayer)
-    implementation(libs.media3.ui)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.material.icons)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-    implementation(libs.androidx.lifecycle.viewmodel)
-    annotationProcessor(libs.androidx.lifecycle.compiler)
-    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.okhttp3)
-    implementation(libs.okhttp3.logging.interceptor)
-
+    implementation(libs.coil)
+    implementation(libs.coil.network)
     implementation(libs.hilt.viewmodel.compose)
-
-    implementation(libs.androidx.browser)
-
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.coroutines.play.services)
+    annotationProcessor(libs.androidx.lifecycle.compiler)
 
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.messaging)
     implementation(libs.firebase.crashlytics)
+
+    testImplementation(projects.core.common)
+    testImplementation(projects.core.testing)
+    testImplementation(projects.core.ui)
+    testImplementation(projects.core.user)
+    testImplementation(projects.feature.auth)
+    testImplementation(projects.feature.notification)
+    testImplementation(projects.feature.push)
 }

@@ -126,7 +126,7 @@ The application follows **Clean Architecture** principles, split into three inde
 - **`domain/`** — Business core, independent of the Android framework: entities, repository interfaces, and **UseCases** (one responsibility per use case: `CreateFilterUseCase`, `GetStreamersByFilterUseCase`, `ReportStreamerUseCase`…). Each use case is a `fun interface` implemented by a `Default…` class, so tests can replace it with a plain lambda.
 - **`presentation/`** — ViewModels, UI states, and Compose screens. No business logic flows through here: the ViewModel orchestrates UseCases and exposes immutable state.
 
-The project lives in a single `app` module organized into **`core/`** (cross-cutting building blocks: network, database, security, user, streamer, favorites, tags, design system) and **`feature/`** (`auth`, `home`, `search`, `filter`, `favorite`, `streamerdetail`, `streamerprofile`, `notification`, `push`, `account`, `report`), each exposing its own Hilt module.
+The project is split into **Gradle modules**: one `:core:*` module per cross-cutting building block (network, database, security, user, streamer, favorites, tags, design system…) and one `:feature:*` module per feature (`auth`, `home`, `search`, `filter`, `favorite`, `streamerdetail`, `streamerprofile`, `streamervideos`, `schedule`, `notification`, `push`, `account`, `report`), each exposing its own Hilt module. Shared Gradle configuration lives in **convention plugins** (`build-logic/`): `strimup.android.library`, `strimup.android.feature`, `strimup.android.compose`, `strimup.hilt`, `strimup.android.room`, `strimup.detekt`.
 
 ### MVVM / MVI & state management
 
@@ -262,10 +262,13 @@ fun `a conflict should mean the profile was already reported`() = runTest {
 ## Project Structure
 
 ```
-app/src/main/java/com/strimup/
-├── core/                      # Shared cross-cutting building blocks
-│   ├── common/                 # DomainError, DomainException (pure Kotlin)
-│   ├── database/               # Room: database, migrations, converters
+strimup-android/
+├── app/                       # Entry point: Application, MainActivity, NavDisplay
+├── build-logic/convention/    # Gradle convention plugins (strimup.android.*)
+│
+├── core/                      # Shared cross-cutting modules (:core:*)
+│   ├── common/                 # DomainError, DomainException, scopes
+│   ├── database/               # Room: database, entities, DAOs, migrations
 │   ├── network/                # Retrofit / OkHttp, error mapping
 │   ├── security/               # Android Keystore encryption
 │   ├── user/                   # Signed-in user
@@ -273,9 +276,12 @@ app/src/main/java/com/strimup/
 │   ├── favorite/               # Favorites (Room + API)
 │   ├── tag/                    # Tags & categories
 │   ├── navigation/             # Navigation 3 destinations
+│   ├── legal/                  # Legal URLs
+│   ├── util/                   # Utilities (formatting…)
+│   ├── testing/                # Shared test helpers (MainDispatcherRule)
 │   └── ui/                     # Design system, components, UiText, errors
 │
-└── feature/                   # Screens & business logic per feature
+└── feature/                   # One module per feature (:feature:*)
     ├── auth/                   # Sign-in, sign-up, Twitch OAuth
     ├── home/                   # Home, banner, offline cache
     ├── search/                 # Streamer search
@@ -283,6 +289,8 @@ app/src/main/java/com/strimup/
     ├── favorite/               # Favorites list
     ├── streamerdetail/         # Streamer page
     ├── streamerprofile/        # Signed-in streamer profile & editing
+    ├── streamervideos/         # Streamer videos
+    ├── schedule/               # Schedule & image export
     ├── notification/           # Notification center & settings
     ├── push/                   # Firebase Cloud Messaging
     ├── account/                # My account, account deletion
