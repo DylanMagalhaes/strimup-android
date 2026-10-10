@@ -1,0 +1,74 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Errors -->
+    <string name="error_invalid_credentials">E-mail ou mot de passe incorrect.</string>
+
+    <!-- Password -->
+    <string name="password_error_min_length">Le mot de passe doit contenir au moins 12 caractères.</string>
+    <string name="password_error_uppercase">Le mot de passe doit contenir au moins une majuscule.</string>
+    <string name="password_error_lowercase">Le mot de passe doit contenir au moins une minuscule.</string>
+    <string name="password_error_digit">Le mot de passe doit contenir au moins un chiffre.</string>
+    <string name="password_error_special_character" formatted="false">Le mot de passe doit contenir au moins un caractère spécial parmi @ $ ! % * ? &amp; . / - _</string>
+    <string name="password_error_mismatch">Les mots de passe ne correspondent pas.</string>
+    <string name="password_error_max_length">Le mot de passe doit contenir au plus 128 caractères.</string>
+    <string name="password_error_forbidden_character">Le caractère « %1$s » n\'est pas autorisé. Caractères spéciaux acceptés : @ $ ! %% * ? &amp; . / - _</string>
+    <string name="password_error_whitespace">Le mot de passe ne doit pas contenir d\'espace.</string>
+    <string name="password_error_personal_information">Le mot de passe ne doit contenir ni ton pseudo ni le début de ton e-mail.</string>
+    <string name="password_checklist_min_length">12 car. min.</string>
+    <string name="password_checklist_uppercase">Majuscule</string>
+    <string name="password_checklist_lowercase">Minuscule</string>
+    <string name="password_checklist_digit">Chiffre</string>
+    <string name="password_checklist_special_character">Spécial (@$!%*?&amp;./-_)</string>
+    <string name="password_checklist_max_length">128 car. max.</string>
+    <string name="password_checklist_allowed_characters">Caractères autorisés</string>
+    <string name="password_checklist_personal_information">Sans pseudo ni e-mail</string>
+
+    <!-- Registration -->
+    <string name="email_error_required">L\'e-mail est obligatoire.</string>
+    <string name="gender_error_required">Choisis une option.</string>
+    <string name="role_error_required">Choisis ton profil.</string>
+    <string name="password_error_required">Le mot de passe est obligatoire.</string>
+    <string name="password_error_confirmation_required">Confirme ton mot de passe.</string>
+    <string name="terms_error_required">Tu dois accepter les CGU et la politique de confidentialité.</string>
+    <string name="pseudo_error_required">Le pseudo est obligatoire.</string>
+    <string name="pseudo_error_reserved">Ce pseudo est réservé. Choisis-en un autre.</string>
+    <string name="birth_date_error_required">La date de naissance est obligatoire.</string>
+    <string name="birth_date_error_invalid">Date de naissance invalide.</string>
+    <string name="birth_date_error_in_future">La date de naissance ne peut pas être dans le futur.</string>
+    <string name="birth_date_error_too_young" tools:ignore="PluralsCandidate">Tu dois avoir au moins %1$d ans pour créer ce type de compte.</string>
+
+    <!-- OAuth -->
+    <string name="oauth_twitch_continue">Continuer avec Twitch</string>
+    <string name="oauth_onboarding_title">Encore un peu d\'infos</string>
+    <string name="oauth_onboarding_submit">Continuer</string>
+    <string name="oauth_onboarding_submit_loading">Finalisation…</string>
+
+    <!-- Auth -->
+    <string name="auth_logo_description">Logo Strimup</string>
+    <string name="auth_email_label">E-mail</string>
+    <string name="auth_password_label">Mot de passe</string>
+    <string name="auth_birth_date_label">Date de naissance</string>
+    <string name="auth_birth_date_pick">Choisir ta date de naissance</string>
+    <string name="auth_gender_label">Sexe</string>
+    <string name="auth_gender_pick">Choisir ton sexe</string>
+    <string name="auth_role_label">Je suis un(e)</string>
+    <string name="auth_role_pick">Choisir ton profil</string>
+    <string name="auth_legal_sentence">%1$s les %2$s et la %3$s.</string>
+    <string name="auth_legal_terms">CGU</string>
+    <string name="auth_legal_privacy_policy">politique de confidentialité</string>
+    <string name="auth_oauth_divider">Ou continuer avec</string>
+    <string name="auth_oauth_legal_prefix">En continuant avec Twitch, j\'accepte</string>
+    <string name="login_forgot_password">Mot de passe oublié ?</string>
+    <string name="login_submit">Se connecter</string>
+    <string name="login_submit_loading">Connexion en cours…</string>
+    <string name="login_no_account">Pas encore de compte ?</string>
+    <string name="login_register_link">S\'inscrire</string>
+    <string name="register_title">Créer un compte</string>
+    <string name="register_pseudo_label">Pseudo</string>
+    <string name="register_password_confirmation_label">Confirmation</string>
+    <string name="register_legal_prefix">J\'accepte</string>
+    <string name="register_submit">S\'inscrire</string>
+    <string name="register_submit_loading">Inscription en cours…</string>
+    <string name="register_has_account">Déjà un compte ?</string>
+    <string name="register_login_link">Se connecter</string>
+    <string name="oauth_onboarding_legal_prefix">En continuant, j\'accepte</string>
+</resources>

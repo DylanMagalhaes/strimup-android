@@ -1,0 +1,21 @@
+<resources>
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_empty">Aucune notification</string>
+    <string name="notifications_mark_all_as_read">Tout marquer comme lu</string>
+    <string name="notifications_delete">Supprimer</string>
+    <string name="notifications_error_mark_as_read">Impossible de marquer la notification comme lue. Réessaie.</string>
+    <string name="notifications_error_mark_all_as_read">Impossible de tout marquer comme lu. Réessaie.</string>
+    <string name="notifications_error_delete">Impossible de supprimer la notification. Réessaie.</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">À l\'instant</string>
+    <string name="time_minutes_ago">il y a %1$d min</string>
+    <string name="time_hours_ago">il y a %1$d h</string>
+    <string name="time_yesterday">Hier</string>
+    <string name="time_days_ago">il y a %1$d j</string>
+    <plurals name="notifications_bell_unread">
+        <item quantity="one">Notifications, %d non lue</item>
+        <item quantity="other">Notifications, %d non lues</item>
+    </plurals>
+</resources>

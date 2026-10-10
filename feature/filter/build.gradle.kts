@@ -1,0 +1,28 @@
+plugins {
+    alias(libs.plugins.strimup.android.feature)
+    alias(libs.plugins.kotlin.serialization)
+}
+
+android {
+    namespace = "com.strimup.feature.filter"
+}
+
+dependencies {
+    implementation(projects.core.database)
+    implementation(projects.core.favorite)
+    implementation(projects.core.navigation)
+    implementation(projects.core.network)
+    implementation(projects.core.streamer)
+    implementation(projects.core.tag)
+
+    implementation(libs.androidx.compose.material.icons)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit)
+
+    testImplementation(projects.core.common)
+}

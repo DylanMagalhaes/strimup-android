@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.strimup.R
 import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
+import com.strimup.core.testing.MainDispatcherRule
 import com.strimup.core.user.domain.entity.UserEntity
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.core.user.domain.usecase.GetUserFlowUseCase
@@ -15,7 +16,6 @@ import com.strimup.feature.auth.domain.usecase.ExchangeOAuthCodeUseCase
 import com.strimup.feature.notification.domain.usecase.WatchUnreadNotificationCountUseCase
 import com.strimup.feature.push.domain.usecase.ObserveShouldAskNotificationPermissionUseCase
 import com.strimup.feature.push.domain.usecase.SyncPushDeviceRegistrationUseCase
-import com.strimup.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import com.strimup.core.ui.R as CoreUiR
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModelTest {
@@ -161,7 +162,7 @@ class MainViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as MainUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.oauth_error_failed)
+            assertThat(event.textRes).isEqualTo(CoreUiR.string.oauth_error_failed)
         }
     }
 
@@ -178,7 +179,7 @@ class MainViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as MainUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_server)
+            assertThat(event.textRes).isEqualTo(CoreUiR.string.error_server)
         }
     }
 
@@ -195,7 +196,7 @@ class MainViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as MainUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.error_network)
+            assertThat(event.textRes).isEqualTo(CoreUiR.string.error_network)
         }
     }
 
@@ -262,7 +263,7 @@ class MainViewModelTest {
             advanceUntilIdle()
 
             val event = awaitItem() as MainUiEvent.ShowSnackBar
-            assertThat(event.textRes).isEqualTo(R.string.oauth_error_failed)
+            assertThat(event.textRes).isEqualTo(CoreUiR.string.oauth_error_failed)
         }
     }
 

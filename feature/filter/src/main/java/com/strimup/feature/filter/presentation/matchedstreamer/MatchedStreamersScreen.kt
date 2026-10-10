@@ -1,0 +1,404 @@
+package com.strimup.feature.filter.presentation.matchedstreamer
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.strimup.core.streamer.domain.entity.Social
+import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.streamer.domain.entity.StreamerMatchResult
+import com.strimup.core.ui.browser.rememberExternalLinkOpener
+import com.strimup.core.ui.component.error.ErrorState
+import com.strimup.core.ui.component.streamer.StreamerCard
+import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.core.ui.theme.zalandoFontFamily
+import com.strimup.feature.filter.R
+import com.strimup.core.ui.R as CoreUiR
+
+@Composable
+fun MatchedStreamersScreen(
+    onNavUp: () -> Unit,
+    onStreamerClick: (String) -> Unit,
+    filterId: String,
+    modifier: Modifier = Modifier,
+    viewModel: MatchedStreamerListViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val favoriteStreamerIds by viewModel.favoriteStreamerIds.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
+    val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
+
+    LaunchedEffect(filterId) {
+        viewModel.initData(filterId)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is MatchedStreamersUiEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(resources.getString(event.textRes))
+                }
+            }
+        }
+    }
+
+    MatchedStreamersScreen(
+        state = state,
+        favoriteStreamerIds = favoriteStreamerIds,
+        snackBarHostState = snackBarHostState,
+        onNavUp = onNavUp,
+        onStreamerClick = onStreamerClick,
+        onSocialClick = openExternalLink::invoke,
+        onFavoriteClick = viewModel::onFavoriteClick,
+        onLoadNextPage = viewModel::loadNextPage,
+        onLiveCheckedChange = viewModel::onLiveSwitch,
+        onRetryClick = viewModel::retry,
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MatchedStreamersScreen(
+    state: MatchedStreamersUiState,
+    favoriteStreamerIds: Set<String>,
+    snackBarHostState: SnackbarHostState,
+    onNavUp: () -> Unit,
+    onStreamerClick: (String) -> Unit,
+    onSocialClick: (String?) -> Unit,
+    onFavoriteClick: (String) -> Unit,
+    onLoadNextPage: () -> Unit,
+    onLiveCheckedChange: () -> Unit,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val topBarTitle = when (state) {
+        is MatchedStreamersUiState.Success -> state.filterName ?: stringResource(R.string.filter_results_default_title)
+        else -> stringResource(R.string.filter_results_default_title)
+    }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = screenTopWindowInsets,
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = topBarTitle,
+                        fontFamily = zalandoFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavUp) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(CoreUiR.string.action_back)
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            when (state) {
+                is MatchedStreamersUiState.Loading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+
+                is MatchedStreamersUiState.Error -> {
+                    ErrorState(
+                        messageRes = state.errorMessageRes,
+                        onRetryClick = onRetryClick,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                is MatchedStreamersUiState.Success -> {
+                    MatchedStreamersContent(
+                        state = state,
+                        favoriteStreamerIds = favoriteStreamerIds,
+                        onStreamerClick = onStreamerClick,
+                        onSocialClick = onSocialClick,
+                        onFavoriteClick = onFavoriteClick,
+                        onLoadNextPage = onLoadNextPage,
+                        onLiveCheckedChange = onLiveCheckedChange,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MatchedStreamersContent(
+    state: MatchedStreamersUiState.Success,
+    favoriteStreamerIds: Set<String>,
+    onStreamerClick: (String) -> Unit,
+    onSocialClick: (String?) -> Unit,
+    onFavoriteClick: (String) -> Unit,
+    onLoadNextPage: () -> Unit,
+    onLiveCheckedChange: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val streamers = state.matchedResult.streamers.orEmpty()
+    val totalCount = state.matchedResult.total ?: 0
+
+    if (streamers.isEmpty()) {
+        EmptyMatchedStreamers(modifier = modifier)
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            item(key = "total_header") {
+                TotalStreamersHeader(
+                    total = totalCount,
+                    isLive = state.isLiveOnly,
+                    onLiveCheckedChange = onLiveCheckedChange,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+
+            itemsIndexed(
+                items = streamers,
+                key = { _, streamer -> streamer.id }
+            ) { index, streamer ->
+                if (index >= streamers.size - 1) {
+                    LaunchedEffect(index) {
+                        onLoadNextPage()
+                    }
+                }
+
+                StreamerCard(
+                    pseudo = streamer.userName,
+                    socials = streamer.socials,
+                    imageUrl = streamer.imageUrl,
+                    isLive = streamer.isLive,
+                    liveTitle = streamer.liveTitle,
+                    onClick = { onStreamerClick(streamer.id) },
+                    onSocialClick = onSocialClick,
+                    onFavoriteClick = { onFavoriteClick(streamer.id) },
+                    modifier = Modifier.fillMaxWidth(),
+                    tags = streamer.tags.orEmpty().map { it.name },
+                    nextLive = streamer.nextLive,
+                    isFavorite = streamer.id in favoriteStreamerIds,
+                )
+            }
+
+            if (state.isLoadingNextPage) {
+                item(key = "pagination_loader") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(28.dp),
+                            strokeWidth = 3.dp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TotalStreamersHeader(
+    total: Int,
+    isLive: Boolean,
+    onLiveCheckedChange: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "$total",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = pluralStringResource(R.plurals.filter_results_count_label, total),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Surface(
+            onClick = onLiveCheckedChange,
+            shape = CircleShape,
+            color = if (isLive) Color(0xFF220000) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            border = BorderStroke(
+                width = 1.dp,
+                color = if (isLive) Color(0xFFFF2E4D) else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            )
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(
+                            color = if (isLive) Color(0xFFFF2E4D) else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                            shape = CircleShape
+                        )
+                )
+
+                Text(
+                    text = stringResource(R.string.filter_results_live_only),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (isLive) FontWeight.Bold else FontWeight.Medium,
+                    color = if (isLive) Color(0xFFFF2E4D) else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyMatchedStreamers(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.PersonSearch,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.outline
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(R.string.filter_results_empty_title),
+                fontFamily = zalandoFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.filter_results_empty_description),
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun MatchedStreamersScreenPreview() {
+    StrimupTheme {
+        MatchedStreamersScreen(
+            onNavUp = {},
+            onLiveCheckedChange = {},
+            onStreamerClick = {},
+            onSocialClick = {},
+            onFavoriteClick = {},
+            onLoadNextPage = {},
+            onRetryClick = {},
+            favoriteStreamerIds = emptySet(),
+            snackBarHostState = remember { SnackbarHostState() },
+            state = MatchedStreamersUiState.Success(
+                filterName = "Mon Filtre",
+                isLiveOnly = true,
+                matchedResult = StreamerMatchResult(
+                    total = 230,
+                    streamers = listOf(
+                        Streamer(
+                            id = "1",
+                            userName = "squeezie",
+                            imageUrl = "",
+                            isLive = true,
+                            socials = listOf(
+                                Social(
+                                    url = "https://twitch.tv/squeezie",
+                                    type = Social.Type.Twitch
+                                )
+                            ),
+                            liveTitle = "Live spécial !",
+                            isFavorite = false,
+                            tags = emptyList()
+                        )
+                    )
+                ),
+                originalMatchedResult = StreamerMatchResult(
+                    total = 230,
+                    streamers = emptyList()
+                )
+            )
+        )
+    }
+}

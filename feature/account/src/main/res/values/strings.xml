@@ -1,0 +1,27 @@
+<resources>
+    <!-- Account -->
+    <string name="account_section_preferences">Préférences</string>
+    <string name="account_notifications">Notifications</string>
+    <string name="account_notifications_enabled">Activées</string>
+    <string name="account_notifications_disabled">Désactivées</string>
+    <string name="account_section_legal">Informations légales</string>
+    <string name="account_terms_of_service">Conditions générales d\'utilisation</string>
+    <string name="account_privacy_policy">Politique de confidentialité</string>
+    <string name="account_logout">Se déconnecter</string>
+    <string name="account_delete">Supprimer mon compte</string>
+    <string name="account_nav_back">Retour</string>
+
+    <!-- Account deletion -->
+    <string name="account_deletion_title">Supprimer mon compte</string>
+    <string name="account_deletion_warning_title">Cette action est définitive</string>
+    <string name="account_deletion_warning_body">Ton e-mail, ton pseudo, ton mot de passe, tes sessions, ta liaison Twitch, ton profil, tes favoris et tes filtres seront effacés. Ton compte ne pourra pas être récupéré.</string>
+    <string name="account_deletion_confirmation_instruction">Pour confirmer, tape %1$s ci-dessous.</string>
+    <string name="account_deletion_confirmation_label">Confirmation</string>
+    <string name="account_deletion_password_instruction">Saisis ton mot de passe pour confirmer qu\'il s\'agit bien de toi.</string>
+    <string name="account_deletion_password_label">Mot de passe</string>
+    <string name="account_deletion_submit">Supprimer définitivement</string>
+    <string name="account_deletion_error_invalid_password">Mot de passe incorrect.</string>
+    <string name="account_deletion_error_not_allowed">Ce compte ne peut pas être supprimé depuis l\'application.</string>
+    <string name="account_deletion_error_pending_obligations">Ton compte ne peut pas être supprimé pour le moment.</string>
+    <string name="account_deletion_error_too_many_attempts">Trop d\'essais. Réessaie dans quelques minutes.</string>
+</resources>
