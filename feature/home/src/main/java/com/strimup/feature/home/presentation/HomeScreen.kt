@@ -2,6 +2,7 @@ package com.strimup.feature.home.presentation
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,15 +38,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.strimup.core.ui.R
 import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.streamer.StreamerCard
 import com.strimup.core.ui.inset.screenTopWindowInsets
 import com.strimup.core.ui.theme.StrimupTheme
+import com.strimup.feature.home.R
 import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.BannerType
 import com.strimup.feature.home.domain.entity.FilterEntity
@@ -54,6 +57,7 @@ import com.strimup.feature.home.presentation.component.HomeOfflineBanner
 import com.strimup.feature.home.presentation.component.HomeStreamersError
 import com.strimup.feature.home.presentation.component.HomeTabs
 import com.strimup.feature.notification.presentation.bell.NotificationBell
+import com.strimup.core.ui.R as CoreUiR
 
 @Composable
 fun HomeScreen(
@@ -193,7 +197,7 @@ private fun HomeContent(
                                 if (state.shouldShowStreamersError) {
                                     item {
                                         HomeStreamersError(
-                                            messageRes = state.errorMessageRes ?: R.string.error_unknown,
+                                            messageRes = state.errorMessageRes ?: CoreUiR.string.error_unknown,
                                             onRetryClick = onRetryClick,
                                         )
                                     }
@@ -240,9 +244,16 @@ private fun HomeTopBar(
             .fillMaxWidth()
             .height(48.dp)
             .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Image(
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .height(24.dp),
+            painter = painterResource(R.drawable.strimup_logo),
+            contentDescription = stringResource(R.string.home_logo_description),
+        )
         unreadNotificationCount?.let { count ->
             NotificationBell(unreadCount = count, onClick = onNotificationsClick)
         }

@@ -4,4 +4,5 @@
     <string name="home_tab_live">En live</string>
     <string name="home_banner_avatar_description">Avatar de %1$s</string>
     <string name="home_offline_saved_content">Hors ligne · contenu enregistré</string>
+    <string name="home_logo_description">Logo Strimup</string>
 </resources>
