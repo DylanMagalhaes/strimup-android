@@ -223,7 +223,7 @@
 - [ ] Demande d'accès à la production
 
 ### 7.7 Bonus (fort impact entretien)
-- [ ] Modularisation Gradle `:core:*` / `:feature:*`
+- [x] Modularisation Gradle `:core:*` / `:feature:*`
 - [ ] Baseline Profile + module macrobenchmark
 - [ ] `fastlane` ou Gradle Play Publisher pour l'upload automatisé
 

@@ -1,0 +1,4 @@
+<resources>
+    <!-- Streamer -->
+    <string name="search_no_result">Aucun streamer trouvé pour « %1$s »</string>
+</resources>

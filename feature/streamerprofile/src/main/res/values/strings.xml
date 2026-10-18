@@ -1,0 +1,26 @@
+<resources>
+    <!-- Errors -->
+    <string name="error_not_logged_in">Utilisateur non connecté.</string>
+
+    <!-- Profile -->
+    <string name="profile_edit_title">Modifier le profil</string>
+    <string name="profile_photo_section">Photo de profil</string>
+    <string name="profile_change_photo">Modifier ma photo de profil</string>
+    <string name="profile_general_section">Informations générales</string>
+    <string name="profile_bio">Bio</string>
+    <string name="profile_edit_bio_title">Modifier la bio</string>
+    <string name="profile_daily_status">Statut du jour</string>
+    <string name="profile_edit_status_title">Modifier le statut du jour</string>
+    <string name="profile_details_section">Détails du profil</string>
+    <string name="profile_my_tags">Mes tags</string>
+    <string name="profile_personality_primary">Personnalité principale</string>
+    <string name="profile_personality_secondary">Personnalité secondaire</string>
+    <string name="profile_socials_section">Réseaux sociaux</string>
+    <string name="profile_social_link_title">Lien %1$s</string>
+    <string name="profile_social_link_hint">Colle l\'URL de ton compte ici</string>
+    <string name="profile_tags_title">Tes tags de stream</string>
+    <plurals name="profile_tags_description">
+        <item quantity="one">Choisis jusqu\'à %1$d tag pour aider les viewers à découvrir ton contenu.</item>
+        <item quantity="other">Choisis jusqu\'à %1$d tags pour aider les viewers à découvrir ton contenu.</item>
+    </plurals>
+</resources>

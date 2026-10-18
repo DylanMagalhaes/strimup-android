@@ -1,0 +1,39 @@
+package com.strimup.core.favorite.data.mapper
+
+import com.strimup.core.database.model.FavoriteRoomEntity
+import com.strimup.core.favorite.data.response.FavoriteStreamerResponse
+import com.strimup.core.streamer.domain.entity.Streamer
+
+fun FavoriteStreamerResponse.toDomain(): Streamer {
+    return Streamer(
+        id = this.id,
+        userName = this.pseudo,
+        imageUrl = this.avatarUrl,
+        isLive = this.isLive,
+        liveTitle = this.liveTitle
+    )
+}
+
+fun FavoriteStreamerResponse.toRoomEntity(): FavoriteRoomEntity {
+    return FavoriteRoomEntity(
+        id = this.id,
+        userName = this.pseudo,
+        imageUrl = this.avatarUrl
+    )
+}
+
+fun FavoriteRoomEntity.toDomain(): Streamer {
+    return Streamer(
+        id = this.id,
+        userName = this.userName,
+        imageUrl = this.imageUrl
+    )
+}
+
+fun Streamer.toFavoriteRoom(): FavoriteRoomEntity {
+    return FavoriteRoomEntity(
+        id = this.id,
+        userName = this.userName,
+        imageUrl = this.imageUrl
+    )
+}

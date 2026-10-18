@@ -126,7 +126,7 @@ L'application suit les principes de la **Clean Architecture**, découpée en tro
 - **`domain/`** — Cœur métier, indépendant du framework Android : entités, interfaces de repository et **UseCases** (une responsabilité par cas d'usage : `CreateFilterUseCase`, `GetStreamersByFilterUseCase`, `ReportStreamerUseCase`…). Chaque use case est une `fun interface` implémentée par une classe `Default…`, ce qui permet de la remplacer par une simple lambda dans les tests.
 - **`presentation/`** — ViewModels, états d'UI et écrans Compose. Aucune logique métier n'y transite : le ViewModel orchestre les UseCases et expose un état immuable.
 
-Le projet est organisé au sein d'un module `app` unique en **`core/`** (briques transverses : réseau, base de données, sécurité, utilisateur, streamer, favoris, tags, design system) et **`feature/`** (`auth`, `home`, `search`, `filter`, `favorite`, `streamerdetail`, `streamerprofile`, `notification`, `push`, `account`, `report`), chacun exposant son propre module Hilt.
+Le projet est découpé en **modules Gradle** : un module `:core:*` par brique transverse (réseau, base de données, sécurité, utilisateur, streamer, favoris, tags, design system…) et un module `:feature:*` par fonctionnalité (`auth`, `home`, `search`, `filter`, `favorite`, `streamerdetail`, `streamerprofile`, `streamervideos`, `schedule`, `notification`, `push`, `account`, `report`), chacun exposant son propre module Hilt. La configuration Gradle commune est factorisée dans des **convention plugins** (`build-logic/`) : `strimup.android.library`, `strimup.android.feature`, `strimup.android.compose`, `strimup.hilt`, `strimup.android.room`, `strimup.detekt`.
 
 ### MVVM / MVI & gestion d'état
 
@@ -262,10 +262,13 @@ fun `a conflict should mean the profile was already reported`() = runTest {
 ## Structure du projet
 
 ```
-app/src/main/java/com/strimup/
-├── core/                      # Briques transverses partagées
-│   ├── common/                 # DomainError, DomainException (pur Kotlin)
-│   ├── database/               # Room : base, migrations, converters
+strimup-android/
+├── app/                       # Point d'entrée : Application, MainActivity, NavDisplay
+├── build-logic/convention/    # Convention plugins Gradle (strimup.android.*)
+│
+├── core/                      # Modules transverses partagés (:core:*)
+│   ├── common/                 # DomainError, DomainException, scopes
+│   ├── database/               # Room : base, entités, DAO, migrations
 │   ├── network/                # Retrofit / OkHttp, mapping des erreurs
 │   ├── security/               # Chiffrement Android Keystore
 │   ├── user/                   # Utilisateur connecté
@@ -273,9 +276,12 @@ app/src/main/java/com/strimup/
 │   ├── favorite/               # Favoris (Room + API)
 │   ├── tag/                    # Tags & catégories
 │   ├── navigation/             # Destinations Navigation 3
+│   ├── legal/                  # URLs légales
+│   ├── util/                   # Utilitaires (formatage…)
+│   ├── testing/                # Outils de test partagés (MainDispatcherRule)
 │   └── ui/                     # Design system, composants, UiText, erreurs
 │
-└── feature/                   # Écrans & logique métier par fonctionnalité
+└── feature/                   # Un module par fonctionnalité (:feature:*)
     ├── auth/                   # Connexion, inscription, OAuth Twitch
     ├── home/                   # Accueil, bannière, cache hors-ligne
     ├── search/                 # Recherche de streamers
@@ -283,6 +289,8 @@ app/src/main/java/com/strimup/
     ├── favorite/               # Liste des favoris
     ├── streamerdetail/         # Fiche d'un streamer
     ├── streamerprofile/        # Profil du streamer connecté & édition
+    ├── streamervideos/         # Vidéos du streamer
+    ├── schedule/               # Planning & export image
     ├── notification/           # Centre de notifications & réglages
     ├── push/                   # Firebase Cloud Messaging
     ├── account/                # Mon compte, suppression de compte
@@ -340,7 +348,7 @@ Copier `keystore.properties.example` en `keystore.properties` (ignoré par Git) 
 - [ ] Tests instrumentés DAO Room & tests UI Compose
 - [ ] Rapport de couverture (Kover) & badge
 - [ ] Bandeau « hors ligne » global
-- [ ] Modularisation Gradle multi-module (`:core:*`, `:feature:*`)
+- [x] Modularisation Gradle multi-module (`:core:*`, `:feature:*`) & convention plugins
 
 Le détail est suivi dans [`docs/ROADMAP.md`](docs/ROADMAP.md).
 

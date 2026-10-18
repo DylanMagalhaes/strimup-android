@@ -1,0 +1,106 @@
+<resources>
+    <!-- Errors -->
+    <string name="error_network">Vérifie ta connexion internet.</string>
+    <string name="error_timeout">La requête a pris trop de temps. Réessaie.</string>
+    <string name="error_unauthorized">Ta session a expiré. Reconnecte-toi.</string>
+    <string name="error_server">Le serveur rencontre un problème. Réessaie plus tard.</string>
+    <string name="error_serialization">Une erreur inattendue est survenue.</string>
+    <string name="error_unknown">Une erreur est survenue.</string>
+    <string name="error_open_link">Impossible d\'ouvrir ce lien.</string>
+    <string name="error_generic_title">Une erreur est survenue</string>
+
+    <!-- Actions -->
+    <string name="action_retry">Réessayer</string>
+    <string name="action_back">Retour</string>
+    <string name="action_ok">OK</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="action_done">Terminer</string>
+    <string name="not_specified">Non renseigné</string>
+    <string name="edit_field_content_description">Modifier %1$s</string>
+    <string name="multi_select_hint">Plusieurs choix possibles</string>
+    <string name="password_show">Montrer le mot de passe</string>
+    <string name="password_hide">Cacher le mot de passe</string>
+
+    <!-- Gender -->
+    <string name="gender_male">Homme</string>
+    <string name="gender_female">Femme</string>
+    <string name="gender_non_binary">Non-binaire</string>
+    <string name="gender_prefer_not_to_say">Je préfère ne pas préciser</string>
+
+    <!-- Role -->
+    <string name="role_viewer">Viewer</string>
+    <string name="role_streamer">Streamer / Créateur</string>
+    <string name="role_admin">Admin</string>
+
+    <!-- OAuth -->
+    <string name="oauth_error_failed">La connexion avec Twitch a échoué. Réessaie.</string>
+
+    <!-- Auth -->
+    <string name="login_title">Connexion</string>
+
+    <!-- Profile -->
+    <string name="profile_about">À propos</string>
+    <string name="profile_read_more">Lire la suite</string>
+    <string name="profile_read_less">Voir moins</string>
+    <string name="profile_stream_frequency">Fréquence de stream</string>
+    <string name="profile_average_viewers">Nombre de viewers moyen</string>
+    <string name="profile_languages">Langues</string>
+
+    <!-- Tags -->
+    <string name="tags_selected_count">Tags sélectionnés (%1$d/%2$d) :</string>
+    <string name="tags_none_selected">Aucun tag sélectionné pour le moment</string>
+    <string name="tags_category_placeholder">Choisis une catégorie</string>
+    <string name="tags_select_category">Choisir une catégorie</string>
+
+    <!-- Filters -->
+    <string name="filters_title">Mes filtres</string>
+
+    <!-- Account -->
+    <string name="account_title">Mon compte</string>
+
+    <!-- Streamer -->
+    <string name="streamer_live_badge">LIVE</string>
+    <string name="streamer_more_tags">+%1$d</string>
+    <string name="streamer_next_live">Prochain live</string>
+    <string name="streamer_next_live_tomorrow">Demain</string>
+    <string name="day_short_monday">Lun.</string>
+    <string name="day_short_tuesday">Mar.</string>
+    <string name="day_short_wednesday">Mer.</string>
+    <string name="day_short_thursday">Jeu.</string>
+    <string name="day_short_friday">Ven.</string>
+    <string name="day_short_saturday">Sam.</string>
+    <string name="day_short_sunday">Dim.</string>
+    <string name="streamer_add_favorite">Ajouter aux favoris</string>
+    <string name="streamer_remove_favorite">Retirer des favoris</string>
+    <string name="streamer_videos">Vidéos</string>
+    <string name="streamer_open_social">Ouvrir %1$s</string>
+    <string name="search_placeholder">Rechercher un streamer…</string>
+
+    <!-- Schedule -->
+    <string name="schedule_today">Aujourd\'hui</string>
+    <string name="schedule_day_monday">Lundi</string>
+    <string name="schedule_day_tuesday">Mardi</string>
+    <string name="schedule_day_wednesday">Mercredi</string>
+    <string name="schedule_day_thursday">Jeudi</string>
+    <string name="schedule_day_friday">Vendredi</string>
+    <string name="schedule_day_saturday">Samedi</string>
+    <string name="schedule_day_sunday">Dimanche</string>
+    <string name="schedule_export_day_monday">LUN</string>
+    <string name="schedule_export_day_tuesday">MAR</string>
+    <string name="schedule_export_day_wednesday">MER</string>
+    <string name="schedule_export_day_thursday">JEU</string>
+    <string name="schedule_export_day_friday">VEN</string>
+    <string name="schedule_export_day_saturday">SAM</string>
+    <string name="schedule_export_day_sunday">DIM</string>
+
+    <!-- Push -->
+    <string name="video_playback_error">Lecture impossible sur cet appareil</string>
+    <string name="video_close">Fermer la vidéo</string>
+    <string name="video_link_unavailable">Lien indisponible</string>
+    <string name="video_platform_youtube">YouTube</string>
+    <string name="video_platform_tiktok">TikTok</string>
+    <string name="video_platform_twitch">Twitch</string>
+    <string name="video_platform_instagram">Instagram</string>
+    <string name="video_platform_kick">Kick</string>
+</resources>

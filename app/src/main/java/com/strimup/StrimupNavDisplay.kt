@@ -81,6 +81,7 @@ import com.strimup.feature.streamerprofile.presentation.navigation.ProfileNaviga
 import com.strimup.presentation.MainUiEvent
 import com.strimup.presentation.MainViewModel
 import kotlinx.coroutines.launch
+import com.strimup.core.ui.R as CoreUiR
 
 @Composable
 fun StrimupNavDisplay(
@@ -362,7 +363,7 @@ private fun StrimupBottomBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Tune,
-                    contentDescription = stringResource(R.string.filters_title),
+                    contentDescription = stringResource(CoreUiR.string.filters_title),
                 )
             }
         )
@@ -474,7 +475,7 @@ private fun ProfileNavigationIcon(
     if (!isLoggedIn) {
         Icon(
             imageVector = if (isSelected) Icons.Filled.Person else Icons.Outlined.Person,
-            contentDescription = stringResource(R.string.login_title)
+            contentDescription = stringResource(CoreUiR.string.login_title)
         )
         return
     }
@@ -482,7 +483,7 @@ private fun ProfileNavigationIcon(
     if (userRole == UserRole.VIEWER) {
         Icon(
             imageVector = if (isSelected) Icons.Filled.Settings else Icons.Outlined.Settings,
-            contentDescription = stringResource(R.string.account_title)
+            contentDescription = stringResource(CoreUiR.string.account_title)
         )
         return
     }

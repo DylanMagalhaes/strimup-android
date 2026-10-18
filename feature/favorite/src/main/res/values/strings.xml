@@ -1,0 +1,7 @@
+<resources>
+    <!-- Favorites -->
+    <string name="favorites_title">Mes streamers</string>
+    <string name="favorites_live">Live</string>
+    <string name="favorites_empty_title">Aucun streamer enregistré</string>
+    <string name="favorites_empty_description">Ajoute des streamers à tes favoris pour les retrouver rapidement.</string>
+</resources>
