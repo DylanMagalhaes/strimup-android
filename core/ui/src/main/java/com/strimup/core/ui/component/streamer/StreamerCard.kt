@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -166,17 +166,13 @@ private fun StreamerCardHeader(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(avatarSize),
+                    .heightIn(min = avatarSize),
                 contentAlignment = Alignment.CenterStart,
             ) {
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.spacedBy(HeaderItemSpacing),
-                ) {
-                    StreamerTags(tags = tags, onTagClick = onTagClick)
-                    FavoriteButton(isFavorite = isFavorite, onClick = onFavoriteClick)
-                }
+                StreamerTags(tags = tags, onTagClick = onTagClick)
             }
+
+            FavoriteButton(isFavorite = isFavorite, onClick = onFavoriteClick)
         }
     }
 }
