@@ -6,6 +6,7 @@ import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
 import com.strimup.core.favorite.domain.usecase.AddStreamerToFavoritesUseCase
 import com.strimup.core.favorite.domain.usecase.DeleteStreamerFromFavoritesUseCase
+import com.strimup.core.streamer.domain.entity.Social
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.testing.MainDispatcherRule
 import com.strimup.core.ui.R
@@ -238,4 +239,60 @@ class StreamerDetailViewModelTest {
         assertThat(addCalled).isFalse()
         assertThat(deleteCalled).isFalse()
     }
+
+    @Test
+    fun `loadStreamer when streamer is live with a twitch link should expose its twitch channel`() = runTest {
+        // GIVEN
+        val viewModel = viewModelLoading(
+            fakeStreamer.copy(isLive = true, socials = listOf(twitchSocial)),
+        )
+
+        // WHEN
+        viewModel.loadStreamer("12")
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as StreamerDetailUiState.Success
+        assertThat(state.liveTwitchChannel).isEqualTo("inox")
+    }
+
+    @Test
+    fun `loadStreamer when streamer is offline should not expose a twitch channel`() = runTest {
+        // GIVEN
+        val viewModel = viewModelLoading(
+            fakeStreamer.copy(isLive = false, socials = listOf(twitchSocial)),
+        )
+
+        // WHEN
+        viewModel.loadStreamer("12")
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as StreamerDetailUiState.Success
+        assertThat(state.liveTwitchChannel).isNull()
+    }
+
+    @Test
+    fun `loadStreamer when live streamer has no twitch link should not expose a twitch channel`() = runTest {
+        // GIVEN
+        val viewModel = viewModelLoading(fakeStreamer.copy(isLive = true))
+
+        // WHEN
+        viewModel.loadStreamer("12")
+        advanceUntilIdle()
+
+        // THEN
+        val state = viewModel.state.value as StreamerDetailUiState.Success
+        assertThat(state.liveTwitchChannel).isNull()
+    }
+
+    private val twitchSocial = Social(url = "https://www.twitch.tv/inox", type = Social.Type.Twitch)
+
+    private fun viewModelLoading(streamer: Streamer) = StreamerDetailViewModel(
+        getStreamer = GetStreamerUseCase {
+            Result.success(StreamerDetailResult(streamer = streamer, isFavorite = false))
+        },
+        addStreamerToFavorites = AddStreamerToFavoritesUseCase { Result.success(Unit) },
+        deleteStreamerFromFavorites = DeleteStreamerFromFavoritesUseCase { Result.success(Unit) },
+    )
 }
