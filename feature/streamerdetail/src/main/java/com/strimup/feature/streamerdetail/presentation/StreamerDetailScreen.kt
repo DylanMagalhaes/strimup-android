@@ -1,6 +1,7 @@
 package com.strimup.feature.streamerdetail.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,6 +50,9 @@ import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.error.ErrorState
 import com.strimup.core.ui.component.streamer.StreamerContent
 import com.strimup.core.ui.component.streamer.StreamerHero
+import com.strimup.core.ui.component.twitch.TwitchLivePlayer
+import com.strimup.core.ui.component.twitch.WatchOnTwitchButton
+import com.strimup.core.ui.component.twitch.rememberTwitchChannelOpener
 import com.strimup.core.ui.component.video.StreamerVideoPlayerHost
 import com.strimup.core.ui.component.video.rememberStreamerVideoOpener
 import com.strimup.core.ui.inset.screenTopWindowInsets
@@ -77,6 +83,7 @@ fun StreamerDetailScreen(
     val resources = LocalResources.current
     val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
     val videoOpener = rememberStreamerVideoOpener(snackBarHostState)
+    val openTwitchChannel = rememberTwitchChannelOpener(snackBarHostState)
 
     LaunchedEffect(streamerId) {
         viewModel.loadStreamer(streamerId)
@@ -110,6 +117,7 @@ fun StreamerDetailScreen(
         onNavUp = onNavUp,
         onSocialClick = openExternalLink::invoke,
         onVideoClick = videoOpener::open,
+        onWatchOnTwitchClick = openTwitchChannel::invoke,
         onFavoriteClick = { viewModel.onFavoriteClick() },
         onRetryClick = { viewModel.loadStreamer(streamerId) },
         isReportAvailable = !isOwnProfile,
@@ -145,6 +153,7 @@ private fun StreamerDetailScreen(
     onNavUp: () -> Unit,
     onSocialClick: (String?) -> Unit,
     onVideoClick: (Streamer.Video) -> Unit,
+    onWatchOnTwitchClick: (String) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
     isReportAvailable: Boolean,
@@ -189,6 +198,7 @@ private fun StreamerDetailScreen(
             state = state,
             onSocialClick = onSocialClick,
             onVideoClick = onVideoClick,
+            onWatchOnTwitchClick = onWatchOnTwitchClick,
             onFavoriteClick = onFavoriteClick,
             onRetryClick = onRetryClick,
             scheduleContent = scheduleContent,
@@ -231,6 +241,7 @@ private fun StreamerDetailContent(
     state: StreamerDetailUiState,
     onSocialClick: (String?) -> Unit,
     onVideoClick: (Streamer.Video) -> Unit,
+    onWatchOnTwitchClick: (String) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
     scheduleContent: @Composable () -> Unit,
@@ -265,6 +276,17 @@ private fun StreamerDetailContent(
 
                 )
 
+                state.liveTwitchChannel?.let { channel ->
+                    StreamerLiveSection(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        channel = channel,
+                        liveTitle = state.streamer.liveTitle,
+                        onWatchOnTwitchClick = { onWatchOnTwitchClick(channel) },
+                    )
+                }
+
                 StreamerContent(
                     modifier = Modifier.fillMaxSize(),
                     description = state.streamer.bio ?: "",
@@ -287,6 +309,44 @@ private fun StreamerDetailContent(
     }
 }
 
+@Composable
+private fun StreamerLiveSection(
+    channel: String,
+    liveTitle: String?,
+    onWatchOnTwitchClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(
+            text = stringResource(CoreUiR.string.twitch_live_now),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontFamily = zalandoFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+        )
+
+        if (!liveTitle.isNullOrBlank()) {
+            Text(
+                text = liveTitle,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 13.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+
+        TwitchLivePlayer(channel = channel)
+
+        WatchOnTwitchButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onWatchOnTwitchClick,
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun StreamerDetailScreenPreview() {
@@ -295,6 +355,7 @@ private fun StreamerDetailScreenPreview() {
             onNavUp = {},
             onFavoriteClick = {},
             onVideoClick = {},
+            onWatchOnTwitchClick = {},
             onSocialClick = {},
             snackBarHostState = remember { SnackbarHostState() },
             state = StreamerDetailUiState.Success(
