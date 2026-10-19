@@ -2,6 +2,7 @@ package com.strimup.feature.auth.data.local
 
 import com.strimup.core.database.dao.FavoriteDao
 import com.strimup.core.database.dao.FilterDao
+import com.strimup.core.database.dao.RecentStreamerDao
 import com.strimup.core.database.dao.UserDao
 import javax.inject.Inject
 
@@ -14,11 +15,13 @@ class DefaultLocalSessionDataSource @Inject constructor(
     private val userDao: UserDao,
     private val filterDao: FilterDao,
     private val favoriteDao: FavoriteDao,
+    private val recentStreamerDao: RecentStreamerDao,
 ) : LocalSessionDataSource {
     override suspend fun clear() {
         preferences.clear()
         userDao.deleteAllUsers()
         filterDao.deleteAllFilters()
         favoriteDao.deleteAllFavorites()
+        recentStreamerDao.deleteAllRecentStreamers()
     }
 }
