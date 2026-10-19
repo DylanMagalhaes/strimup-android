@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.database)
     implementation(projects.core.navigation)
     implementation(projects.core.network)
     implementation(projects.core.streamer)

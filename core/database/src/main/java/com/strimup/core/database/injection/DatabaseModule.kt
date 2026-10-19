@@ -9,6 +9,7 @@ import com.strimup.core.database.StrimupDatabaseMigrations
 import com.strimup.core.database.dao.FavoriteDao
 import com.strimup.core.database.dao.FilterDao
 import com.strimup.core.database.dao.HomeDao
+import com.strimup.core.database.dao.RecentStreamerDao
 import com.strimup.core.database.dao.UserDao
 import dagger.Module
 import dagger.Provides
@@ -49,6 +50,12 @@ import javax.inject.Singleton
     @Singleton
     fun provideHomeDao(database: StrimupDatabase): HomeDao {
         return database.homeDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRecentStreamerDao(database: StrimupDatabase): RecentStreamerDao {
+        return database.recentStreamerDao()
     }
 
     @Provides

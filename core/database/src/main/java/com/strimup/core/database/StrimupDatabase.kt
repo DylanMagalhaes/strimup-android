@@ -7,11 +7,13 @@ import com.strimup.core.database.converter.CommonConverters
 import com.strimup.core.database.dao.FavoriteDao
 import com.strimup.core.database.dao.FilterDao
 import com.strimup.core.database.dao.HomeDao
+import com.strimup.core.database.dao.RecentStreamerDao
 import com.strimup.core.database.dao.UserDao
 import com.strimup.core.database.model.FavoriteRoomEntity
 import com.strimup.core.database.model.FilterRoomEntity
 import com.strimup.core.database.model.HomeBannerRoomEntity
 import com.strimup.core.database.model.HomeStreamerRoomEntity
+import com.strimup.core.database.model.RecentStreamerRoomEntity
 import com.strimup.core.database.model.UserRoomEntity
 
 @Database(
@@ -21,6 +23,7 @@ import com.strimup.core.database.model.UserRoomEntity
         FavoriteRoomEntity::class,
         HomeBannerRoomEntity::class,
         HomeStreamerRoomEntity::class,
+        RecentStreamerRoomEntity::class,
     ],
     version = STRIMUP_DATABASE_VERSION,
     exportSchema = true
@@ -33,4 +36,6 @@ abstract class StrimupDatabase : RoomDatabase() {
     abstract fun favoritesDao(): FavoriteDao
 
     abstract fun homeDao(): HomeDao
+
+    abstract fun recentStreamerDao(): RecentStreamerDao
 }
