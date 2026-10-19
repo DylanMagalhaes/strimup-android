@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.strimup.core.network.toDomainError
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.error.toMessageRes
+import com.strimup.feature.search.domain.usecase.GetLiveStreamersUseCase
 import com.strimup.feature.search.domain.usecase.GetStreamersUseCase
 import com.strimup.feature.search.domain.usecase.ObserveRecentStreamersUseCase
 import com.strimup.feature.search.domain.usecase.RemoveRecentStreamerUseCase
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,12 +30,16 @@ class SearchViewModel @Inject constructor(
     private val saveRecentStreamer: SaveRecentStreamerUseCase,
     private val removeRecentStreamer: RemoveRecentStreamerUseCase,
     observeRecentStreamers: ObserveRecentStreamersUseCase,
+    getLiveStreamers: GetLiveStreamersUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<SearchUiState>(SearchUiState.Content())
     val state = _state.asStateFlow()
 
     val recentStreamers: StateFlow<List<Streamer>> = observeRecentStreamers()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), emptyList())
+
+    val liveStreamers: StateFlow<List<Streamer>> = flow { emit(getLiveStreamers().getOrDefault(emptyList())) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), emptyList())
 
     private var searchJob: Job? = null

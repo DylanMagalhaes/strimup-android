@@ -7,6 +7,7 @@ import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.testing.MainDispatcherRule
 import com.strimup.core.ui.R
+import com.strimup.feature.search.domain.usecase.GetLiveStreamersUseCase
 import com.strimup.feature.search.domain.usecase.GetStreamersUseCase
 import com.strimup.feature.search.domain.usecase.ObserveRecentStreamersUseCase
 import com.strimup.feature.search.domain.usecase.RemoveRecentStreamerUseCase
@@ -30,11 +31,13 @@ class SearchViewModelTest {
         saveRecentStreamer: SaveRecentStreamerUseCase = SaveRecentStreamerUseCase {},
         removeRecentStreamer: RemoveRecentStreamerUseCase = RemoveRecentStreamerUseCase {},
         observeRecentStreamers: ObserveRecentStreamersUseCase = ObserveRecentStreamersUseCase { flowOf(emptyList()) },
+        getLiveStreamers: GetLiveStreamersUseCase = GetLiveStreamersUseCase { Result.success(emptyList()) },
     ) = SearchViewModel(
         getStreamers = getStreamers,
         saveRecentStreamer = saveRecentStreamer,
         removeRecentStreamer = removeRecentStreamer,
         observeRecentStreamers = observeRecentStreamers,
+        getLiveStreamers = getLiveStreamers,
     )
 
     @Test
@@ -222,6 +225,36 @@ class SearchViewModelTest {
             // THEN
             assertThat(awaitItem()).isEmpty()
             assertThat(awaitItem()).isEqualTo(recentStreamers)
+        }
+    }
+
+    @Test
+    fun `live streamers should expose the streamers currently live`() = runTest {
+        // GIVEN
+        val liveStreamers = listOf(Streamer(id = "1", userName = "inox", imageUrl = "", isLive = true))
+        val viewModel = searchViewModel(getLiveStreamers = { Result.success(liveStreamers) })
+
+        // WHEN
+        viewModel.liveStreamers.test {
+            // THEN
+            assertThat(awaitItem()).isEmpty()
+            assertThat(awaitItem()).isEqualTo(liveStreamers)
+        }
+    }
+
+    @Test
+    fun `live streamers should stay empty when loading them fails`() = runTest {
+        // GIVEN
+        val viewModel = searchViewModel(
+            getLiveStreamers = { Result.failure(DomainException(DomainError.Network)) }
+        )
+
+        // WHEN
+        viewModel.liveStreamers.test {
+            // THEN
+            assertThat(awaitItem()).isEmpty()
+            advanceUntilIdle()
+            expectNoEvents()
         }
     }
 }
