@@ -1,5 +1,6 @@
 package com.strimup.feature.search.presentation
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
@@ -7,7 +8,11 @@ import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.testing.MainDispatcherRule
 import com.strimup.core.ui.R
 import com.strimup.feature.search.domain.usecase.GetStreamersUseCase
+import com.strimup.feature.search.domain.usecase.ObserveRecentStreamersUseCase
+import com.strimup.feature.search.domain.usecase.RemoveRecentStreamerUseCase
+import com.strimup.feature.search.domain.usecase.SaveRecentStreamerUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -20,6 +25,18 @@ class SearchViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private fun searchViewModel(
+        getStreamers: GetStreamersUseCase = GetStreamersUseCase { Result.success(emptyList()) },
+        saveRecentStreamer: SaveRecentStreamerUseCase = SaveRecentStreamerUseCase {},
+        removeRecentStreamer: RemoveRecentStreamerUseCase = RemoveRecentStreamerUseCase {},
+        observeRecentStreamers: ObserveRecentStreamersUseCase = ObserveRecentStreamersUseCase { flowOf(emptyList()) },
+    ) = SearchViewModel(
+        getStreamers = getStreamers,
+        saveRecentStreamer = saveRecentStreamer,
+        removeRecentStreamer = removeRecentStreamer,
+        observeRecentStreamers = observeRecentStreamers,
+    )
+
     @Test
     fun `on search input change, should emit Loading then Content with streamers when search succeeds`() = runTest {
         // GIVEN
@@ -29,7 +46,7 @@ class SearchViewModelTest {
             Streamer(id = "2", userName = "gotaga", imageUrl = "")
         )
 
-        val viewModel = SearchViewModel(
+        val viewModel = searchViewModel(
             getStreamers = GetStreamersUseCase { Result.success(streamers) }
         )
 
@@ -57,7 +74,7 @@ class SearchViewModelTest {
     fun `on search input change, should emit Empty when search returns empty list`() = runTest {
         // GIVEN
         val query = "inconnu"
-        val viewModel = SearchViewModel(
+        val viewModel = searchViewModel(
             getStreamers = GetStreamersUseCase { Result.success(emptyList()) }
         )
 
@@ -77,7 +94,7 @@ class SearchViewModelTest {
     fun `on search input change, should emit Error with the mapped DomainError message when search fails`() = runTest {
         // GIVEN
         val query = "erreur"
-        val viewModel = SearchViewModel(
+        val viewModel = searchViewModel(
             getStreamers = GetStreamersUseCase { Result.failure(Exception("peu importe")) }
         )
 
@@ -98,7 +115,7 @@ class SearchViewModelTest {
     fun `on search input change, should emit Error keeping the DomainException own category`() = runTest {
         // GIVEN
         val query = "erreur"
-        val viewModel = SearchViewModel(
+        val viewModel = searchViewModel(
             getStreamers = GetStreamersUseCase { Result.failure(DomainException(DomainError.Network)) }
         )
 
@@ -115,7 +132,7 @@ class SearchViewModelTest {
     fun `on search input change with blank query, should emit Content empty without invoking use case`() = runTest {
         // GIVEN
         var useCaseCalled = false
-        val viewModel = SearchViewModel(
+        val viewModel = searchViewModel(
             getStreamers = GetStreamersUseCase {
                 useCaseCalled = true
                 Result.success(emptyList())
@@ -141,7 +158,7 @@ class SearchViewModelTest {
         var callCount = 0
         var lastQueryProcessed = ""
 
-        val viewModel = SearchViewModel(
+        val viewModel = searchViewModel(
             getStreamers = GetStreamersUseCase { query ->
                 callCount++
                 lastQueryProcessed = query
@@ -163,5 +180,48 @@ class SearchViewModelTest {
         assertThat(callCount).isEqualTo(1)
         assertThat(lastQueryProcessed).isEqualTo("inox")
         assertThat(viewModel.state.value.searchQuery).isEqualTo("inox")
+    }
+
+    @Test
+    fun `on streamer click, should save the streamer as recently opened`() = runTest {
+        // GIVEN
+        val streamer = Streamer(id = "1", userName = "inox", imageUrl = "")
+        val savedStreamers = mutableListOf<Streamer>()
+        val viewModel = searchViewModel(saveRecentStreamer = { savedStreamers += it })
+
+        // WHEN
+        viewModel.onStreamerClick(streamer)
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(savedStreamers).containsExactly(streamer)
+    }
+
+    @Test
+    fun `on remove recent streamer click, should remove that streamer`() = runTest {
+        // GIVEN
+        val removedIds = mutableListOf<String>()
+        val viewModel = searchViewModel(removeRecentStreamer = { removedIds += it })
+
+        // WHEN
+        viewModel.onRemoveRecentStreamerClick("1")
+        advanceUntilIdle()
+
+        // THEN
+        assertThat(removedIds).containsExactly("1")
+    }
+
+    @Test
+    fun `recent streamers should expose the observed recent streamers`() = runTest {
+        // GIVEN
+        val recentStreamers = listOf(Streamer(id = "1", userName = "inox", imageUrl = ""))
+        val viewModel = searchViewModel(observeRecentStreamers = { flowOf(recentStreamers) })
+
+        // WHEN
+        viewModel.recentStreamers.test {
+            // THEN
+            assertThat(awaitItem()).isEmpty()
+            assertThat(awaitItem()).isEqualTo(recentStreamers)
+        }
     }
 }

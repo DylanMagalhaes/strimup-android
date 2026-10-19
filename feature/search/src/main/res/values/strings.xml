@@ -1,4 +1,6 @@
 <resources>
     <!-- Streamer -->
     <string name="search_no_result">Aucun streamer trouvé pour « %1$s »</string>
+    <string name="search_recent_title">Récemment consultés</string>
+    <string name="search_recent_remove_description">Retirer %1$s des streamers récents</string>
 </resources>

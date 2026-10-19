@@ -15,9 +15,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -52,11 +54,17 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val recentStreamers by viewModel.recentStreamers.collectAsStateWithLifecycle()
 
     SearchScreen(
         modifier = modifier,
         state = state,
-        onStreamerClick = onStreamerClick,
+        recentStreamers = recentStreamers,
+        onStreamerClick = { streamer ->
+            viewModel.onStreamerClick(streamer)
+            onStreamerClick(streamer.id)
+        },
+        onRemoveRecentStreamerClick = viewModel::onRemoveRecentStreamerClick,
         onSearchInputChange = viewModel::onSearchInputChange
     )
 }
@@ -64,8 +72,10 @@ fun SearchScreen(
 @Composable
 private fun SearchScreen(
     state: SearchUiState,
+    recentStreamers: List<Streamer>,
     onSearchInputChange: (String) -> Unit,
-    onStreamerClick: (String) -> Unit,
+    onStreamerClick: (Streamer) -> Unit,
+    onRemoveRecentStreamerClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -95,7 +105,9 @@ private fun SearchScreen(
             SearchContent(
                 modifier = Modifier.weight(1f),
                 state = state,
+                recentStreamers = recentStreamers,
                 onStreamerClick = onStreamerClick,
+                onRemoveRecentStreamerClick = onRemoveRecentStreamerClick,
                 onRetryClick = { onSearchInputChange(state.searchQuery) }
             )
         }
@@ -105,7 +117,9 @@ private fun SearchScreen(
 @Composable
 private fun SearchContent(
     state: SearchUiState,
-    onStreamerClick: (String) -> Unit,
+    recentStreamers: List<Streamer>,
+    onStreamerClick: (Streamer) -> Unit,
+    onRemoveRecentStreamerClick: (String) -> Unit,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -136,6 +150,14 @@ private fun SearchContent(
                 modifier = modifier.fillMaxSize(),
             )
         }
+        is SearchUiState.Content if state.searchQuery.isBlank() -> {
+            RecentStreamers(
+                modifier = modifier.fillMaxSize(),
+                streamers = recentStreamers,
+                onStreamerClick = onStreamerClick,
+                onRemoveClick = onRemoveRecentStreamerClick,
+            )
+        }
         is SearchUiState.Content -> {
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
@@ -148,7 +170,7 @@ private fun SearchContent(
                 ) { streamer ->
                     StreamerSearchCard(
                         streamer = streamer,
-                        onClick = { onStreamerClick(streamer.id) }
+                        onClick = { onStreamerClick(streamer) }
                     )
                 }
             }
@@ -157,10 +179,50 @@ private fun SearchContent(
 }
 
 @Composable
+private fun RecentStreamers(
+    streamers: List<Streamer>,
+    onStreamerClick: (Streamer) -> Unit,
+    onRemoveClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        if (streamers.isNotEmpty()) {
+            item {
+                Text(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
+                    text = stringResource(R.string.search_recent_title),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontFamily = zalandoFontFamily,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+
+        items(
+            items = streamers,
+            key = { streamer -> streamer.id }
+        ) { streamer ->
+            StreamerSearchCard(
+                modifier = Modifier.animateItem(),
+                streamer = streamer,
+                onClick = { onStreamerClick(streamer) },
+                onRemoveClick = { onRemoveClick(streamer.id) },
+            )
+        }
+    }
+}
+
+@Composable
 private fun StreamerSearchCard(
     streamer: Streamer,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRemoveClick: (() -> Unit)? = null,
 ) {
     Surface(
         onClick = onClick,
@@ -197,6 +259,19 @@ private fun StreamerSearchCard(
                     fontWeight = FontWeight.Bold,
                 )
             }
+
+            onRemoveClick?.let {
+                IconButton(onClick = onRemoveClick) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(
+                            R.string.search_recent_remove_description,
+                            streamer.userName
+                        ),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
     }
 }
@@ -208,6 +283,8 @@ private fun SearchScreenPreview() {
         SearchScreen(
             modifier = Modifier.fillMaxSize(),
             onStreamerClick = {},
+            onRemoveRecentStreamerClick = {},
+            recentStreamers = emptyList(),
             state = SearchUiState.Content(
                 searchQuery = "Search",
                 streamers = listOf(
