@@ -53,6 +53,18 @@ class StrimupDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migratingFrom2To3ShouldKeepExistingFavoritesAndCreateAnEmptyRecentStreamersTable() = runTest {
+        migrationTestHelper.createDatabase(2).use { connection ->
+            connection.execSQL("INSERT INTO favorite (id, userName, imageUrl) VALUES ('42', 'Inox', NULL)")
+        }
+
+        migrationTestHelper.runMigrationsAndValidate(3, listOf(StrimupDatabaseMigrations.MIGRATION_2_3)).use { connection ->
+            assertThat(connection.count("favorite")).isEqualTo(1)
+            assertThat(connection.count("recent_streamers")).isEqualTo(0)
+        }
+    }
+
     private fun SQLiteConnection.count(table: String): Long =
         prepare("SELECT COUNT(*) FROM `$table`").use { statement ->
             statement.step()

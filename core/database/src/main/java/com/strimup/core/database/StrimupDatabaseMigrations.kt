@@ -4,7 +4,7 @@ import androidx.room3.migration.Migration
 import androidx.sqlite.execSQL
 
 const val STRIMUP_DATABASE_NAME = "strimup_database"
-const val STRIMUP_DATABASE_VERSION = 2
+const val STRIMUP_DATABASE_VERSION = 3
 
 object StrimupDatabaseMigrations {
 
@@ -23,5 +23,13 @@ object StrimupDatabaseMigrations {
         )
     }
 
-    val all: List<Migration> = listOf(MIGRATION_1_2)
+    val MIGRATION_2_3: Migration = Migration(startVersion = 2, endVersion = 3) { connection ->
+        connection.execSQL(
+            "CREATE TABLE IF NOT EXISTS `recent_streamers` (" +
+                "`id` TEXT NOT NULL, `userName` TEXT NOT NULL, `imageUrl` TEXT, " +
+                "`viewedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))"
+        )
+    }
+
+    val all: List<Migration> = listOf(MIGRATION_1_2, MIGRATION_2_3)
 }
