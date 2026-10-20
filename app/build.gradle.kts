@@ -26,7 +26,7 @@ android {
 
     defaultConfig {
         applicationId = "com.strimup"
-        versionCode = 4
+        versionCode = 5
         versionName = "1.2"
 
         manifestPlaceholders["crashlyticsCollectionEnabled"] = true
@@ -100,6 +100,7 @@ dependencies {
     implementation(libs.coil.network)
     implementation(libs.hilt.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.play.app.update)
     annotationProcessor(libs.androidx.lifecycle.compiler)
 
     implementation(platform(libs.firebase.bom))
