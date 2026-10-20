@@ -100,6 +100,7 @@ dependencies {
     implementation(libs.coil.network)
     implementation(libs.hilt.viewmodel.compose)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.play.app.update)
     annotationProcessor(libs.androidx.lifecycle.compiler)
 
     implementation(platform(libs.firebase.bom))

@@ -1,5 +1,6 @@
 [versions]
 exifinterface = "1.4.2"
+playAppUpdate = "2.1.0"
 agp = "9.2.1"
 detekt = "1.23.8"
 coreKtx = "1.18.0"
@@ -36,6 +37,7 @@ androidxTestCore = "1.6.1"
 
 
 [libraries]
+play-app-update = { group = "com.google.android.play", name = "app-update", version.ref = "playAppUpdate" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
