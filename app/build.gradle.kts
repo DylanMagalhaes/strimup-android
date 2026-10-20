@@ -26,7 +26,7 @@ android {
 
     defaultConfig {
         applicationId = "com.strimup"
-        versionCode = 4
+        versionCode = 5
         versionName = "1.2"
 
         manifestPlaceholders["crashlyticsCollectionEnabled"] = true
