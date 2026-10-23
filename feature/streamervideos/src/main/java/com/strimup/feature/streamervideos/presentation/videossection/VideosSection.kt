@@ -93,9 +93,7 @@ fun VideosSection(
     VideosSection(
         state = state,
         onRetryClick = viewModel::loadVideos,
-        onAddClick = {
-            videoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
-        },
+        onAddClick = viewModel::onAddClick,
         onDeleteClick = { videoId -> videoToDelete = videoId },
         onVideoClick = videoOpener::open,
         modifier = modifier,
@@ -106,11 +104,18 @@ fun VideosSection(
     if (addVideoState.isVisible) {
         AddVideoSheet(
             state = addVideoState,
-            onTitleChange = viewModel::onTitleChange,
-            onDescriptionChange = viewModel::onDescriptionChange,
-            onUploadClick = viewModel::onUploadClick,
-            onCancelUploadClick = viewModel::onCancelUploadClick,
-            onDismiss = viewModel::onAddDismiss,
+            actions = AddVideoActions(
+                onModeChange = viewModel.addVideoForm::onModeChange,
+                onPickFileClick = {
+                    videoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly))
+                },
+                onUrlChange = viewModel.addVideoForm::onUrlChange,
+                onTitleChange = viewModel.addVideoForm::onTitleChange,
+                onDescriptionChange = viewModel.addVideoForm::onDescriptionChange,
+                onSubmitClick = viewModel::onSubmitClick,
+                onCancelUploadClick = viewModel::onCancelUploadClick,
+            ),
+            onDismiss = viewModel.addVideoForm::onDismiss,
         )
     }
 
