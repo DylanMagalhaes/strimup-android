@@ -10,6 +10,7 @@ build/
 *.aab
 
 keystore.properties
+*play-publisher*.json
 *.jks
 *.keystore
 .env
