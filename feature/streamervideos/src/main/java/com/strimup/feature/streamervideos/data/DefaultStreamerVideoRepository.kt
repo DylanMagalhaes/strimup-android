@@ -6,9 +6,11 @@ import com.strimup.core.network.toDomainResult
 import com.strimup.core.streamer.data.mapper.toEntity
 import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.feature.streamervideos.data.file.VideoFileReader
+import com.strimup.feature.streamervideos.data.request.AddVideoLinkRequest
 import com.strimup.feature.streamervideos.domain.StreamerVideoRepository
 import com.strimup.feature.streamervideos.domain.entity.LocalVideoFile
 import com.strimup.feature.streamervideos.domain.entity.NewStreamerVideo
+import com.strimup.feature.streamervideos.domain.entity.NewStreamerVideoLink
 import com.strimup.feature.streamervideos.domain.entity.VideoUploadEvent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -61,6 +63,14 @@ class DefaultStreamerVideoRepository @Inject constructor(
         } else {
             DomainException(error.toDomainError())
         }
+    }
+
+    override suspend fun addVideoLink(link: NewStreamerVideoLink): Result<Streamer.Video> {
+        return runCatching {
+            service.addVideoLink(
+                AddVideoLinkRequest(url = link.url, title = link.title, description = link.description),
+            ).video.toEntity()
+        }.toDomainResult()
     }
 
     override suspend fun deleteVideo(id: String): Result<Unit> {

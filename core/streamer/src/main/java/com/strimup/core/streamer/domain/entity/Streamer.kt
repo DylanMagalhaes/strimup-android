@@ -28,7 +28,9 @@ data class Streamer(
         val title: String,
         val description: String,
         val url: String,
-        val order: Int
+        val order: Int,
+        val embed: VideoEmbed? = null,
+        val thumbnailUrl: String? = null,
     )
 
     data class NextLive(

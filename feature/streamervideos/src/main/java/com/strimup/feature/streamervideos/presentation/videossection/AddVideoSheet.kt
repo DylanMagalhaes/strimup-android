@@ -2,16 +2,12 @@ package com.strimup.feature.streamervideos.presentation.videossection
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -24,11 +20,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.strimup.core.ui.component.button.PrimaryButton
@@ -38,20 +32,25 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.streamervideos.R
 import com.strimup.feature.streamervideos.domain.entity.LocalVideoFile
 import com.strimup.feature.streamervideos.domain.entity.VideoPolicy
-import java.util.Locale
 
-private const val BYTES_PER_MEGABYTE = 1024.0 * 1024.0
 private const val PERCENT = 100f
 private const val DESCRIPTION_MIN_LINES = 3
+
+internal data class AddVideoActions(
+    val onModeChange: (AddVideoMode) -> Unit,
+    val onPickFileClick: () -> Unit,
+    val onUrlChange: (String) -> Unit,
+    val onTitleChange: (String) -> Unit,
+    val onDescriptionChange: (String) -> Unit,
+    val onSubmitClick: () -> Unit,
+    val onCancelUploadClick: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AddVideoSheet(
     state: AddVideoUiState,
-    onTitleChange: (String) -> Unit,
-    onDescriptionChange: (String) -> Unit,
-    onUploadClick: () -> Unit,
-    onCancelUploadClick: () -> Unit,
+    actions: AddVideoActions,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -65,23 +64,14 @@ internal fun AddVideoSheet(
         ),
         modifier = modifier,
     ) {
-        AddVideoContent(
-            state = state,
-            onTitleChange = onTitleChange,
-            onDescriptionChange = onDescriptionChange,
-            onUploadClick = onUploadClick,
-            onCancelUploadClick = onCancelUploadClick,
-        )
+        AddVideoContent(state = state, actions = actions)
     }
 }
 
 @Composable
 private fun AddVideoContent(
     state: AddVideoUiState,
-    onTitleChange: (String) -> Unit,
-    onDescriptionChange: (String) -> Unit,
-    onUploadClick: () -> Unit,
-    onCancelUploadClick: () -> Unit,
+    actions: AddVideoActions,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -93,57 +83,35 @@ private fun AddVideoContent(
             .imePadding(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(
-                text = stringResource(R.string.videos_add_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontFamily = zalandoFontFamily,
-                fontWeight = FontWeight.Bold,
+        Text(
+            text = stringResource(R.string.videos_add_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontFamily = zalandoFontFamily,
+            fontWeight = FontWeight.Bold,
+        )
+
+        ModeTabs(
+            mode = state.mode,
+            enabled = !state.isUploading,
+            onModeChange = actions.onModeChange,
+        )
+
+        when (state.mode) {
+            AddVideoMode.FILE -> FileSource(
+                file = state.file,
+                enabled = !state.isUploading,
+                onPickFileClick = actions.onPickFileClick,
             )
-            Text(
-                text = stringResource(R.string.videos_add_subtitle, VideoPolicy.MAX_FILE_SIZE_MEGABYTES),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+
+            AddVideoMode.LINK -> LinkSource(
+                url = state.url,
+                isInvalid = state.isLinkInvalid,
+                enabled = !state.isUploading,
+                onUrlChange = actions.onUrlChange,
             )
         }
 
-        state.file?.let { file -> SelectedFileRow(file = file) }
-
-        OutlinedTextField(
-            value = state.title,
-            onValueChange = onTitleChange,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isUploading,
-            singleLine = true,
-            label = { Text(text = stringResource(R.string.videos_add_title_label)) },
-            supportingText = {
-                Text(
-                    text = stringResource(
-                        R.string.videos_add_counter,
-                        state.title.length,
-                        VideoPolicy.MAX_TITLE_LENGTH,
-                    ),
-                )
-            },
-        )
-
-        OutlinedTextField(
-            value = state.description,
-            onValueChange = onDescriptionChange,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isUploading,
-            minLines = DESCRIPTION_MIN_LINES,
-            label = { Text(text = stringResource(R.string.videos_add_description_label)) },
-            supportingText = {
-                Text(
-                    text = stringResource(
-                        R.string.videos_add_counter,
-                        state.description.length,
-                        VideoPolicy.MAX_DESCRIPTION_LENGTH,
-                    ),
-                )
-            },
-        )
+        DetailsFields(state = state, actions = actions)
 
         state.errorMessage?.let { message ->
             Text(
@@ -153,48 +121,58 @@ private fun AddVideoContent(
             )
         }
 
-        if (state.isUploading) {
-            UploadProgress(
-                progressPercent = state.progressPercent,
-                onCancelClick = onCancelUploadClick,
-            )
-        } else {
-            PrimaryButton(
-                label = stringResource(R.string.videos_add_submit),
-                onClick = onUploadClick,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = state.isSubmitEnabled,
-            )
-        }
+        SubmitArea(state = state, actions = actions)
     }
 }
 
 @Composable
-private fun SelectedFileRow(
-    file: LocalVideoFile,
-    modifier: Modifier = Modifier,
-) {
-    val fileName = file.fileName ?: stringResource(R.string.videos_add_unnamed_file)
-    val label = file.sizeBytes?.let { size ->
-        val sizeMegabytes = String.format(Locale.FRANCE, "%.1f", size / BYTES_PER_MEGABYTE)
-        stringResource(R.string.videos_add_file, fileName, sizeMegabytes)
-    } ?: fileName
+private fun DetailsFields(state: AddVideoUiState, actions: AddVideoActions) {
+    OutlinedTextField(
+        value = state.title,
+        onValueChange = actions.onTitleChange,
+        modifier = Modifier.fillMaxWidth(),
+        enabled = !state.isUploading,
+        singleLine = true,
+        label = { Text(text = stringResource(R.string.videos_add_title_label)) },
+        supportingText = {
+            Text(text = stringResource(R.string.videos_add_counter, state.title.length, VideoPolicy.MAX_TITLE_LENGTH))
+        },
+    )
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.Movie,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+    OutlinedTextField(
+        value = state.description,
+        onValueChange = actions.onDescriptionChange,
+        modifier = Modifier.fillMaxWidth(),
+        enabled = !state.isUploading,
+        minLines = DESCRIPTION_MIN_LINES,
+        label = { Text(text = stringResource(R.string.videos_add_description_label)) },
+        supportingText = {
+            Text(
+                text = stringResource(
+                    R.string.videos_add_counter,
+                    state.description.length,
+                    VideoPolicy.MAX_DESCRIPTION_LENGTH,
+                ),
+            )
+        },
+    )
+}
+
+@Composable
+private fun SubmitArea(state: AddVideoUiState, actions: AddVideoActions) {
+    when {
+        state.isUploading && state.mode == AddVideoMode.FILE -> UploadProgress(
+            progressPercent = state.progressPercent,
+            onCancelClick = actions.onCancelUploadClick,
         )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+
+        else -> PrimaryButton(
+            label = stringResource(
+                if (state.isUploading) R.string.videos_add_link_in_progress else R.string.videos_add_submit,
+            ),
+            onClick = actions.onSubmitClick,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = state.isSubmitEnabled,
         )
     }
 }
@@ -239,6 +217,16 @@ private fun UploadProgress(
     }
 }
 
+private val previewActions = AddVideoActions(
+    onModeChange = {},
+    onPickFileClick = {},
+    onUrlChange = {},
+    onTitleChange = {},
+    onDescriptionChange = {},
+    onSubmitClick = {},
+    onCancelUploadClick = {},
+)
+
 private val previewFile = LocalVideoFile(
     uri = "content://video/1",
     fileName = "best-of-gta-rp.mp4",
@@ -253,10 +241,7 @@ internal fun AddVideoContentPreview() {
         Surface {
             AddVideoContent(
                 state = AddVideoUiState(file = previewFile, title = "Best of GTA RP"),
-                onTitleChange = {},
-                onDescriptionChange = {},
-                onUploadClick = {},
-                onCancelUploadClick = {},
+                actions = previewActions,
             )
         }
     }
@@ -274,10 +259,25 @@ internal fun AddVideoContentUploadingPreview() {
                     isUploading = true,
                     progressPercent = 42,
                 ),
-                onTitleChange = {},
-                onDescriptionChange = {},
-                onUploadClick = {},
-                onCancelUploadClick = {},
+                actions = previewActions,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+internal fun AddVideoContentLinkPreview() {
+    StrimupTheme {
+        Surface {
+            AddVideoContent(
+                state = AddVideoUiState(
+                    isOpen = true,
+                    mode = AddVideoMode.LINK,
+                    url = "https://vimeo.com/123",
+                    title = "Mon meilleur clip",
+                ),
+                actions = previewActions,
             )
         }
     }

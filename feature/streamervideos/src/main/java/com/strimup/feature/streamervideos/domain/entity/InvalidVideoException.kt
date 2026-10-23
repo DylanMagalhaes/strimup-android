@@ -6,5 +6,6 @@ class InvalidVideoException(val reason: Reason) : IllegalArgumentException() {
         FILE_TOO_LARGE,
         INVALID_TITLE,
         INVALID_DESCRIPTION,
+        INVALID_LINK,
     }
 }

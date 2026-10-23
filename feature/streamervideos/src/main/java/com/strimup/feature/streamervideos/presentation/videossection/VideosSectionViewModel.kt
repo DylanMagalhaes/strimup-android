@@ -3,11 +3,13 @@ package com.strimup.feature.streamervideos.presentation.videossection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.strimup.core.network.toDomainError
+import com.strimup.core.streamer.domain.entity.Streamer
 import com.strimup.core.ui.error.toMessageRes
 import com.strimup.core.ui.text.UiText
 import com.strimup.feature.streamervideos.R
-import com.strimup.feature.streamervideos.domain.entity.VideoPolicy
+import com.strimup.feature.streamervideos.domain.entity.LocalVideoFile
 import com.strimup.feature.streamervideos.domain.entity.VideoUploadEvent
+import com.strimup.feature.streamervideos.domain.usecase.AddVideoLinkUseCase
 import com.strimup.feature.streamervideos.domain.usecase.DeleteVideoUseCase
 import com.strimup.feature.streamervideos.domain.usecase.GetMyVideosUseCase
 import com.strimup.feature.streamervideos.domain.usecase.SelectVideoFileUseCase
@@ -29,14 +31,15 @@ class VideosSectionViewModel @Inject constructor(
     private val getMyVideos: GetMyVideosUseCase,
     private val selectVideoFile: SelectVideoFileUseCase,
     private val uploadVideo: UploadVideoUseCase,
+    private val addVideoLink: AddVideoLinkUseCase,
     private val deleteVideo: DeleteVideoUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<VideosSectionUiState>(VideosSectionUiState.Loading)
     val state: StateFlow<VideosSectionUiState> = _state.asStateFlow()
 
-    private val _addVideoState = MutableStateFlow(AddVideoUiState())
-    val addVideoState: StateFlow<AddVideoUiState> = _addVideoState.asStateFlow()
+    val addVideoForm = AddVideoForm()
+    val addVideoState: StateFlow<AddVideoUiState> = addVideoForm.state
 
     private val _events = Channel<VideosSectionUiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -55,40 +58,52 @@ class VideosSectionViewModel @Inject constructor(
         }
     }
 
+    fun onAddClick() {
+        val currentState = _state.value
+        if (currentState !is VideosSectionUiState.Success || !currentState.canAddVideo) return
+
+        addVideoForm.open()
+    }
+
     fun onVideoPicked(uri: String?) {
         val currentState = _state.value
         if (uri == null || currentState !is VideosSectionUiState.Success || !currentState.canAddVideo) return
 
         viewModelScope.launch {
             selectVideoFile(uri)
-                .onSuccess { file -> _addVideoState.value = AddVideoUiState(file = file) }
+                .onSuccess { file ->
+                    addVideoForm.update {
+                        it.copy(isOpen = true, mode = AddVideoMode.FILE, file = file, errorMessage = null)
+                    }
+                }
                 .onFailure { exception ->
-                    _events.send(VideosSectionUiEvent.ShowMessage(exception.toVideoErrorUiText()))
+                    val message = exception.toVideoErrorUiText()
+                    if (addVideoForm.value.isVisible) {
+                        addVideoForm.update { it.copy(errorMessage = message) }
+                    } else {
+                        _events.send(VideosSectionUiEvent.ShowMessage(message))
+                    }
                 }
         }
     }
 
-    fun onTitleChange(title: String) {
-        _addVideoState.update { it.copy(title = title.take(VideoPolicy.MAX_TITLE_LENGTH), errorMessage = null) }
-    }
+    fun onSubmitClick() {
+        val currentState = addVideoForm.value
+        if (!currentState.isSubmitEnabled || uploadJob?.isActive == true) return
 
-    fun onDescriptionChange(description: String) {
-        _addVideoState.update {
-            it.copy(description = description.take(VideoPolicy.MAX_DESCRIPTION_LENGTH), errorMessage = null)
+        when (currentState.mode) {
+            AddVideoMode.FILE -> currentState.file?.let { file -> upload(file, currentState) }
+            AddVideoMode.LINK -> addLink(currentState)
         }
     }
 
-    fun onUploadClick() {
-        val currentState = _addVideoState.value
-        val file = currentState.file
-        if (!currentState.isSubmitEnabled || file == null || uploadJob?.isActive == true) return
-
-        _addVideoState.update { it.copy(isUploading = true, progressPercent = 0, errorMessage = null) }
+    private fun upload(file: LocalVideoFile, currentState: AddVideoUiState) {
+        addVideoForm.update { it.copy(isUploading = true, progressPercent = 0, errorMessage = null) }
 
         uploadJob = viewModelScope.launch {
             uploadVideo(file, currentState.title, currentState.description)
                 .catch { exception ->
-                    _addVideoState.update {
+                    addVideoForm.update {
                         it.copy(
                             isUploading = false,
                             progressPercent = null,
@@ -99,19 +114,33 @@ class VideosSectionViewModel @Inject constructor(
                 .collect { event ->
                     when (event) {
                         is VideoUploadEvent.Progress -> {
-                            _addVideoState.update { it.copy(progressPercent = event.percent) }
+                            addVideoForm.update { it.copy(progressPercent = event.percent) }
                         }
 
-                        is VideoUploadEvent.Completed -> {
-                            _addVideoState.value = AddVideoUiState()
-                            updateSuccess { success ->
-                                success.copy(videos = (success.videos + event.video).sortedBy { it.order })
-                            }
-                            _events.send(VideosSectionUiEvent.ShowMessage(UiText.Resource(R.string.videos_added)))
-                        }
+                        is VideoUploadEvent.Completed -> onVideoAdded(event.video)
                     }
                 }
         }
+    }
+
+    private fun addLink(currentState: AddVideoUiState) {
+        addVideoForm.update { it.copy(isUploading = true, progressPercent = null, errorMessage = null) }
+
+        uploadJob = viewModelScope.launch {
+            addVideoLink(currentState.url, currentState.title, currentState.description)
+                .onSuccess { video -> onVideoAdded(video) }
+                .onFailure { exception ->
+                    addVideoForm.update {
+                        it.copy(isUploading = false, errorMessage = exception.toVideoErrorUiText())
+                    }
+                }
+        }
+    }
+
+    private suspend fun onVideoAdded(video: Streamer.Video) {
+        addVideoForm.reset()
+        updateSuccess { success -> success.copy(videos = (success.videos + video).sortedBy { it.order }) }
+        _events.send(VideosSectionUiEvent.ShowMessage(UiText.Resource(R.string.videos_added)))
     }
 
     fun onCancelUploadClick() {
@@ -119,18 +148,12 @@ class VideosSectionViewModel @Inject constructor(
 
         uploadJob?.cancel()
         uploadJob = null
-        _addVideoState.update {
+        addVideoForm.update {
             it.copy(
                 isUploading = false,
                 progressPercent = null,
                 errorMessage = UiText.Resource(R.string.videos_upload_cancelled),
             )
-        }
-    }
-
-    fun onAddDismiss() {
-        if (!_addVideoState.value.isUploading) {
-            _addVideoState.value = AddVideoUiState()
         }
     }
 

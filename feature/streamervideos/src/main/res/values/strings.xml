@@ -16,6 +16,14 @@
     <string name="videos_add_description_label">Description (facultatif)</string>
     <string name="videos_add_counter">%1$d/%2$d</string>
     <string name="videos_add_submit">Publier la vidéo</string>
+    <string name="videos_add_tab_file">Fichier</string>
+    <string name="videos_add_tab_link">Lien</string>
+    <string name="videos_add_pick_file">Choisir une vidéo</string>
+    <string name="videos_add_change_file">Changer</string>
+    <string name="videos_add_link_subtitle">Lien YouTube, TikTok ou Twitch. La vidéo reste sur la plateforme et se lit dans son lecteur officiel.</string>
+    <string name="videos_add_link_label">Lien de la vidéo</string>
+    <string name="videos_add_link_placeholder">https://youtu.be/…</string>
+    <string name="videos_add_link_in_progress">Ajout en cours…</string>
     <string name="videos_upload_progress">Envoi en cours… %1$d %%</string>
     <string name="videos_upload_keep_open">Garde l\'appli ouverte jusqu\'à la fin de l\'envoi.</string>
     <string name="videos_upload_cancel">Annuler l\'envoi</string>
@@ -25,4 +33,5 @@
     <string name="videos_error_size">Vidéo trop lourde : 80 Mo maximum.</string>
     <string name="videos_error_title">Le titre doit faire entre 2 et 120 caractères.</string>
     <string name="videos_error_description">La description ne doit pas dépasser 1000 caractères.</string>
+    <string name="videos_error_link">Lien non reconnu : colle un lien YouTube, TikTok ou Twitch.</string>
 </resources>

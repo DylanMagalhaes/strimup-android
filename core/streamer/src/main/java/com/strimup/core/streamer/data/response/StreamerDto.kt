@@ -50,6 +50,15 @@ data class StreamerDto(
         val url: String,
         val description: String? = null,
         val order: Int,
+        val embed: Embed? = null,
+    )
+
+    @Serializable
+    data class Embed(
+        val provider: String,
+        val id: String,
+        val kind: String? = null,
+        val orientation: String? = null,
     )
 
     @Serializable
