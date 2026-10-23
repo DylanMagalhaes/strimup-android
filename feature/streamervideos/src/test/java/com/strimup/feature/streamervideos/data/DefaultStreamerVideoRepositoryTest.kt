@@ -5,10 +5,13 @@ import com.strimup.core.common.DomainError
 import com.strimup.core.common.DomainException
 import com.strimup.core.streamer.data.response.StreamerDto
 import com.strimup.core.streamer.domain.entity.Streamer
+import com.strimup.core.streamer.domain.entity.VideoEmbed
 import com.strimup.feature.streamervideos.data.file.VideoFileReader
+import com.strimup.feature.streamervideos.data.request.AddVideoLinkRequest
 import com.strimup.feature.streamervideos.data.response.AddStreamerVideoResponse
 import com.strimup.feature.streamervideos.domain.entity.LocalVideoFile
 import com.strimup.feature.streamervideos.domain.entity.NewStreamerVideo
+import com.strimup.feature.streamervideos.domain.entity.NewStreamerVideoLink
 import com.strimup.feature.streamervideos.domain.entity.VideoFormat
 import com.strimup.feature.streamervideos.domain.entity.VideoUploadEvent
 import kotlinx.coroutines.flow.toList
@@ -53,8 +56,10 @@ class DefaultStreamerVideoRepositoryTest {
     private class FakeStreamerVideoApiService(
         private val myVideos: () -> List<StreamerDto.Video> = { emptyList() },
         private val addResult: () -> AddStreamerVideoResponse = { error("unused") },
+        private val addLinkResult: () -> AddStreamerVideoResponse = { error("unused") },
     ) : StreamerVideoApiService {
         val sentParts = mutableListOf<MultipartBody.Part>()
+        val sentLinks = mutableListOf<AddVideoLinkRequest>()
         val deletedIds = mutableListOf<String>()
 
         override suspend fun getMyVideos(): List<StreamerDto.Video> = myVideos()
@@ -67,6 +72,11 @@ class DefaultStreamerVideoRepositoryTest {
             sentParts += listOfNotNull(video, title, description)
             video.body.writeTo(Buffer())
             return addResult()
+        }
+
+        override suspend fun addVideoLink(request: AddVideoLinkRequest): AddStreamerVideoResponse {
+            sentLinks += request
+            return addLinkResult()
         }
 
         override suspend fun deleteVideo(id: String) {
@@ -197,5 +207,46 @@ class DefaultStreamerVideoRepositoryTest {
 
         assertThat(result.isSuccess).isTrue()
         assertThat(service.deletedIds).containsExactly("v1")
+    }
+
+    @Test
+    fun `addVideoLink should send the link as json and map the embed`() = runTest {
+        val linkedVideo = StreamerDto.Video(
+            id = "v4",
+            title = "Mon short",
+            url = "https://www.youtube.com/shorts/abc123",
+            order = 2,
+            embed = StreamerDto.Embed(provider = "youtube", id = "abc123", kind = "short", orientation = "vertical"),
+        )
+        val service = FakeStreamerVideoApiService(addLinkResult = { AddStreamerVideoResponse(video = linkedVideo) })
+        val repository = DefaultStreamerVideoRepository(service, FakeVideoFileReader())
+
+        val result = repository.addVideoLink(
+            NewStreamerVideoLink(url = "https://youtube.com/shorts/abc123", title = "Mon short", description = null),
+        )
+
+        assertThat(service.sentLinks).containsExactly(
+            AddVideoLinkRequest(url = "https://youtube.com/shorts/abc123", title = "Mon short", description = null),
+        )
+        assertThat(result.getOrThrow().embed?.provider).isEqualTo(VideoEmbed.Provider.YOUTUBE)
+        assertThat(result.getOrThrow().url).isEqualTo("https://www.youtube.com/shorts/abc123")
+    }
+
+    @Test
+    fun `addVideoLink should expose the server message of a rejected link`() = runTest {
+        val rejection = HttpException(
+            Response.error<Any>(429, """{"message":"Trop d'ajouts, réessaie plus tard."}""".toResponseBody()),
+        )
+        val repository = DefaultStreamerVideoRepository(
+            FakeStreamerVideoApiService(addLinkResult = { throw rejection }),
+            FakeVideoFileReader(),
+        )
+
+        val result = repository.addVideoLink(
+            NewStreamerVideoLink(url = "https://youtu.be/abc", title = "Mon clip", description = null),
+        )
+
+        assertThat((result.exceptionOrNull() as DomainException).error)
+            .isEqualTo(DomainError.Server(429, "Trop d'ajouts, réessaie plus tard."))
     }
 }

@@ -1,8 +1,10 @@
 package com.strimup.feature.streamervideos.data
 
 import com.strimup.core.streamer.data.response.StreamerDto
+import com.strimup.feature.streamervideos.data.request.AddVideoLinkRequest
 import com.strimup.feature.streamervideos.data.response.AddStreamerVideoResponse
 import okhttp3.MultipartBody
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -21,6 +23,9 @@ interface StreamerVideoApiService {
         @Part title: MultipartBody.Part,
         @Part description: MultipartBody.Part?,
     ): AddStreamerVideoResponse
+
+    @POST("api/streamer/videos/link")
+    suspend fun addVideoLink(@Body request: AddVideoLinkRequest): AddStreamerVideoResponse
 
     @DELETE("api/streamer/videos/{id}")
     suspend fun deleteVideo(@Path("id") id: String)

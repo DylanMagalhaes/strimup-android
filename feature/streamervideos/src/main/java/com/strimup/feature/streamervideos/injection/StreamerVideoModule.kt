@@ -5,6 +5,8 @@ import com.strimup.feature.streamervideos.data.StreamerVideoApiService
 import com.strimup.feature.streamervideos.data.file.ContentResolverVideoFileReader
 import com.strimup.feature.streamervideos.data.file.VideoFileReader
 import com.strimup.feature.streamervideos.domain.StreamerVideoRepository
+import com.strimup.feature.streamervideos.domain.usecase.AddVideoLinkUseCase
+import com.strimup.feature.streamervideos.domain.usecase.DefaultAddVideoLinkUseCase
 import com.strimup.feature.streamervideos.domain.usecase.DefaultDeleteVideoUseCase
 import com.strimup.feature.streamervideos.domain.usecase.DefaultGetMyVideosUseCase
 import com.strimup.feature.streamervideos.domain.usecase.DefaultSelectVideoFileUseCase
@@ -47,6 +49,9 @@ interface StreamerVideoModule {
 
     @Binds
     fun bindUploadVideoUseCase(impl: DefaultUploadVideoUseCase): UploadVideoUseCase
+
+    @Binds
+    fun bindAddVideoLinkUseCase(impl: DefaultAddVideoLinkUseCase): AddVideoLinkUseCase
 
     @Binds
     fun bindDeleteVideoUseCase(impl: DefaultDeleteVideoUseCase): DeleteVideoUseCase

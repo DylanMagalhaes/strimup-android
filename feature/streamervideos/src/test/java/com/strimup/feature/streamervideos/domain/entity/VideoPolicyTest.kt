@@ -49,4 +49,43 @@ class VideoPolicyTest {
         assertThat(VideoPolicy.isValidDescription("a".repeat(1000))).isTrue()
         assertThat(VideoPolicy.isValidDescription("a".repeat(1001))).isFalse()
     }
+
+    @Test
+    fun `isSupportedLink should accept youtube tiktok and twitch links`() {
+        listOf(
+            "https://www.youtube.com/watch?v=abc123",
+            "https://youtu.be/abc123",
+            "https://m.youtube.com/shorts/abc123",
+            "https://www.tiktok.com/@strimup/video/7350000000000000000",
+            "https://vm.tiktok.com/ZMabc123/",
+            "https://www.twitch.tv/videos/2100000000",
+            "https://clips.twitch.tv/FunnyClipSlug",
+            "youtu.be/abc123",
+        ).forEach { url -> assertThat(VideoPolicy.isSupportedLink(url)).isTrue() }
+    }
+
+    @Test
+    fun `isSupportedLink should reject other domains and lookalikes`() {
+        listOf(
+            "",
+            "https://vimeo.com/123",
+            "https://notyoutube.com/watch?v=abc",
+            "https://youtube.com.evil.example/watch?v=abc",
+            "ftp://youtube.com/watch?v=abc",
+            "pas un lien",
+        ).forEach { url -> assertThat(VideoPolicy.isSupportedLink(url)).isFalse() }
+    }
+
+    @Test
+    fun `isSupportedLink should reject links longer than 500 characters`() {
+        val url = "https://youtube.com/watch?v=" + "a".repeat(VideoPolicy.MAX_LINK_LENGTH)
+
+        assertThat(VideoPolicy.isSupportedLink(url)).isFalse()
+    }
+
+    @Test
+    fun `normalizeLink should add https when the scheme is missing`() {
+        assertThat(VideoPolicy.normalizeLink("  youtu.be/abc ")).isEqualTo("https://youtu.be/abc")
+        assertThat(VideoPolicy.normalizeLink("http://youtu.be/abc")).isEqualTo("http://youtu.be/abc")
+    }
 }

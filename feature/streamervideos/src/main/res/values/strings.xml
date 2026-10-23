@@ -25,4 +25,5 @@
     <string name="videos_error_size">Vidéo trop lourde : 80 Mo maximum.</string>
     <string name="videos_error_title">Le titre doit faire entre 2 et 120 caractères.</string>
     <string name="videos_error_description">La description ne doit pas dépasser 1000 caractères.</string>
+    <string name="videos_error_link">Lien non reconnu : colle un lien YouTube, TikTok ou Twitch.</string>
 </resources>

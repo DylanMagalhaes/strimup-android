@@ -13,6 +13,7 @@ internal fun Throwable.toVideoErrorUiText(): UiText = when (this) {
             InvalidVideoException.Reason.FILE_TOO_LARGE -> R.string.videos_error_size
             InvalidVideoException.Reason.INVALID_TITLE -> R.string.videos_error_title
             InvalidVideoException.Reason.INVALID_DESCRIPTION -> R.string.videos_error_description
+            InvalidVideoException.Reason.INVALID_LINK -> R.string.videos_error_link
         },
     )
     else -> toDomainError().toUiText()
