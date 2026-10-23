@@ -1,9 +1,6 @@
 package com.strimup.core.ui.component.twitch
 
-import android.annotation.SuppressLint
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,12 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.strimup.core.streamer.domain.entity.EMBED_PARENT_DOMAIN
+import com.strimup.core.ui.component.embed.configureForEmbed
+import com.strimup.core.ui.component.embed.loadEmbedHtml
 
-private const val TWITCH_EMBED_PARENT = "strimup.com"
 private const val PLAYER_WIDTH = 534
 private const val PLAYER_HEIGHT = 300
 
@@ -45,20 +43,14 @@ fun TwitchLivePlayer(
             .background(Color.Black),
         factory = { context ->
             WebView(context).apply {
-                configureForTwitchEmbed()
+                configureForEmbed()
                 webView = this
             }
         },
         update = { view ->
             if (view.tag != channel) {
                 view.tag = channel
-                view.loadDataWithBaseURL(
-                    "https://$TWITCH_EMBED_PARENT/",
-                    twitchEmbedHtml(channel),
-                    "text/html",
-                    "utf-8",
-                    null,
-                )
+                view.loadEmbedHtml(twitchEmbedHtml(channel))
             }
         },
         onRelease = { view ->
@@ -66,25 +58,6 @@ fun TwitchLivePlayer(
             view.destroy()
         },
     )
-}
-
-@SuppressLint("SetJavaScriptEnabled")
-private fun WebView.configureForTwitchEmbed() {
-    setBackgroundColor(Color.Black.toArgb())
-    isVerticalScrollBarEnabled = false
-    isHorizontalScrollBarEnabled = false
-    settings.apply {
-        javaScriptEnabled = true
-        domStorageEnabled = true
-        mediaPlaybackRequiresUserGesture = false
-        useWideViewPort = true
-        loadWithOverviewMode = true
-        setSupportZoom(false)
-    }
-    webViewClient = object : WebViewClient() {
-        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean =
-            request.isForMainFrame
-    }
 }
 
 private fun twitchEmbedHtml(channel: String): String = """
@@ -99,7 +72,7 @@ private fun twitchEmbedHtml(channel: String): String = """
     </head>
     <body>
     <iframe
-        src="https://player.twitch.tv/?channel=$channel&parent=$TWITCH_EMBED_PARENT&muted=true&autoplay=true"
+        src="https://player.twitch.tv/?channel=$channel&parent=$EMBED_PARENT_DOMAIN&muted=true&autoplay=true"
         allow="autoplay; fullscreen"
         allowfullscreen>
     </iframe>

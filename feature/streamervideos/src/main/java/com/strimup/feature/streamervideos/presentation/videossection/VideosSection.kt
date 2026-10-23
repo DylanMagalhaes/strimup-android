@@ -47,12 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.streamer.domain.entity.Streamer
-import com.strimup.core.streamer.domain.entity.VideoSource
-import com.strimup.core.streamer.domain.entity.source
 import com.strimup.core.ui.component.spacer.VerticalSpacer
 import com.strimup.core.ui.component.video.StreamerVideoPlayerHost
 import com.strimup.core.ui.component.video.StreamerVideoPreview
 import com.strimup.core.ui.component.video.rememberStreamerVideoOpener
+import com.strimup.core.ui.component.video.rememberStreamerVideoPreview
+import com.strimup.core.ui.component.video.width
 import com.strimup.core.ui.text.asString
 import com.strimup.core.ui.theme.StrimupTheme
 import com.strimup.core.ui.theme.zalandoFontFamily
@@ -180,9 +180,10 @@ private fun VideosSection(
                         VideosMessage(messageRes = R.string.videos_empty)
                     }
 
-                    state.videos.forEach { video ->
+                    state.videos.forEachIndexed { index, video ->
                         VideoRow(
                             video = video,
+                            position = index + 1,
                             isDeleting = video.id in state.deletingVideoIds,
                             onDeleteClick = { onDeleteClick(video.id) },
                             onClick = { onVideoClick(video) },
@@ -225,16 +226,17 @@ private fun VideosSection(
 @Composable
 private fun VideoRow(
     video: Streamer.Video,
+    position: Int,
     isDeleting: Boolean,
     onDeleteClick: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val source = video.source()
+    val preview = rememberStreamerVideoPreview(video)
 
     Surface(
         onClick = onClick,
-        enabled = source !is VideoSource.Unavailable,
+        enabled = preview.isPlayable,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -244,10 +246,10 @@ private fun VideoRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             StreamerVideoPreview(
-                source = source,
-                title = video.title,
+                preview = preview,
+                position = position,
                 isCompact = true,
-                modifier = Modifier.width(96.dp),
+                modifier = Modifier.width(preview.width(horizontalWidth = 96.dp, verticalWidth = 54.dp)),
             )
             Column(
                 modifier = Modifier
