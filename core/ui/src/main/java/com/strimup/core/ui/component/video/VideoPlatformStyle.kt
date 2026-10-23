@@ -50,3 +50,9 @@ internal val VideoEmbed.Provider.brandColor: Color
         VideoEmbed.Provider.TIKTOK -> TikTokBlack
         VideoEmbed.Provider.TWITCH -> PurpleTwitch
     }
+
+internal val VideoEmbed.Provider.watchButtonColor: Color
+    get() = if (this == VideoEmbed.Provider.TIKTOK) Color.White else brandColor
+
+internal val VideoEmbed.Provider.watchButtonContentColor: Color
+    get() = if (this == VideoEmbed.Provider.TIKTOK) TikTokBlack else Color.White

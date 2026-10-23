@@ -1,5 +1,6 @@
 package com.strimup.core.ui.component.video
 
+import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -132,6 +133,10 @@ private fun EmbedVideoPlayer(url: String, modifier: Modifier = Modifier) {
         modifier = modifier.background(Color.Black),
         factory = { context ->
             WebView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                )
                 configureForEmbed()
                 webView = this
             }
@@ -160,8 +165,8 @@ private fun WatchOnPlatformButton(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = provider.brandColor,
-            contentColor = Color.White,
+            containerColor = provider.watchButtonColor,
+            contentColor = provider.watchButtonContentColor,
         ),
     ) {
         Row(
@@ -171,7 +176,7 @@ private fun WatchOnPlatformButton(
             Icon(
                 painter = painterResource(provider.iconRes),
                 contentDescription = null,
-                tint = Color.White,
+                tint = provider.watchButtonContentColor,
                 modifier = Modifier.size(18.dp),
             )
             Text(

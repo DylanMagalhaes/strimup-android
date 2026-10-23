@@ -18,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -37,12 +38,14 @@ internal fun ModeTabs(
     enabled: Boolean,
     onModeChange: (AddVideoMode) -> Unit,
 ) {
-    PrimaryTabRow(selectedTabIndex = mode.ordinal) {
+    PrimaryTabRow(selectedTabIndex = mode.ordinal, containerColor = Color.Transparent) {
         AddVideoMode.entries.forEach { tabMode ->
             Tab(
                 selected = tabMode == mode,
                 onClick = { onModeChange(tabMode) },
                 enabled = enabled,
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 text = {
                     Text(
                         text = stringResource(
