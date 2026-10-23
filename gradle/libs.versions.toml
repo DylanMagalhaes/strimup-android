@@ -1,6 +1,7 @@
 [versions]
 exifinterface = "1.4.2"
 playAppUpdate = "2.1.0"
+playPublisher = "4.1.1"
 agp = "9.2.1"
 detekt = "1.23.8"
 coreKtx = "1.18.0"
@@ -114,6 +115,7 @@ room3 = { id = "androidx.room3", version.ref = "room3" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
+play-publisher = { id = "com.github.triplet.play", version.ref = "playPublisher" }
 
 # Convention plugins
 strimup-android-application = { id = "strimup.android.application" }

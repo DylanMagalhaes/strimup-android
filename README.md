@@ -333,6 +333,15 @@ Copier `keystore.properties.example` en `keystore.properties` (ignoré par Git) 
 ./gradlew bundleRelease
 ```
 
+### Publication sur Play Console
+
+[Gradle Play Publisher](https://github.com/Triple-T/gradle-play-publisher) envoie le bundle signé et les notes de version (`app/src/main/play/release-notes/fr-FR/default.txt`) sur la piste **Alpha** (test fermé). Il faut la clé JSON d'un compte de service Google ayant accès à l'app dans Play Console, gardée hors du dépôt et indiquée par `playCredentials` dans `keystore.properties` ou la variable `STRIMUP_PLAY_CREDENTIALS` :
+
+```bash
+./gradlew publishReleaseBundle
+./gradlew promoteReleaseArtifact --from-track alpha --promote-track production
+```
+
 ---
 <a id="roadmap"></a>
 ## Roadmap

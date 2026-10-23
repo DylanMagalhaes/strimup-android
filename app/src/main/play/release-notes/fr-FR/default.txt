@@ -1,0 +1,6 @@
+Nouveautés de la version 1.3 :
+• Vidéos de profil : ajoute une vidéo YouTube, TikTok ou Twitch avec un simple lien
+• Les vidéos se lisent directement dans l'app avec le lecteur officiel de chaque plateforme
+• Affichage au bon format : vertical pour les TikTok et les Shorts, horizontal pour le reste
+• Bouton pour ouvrir la vidéo sur YouTube, TikTok ou Twitch
+• Améliorations et corrections

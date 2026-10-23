@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.strimup.hilt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.play.publisher)
 }
 
 val keystoreProperties = Properties().apply {
@@ -17,6 +18,9 @@ val keystoreProperties = Properties().apply {
 
 fun releaseSigningValue(name: String): String? =
     keystoreProperties.getProperty(name) ?: System.getenv("STRIMUP_RELEASE_${name.uppercase()}")
+
+val playCredentialsFile = (keystoreProperties.getProperty("playCredentials") ?: System.getenv("STRIMUP_PLAY_CREDENTIALS"))
+    ?.let { path -> rootProject.file(path) }
 
 val releaseStoreFile = releaseSigningValue("storeFile")?.let { path -> rootProject.file(path) }
 val hasReleaseSigning = releaseStoreFile?.exists() == true
@@ -59,6 +63,12 @@ android {
             )
         }
     }
+}
+
+play {
+    playCredentialsFile?.let { serviceAccountCredentials.set(it) }
+    track.set("alpha")
+    defaultToAppBundles.set(true)
 }
 
 dependencies {
