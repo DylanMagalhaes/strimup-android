@@ -110,4 +110,5 @@
     <!-- Twitch -->
     <string name="twitch_watch_on_twitch">Voir sur Twitch</string>
     <string name="twitch_live_now">En direct maintenant</string>
+    <string name="video_report">Signaler cette vidéo</string>
 </resources>

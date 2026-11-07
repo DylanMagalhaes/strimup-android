@@ -55,6 +55,7 @@ fun StreamerVideoCard(
     modifier: Modifier = Modifier,
     horizontalWidth: Dp = 220.dp,
     verticalWidth: Dp = 124.dp,
+    onReportClick: ((Streamer.Video) -> Unit)? = null,
 ) {
     val preview = rememberStreamerVideoPreview(video)
 
@@ -62,13 +63,23 @@ fun StreamerVideoCard(
         modifier = modifier.width(preview.width(horizontalWidth, verticalWidth)),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        StreamerVideoPreview(
-            preview = preview,
-            position = position,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = preview.isPlayable) { onClick(video) },
-        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            StreamerVideoPreview(
+                preview = preview,
+                position = position,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = preview.isPlayable) { onClick(video) },
+            )
+            if (onReportClick != null) {
+                VideoReportButton(
+                    onClick = { onReportClick(video) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp),
+                )
+            }
+        }
         if (video.title.isNotBlank()) {
             Text(
                 text = video.title,

@@ -61,6 +61,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.report.presentation.ReportStreamerSheet
 import com.strimup.feature.report.presentation.ReportStreamerUiEvent
 import com.strimup.feature.report.presentation.ReportStreamerViewModel
+import com.strimup.feature.report.presentation.ReportVideoSheet
 import com.strimup.feature.schedule.presentation.schedulesection.ScheduleSection
 import com.strimup.feature.streamerdetail.R
 import com.strimup.core.ui.R as CoreUiR
@@ -79,6 +80,7 @@ fun StreamerDetailScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val reportState by reportViewModel.state.collectAsStateWithLifecycle()
     var isReportSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var reportedVideoId by rememberSaveable { mutableStateOf<String?>(null) }
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
@@ -124,6 +126,9 @@ fun StreamerDetailScreen(
         onReportClick = {
             if (isLoggedIn) isReportSheetVisible = true else onLoginRequired()
         },
+        onVideoReportClick = { video: Streamer.Video ->
+            if (isLoggedIn) reportedVideoId = video.id else onLoginRequired()
+        }.takeIf { !isOwnProfile },
         scheduleContent = { ScheduleSection(streamerId = streamerId) },
     )
 
@@ -143,6 +148,21 @@ fun StreamerDetailScreen(
             },
         )
     }
+
+    reportedVideoId?.let { videoId ->
+        ReportVideoSheet(
+            videoId = videoId,
+            onDismiss = { reportedVideoId = null },
+            onVideoUnavailable = {
+                reportedVideoId = null
+                viewModel.loadStreamer(streamerId)
+            },
+            onLoginRequired = {
+                reportedVideoId = null
+                onLoginRequired()
+            },
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -158,6 +178,7 @@ private fun StreamerDetailScreen(
     onRetryClick: () -> Unit,
     isReportAvailable: Boolean,
     onReportClick: () -> Unit,
+    onVideoReportClick: ((Streamer.Video) -> Unit)?,
     scheduleContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -201,6 +222,7 @@ private fun StreamerDetailScreen(
             onWatchOnTwitchClick = onWatchOnTwitchClick,
             onFavoriteClick = onFavoriteClick,
             onRetryClick = onRetryClick,
+            onVideoReportClick = onVideoReportClick,
             scheduleContent = scheduleContent,
         )
     }
@@ -244,6 +266,7 @@ private fun StreamerDetailContent(
     onWatchOnTwitchClick: (String) -> Unit,
     onFavoriteClick: () -> Unit,
     onRetryClick: () -> Unit,
+    onVideoReportClick: ((Streamer.Video) -> Unit)?,
     scheduleContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -295,6 +318,7 @@ private fun StreamerDetailContent(
                     videos = state.streamer.videos,
                     onVideoClick = onVideoClick,
                     belowAboutContent = scheduleContent,
+                    onVideoReportClick = onVideoReportClick,
                 )
             }
         }
@@ -388,6 +412,7 @@ private fun StreamerDetailScreenPreview() {
             onRetryClick = {},
             isReportAvailable = true,
             onReportClick = {},
+            onVideoReportClick = {},
             scheduleContent = {},
         )
     }
