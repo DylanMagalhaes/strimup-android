@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(projects.core.network)
     implementation(projects.core.streamer)
+    implementation(projects.core.user)
     implementation(projects.feature.report)
 
     implementation(libs.androidx.compose.material.icons)
@@ -21,5 +22,6 @@ dependencies {
     implementation(libs.media3.ui)
     implementation(libs.retrofit)
 
+    testImplementation(projects.core.common)
     testImplementation(libs.okhttp3)
 }
