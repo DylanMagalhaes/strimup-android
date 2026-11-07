@@ -66,7 +66,7 @@ internal fun CutInfo(
 }
 
 @Composable
-private fun CutAuthorRow(
+internal fun CutAuthorRow(
     author: Cut.Author,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -46,6 +47,8 @@ private const val HEART_MAX_SCALE = 1.2f
 private const val HEART_GROW_SPEED = 3f
 private const val PLAY_ICON_ALPHA = 0.8f
 private const val SCRIM_ALPHA = 0.6f
+private val EMBED_AUTHOR_TOP_OFFSET = 64.dp
+private val bottomScrim = Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = SCRIM_ALPHA)))
 
 @Composable
 internal fun CutSlideContent(
@@ -102,15 +105,7 @@ internal fun CutSlideContent(
             HeartBurst(trigger = heartBursts, modifier = Modifier.align(Alignment.Center))
         }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = SCRIM_ALPHA))))
-                .padding(start = 16.dp, end = 8.dp, bottom = 16.dp, top = 48.dp),
-            verticalAlignment = Alignment.Bottom,
-        ) {
-            CutInfo(cut = cut, onAuthorClick = onAuthorClick, modifier = Modifier.weight(1f))
+        val actions: @Composable (Modifier) -> Unit = { actionsModifier ->
             CutActions(
                 likesCount = cut.likesCount,
                 isLiked = cut.isLikedByMe,
@@ -120,6 +115,35 @@ internal fun CutSlideContent(
                 onMuteClick = onMuteClick,
                 onLikeClick = { onLikeClick(false) },
                 onReportClick = onReportClick,
+                modifier = actionsModifier,
+            )
+        }
+
+        if (embed == null) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(bottomScrim)
+                    .padding(start = 16.dp, end = 8.dp, bottom = 16.dp, top = 48.dp),
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                CutInfo(cut = cut, onAuthorClick = onAuthorClick, modifier = Modifier.weight(1f))
+                actions(Modifier)
+            }
+        } else {
+            CutAuthorRow(
+                author = cut.author,
+                onClick = onAuthorClick,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .statusBarsPadding()
+                    .padding(start = 16.dp, top = EMBED_AUTHOR_TOP_OFFSET),
+            )
+            actions(
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 8.dp),
             )
         }
     }
