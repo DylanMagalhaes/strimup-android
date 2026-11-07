@@ -16,6 +16,9 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.strimup.core.streamer.domain.entity.VideoEmbed
 import com.strimup.core.streamer.domain.entity.playerUrl
 
+private const val TIKTOK_HIDDEN_CONTROLS = "&controls=0&progress_bar=0&play_button=0&volume_control=0" +
+    "&fullscreen_button=0&timestamp=0&music_info=0&description=0&native_context_menu=0&closed_caption=0"
+
 val VideoEmbed.supportsSoundControl: Boolean
     get() = provider == VideoEmbed.Provider.YOUTUBE
 
@@ -70,8 +73,9 @@ private fun VideoEmbed.inlinePlayerUrl(startMuted: Boolean): String {
     val baseUrl = playerUrl(autoplay = true)
     return when (provider) {
         VideoEmbed.Provider.YOUTUBE ->
-            "$baseUrl&mute=${if (startMuted) 1 else 0}&loop=1&playlist=$id&enablejsapi=1&controls=0"
-        VideoEmbed.Provider.TIKTOK -> "$baseUrl&loop=1"
+            "$baseUrl&mute=${if (startMuted) 1 else 0}&loop=1&playlist=$id&enablejsapi=1" +
+                "&controls=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1"
+        VideoEmbed.Provider.TIKTOK -> "$baseUrl&loop=1$TIKTOK_HIDDEN_CONTROLS"
         VideoEmbed.Provider.TWITCH -> baseUrl
     }
 }
