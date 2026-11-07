@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ReportStreamerRequest(
+data class ReportRequest(
     @SerialName("reason")
     val reason: String,
     @SerialName("details")

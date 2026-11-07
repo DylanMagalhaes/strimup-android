@@ -4,7 +4,9 @@ import com.strimup.feature.report.data.DefaultReportRepository
 import com.strimup.feature.report.data.ReportApiService
 import com.strimup.feature.report.domain.ReportRepository
 import com.strimup.feature.report.domain.usecase.DefaultReportStreamerUseCase
+import com.strimup.feature.report.domain.usecase.DefaultReportVideoUseCase
 import com.strimup.feature.report.domain.usecase.ReportStreamerUseCase
+import com.strimup.feature.report.domain.usecase.ReportVideoUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -34,4 +36,7 @@ interface ReportDomainModule {
 
     @Binds
     fun bindsReportStreamerUseCase(impl: DefaultReportStreamerUseCase): ReportStreamerUseCase
+
+    @Binds
+    fun bindsReportVideoUseCase(impl: DefaultReportVideoUseCase): ReportVideoUseCase
 }
