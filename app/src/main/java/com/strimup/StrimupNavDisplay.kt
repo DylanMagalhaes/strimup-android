@@ -1,5 +1,6 @@
 package com.strimup
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,8 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -46,8 +50,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -64,12 +70,15 @@ import coil3.compose.AsyncImage
 import com.strimup.core.navigation.Destination
 import com.strimup.core.navigation.navigateAsTab
 import com.strimup.core.navigation.popOrReplaceWith
+import com.strimup.core.ui.theme.BrandPink
 import com.strimup.core.user.domain.entity.UserRole
 import com.strimup.feature.account.presentation.account.AccountScreen
 import com.strimup.feature.account.presentation.deletion.DeleteAccountScreen
 import com.strimup.feature.auth.presentation.login.LoginScreen
 import com.strimup.feature.auth.presentation.oauthonboarding.OAuthOnboardingScreen
 import com.strimup.feature.auth.presentation.register.RegisterScreen
+import com.strimup.feature.cuts.presentation.CutsScreen
+import com.strimup.feature.cuts.presentation.CutsTabViewModel
 import com.strimup.feature.favorite.presentation.FavoriteStreamerScreen
 import com.strimup.feature.filter.presentation.navigation.FilterNavigation
 import com.strimup.feature.home.presentation.navigation.HomeNavigation
@@ -87,12 +96,14 @@ import com.strimup.core.ui.R as CoreUiR
 fun StrimupNavDisplay(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
+    cutsTabViewModel: CutsTabViewModel = hiltViewModel(),
 ) {
     val backStack = rememberNavBackStack(Destination.Home.StreamerList)
     val currentDestination = backStack.lastOrNull()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val unreadNotificationCount by viewModel.unreadNotificationCount.collectAsStateWithLifecycle()
+    val showCutsNewBadge by cutsTabViewModel.showNewBadge.collectAsStateWithLifecycle()
     val isLoggedIn = state.user != null
     val userId = state.user?.id
     val userRole = state.user?.role
@@ -112,6 +123,7 @@ fun StrimupNavDisplay(
     }
 
     val shouldHideBottomBar = currentDestination is Destination.StreamerDetail ||
+            currentDestination is Destination.Cuts ||
             currentDestination is Destination.Login ||
             currentDestination is Destination.Register ||
             currentDestination is Destination.OAuthOnboarding ||
@@ -137,6 +149,7 @@ fun StrimupNavDisplay(
                     userId = userId,
                     avatarUrl = state.user?.avatarUrl,
                     userRole = userRole ?: UserRole.VIEWER,
+                    showCutsNewBadge = showCutsNewBadge,
                     onNavigateAsTab = { destination -> backStack.navigateAsTab(destination) },
                 )
             }
@@ -174,6 +187,17 @@ fun StrimupNavDisplay(
                         onStreamerClick = { streamerId ->
                             backStack.add(Destination.StreamerDetail(streamerId = streamerId))
                         }
+                    )
+                }
+
+                entry<Destination.Cuts> {
+                    CutsScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        onNavUp = { backStack.popOrReplaceWith(Destination.Home.StreamerList) },
+                        onAuthorClick = { streamerId ->
+                            backStack.add(Destination.StreamerDetail(streamerId = streamerId))
+                        },
+                        onLoginRequired = { backStack.add(Destination.Login) },
                     )
                 }
 
@@ -219,8 +243,12 @@ fun StrimupNavDisplay(
                     LoginScreen(
                         modifier = Modifier.fillMaxSize(),
                         onNavToHome = {
-                            backStack.clear()
-                            backStack.add(Destination.Home.StreamerList)
+                            if (backStack.getOrNull(backStack.lastIndex - 1) is Destination.Cuts) {
+                                backStack.removeAt(backStack.lastIndex)
+                            } else {
+                                backStack.clear()
+                                backStack.add(Destination.Home.StreamerList)
+                            }
                         },
                         onNavToRegister = {
                             backStack.clear()
@@ -331,8 +359,10 @@ private fun StrimupBottomBar(
     userId: String?,
     userRole: UserRole,
     avatarUrl: String?,
+    showCutsNewBadge: Boolean,
     onNavigateAsTab: (Destination) -> Unit,
 ) {
+    val isCutsSelected = currentDestination is Destination.Cuts
     val isHomeSelected = currentDestination is Destination.Home
     val isFilterSelected = currentDestination is Destination.Filter
     val isSearchSelected = currentDestination is Destination.Search
@@ -366,6 +396,12 @@ private fun StrimupBottomBar(
                     contentDescription = stringResource(CoreUiR.string.filters_title),
                 )
             }
+        )
+
+        CompactNavigationBarItem(
+            selected = isCutsSelected,
+            onClick = { onNavigateAsTab(Destination.Cuts) },
+            icon = { CutsNavigationIcon(isSelected = isCutsSelected, showNewBadge = showCutsNewBadge) }
         )
 
         CompactNavigationBarItem(
@@ -462,6 +498,25 @@ private fun RowScope.CompactNavigationBarItem(
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             icon()
         }
+    }
+}
+
+@Composable
+private fun CutsNavigationIcon(isSelected: Boolean, showNewBadge: Boolean) {
+    BadgedBox(
+        badge = {
+            if (showNewBadge) {
+                Badge(containerColor = BrandPink, contentColor = Color.White) {
+                    Text(text = stringResource(R.string.nav_cuts_new))
+                }
+            }
+        },
+    ) {
+        Image(
+            painter = painterResource(if (isSelected) R.drawable.ic_cuts_selected else R.drawable.ic_cuts),
+            contentDescription = stringResource(R.string.nav_cuts),
+            modifier = Modifier.size(24.dp),
+        )
     }
 }
 

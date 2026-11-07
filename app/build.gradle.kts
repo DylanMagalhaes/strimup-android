@@ -86,6 +86,7 @@ dependencies {
     implementation(projects.core.util)
     implementation(projects.feature.account)
     implementation(projects.feature.auth)
+    implementation(projects.feature.cuts)
     implementation(projects.feature.favorite)
     implementation(projects.feature.filter)
     implementation(projects.feature.home)
