@@ -1,26 +1,20 @@
 package com.strimup.feature.home.presentation
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,22 +27,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.strimup.core.ui.browser.rememberExternalLinkOpener
 import com.strimup.core.ui.component.streamer.StreamerCard
-import com.strimup.core.ui.inset.screenTopWindowInsets
+import com.strimup.core.ui.component.twitch.rememberTwitchChannelOpener
 import com.strimup.core.ui.theme.StrimupTheme
-import com.strimup.feature.home.R
 import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.BannerType
 import com.strimup.feature.home.domain.entity.FilterEntity
@@ -56,8 +51,22 @@ import com.strimup.feature.home.presentation.component.HomeBanner
 import com.strimup.feature.home.presentation.component.HomeOfflineBanner
 import com.strimup.feature.home.presentation.component.HomeStreamersError
 import com.strimup.feature.home.presentation.component.HomeTabs
-import com.strimup.feature.notification.presentation.bell.NotificationBell
+import com.strimup.feature.home.presentation.hero.HomeCutsRow
+import com.strimup.feature.home.presentation.hero.HomeHero
+import com.strimup.feature.home.presentation.hero.HomeHeroUiState
+import com.strimup.feature.home.presentation.hero.HomeHeroViewModel
 import com.strimup.core.ui.R as CoreUiR
+
+private const val HERO_SCREEN_RATIO = 0.45f
+private const val HERO_VISIBLE_RATIO = 0.5f
+private const val HERO_ITEM_INDEX = 0
+
+data class HomeHeroActions(
+    val onMuteClick: () -> Unit,
+    val onWatchOnTwitchClick: (String) -> Unit,
+    val onCutClick: (String) -> Unit,
+    val onSeeAllCutsClick: () -> Unit,
+)
 
 @Composable
 fun HomeScreen(
@@ -67,13 +76,18 @@ fun HomeScreen(
     onNotificationsClick: () -> Unit,
     isLoggedIn: Boolean,
     onLoginRequired: () -> Unit,
+    onCutClick: (String) -> Unit,
+    onSeeAllCutsClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
+    heroViewModel: HomeHeroViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val heroState by heroViewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val openExternalLink = rememberExternalLinkOpener(snackBarHostState)
+    val openTwitchChannel = rememberTwitchChannelOpener(snackBarHostState)
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -88,6 +102,13 @@ fun HomeScreen(
     HomeContent(
         modifier = modifier.fillMaxSize(),
         state = state,
+        heroState = heroState,
+        heroActions = HomeHeroActions(
+            onMuteClick = heroViewModel::onMuteClick,
+            onWatchOnTwitchClick = openTwitchChannel::invoke,
+            onCutClick = onCutClick,
+            onSeeAllCutsClick = onSeeAllCutsClick,
+        ),
         snackBarHostState = snackBarHostState,
         onStreamerClick = onStreamerClick,
         onSocialClick = openExternalLink::invoke,
@@ -96,7 +117,10 @@ fun HomeScreen(
         },
         onTabClick = viewModel::onTabClick,
         onRetryClick = viewModel::onRetryClick,
-        onRefresh = viewModel::onRefresh,
+        onRefresh = {
+            viewModel.onRefresh()
+            heroViewModel.refresh()
+        },
         unreadNotificationCount = unreadNotificationCount,
         onNotificationsClick = onNotificationsClick,
         onBannerClick = { banner ->
@@ -113,6 +137,8 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState,
+    heroState: HomeHeroUiState,
+    heroActions: HomeHeroActions,
     snackBarHostState: SnackbarHostState,
     onStreamerClick: (id: String) -> Unit,
     onBannerClick: (BannerItemEntity) -> Unit,
@@ -125,148 +151,177 @@ private fun HomeContent(
     onNotificationsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lazyListState = rememberLazyListState()
+    val heroHeight = LocalConfiguration.current.screenHeightDp.dp * HERO_SCREEN_RATIO
+    val isHeroVisible by rememberIsHeroVisible(lazyListState, heroHeight)
+    val isHeroScrolledAway by remember { derivedStateOf { lazyListState.firstVisibleItemIndex > HERO_ITEM_INDEX } }
+
     Scaffold(
         modifier = modifier,
-        contentWindowInsets = screenTopWindowInsets,
+        contentWindowInsets = WindowInsets(0),
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
     ) { padding ->
         Surface(
             modifier = Modifier.padding(padding),
             color = MaterialTheme.colorScheme.background,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
+            PullToRefreshBox(
+                modifier = Modifier.fillMaxSize(),
+                isRefreshing = state.isRefreshing,
+                onRefresh = onRefresh,
             ) {
-                HomeTopBar(
-                    unreadNotificationCount = unreadNotificationCount,
-                    onNotificationsClick = onNotificationsClick,
-                )
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    item(key = "hero") {
+                        HomeHero(
+                            state = heroState,
+                            isVisible = isHeroVisible,
+                            unreadNotificationCount = unreadNotificationCount,
+                            onNotificationsClick = onNotificationsClick,
+                            onMuteClick = heroActions.onMuteClick,
+                            onStreamerClick = onStreamerClick,
+                            onWatchOnTwitchClick = heroActions.onWatchOnTwitchClick,
+                            onCutClick = heroActions.onCutClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(heroHeight),
+                        )
+                    }
 
-                Crossfade(targetState = state.isLoading, label = "loading_crossfade") { isLoading ->
-                    if (isLoading) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                        }
-                    } else {
-                        val lazyListState = rememberLazyListState()
-                        val snapFlingBehavior = rememberSnapFlingBehavior(lazyListState = lazyListState)
-
-                        PullToRefreshBox(
-                            modifier = Modifier.fillMaxSize(),
-                            isRefreshing = state.isRefreshing,
-                            onRefresh = onRefresh,
-                        ) {
-                            LazyColumn(
-                                state = lazyListState,
-                                flingBehavior = snapFlingBehavior,
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(bottom = 24.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp),
-                            ) {
-                                item {
-                                    HomeBanner(
-                                        banners = state.bannerItems,
-                                        onBannerClick = onBannerClick
-                                    )
-                                    Spacer(modifier = Modifier.height(24.dp))
-                                }
-
-                                stickyHeader {
-                                    Surface(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.background
-                                    ) {
-                                        HomeTabs(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(vertical = 8.dp),
-                                            onButtonClick = onTabClick,
-                                            currentTab = state.currentTab,
-                                        )
-                                    }
-                                }
-
-                                if (state.isShowingSavedContent) {
-                                    item {
-                                        HomeOfflineBanner(modifier = Modifier.padding(horizontal = 16.dp))
-                                    }
-                                }
-
-                                if (state.shouldShowStreamersError) {
-                                    item {
-                                        HomeStreamersError(
-                                            messageRes = state.errorMessageRes ?: CoreUiR.string.error_unknown,
-                                            onRetryClick = onRetryClick,
-                                        )
-                                    }
-                                }
-
-                                items(
-                                    items = state.streamers,
-                                    key = { streamer -> streamer.id }
-                                ) { streamer ->
-                                    StreamerCard(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
-                                            .defaultMinSize(minHeight = 112.dp),
-                                        pseudo = streamer.userName,
-                                        socials = streamer.socials,
-                                        imageUrl = streamer.imageUrl,
-                                        isLive = streamer.isLive,
-                                        liveTitle = streamer.liveTitle,
-                                        onClick = { onStreamerClick(streamer.id) },
-                                        onSocialClick = onSocialClick,
-                                        onFavoriteClick = { onFavoriteClick(streamer.id) },
-                                        tags = streamer.tags.orEmpty().map { it.name },
-                                        nextLive = streamer.nextLive,
-                                        isFavorite = streamer.id in state.favoriteStreamerIds,
-                                    )
-                                }
-                            }
+                    if (heroState.cuts.isNotEmpty()) {
+                        item(key = "cuts") {
+                            HomeCutsRow(
+                                cuts = heroState.cuts,
+                                onCutClick = heroActions.onCutClick,
+                                onSeeAllClick = heroActions.onSeeAllCutsClick,
+                                modifier = Modifier.padding(top = 8.dp),
+                            )
                         }
                     }
+
+                    if (state.bannerItems.isNotEmpty()) {
+                        item(key = "banner") {
+                            HomeBanner(banners = state.bannerItems, onBannerClick = onBannerClick)
+                        }
+                    }
+
+                    stickyHeader(key = "tabs") {
+                        Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.background) {
+                            HomeTabs(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = if (isHeroScrolledAway) statusBarHeight() else 0.dp)
+                                    .padding(vertical = 8.dp),
+                                onButtonClick = onTabClick,
+                                currentTab = state.currentTab,
+                            )
+                        }
+                    }
+
+                    homeStreamers(
+                        state = state,
+                        onStreamerClick = onStreamerClick,
+                        onSocialClick = onSocialClick,
+                        onFavoriteClick = onFavoriteClick,
+                        onRetryClick = onRetryClick,
+                    )
                 }
             }
         }
     }
 }
 
-@Composable
-private fun HomeTopBar(
-    unreadNotificationCount: Int?,
-    onNotificationsClick: () -> Unit,
+private fun LazyListScope.homeStreamers(
+    state: HomeUiState,
+    onStreamerClick: (id: String) -> Unit,
+    onSocialClick: (String?) -> Unit,
+    onFavoriteClick: (id: String) -> Unit,
+    onRetryClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Image(
+    if (state.isLoading) {
+        item(key = "loading") {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        return
+    }
+
+    if (state.isShowingSavedContent) {
+        item(key = "offline") {
+            HomeOfflineBanner(modifier = Modifier.padding(horizontal = 16.dp))
+        }
+    }
+
+    if (state.shouldShowStreamersError) {
+        item(key = "error") {
+            HomeStreamersError(
+                messageRes = state.errorMessageRes ?: CoreUiR.string.error_unknown,
+                onRetryClick = onRetryClick,
+            )
+        }
+    }
+
+    items(items = state.streamers, key = { streamer -> streamer.id }) { streamer ->
+        StreamerCard(
             modifier = Modifier
-                .padding(start = 8.dp)
-                .height(24.dp),
-            painter = painterResource(R.drawable.strimup_logo),
-            contentDescription = stringResource(R.string.home_logo_description),
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .defaultMinSize(minHeight = 112.dp),
+            pseudo = streamer.userName,
+            socials = streamer.socials,
+            imageUrl = streamer.imageUrl,
+            isLive = streamer.isLive,
+            liveTitle = streamer.liveTitle,
+            onClick = { onStreamerClick(streamer.id) },
+            onSocialClick = onSocialClick,
+            onFavoriteClick = { onFavoriteClick(streamer.id) },
+            tags = streamer.tags.orEmpty().map { it.name },
+            nextLive = streamer.nextLive,
+            isFavorite = streamer.id in state.favoriteStreamerIds,
         )
-        unreadNotificationCount?.let { count ->
-            NotificationBell(unreadCount = count, onClick = onNotificationsClick)
+    }
+}
+
+@Composable
+private fun rememberIsHeroVisible(lazyListState: LazyListState, heroHeight: Dp) = with(LocalDensity.current) {
+    val visibleLimitPx = heroHeight.toPx() * HERO_VISIBLE_RATIO
+    remember(lazyListState, visibleLimitPx) {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex == HERO_ITEM_INDEX &&
+                lazyListState.firstVisibleItemScrollOffset < visibleLimitPx
         }
     }
 }
+
+@Composable
+private fun statusBarHeight(): Dp = with(LocalDensity.current) { WindowInsets.statusBars.getTop(this).toDp() }
 
 @Composable
 @Preview
 private fun HomeScreenPreview() {
     StrimupTheme {
         HomeContent(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
             state = HomeUiState(),
+            heroState = HomeHeroUiState(isLoading = false),
+            heroActions = HomeHeroActions(
+                onMuteClick = {},
+                onWatchOnTwitchClick = {},
+                onCutClick = {},
+                onSeeAllCutsClick = {},
+            ),
             snackBarHostState = remember { SnackbarHostState() },
             onStreamerClick = {},
             onSocialClick = {},

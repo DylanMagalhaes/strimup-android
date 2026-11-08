@@ -178,6 +178,8 @@ fun StrimupNavDisplay(
                         onNotificationsClick = { backStack.add(Destination.Notifications) },
                         isLoggedIn = isLoggedIn,
                         onLoginRequired = { backStack.add(Destination.Login) },
+                        onCutClick = { videoId -> backStack.add(Destination.Cuts(startVideoId = videoId)) },
+                        onSeeAllCutsClick = { backStack.navigateAsTab(Destination.Cuts()) },
                     )
                 }
 
