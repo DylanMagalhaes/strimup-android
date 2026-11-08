@@ -17,6 +17,8 @@
     <!-- Navigation -->
     <string name="nav_home">Accueil</string>
     <string name="nav_search">Rechercher</string>
+    <string name="nav_cuts">Cuts</string>
+    <string name="nav_cuts_new">Nouveau</string>
     <string name="nav_favorites">Mes streamers favoris</string>
     <string name="nav_profile">Mon profil</string>
 </resources>

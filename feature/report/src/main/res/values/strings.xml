@@ -15,4 +15,20 @@
     <string name="report_submit">Envoyer le signalement</string>
     <string name="report_sent">Merci ! Notre équipe va examiner ce profil.</string>
     <string name="report_already_sent">Tu as déjà signalé ce profil. Notre équipe s\'en occupe.</string>
+
+    <!-- Video report -->
+    <string name="report_video_title">Signaler cette vidéo</string>
+    <string name="report_video_subtitle">Pourquoi signales-tu cette vidéo ?</string>
+    <string name="report_video_reason_spam_or_scam">Spam ou arnaque</string>
+    <string name="report_video_reason_harassment_or_hate">Harcèlement ou haine</string>
+    <string name="report_video_reason_violence">Violence ou contenu dangereux</string>
+    <string name="report_video_reason_copyright">Violation de droits d\'auteur</string>
+    <string name="report_video_reason_sexual_content">Contenu sexuel</string>
+    <string name="report_video_reason_underage">Utilisateur mineur</string>
+    <string name="report_video_reason_other">Autre</string>
+    <string name="report_video_anonymity">Ton identité n\'est jamais communiquée au streamer.</string>
+    <string name="report_video_sent">Signalement envoyé</string>
+    <string name="report_video_already_sent">Tu as déjà signalé cette vidéo.</string>
+    <string name="report_video_confirmation">Merci. L\'équipe StrimUp va examiner cette vidéo. L\'auteur ne saura jamais qui l\'a signalée.</string>
+    <string name="report_video_close">Fermer</string>
 </resources>

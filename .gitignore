@@ -16,3 +16,4 @@ keystore.properties
 .env
 
 /.idea
+.claude/worktrees/

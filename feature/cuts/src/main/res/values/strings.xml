@@ -1,0 +1,17 @@
+<resources>
+    <string name="cuts_title">Cuts</string>
+    <string name="cuts_new_badge">Nouveau</string>
+    <string name="cuts_login_to_like">Connecte-toi pour aimer cette vidéo</string>
+    <string name="cuts_login_to_report">Connecte-toi pour signaler cette vidéo</string>
+    <string name="cuts_login_action">Se connecter</string>
+    <string name="cuts_empty">Aucune vidéo pour le moment.</string>
+    <string name="cuts_like">J\'aime</string>
+    <string name="cuts_unlike">Je n\'aime plus</string>
+    <string name="cuts_report">Signaler cette vidéo</string>
+    <string name="cuts_sound_on">Activer le son</string>
+    <string name="cuts_sound_off">Couper le son</string>
+    <string name="cuts_play">Lire la vidéo</string>
+    <string name="cuts_verified">Vérifié</string>
+    <string name="cuts_live">Live</string>
+    <string name="cuts_open_profile">Voir le profil de %1$s</string>
+</resources>

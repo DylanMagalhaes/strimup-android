@@ -47,6 +47,7 @@ fun StreamerContent(
     onVideoClick: (Streamer.Video) -> Unit,
     modifier: Modifier = Modifier,
     belowAboutContent: (@Composable () -> Unit)? = null,
+    onVideoReportClick: ((Streamer.Video) -> Unit)? = null,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -142,6 +143,7 @@ fun StreamerContent(
                             video = video,
                             position = index + 1,
                             onClick = onVideoClick,
+                            onReportClick = onVideoReportClick,
                         )
                     }
                 }

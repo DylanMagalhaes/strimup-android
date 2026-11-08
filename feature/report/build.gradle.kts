@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(projects.core.network)
 
+    implementation(libs.androidx.compose.material.icons)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)

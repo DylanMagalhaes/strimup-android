@@ -30,6 +30,9 @@ sealed interface Destination : NavKey {
     data object Search : Destination
 
     @Serializable
+    data object Cuts : Destination
+
+    @Serializable
     data object Favorite : Destination
 
     @Serializable
