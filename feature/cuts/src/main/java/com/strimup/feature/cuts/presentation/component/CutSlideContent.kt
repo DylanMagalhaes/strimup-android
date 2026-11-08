@@ -30,13 +30,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import com.strimup.core.streamer.domain.entity.VideoSource
-import com.strimup.core.streamer.domain.entity.source
-import com.strimup.core.ui.component.embed.InlineEmbedPlayer
 import com.strimup.core.ui.component.embed.supportsSoundControl
 import com.strimup.core.ui.theme.BrandPink
 import com.strimup.feature.cuts.R
@@ -73,7 +68,13 @@ internal fun CutSlideContent(
     }
 
     Box(modifier = modifier.background(Color.Black)) {
-        CutMedia(cut = cut, isActive = isActive, isPlaying = isPlaying, isMuted = isMuted)
+        CutVideoPlayer(
+            cut = cut,
+            isActive = isActive,
+            isPlaying = isPlaying,
+            isMuted = isMuted,
+            modifier = Modifier.fillMaxSize(),
+        )
 
         Box(
             modifier = Modifier
@@ -146,37 +147,6 @@ internal fun CutSlideContent(
                     .padding(end = 8.dp),
             )
         }
-    }
-}
-
-@Composable
-private fun CutMedia(cut: Cut, isActive: Boolean, isPlaying: Boolean, isMuted: Boolean) {
-    val embed = cut.video.embed
-    val source = remember(cut.video) { cut.video.source() }
-
-    when {
-        embed != null && isActive -> InlineEmbedPlayer(
-            embed = embed,
-            isPlaying = isPlaying,
-            isMuted = isMuted,
-            modifier = Modifier.fillMaxSize(),
-        )
-
-        embed != null -> AsyncImage(
-            model = cut.video.thumbnailUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-
-        source is VideoSource.HostedFile -> CutHostedPlayer(
-            url = source.url,
-            isPlaying = isPlaying,
-            isMuted = isMuted,
-            modifier = Modifier.fillMaxSize(),
-        )
-
-        else -> Box(modifier = Modifier.fillMaxSize())
     }
 }
 
