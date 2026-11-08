@@ -15,6 +15,7 @@ import com.strimup.feature.cuts.domain.entity.CutLike
 import com.strimup.feature.cuts.domain.entity.CutUnavailableException
 import com.strimup.feature.cuts.domain.entity.CutsPage
 import com.strimup.feature.cuts.domain.entity.LikeRateLimitedException
+import com.strimup.feature.cuts.domain.usecase.GetCachedCutUseCase
 import com.strimup.feature.cuts.domain.usecase.GetCutsUseCase
 import com.strimup.feature.cuts.domain.usecase.LikeCutUseCase
 import com.strimup.feature.cuts.domain.usecase.MarkCutsOpenedUseCase
@@ -45,7 +46,11 @@ class CutsViewModelTest {
     }
     private var openedCount = 0
 
-    private fun buildViewModel() = CutsViewModel(
+    private val cachedCuts = mutableMapOf<String, Cut>()
+
+    private fun buildViewModel(startVideoId: String? = null) = CutsViewModel(
+        startVideoId = startVideoId,
+        getCachedCut = GetCachedCutUseCase { videoId -> cachedCuts[videoId] },
         pager = CutsPager(
             getCuts = GetCutsUseCase { cursor ->
                 requestedCursors += cursor
@@ -300,5 +305,28 @@ class CutsViewModelTest {
         assertThat(viewModel.state.value.isMuted).isTrue()
         viewModel.onMuteClick()
         assertThat(viewModel.state.value.isMuted).isFalse()
+    }
+
+    @Test
+    fun `opening on a known video should show it first without repeating it`() = runTest {
+        cachedCuts["b"] = cut("b", likesCount = 7)
+        pages += page(cut("a"), cut("b"), cut("c"))
+        val viewModel = buildViewModel(startVideoId = "b")
+
+        assertThat(viewModel.videoIds).containsExactly("b")
+
+        advanceUntilIdle()
+
+        assertThat(viewModel.videoIds).containsExactly("b", "a", "c").inOrder()
+        assertThat(viewModel.cutOf("b").likesCount).isEqualTo(7)
+    }
+
+    @Test
+    fun `an unknown start video should open the regular feed`() = runTest {
+        pages += page(cut("a"))
+        val viewModel = buildViewModel(startVideoId = "missing")
+        advanceUntilIdle()
+
+        assertThat(viewModel.videoIds).containsExactly("a")
     }
 }

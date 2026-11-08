@@ -55,11 +55,14 @@ private const val BEYOND_VIEWPORT_PAGES = 2
 
 @Composable
 fun CutsScreen(
+    startVideoId: String?,
     onNavUp: () -> Unit,
     onAuthorClick: (String) -> Unit,
     onLoginRequired: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CutsViewModel = hiltViewModel(),
+    viewModel: CutsViewModel = hiltViewModel<CutsViewModel, CutsViewModel.Factory>(key = startVideoId) { factory ->
+        factory.create(startVideoId)
+    },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }

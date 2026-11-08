@@ -11,8 +11,12 @@ import com.strimup.feature.cuts.R
 import com.strimup.feature.cuts.domain.entity.Cut
 import com.strimup.feature.cuts.domain.entity.CutUnavailableException
 import com.strimup.feature.cuts.domain.entity.LikeRateLimitedException
+import com.strimup.feature.cuts.domain.usecase.GetCachedCutUseCase
 import com.strimup.feature.cuts.domain.usecase.LikeCutUseCase
 import com.strimup.feature.cuts.domain.usecase.MarkCutsOpenedUseCase
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -22,14 +26,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
 const val CUTS_PREFETCH_THRESHOLD = 3
 val LIKE_COOLDOWN = 5.minutes
 
-@HiltViewModel
-class CutsViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = CutsViewModel.Factory::class)
+class CutsViewModel @AssistedInject constructor(
+    @Assisted private val startVideoId: String?,
+    getCachedCut: GetCachedCutUseCase,
     private val pager: CutsPager,
     private val likeCut: LikeCutUseCase,
     getUser: GetUserFlowUseCase,
@@ -46,8 +51,13 @@ class CutsViewModel @Inject constructor(
     private var loadJob: Job? = null
     private var nextSlideKey = 0L
     private var isLoggedIn = false
+    private var pinnedVideoId: String? = null
 
     init {
+        startVideoId?.let(getCachedCut::invoke)?.let { cut ->
+            pinnedVideoId = cut.id
+            _state.update { it.copy(slides = listOf(CutSlide(key = nextSlideKey++, cut = cut))) }
+        }
         viewModelScope.launch { getUser().collect { user -> isLoggedIn = user != null } }
         viewModelScope.launch { markCutsOpened() }
         loadMore()
@@ -103,7 +113,10 @@ class CutsViewModel @Inject constructor(
         loadJob = viewModelScope.launch {
             pager.loadNextPage()
                 .onSuccess { cuts ->
-                    val newSlides = cuts.map { cut -> CutSlide(key = nextSlideKey++, cut = cut) }
+                    val newSlides = cuts
+                        .filterNot { cut -> cut.id == pinnedVideoId }
+                        .map { cut -> CutSlide(key = nextSlideKey++, cut = cut) }
+                    pinnedVideoId = null
                     _state.update {
                         it.copy(slides = it.slides + newSlides, isLoading = false, canLoadMore = cuts.isNotEmpty())
                     }
@@ -151,5 +164,10 @@ class CutsViewModel @Inject constructor(
 
             else -> _events.send(CutsUiEvent.ShowMessage(exception.toDomainError().toUiText()))
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(startVideoId: String?): CutsViewModel
     }
 }

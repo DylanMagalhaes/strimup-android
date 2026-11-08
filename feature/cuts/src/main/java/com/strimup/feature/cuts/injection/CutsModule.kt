@@ -5,10 +5,12 @@ import com.strimup.feature.cuts.data.DefaultCutsRepository
 import com.strimup.feature.cuts.data.local.DataStoreCutsDiscoveryRepository
 import com.strimup.feature.cuts.domain.CutsDiscoveryRepository
 import com.strimup.feature.cuts.domain.CutsRepository
+import com.strimup.feature.cuts.domain.usecase.DefaultGetCachedCutUseCase
 import com.strimup.feature.cuts.domain.usecase.DefaultGetCutsUseCase
 import com.strimup.feature.cuts.domain.usecase.DefaultLikeCutUseCase
 import com.strimup.feature.cuts.domain.usecase.DefaultMarkCutsOpenedUseCase
 import com.strimup.feature.cuts.domain.usecase.DefaultObserveHasOpenedCutsUseCase
+import com.strimup.feature.cuts.domain.usecase.GetCachedCutUseCase
 import com.strimup.feature.cuts.domain.usecase.GetCutsUseCase
 import com.strimup.feature.cuts.domain.usecase.LikeCutUseCase
 import com.strimup.feature.cuts.domain.usecase.MarkCutsOpenedUseCase
@@ -46,6 +48,9 @@ interface CutsDomainModule {
 
     @Binds
     fun bindsGetCutsUseCase(impl: DefaultGetCutsUseCase): GetCutsUseCase
+
+    @Binds
+    fun bindsGetCachedCutUseCase(impl: DefaultGetCachedCutUseCase): GetCachedCutUseCase
 
     @Binds
     fun bindsLikeCutUseCase(impl: DefaultLikeCutUseCase): LikeCutUseCase

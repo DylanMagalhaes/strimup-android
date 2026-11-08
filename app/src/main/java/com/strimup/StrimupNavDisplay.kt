@@ -190,8 +190,9 @@ fun StrimupNavDisplay(
                     )
                 }
 
-                entry<Destination.Cuts> {
+                entry<Destination.Cuts> { destination ->
                     CutsScreen(
+                        startVideoId = destination.startVideoId,
                         modifier = Modifier.fillMaxSize(),
                         onNavUp = { backStack.popOrReplaceWith(Destination.Home.StreamerList) },
                         onAuthorClick = { streamerId ->
@@ -400,7 +401,7 @@ private fun StrimupBottomBar(
 
         CompactNavigationBarItem(
             selected = isCutsSelected,
-            onClick = { onNavigateAsTab(Destination.Cuts) },
+            onClick = { onNavigateAsTab(Destination.Cuts()) },
             icon = { CutsNavigationIcon(isSelected = isCutsSelected, showNewBadge = showCutsNewBadge) }
         )
 

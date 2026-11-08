@@ -146,4 +146,14 @@ class DefaultCutsRepositoryTest {
 
         assertThat(error.error).isEqualTo(DomainError.Unauthorized)
     }
+
+    @Test
+    fun `fetched cuts should be kept in memory`() = runTest {
+        service.cutsResponse = { CutsResponse(items = listOf(youtubeItem), nextCursor = null) }
+
+        assertThat(repository.cachedCut("video-1")).isNull()
+        repository.getCuts(cursor = null, limit = 10)
+
+        assertThat(repository.cachedCut("video-1")?.author?.username).isEqualTo("Inox")
+    }
 }
