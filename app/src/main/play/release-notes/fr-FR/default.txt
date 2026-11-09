@@ -1,6 +1,6 @@
-Nouveautés de la version 1.3 :
-• Vidéos de profil : ajoute une vidéo YouTube, TikTok ou Twitch avec un simple lien
-• Les vidéos se lisent directement dans l'app avec le lecteur officiel de chaque plateforme
-• Affichage au bon format : vertical pour les TikTok et les Shorts, horizontal pour le reste
-• Bouton pour ouvrir la vidéo sur YouTube, TikTok ou Twitch
+Nouveautés de la version 1.4 :
+• Cuts : un fil de vidéos verticales à faire défiler, avec like en double tap
+• Nouvel accueil : un live en plein écran en haut et une rangée de Cuts
+• Signalement d'une vidéo en un geste
+• Chargement plus fluide avec des aperçus pendant le chargement
 • Améliorations et corrections
