@@ -26,6 +26,10 @@ android {
                 buildConfigField("String", "BASE_URL", baseUrl)
             }
         }
+        create("benchmark") {
+            initWith(getByName("debug"))
+            matchingFallbacks += listOf("release")
+        }
     }
 
     buildFeatures {
