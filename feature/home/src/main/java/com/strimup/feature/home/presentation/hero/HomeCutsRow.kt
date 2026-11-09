@@ -38,6 +38,8 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.cuts.domain.entity.Cut
 import com.strimup.feature.cuts.presentation.component.formatLikesCount
 import com.strimup.feature.home.R
+import com.strimup.feature.home.presentation.component.CUT_CARD_ASPECT_RATIO
+import com.strimup.feature.home.presentation.component.CutCardWidth
 
 private const val CARD_SCRIM_ALPHA = 0.7f
 private val PillShape = RoundedCornerShape(percent = 50)
@@ -94,11 +96,16 @@ private fun HomeCutCard(cut: Cut, onClick: () -> Unit, modifier: Modifier = Modi
 
     Box(
         modifier = modifier
-            .width(116.dp)
+            .width(CutCardWidth)
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick),
     ) {
-        StreamerVideoPreview(preview = preview, isCompact = true, modifier = Modifier.fillMaxWidth())
+        StreamerVideoPreview(
+            preview = preview,
+            isCompact = true,
+            aspectRatio = CUT_CARD_ASPECT_RATIO,
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Column(
             modifier = Modifier

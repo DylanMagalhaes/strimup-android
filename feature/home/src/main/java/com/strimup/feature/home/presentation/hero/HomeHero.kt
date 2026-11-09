@@ -44,6 +44,7 @@ import com.strimup.core.ui.theme.zalandoFontFamily
 import com.strimup.feature.cuts.domain.entity.Cut
 import com.strimup.feature.cuts.presentation.component.CutVideoPlayer
 import com.strimup.feature.home.R
+import com.strimup.feature.home.presentation.component.HomeHeroSkeleton
 import com.strimup.feature.notification.presentation.bell.NotificationBell
 
 private const val SCRIM_ALPHA = 0.75f
@@ -73,6 +74,8 @@ fun HomeHero(
     Box(modifier = modifier.background(Color.Black)) {
         val fallbackCut = state.fallbackCut
         when {
+            state.isLoading -> HomeHeroSkeleton()
+
             state.lives.isNotEmpty() -> LivePager(
                 lives = state.lives,
                 isVisible = isVisible,

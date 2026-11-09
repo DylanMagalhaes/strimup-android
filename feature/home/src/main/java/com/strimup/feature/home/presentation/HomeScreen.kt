@@ -3,7 +3,6 @@ package com.strimup.feature.home.presentation
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
@@ -17,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -48,9 +45,12 @@ import com.strimup.feature.home.domain.entity.BannerItemEntity
 import com.strimup.feature.home.domain.entity.BannerType
 import com.strimup.feature.home.domain.entity.FilterEntity
 import com.strimup.feature.home.presentation.component.HomeBanner
+import com.strimup.feature.home.presentation.component.HomeBannerSkeleton
+import com.strimup.feature.home.presentation.component.HomeCutsRowSkeleton
 import com.strimup.feature.home.presentation.component.HomeOfflineBanner
 import com.strimup.feature.home.presentation.component.HomeStreamersError
 import com.strimup.feature.home.presentation.component.HomeTabs
+import com.strimup.feature.home.presentation.component.StreamerCardSkeleton
 import com.strimup.feature.home.presentation.hero.HomeCutsRow
 import com.strimup.feature.home.presentation.hero.HomeHero
 import com.strimup.feature.home.presentation.hero.HomeHeroUiState
@@ -60,6 +60,7 @@ import com.strimup.core.ui.R as CoreUiR
 private const val HERO_SCREEN_RATIO = 0.45f
 private const val HERO_VISIBLE_RATIO = 0.5f
 private const val HERO_ITEM_INDEX = 0
+private const val STREAMER_SKELETON_COUNT = 3
 
 data class HomeHeroActions(
     val onMuteClick: () -> Unit,
@@ -192,7 +193,11 @@ private fun HomeContent(
                         )
                     }
 
-                    if (heroState.cuts.isNotEmpty()) {
+                    if (heroState.isLoading) {
+                        item(key = "cuts_skeleton") {
+                            HomeCutsRowSkeleton(modifier = Modifier.padding(top = 8.dp))
+                        }
+                    } else if (heroState.cuts.isNotEmpty()) {
                         item(key = "cuts") {
                             HomeCutsRow(
                                 cuts = heroState.cuts,
@@ -206,6 +211,10 @@ private fun HomeContent(
                     if (state.bannerItems.isNotEmpty()) {
                         item(key = "banner") {
                             HomeBanner(banners = state.bannerItems, onBannerClick = onBannerClick)
+                        }
+                    } else if (state.isBannerLoading) {
+                        item(key = "banner_skeleton") {
+                            HomeBannerSkeleton()
                         }
                     }
 
@@ -243,15 +252,12 @@ private fun LazyListScope.homeStreamers(
     onRetryClick: () -> Unit,
 ) {
     if (state.isLoading) {
-        item(key = "loading") {
-            Box(
+        items(count = STREAMER_SKELETON_COUNT, key = { index -> "streamer_skeleton_$index" }) {
+            StreamerCardSkeleton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
+                    .padding(horizontal = 16.dp),
+            )
         }
         return
     }
