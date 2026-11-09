@@ -23,6 +23,7 @@ internal fun CutHostedPlayer(
     isPlaying: Boolean,
     isMuted: Boolean,
     modifier: Modifier = Modifier,
+    fillBounds: Boolean = false,
 ) {
     val context = LocalContext.current
     val player = remember(url) {
@@ -54,7 +55,11 @@ internal fun CutHostedPlayer(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                 )
                 useController = false
-                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                resizeMode = if (fillBounds) {
+                    AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                } else {
+                    AspectRatioFrameLayout.RESIZE_MODE_FIT
+                }
                 setShutterBackgroundColor(android.graphics.Color.BLACK)
                 this.player = player
             }

@@ -5,6 +5,7 @@ import com.strimup.core.network.apiErrorMessage
 import com.strimup.core.network.toDomainError
 import com.strimup.feature.cuts.data.mapper.toEntity
 import com.strimup.feature.cuts.domain.CutsRepository
+import com.strimup.feature.cuts.domain.entity.Cut
 import com.strimup.feature.cuts.domain.entity.CutLike
 import com.strimup.feature.cuts.domain.entity.CutUnavailableException
 import com.strimup.feature.cuts.domain.entity.CutsPage
@@ -12,6 +13,7 @@ import com.strimup.feature.cuts.domain.entity.ExpiredCutsCursorException
 import com.strimup.feature.cuts.domain.entity.LikeRateLimitedException
 import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 private const val HTTP_BAD_REQUEST = 400
@@ -22,6 +24,8 @@ class DefaultCutsRepository @Inject constructor(
     private val service: CutsApiService,
 ) : CutsRepository {
 
+    private val knownCuts = ConcurrentHashMap<String, Cut>()
+
     override suspend fun getCuts(cursor: String?, limit: Int): Result<CutsPage> =
         cutsCall(
             mapHttpError = { exception ->
@@ -29,7 +33,10 @@ class DefaultCutsRepository @Inject constructor(
             },
         ) {
             service.getCuts(limit = limit, cursor = cursor).toEntity()
+                .also { page -> page.cuts.forEach { cut -> knownCuts[cut.id] = cut } }
         }
+
+    override fun cachedCut(videoId: String): Cut? = knownCuts[videoId]
 
     override suspend fun like(videoId: String): Result<CutLike> =
         cutsCall(mapHttpError = ::likeError) { service.like(videoId).toEntity() }

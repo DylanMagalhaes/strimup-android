@@ -178,6 +178,8 @@ fun StrimupNavDisplay(
                         onNotificationsClick = { backStack.add(Destination.Notifications) },
                         isLoggedIn = isLoggedIn,
                         onLoginRequired = { backStack.add(Destination.Login) },
+                        onCutClick = { videoId -> backStack.add(Destination.Cuts(startVideoId = videoId)) },
+                        onSeeAllCutsClick = { backStack.navigateAsTab(Destination.Cuts()) },
                     )
                 }
 
@@ -190,8 +192,9 @@ fun StrimupNavDisplay(
                     )
                 }
 
-                entry<Destination.Cuts> {
+                entry<Destination.Cuts> { destination ->
                     CutsScreen(
+                        startVideoId = destination.startVideoId,
                         modifier = Modifier.fillMaxSize(),
                         onNavUp = { backStack.popOrReplaceWith(Destination.Home.StreamerList) },
                         onAuthorClick = { streamerId ->
@@ -400,7 +403,7 @@ private fun StrimupBottomBar(
 
         CompactNavigationBarItem(
             selected = isCutsSelected,
-            onClick = { onNavigateAsTab(Destination.Cuts) },
+            onClick = { onNavigateAsTab(Destination.Cuts()) },
             icon = { CutsNavigationIcon(isSelected = isCutsSelected, showNewBadge = showCutsNewBadge) }
         )
 

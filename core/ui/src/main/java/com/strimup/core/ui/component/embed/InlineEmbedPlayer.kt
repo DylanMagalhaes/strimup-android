@@ -19,7 +19,41 @@ import com.strimup.core.streamer.domain.entity.playerUrl
 private const val TIKTOK_HIDDEN_CONTROLS = "&controls=0&progress_bar=0&play_button=0&volume_control=0" +
     "&fullscreen_button=0&timestamp=0&music_info=0&description=0&native_context_menu=0&closed_caption=0"
 
-val VideoEmbed.supportsSoundControl: Boolean
+private const val PLAYER_CONTROL_SCRIPT = """
+    var frame = document.getElementById("player");
+    var retryTimer = null;
+    function post(message) {
+        if (frame && frame.contentWindow) { frame.contentWindow.postMessage(message, "*"); }
+    }
+    function youtubeCommand(name) {
+        post(JSON.stringify({ event: "command", func: name, args: [] }));
+    }
+    function applyState() {
+        if (provider === "YOUTUBE") {
+            post(JSON.stringify({ event: "listening", id: 1 }));
+            youtubeCommand(wantMuted || !wantPlaying ? "mute" : "unMute");
+            youtubeCommand(wantPlaying ? "playVideo" : "pauseVideo");
+        }
+    }
+    function applyStateForAWhile() {
+        if (retryTimer) { clearInterval(retryTimer); }
+        var attempts = 0;
+        applyState();
+        retryTimer = setInterval(function() {
+            applyState();
+            attempts++;
+            if (attempts >= 12) { clearInterval(retryTimer); retryTimer = null; }
+        }, 400);
+    }
+    window.strimupSet = function(playing, muted) {
+        wantPlaying = playing;
+        wantMuted = muted;
+        applyStateForAWhile();
+    };
+    frame.addEventListener("load", applyStateForAWhile);
+"""
+
+val VideoEmbed.supportsPlaybackControl: Boolean
     get() = provider == VideoEmbed.Provider.YOUTUBE
 
 @Composable
@@ -30,7 +64,6 @@ fun InlineEmbedPlayer(
     modifier: Modifier = Modifier,
 ) {
     var webView by remember { mutableStateOf<WebView?>(null) }
-    val url = remember(embed, isMuted) { embed.inlinePlayerUrl(startMuted = isMuted) }
 
     LifecycleResumeEffect(webView) {
         webView?.onResume()
@@ -38,10 +71,7 @@ fun InlineEmbedPlayer(
     }
 
     LaunchedEffect(webView, isPlaying, isMuted) {
-        if (embed.supportsSoundControl) {
-            webView?.sendYouTubeCommand(if (isPlaying) "playVideo" else "pauseVideo")
-            webView?.sendYouTubeCommand(if (isMuted) "mute" else "unMute")
-        }
+        webView?.evaluateJavascript("window.strimupSet && window.strimupSet($isPlaying, $isMuted);", null)
     }
 
     AndroidView(
@@ -58,8 +88,9 @@ fun InlineEmbedPlayer(
         },
         update = { view ->
             if (view.tag == null) {
+                val url = embed.inlinePlayerUrl(startPlaying = isPlaying, startMuted = isMuted)
                 view.tag = url
-                view.loadEmbedHtml(inlinePlayerHtml(url))
+                view.loadEmbedHtml(inlinePlayerHtml(url, embed.provider, isPlaying, isMuted))
             }
         },
         onRelease = { view ->
@@ -69,32 +100,24 @@ fun InlineEmbedPlayer(
     )
 }
 
-private fun VideoEmbed.inlinePlayerUrl(startMuted: Boolean): String {
+private fun VideoEmbed.inlinePlayerUrl(startPlaying: Boolean, startMuted: Boolean): String {
     val baseUrl = playerUrl(autoplay = true)
+    val muteFlag = if (startMuted || !startPlaying) 1 else 0
     return when (provider) {
         VideoEmbed.Provider.YOUTUBE ->
-            "$baseUrl&mute=${if (startMuted) 1 else 0}&loop=1&playlist=$id&enablejsapi=1" +
+            "$baseUrl&mute=$muteFlag&loop=1&playlist=$id&enablejsapi=1" +
                 "&controls=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1"
         VideoEmbed.Provider.TIKTOK -> "$baseUrl&loop=1$TIKTOK_HIDDEN_CONTROLS"
         VideoEmbed.Provider.TWITCH -> baseUrl
     }
 }
 
-private fun WebView.sendYouTubeCommand(command: String) {
-    evaluateJavascript(
-        """
-        (function() {
-            var frame = document.querySelector('iframe');
-            if (frame) {
-                frame.contentWindow.postMessage('{"event":"command","func":"$command","args":[]}', '*');
-            }
-        })();
-        """.trimIndent(),
-        null,
-    )
-}
-
-private fun inlinePlayerHtml(url: String): String = """
+private fun inlinePlayerHtml(
+    url: String,
+    provider: VideoEmbed.Provider,
+    startPlaying: Boolean,
+    startMuted: Boolean,
+): String = """
     <!DOCTYPE html>
     <html>
     <head>
@@ -106,11 +129,18 @@ private fun inlinePlayerHtml(url: String): String = """
     </head>
     <body>
     <iframe
+        id="player"
         src="${url.escapeHtmlAttribute()}"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
         referrerpolicy="strict-origin-when-cross-origin"
         allowfullscreen>
     </iframe>
+    <script>
+    var provider = "${provider.name}";
+    var wantPlaying = $startPlaying;
+    var wantMuted = $startMuted;
+    $PLAYER_CONTROL_SCRIPT
+    </script>
     </body>
     </html>
 """.trimIndent()

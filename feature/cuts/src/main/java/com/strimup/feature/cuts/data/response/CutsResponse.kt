@@ -22,6 +22,7 @@ data class CutsResponse(
         val description: String? = null,
         val order: Int = 0,
         val embed: StreamerDto.Embed? = null,
+        val thumbnailUrl: String? = null,
         val likesCount: Int = 0,
         val likedByMe: Boolean = false,
     )

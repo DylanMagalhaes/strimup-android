@@ -68,4 +68,19 @@ class StreamerVideoMapperTest {
         assertThat(video.embed?.orientation).isEqualTo(VideoOrientation.HORIZONTAL)
         assertThat(video.embed?.kind).isEqualTo(VideoEmbed.Kind.VIDEO)
     }
+
+    @Test
+    fun `a thumbnail sent by the server should win over the computed one`() {
+        val dto = StreamerDto.Video(
+            id = "video-1",
+            title = "Clip",
+            url = "https://www.tiktok.com/@a/video/123",
+            order = 1,
+            embed = StreamerDto.Embed(provider = "tiktok", id = "123", kind = "video", orientation = "vertical"),
+            thumbnailUrl = "https://cdn.strimup.com/thumbs/123.jpg",
+        )
+
+        assertThat(dto.toEntity(apiBaseUrl = "https://api.strimup.test/").thumbnailUrl)
+            .isEqualTo("https://cdn.strimup.com/thumbs/123.jpg")
+    }
 }

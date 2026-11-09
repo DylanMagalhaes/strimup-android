@@ -4,5 +4,12 @@
     <string name="home_tab_live">En live</string>
     <string name="home_banner_avatar_description">Avatar de %1$s</string>
     <string name="home_offline_saved_content">Hors ligne · contenu enregistré</string>
-    <string name="home_logo_description">Logo Strimup</string>
+    <string name="home_hero_live">LIVE</string>
+    <string name="home_hero_profile">Voir le profil</string>
+    <string name="home_hero_watch_on_twitch">Regarder sur Twitch</string>
+    <string name="home_hero_open_cut">Voir dans Cuts</string>
+    <string name="home_hero_sound_on">Activer le son</string>
+    <string name="home_hero_sound_off">Couper le son</string>
+    <string name="home_cuts_title">Cuts</string>
+    <string name="home_cuts_see_all">Voir tout</string>
 </resources>

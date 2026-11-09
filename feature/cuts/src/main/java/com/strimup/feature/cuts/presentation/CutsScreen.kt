@@ -48,18 +48,24 @@ import com.strimup.core.ui.component.button.PrimaryButton
 import com.strimup.core.ui.text.asString
 import com.strimup.feature.cuts.R
 import com.strimup.feature.cuts.presentation.component.CutSlideContent
+import com.strimup.feature.cuts.presentation.component.rememberCanPreloadVideos
 import com.strimup.feature.report.presentation.ReportVideoSheet
+import kotlin.math.abs
 import com.strimup.core.ui.R as CoreUiR
 
 private const val BEYOND_VIEWPORT_PAGES = 2
+private const val PRELOAD_DISTANCE = 1
 
 @Composable
 fun CutsScreen(
+    startVideoId: String?,
     onNavUp: () -> Unit,
     onAuthorClick: (String) -> Unit,
     onLoginRequired: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CutsViewModel = hiltViewModel(),
+    viewModel: CutsViewModel = hiltViewModel<CutsViewModel, CutsViewModel.Factory>(key = startVideoId) { factory ->
+        factory.create(startVideoId)
+    },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -173,6 +179,7 @@ private fun CutsPager(
     val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
     val isResumed = lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
     val currentOnActiveSlideChanged by rememberUpdatedState(onActiveSlideChanged)
+    val canPreload = rememberCanPreloadVideos()
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }.collect { page -> currentOnActiveSlideChanged(page) }
@@ -188,6 +195,7 @@ private fun CutsPager(
         CutSlideContent(
             cut = cut,
             isActive = isResumed && page == pagerState.settledPage,
+            isPreloaded = canPreload && abs(page - pagerState.settledPage) <= PRELOAD_DISTANCE,
             isMuted = state.isMuted,
             isLikeEnabled = !state.isLikeDisabled,
             onMuteClick = onMuteClick,

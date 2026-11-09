@@ -30,7 +30,7 @@ sealed interface Destination : NavKey {
     data object Search : Destination
 
     @Serializable
-    data object Cuts : Destination
+    data class Cuts(val startVideoId: String? = null) : Destination
 
     @Serializable
     data object Favorite : Destination

@@ -14,6 +14,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.streamer)
     implementation(projects.core.tag)
+    implementation(projects.feature.cuts)
     implementation(projects.feature.notification)
 
     implementation(libs.androidx.compose.material.icons)

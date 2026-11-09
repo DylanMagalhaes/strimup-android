@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +48,8 @@ import com.strimup.feature.home.domain.entity.BannerType
 import kotlinx.coroutines.delay
 
 
+val BannerHeight = 180.dp
+
 @Composable
 fun HomeBanner(
     banners: List<BannerItemEntity>,
@@ -56,7 +59,7 @@ fun HomeBanner(
 ) {
     if (banners.isEmpty()) return
 
-    val sortedBanners = banners.sortedBy { it.position }
+    val sortedBanners = remember(banners) { banners.sortedBy { it.position } }
     val pagerState = rememberPagerState(pageCount = { sortedBanners.size })
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
@@ -81,7 +84,7 @@ fun HomeBanner(
             state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(180.dp)
+                .height(BannerHeight)
         ) { page ->
             val banner = sortedBanners[page]
             BannerCard(

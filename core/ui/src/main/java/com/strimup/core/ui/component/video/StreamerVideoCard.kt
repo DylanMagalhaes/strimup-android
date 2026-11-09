@@ -99,12 +99,13 @@ fun StreamerVideoPreview(
     modifier: Modifier = Modifier,
     position: Int? = null,
     isCompact: Boolean = false,
+    aspectRatio: Float = preview.orientation.aspectRatio,
 ) {
     val embed = preview.video.embed
 
     Box(
         modifier = modifier
-            .aspectRatio(preview.orientation.aspectRatio)
+            .aspectRatio(aspectRatio)
             .clip(RoundedCornerShape(if (isCompact) 8.dp else 16.dp))
             .background(Color.Black),
         contentAlignment = Alignment.Center,

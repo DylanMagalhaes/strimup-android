@@ -30,8 +30,8 @@ android {
 
     defaultConfig {
         applicationId = "com.strimup"
-        versionCode = 6
-        versionName = "1.3"
+        versionCode = 7
+        versionName = "1.4"
 
         manifestPlaceholders["crashlyticsCollectionEnabled"] = true
     }
@@ -61,6 +61,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("benchmark") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
+            isDebuggable = false
+            isProfileable = true
         }
     }
 }

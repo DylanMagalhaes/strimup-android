@@ -25,6 +25,8 @@ fun HomeNavigation(
     onNotificationsClick: () -> Unit,
     isLoggedIn: Boolean,
     onLoginRequired: () -> Unit,
+    onCutClick: (String) -> Unit,
+    onSeeAllCutsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val homeBackStack = rememberNavBackStack(
@@ -56,6 +58,8 @@ fun HomeNavigation(
                     onNotificationsClick = onNotificationsClick,
                     isLoggedIn = isLoggedIn,
                     onLoginRequired = onLoginRequired,
+                    onCutClick = onCutClick,
+                    onSeeAllCutsClick = onSeeAllCutsClick,
                     modifier = Modifier.fillMaxSize()
                 )
             }
