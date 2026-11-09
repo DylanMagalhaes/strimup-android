@@ -340,7 +340,7 @@ private fun BoxScope.HeroCut(
 ) {
     CutVideoPlayer(
         cut = cut,
-        isActive = isVisible,
+        isLoaded = true,
         isPlaying = isVisible,
         isMuted = isMuted,
         fillBounds = true,

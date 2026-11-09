@@ -32,7 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.strimup.core.ui.component.embed.supportsSoundControl
+import com.strimup.core.ui.component.embed.supportsPlaybackControl
 import com.strimup.core.ui.theme.BrandPink
 import com.strimup.feature.cuts.R
 import com.strimup.feature.cuts.domain.entity.Cut
@@ -49,6 +49,7 @@ private val bottomScrim = Brush.verticalGradient(listOf(Color.Transparent, Color
 internal fun CutSlideContent(
     cut: Cut,
     isActive: Boolean,
+    isPreloaded: Boolean,
     isMuted: Boolean,
     isLikeEnabled: Boolean,
     onMuteClick: () -> Unit,
@@ -61,7 +62,7 @@ internal fun CutSlideContent(
     var heartBursts by remember { mutableIntStateOf(0) }
     val isPlaying = isActive && !isPausedByUser
     val embed = cut.video.embed
-    val canPause = embed == null || embed.supportsSoundControl
+    val canPause = embed == null || embed.supportsPlaybackControl
 
     LaunchedEffect(isActive) {
         if (!isActive) isPausedByUser = false
@@ -70,7 +71,7 @@ internal fun CutSlideContent(
     Box(modifier = modifier.background(Color.Black)) {
         CutVideoPlayer(
             cut = cut,
-            isActive = isActive,
+            isLoaded = isActive || isPreloaded,
             isPlaying = isPlaying,
             isMuted = isMuted,
             modifier = Modifier.fillMaxSize(),

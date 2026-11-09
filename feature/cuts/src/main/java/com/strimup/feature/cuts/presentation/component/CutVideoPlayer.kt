@@ -9,12 +9,13 @@ import coil3.compose.AsyncImage
 import com.strimup.core.streamer.domain.entity.VideoSource
 import com.strimup.core.streamer.domain.entity.source
 import com.strimup.core.ui.component.embed.InlineEmbedPlayer
+import com.strimup.core.ui.component.embed.supportsPlaybackControl
 import com.strimup.feature.cuts.domain.entity.Cut
 
 @Composable
 fun CutVideoPlayer(
     cut: Cut,
-    isActive: Boolean,
+    isLoaded: Boolean,
     isPlaying: Boolean,
     isMuted: Boolean,
     modifier: Modifier = Modifier,
@@ -24,7 +25,7 @@ fun CutVideoPlayer(
     val source = remember(cut.video) { cut.video.source() }
 
     when {
-        embed != null && isActive -> InlineEmbedPlayer(
+        embed != null && isLoaded && (isPlaying || embed.supportsPlaybackControl) -> InlineEmbedPlayer(
             embed = embed,
             isPlaying = isPlaying,
             isMuted = isMuted,

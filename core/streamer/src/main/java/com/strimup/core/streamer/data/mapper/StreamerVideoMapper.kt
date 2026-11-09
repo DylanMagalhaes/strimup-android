@@ -16,7 +16,8 @@ fun StreamerDto.Video.toEntity(apiBaseUrl: String = BuildConfig.BASE_URL): Strea
         url = url,
         order = order,
         embed = videoEmbed,
-        thumbnailUrl = videoEmbed?.thumbnailUrl(videoId = id, apiBaseUrl = apiBaseUrl),
+        thumbnailUrl = thumbnailUrl?.takeIf { it.isNotBlank() }
+            ?: videoEmbed?.thumbnailUrl(videoId = id, apiBaseUrl = apiBaseUrl),
     )
 }
 

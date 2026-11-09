@@ -21,6 +21,7 @@ fun CutsResponse.Item.toEntity(): Cut = Cut(
         description = video.description,
         order = video.order,
         embed = video.embed,
+        thumbnailUrl = video.thumbnailUrl,
     ).toEntity(),
     author = Cut.Author(
         id = streamer.id,

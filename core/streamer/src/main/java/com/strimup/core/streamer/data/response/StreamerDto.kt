@@ -51,6 +51,7 @@ data class StreamerDto(
         val description: String? = null,
         val order: Int,
         val embed: Embed? = null,
+        val thumbnailUrl: String? = null,
     )
 
     @Serializable
