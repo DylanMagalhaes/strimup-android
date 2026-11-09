@@ -28,17 +28,11 @@ private const val PLAYER_CONTROL_SCRIPT = """
     function youtubeCommand(name) {
         post(JSON.stringify({ event: "command", func: name, args: [] }));
     }
-    function tiktokCommand(name) {
-        post({ type: name, value: null, "x-tiktok-player": true });
-    }
     function applyState() {
         if (provider === "YOUTUBE") {
             post(JSON.stringify({ event: "listening", id: 1 }));
-            youtubeCommand(wantMuted ? "mute" : "unMute");
+            youtubeCommand(wantMuted || !wantPlaying ? "mute" : "unMute");
             youtubeCommand(wantPlaying ? "playVideo" : "pauseVideo");
-        } else if (provider === "TIKTOK") {
-            tiktokCommand(wantMuted ? "mute" : "unMute");
-            tiktokCommand(wantPlaying ? "play" : "pause");
         }
     }
     function applyStateForAWhile() {
@@ -57,14 +51,10 @@ private const val PLAYER_CONTROL_SCRIPT = """
         applyStateForAWhile();
     };
     frame.addEventListener("load", applyStateForAWhile);
-    window.addEventListener("message", function(event) {
-        var data = event.data;
-        if (data && data["x-tiktok-player"] && data.type === "onPlayerReady") { applyStateForAWhile(); }
-    });
 """
 
 val VideoEmbed.supportsPlaybackControl: Boolean
-    get() = provider == VideoEmbed.Provider.YOUTUBE || provider == VideoEmbed.Provider.TIKTOK
+    get() = provider == VideoEmbed.Provider.YOUTUBE
 
 @Composable
 fun InlineEmbedPlayer(
@@ -111,10 +101,11 @@ fun InlineEmbedPlayer(
 }
 
 private fun VideoEmbed.inlinePlayerUrl(startPlaying: Boolean, startMuted: Boolean): String {
-    val baseUrl = playerUrl(autoplay = startPlaying || !supportsPlaybackControl)
+    val baseUrl = playerUrl(autoplay = true)
+    val muteFlag = if (startMuted || !startPlaying) 1 else 0
     return when (provider) {
         VideoEmbed.Provider.YOUTUBE ->
-            "$baseUrl&mute=${if (startMuted) 1 else 0}&loop=1&playlist=$id&enablejsapi=1" +
+            "$baseUrl&mute=$muteFlag&loop=1&playlist=$id&enablejsapi=1" +
                 "&controls=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1"
         VideoEmbed.Provider.TIKTOK -> "$baseUrl&loop=1$TIKTOK_HIDDEN_CONTROLS"
         VideoEmbed.Provider.TWITCH -> baseUrl
