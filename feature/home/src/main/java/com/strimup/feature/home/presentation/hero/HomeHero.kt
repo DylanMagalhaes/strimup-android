@@ -147,12 +147,12 @@ private fun LivePager(
             key = { page -> lives[page].channel },
         ) { page ->
             val live = lives[page]
-            val isActive = isVisible && page == pagerState.settledPage
+            val isSelected = page == pagerState.settledPage
             Box(modifier = Modifier.fillMaxSize()) {
-                if (isActive) {
+                if (isSelected) {
                     TwitchLiveCoverPlayer(
                         channel = live.channel,
-                        isPlaying = true,
+                        isPlaying = isVisible,
                         isMuted = isMuted,
                         modifier = Modifier.fillMaxSize(),
                     )
